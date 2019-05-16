@@ -6,13 +6,29 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint --cache ./ --ext .js,.jsx"
+    "lint": "eslint --cache ./ --ext .js,.jsx",
+    "test": "jest"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn test"
+    }
+  },
+  "dependencies": {
+    "react": "16.8.x",
+    "react-dom": "16.8.x"
   },
   "devDependencies": {
-    "babel-eslint": "10.0.x",
+    "@babel/core": "7.4.x",
+    "babel-jest": "24.8.x",
+    "enzyme": "3.8.x",
+    "enzyme-adapter-react-16": "^1.13.0",
+    "enzyme-to-json": "3.3.x",
     "eslint": "5.16.x",
     "eslint-plugin-import": "2.17.x",
     "eslint-plugin-jest": "22.5.x",
-    "eslint-plugin-react": "7.13.x"
+    "eslint-plugin-react": "7.13.x",
+    "husky": "2.3.x",
+    "jest": "24.8.x"
   }
 }
