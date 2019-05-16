@@ -1,0 +1,5 @@
+# Папки с зависимостями проекта
+node_modules/
+
+# Eslint cache
+.eslintcache
