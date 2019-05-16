@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "ssh://git@gitlab.sima-land.ru:7888/SL/isomorph.git",
-  "author": "Listar <shnap2010@yandex.ru>",
+  "author": "",
   "license": "MIT",
   "scripts": {
     "lint": "eslint --cache ./ --ext .js,.jsx"
