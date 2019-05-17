@@ -16,27 +16,5 @@ module.exports = {
 		'@babel/plugin-proposal-class-properties',
 		'@babel/plugin-proposal-object-rest-spread',
 		'lodash',
-		[
-			'module-resolver',
-			{
-				alias: {
-					common: './src/',
-				},
-			},
-		],
-		[
-			'inline-react-svg',
-			{
-				svgo: {
-					plugins: [ {
-						removeAttrs: {
-							attrs: '(data-name)',
-						},
-					}, {
-						cleanupIDs: true,
-					} ],
-				},
-			},
-		],
 	]
 };
