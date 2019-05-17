@@ -1,0 +1,18 @@
+{
+  "name": "sima-land-isomorph",
+  "version": "1.0.0",
+  "description": "Server side rendering for Header service",
+  "main": "index.js",
+  "repository": "ssh://git@gitlab.sima-land.ru:7888/SL/isomorph.git",
+  "author": "www.sima-land.ru team",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "gulp build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "del": "^4.1.1",
+    "gulp": "^4.0.2"
+  }
+}
