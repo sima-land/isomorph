@@ -3,9 +3,6 @@ module.exports = {
 		[
 			'@babel/preset-env',
 			{
-				targets: [
-					'maintained node versions'
-				],
 				useBuiltIns: 'usage',
 			}
 		],
