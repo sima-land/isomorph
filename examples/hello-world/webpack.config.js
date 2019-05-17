@@ -1,10 +1,5 @@
 const path = require('path');
-const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
-const Dotenv = require('dotenv-webpack');
-require('dotenv').config();
-
-const buildVersion = process.env.CI_COMMIT_REF_NAME || 'development';
 
 module.exports = {
 	name: 'server',
@@ -63,7 +58,7 @@ module.exports = {
 						options: {
 							limit: 8192,
 							fallback: 'file-loader',
-							name: `/page-header/${buildVersion}/images/[name].[ext]`,
+							name: `/page-header/development/images/[name].[ext]`,
 							emitFile: false
 						}
 					}
@@ -78,13 +73,5 @@ module.exports = {
 				]
 			}
 		]
-	},
-	plugins: [
-		new Dotenv({
-			systemvars: true
-		}),
-		new webpack.DefinePlugin({
-			BUILD_VERSION: JSON.stringify(buildVersion),
-		}),
-	],
+	}
 };
