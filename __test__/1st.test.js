@@ -5,7 +5,7 @@ import TestComponent from './index';
 describe('test', () => {
   it('test1', () => {
     const wrapper = shallow(<TestComponent />);
-    expect(wrapper.find('h1')).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('test2', () => {
