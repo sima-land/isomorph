@@ -19,10 +19,6 @@
   "devDependencies": {
     "del": "^4.1.1",
     "gulp": "^4.0.2",
-    "nodemon": "^1.19.0",
     "np": "^5.0.2"
-  },
-  "dependencies": {
-    "express": "^4.17.0"
   }
 }
