@@ -7,12 +7,22 @@
   "author": "www.sima-land.ru team",
   "license": "MIT",
   "private": true,
+  "publishConfig": {
+    "registry": "http://registry.sima-land.ru"
+  },
   "scripts": {
+    "dev": "cd ./examples/hello-world/ && yarn && yarn dev",
     "build": "gulp build",
+    "publication": "yarn login && yarn np",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "del": "^4.1.1",
-    "gulp": "^4.0.2"
+    "gulp": "^4.0.2",
+    "nodemon": "^1.19.0",
+    "np": "^5.0.2"
+  },
+  "dependencies": {
+    "express": "^4.17.0"
   }
 }
