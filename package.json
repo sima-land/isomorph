@@ -9,10 +9,40 @@
   "private": true,
   "scripts": {
     "build": "gulp build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint --cache ./ --ext .js,.jsx",
+    "test": "jest"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn jest --coverage",
+      "pre-commit": "yarn lint"
+    }
+  },
+  "dependencies": {
+    "react": "16.8.x",
+    "react-dom": "16.8.x"
   },
   "devDependencies": {
-    "del": "^4.1.1",
-    "gulp": "^4.0.2"
+    "@babel/core": "7.2.x",
+    "@babel/plugin-proposal-class-properties": "7.4.x",
+    "@babel/preset-env": "7.2.x",
+    "@babel/preset-react": "7.0.x",
+    "@types/jest": "24.0.x",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-eslint": "10.0.x",
+    "babel-jest": "23.6.x",
+    "babel-loader": "8.0.x",
+    "enzyme": "3.8.x",
+    "enzyme-adapter-react-16": "1.13.x",
+    "enzyme-to-json": "3.3.x",
+    "eslint": "5.16.x",
+    "eslint-plugin-import": "2.17.x",
+    "eslint-plugin-jest": "22.5.x",
+    "eslint-plugin-react": "7.13.x",
+    "husky": "2.3.x",
+    "identity-obj-proxy": "3.0.x",
+    "jest": "24.8.x",
+    "del": "4.1.x",
+    "gulp": "4.0.x"
   }
 }
