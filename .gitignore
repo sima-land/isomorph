@@ -1,5 +1,20 @@
-# Папки с зависимостями проекта
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.idea
+.vscode/
+
+build/
+
+# Dependency directories
 node_modules/
+
+# Files of macOs
+.DS_Store
 
 # Eslint cache
 .eslintcache

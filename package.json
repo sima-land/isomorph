@@ -1,11 +1,15 @@
 {
-  "name": "isomorph",
+  "name": "sima-land-isomorph",
   "version": "1.0.0",
+  "description": "Server side rendering for Header service",
   "main": "index.js",
   "repository": "ssh://git@gitlab.sima-land.ru:7888/SL/isomorph.git",
-  "author": "",
+  "author": "www.sima-land.ru team",
   "license": "MIT",
+  "private": true,
   "scripts": {
+    "build": "gulp build",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --cache ./ --ext .js,.jsx"
   },
   "devDependencies": {
@@ -13,6 +17,8 @@
     "eslint": "5.16.x",
     "eslint-plugin-import": "2.17.x",
     "eslint-plugin-jest": "22.5.x",
-    "eslint-plugin-react": "7.13.x"
+    "eslint-plugin-react": "7.13.x",
+    "del": "4.1.x",
+    "gulp": "4.0.x"
   }
 }
