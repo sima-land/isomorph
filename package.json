@@ -7,8 +7,13 @@
   "author": "www.sima-land.ru team",
   "license": "MIT",
   "private": true,
+  "publishConfig": {
+    "registry": "https://gitlab.sima-land.ru/api/v4/projects/676/packages/npm/"
+  },
   "scripts": {
+    "dev": "cd ./examples/hello-world/ && yarn && yarn dev",
     "build": "gulp build",
+    "publication": "yarn login && yarn np",
     "lint": "eslint --cache ./ --ext .js,.jsx",
     "test": "jest"
   },
@@ -32,6 +37,7 @@
     "babel-eslint": "10.0.x",
     "babel-jest": "23.6.x",
     "babel-loader": "8.0.x",
+    "del": "4.1.x",
     "enzyme": "3.8.x",
     "enzyme-adapter-react-16": "1.13.x",
     "enzyme-to-json": "3.3.x",
@@ -39,10 +45,10 @@
     "eslint-plugin-import": "2.17.x",
     "eslint-plugin-jest": "22.5.x",
     "eslint-plugin-react": "7.13.x",
+    "gulp": "4.0.x",
     "husky": "2.3.x",
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
-    "del": "4.1.x",
-    "gulp": "4.0.x"
+    "np": "5.0.x"
   }
 }
