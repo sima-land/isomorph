@@ -15,3 +15,9 @@ node_modules/
 
 # Files of macOs
 .DS_Store
+
+# Eslint cache
+.eslintcache
+
+# jest coverage
+coverage/
