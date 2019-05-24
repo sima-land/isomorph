@@ -1,4 +1,5 @@
-import { camelCase, isPlainObject } from 'lodash';
+import camelCase from 'lodash/camelCase';
+import isPlainObject from 'lodash/isPlainObject';
 
 /**
  * Переводит ключи объекта в camelCase
