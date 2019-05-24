@@ -11,7 +11,8 @@ describe('getConfig', () => {
       {
         FIRST_KEY: 1,
         fourthKey: 5,
-      });
+      }
+    );
 
     expect(config).toStrictEqual({
       firstKey: 1,
