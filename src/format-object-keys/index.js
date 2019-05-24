@@ -1,4 +1,4 @@
-import { camelCase, toPairs, isPlainObject } from 'lodash';
+import { camelCase, isPlainObject } from 'lodash';
 
 /**
  * Переводит ключи объекта в camelCase
@@ -10,7 +10,7 @@ export default function formatObjectKeys (obj) {
     throw new TypeError('Параметр "obj" должен быть объеком');
   }
 
-  return toPairs(obj).reduce((formattedObject, current) => {
+  return Object.entries(obj).reduce((formattedObject, current) => {
     const formattedKey = camelCase(current[0]);
 
     if (formattedKey) {

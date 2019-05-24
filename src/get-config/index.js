@@ -1,4 +1,4 @@
-import { toPairs, isPlainObject } from 'lodash';
+import { isPlainObject } from 'lodash';
 import formatObjectKeys from '../format-object-keys/';
 
 /**
@@ -16,7 +16,7 @@ export default function getConfig (data = {}, base = { ...process.env }) {
     throw new TypeError('Параметр "base" должен быть объеком');
   }
 
-  return toPairs(data).reduce((config, current) => {
+  return Object.entries(data).reduce((config, current) => {
     const key = current[0];
 
     if (!(key in config)) {
