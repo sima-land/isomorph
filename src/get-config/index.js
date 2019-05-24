@@ -17,10 +17,10 @@ export default function getConfig (data = {}, base = { ...process.env }) {
   }
 
   return Object.entries(data).reduce((config, current) => {
-    const key = current[0];
+    const [key, value] = current;
 
     if (!(key in config)) {
-      config[key] = current[1];
+      config[key] = value;
     }
     return config;
   }, formatObjectKeys({ ...base }));

@@ -11,10 +11,11 @@ export default function formatObjectKeys (obj) {
   }
 
   return Object.entries(obj).reduce((formattedObject, current) => {
-    const formattedKey = camelCase(current[0]);
+    const [key, value] = current;
+    const formattedKey = camelCase(key);
 
     if (formattedKey) {
-      formattedObject[formattedKey] = current[1];
+      formattedObject[formattedKey] = value;
     }
     return formattedObject;
   }, {});
