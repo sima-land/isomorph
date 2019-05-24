@@ -2,7 +2,7 @@ import { toPairs, isPlainObject } from 'lodash';
 import formatObjectKeys from '../format-object-keys/';
 
 /**
- * Возвращает кофиг из переданных параметров
+ * Возвращает конфиг из переданных параметров
  * @param {Object} data Объект с данными, которые нужно добавить в конфиг
  * @param {Object} base Базовый объект на основе которого строится конфиг
  * @return {Object} Объект конфига
