@@ -7,7 +7,7 @@ import formatObjectKeys from '../format-object-keys/';
  * @param {Object} base Базовый объект на основе которого строится конфиг
  * @return {Object} Объект конфига
  */
-export default function getConfig (data = {}, base = { ...process.env }) {
+export default function makeConfig (data = {}, base = { ...process.env }) {
   if (!isPlainObject(data)) {
     throw new TypeError('Параметр "data" должен быть чистым объектом');
   }
