@@ -8,7 +8,7 @@ import isPlainObject from 'lodash/isPlainObject';
  */
 export default function formatObjectKeys (object) {
   if (!isPlainObject(object)) {
-    throw new TypeError('Параметр "object" должен быть объеком');
+    throw new TypeError('Параметр "object" должен быть чистым объектом');
   }
 
   return Object.entries(object).reduce((formattedObject, current) => {

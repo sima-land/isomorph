@@ -9,11 +9,11 @@ import formatObjectKeys from '../format-object-keys/';
  */
 export default function getConfig (data = {}, base = { ...process.env }) {
   if (!isPlainObject(data)) {
-    throw new TypeError('Параметр "data" должен быть объеком');
+    throw new TypeError('Параметр "data" должен быть чистым объектом');
   }
 
   if (!isPlainObject(base)) {
-    throw new TypeError('Параметр "base" должен быть объеком');
+    throw new TypeError('Параметр "base" должен быть чистым объектом');
   }
 
   return Object.entries(data).reduce((config, current) => {
