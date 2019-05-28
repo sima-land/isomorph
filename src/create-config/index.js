@@ -3,9 +3,9 @@ import formatObjectKeys from '../format-object-keys/';
 
 /**
  * Собирает объект конфигурации из переданных параметров
- * @param {Object} data Объект с данными, которые нужно добавить в конфиг
- * @param {Object} base Базовый объект на основе которого строится конфиг
- * @return {Object} Объект конфига
+ * @param {Object} data Объект с данными, которые нужно добавить в конфигурацию
+ * @param {Object} base Базовый объект на основе которого строится конфигурация
+ * @return {Object} Объект конфигурации
  */
 export default function createConfig (data = {}, base = { ...process.env }) {
   if (!isPlainObject(data)) {
