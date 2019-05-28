@@ -1,7 +1,7 @@
 import formatObjectKeys from './index';
 
 describe('formatObjectKeys', () => {
-  it('Функция formatObjectKeys работает корректно', () => {
+  it('Works properly', () => {
     const formattedObject = formatObjectKeys({
       FIRST_KEY: 1,
       SecondKey: 2,
@@ -17,11 +17,11 @@ describe('formatObjectKeys', () => {
     });
   });
 
-  it('Функция formatObjectKeys падает без входящих параметров', () => {
+  it('Call an error when there are no arguments', () => {
     expect(() => formatObjectKeys()).toThrowError();
   });
 
-  it('Функция formatObjectKeys падает если пришли некорректные параметры', () => {
+  it('Call an error when it receives incorrect arguments', () => {
     expect(() => formatObjectKeys('string')).toThrowError();
     expect(() => formatObjectKeys(true)).toThrowError();
     expect(() => formatObjectKeys(15)).toThrowError();

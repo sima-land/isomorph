@@ -1,7 +1,7 @@
 import createConfig from './index';
 
 describe('createConfig', () => {
-  it('Функция createConfig работает корректно', () => {
+  it('Works properly', () => {
     const config = createConfig(
       {
         firstKey: 2,
@@ -21,12 +21,12 @@ describe('createConfig', () => {
     });
   });
 
-  it('Функция createConfig корректно работает без входящих параметров', () => {
+  it('Works properly when there are no arguments', () => {
     const config = createConfig();
     expect(typeof config).toBe('object');
   });
 
-  it('Функция createConfig падает если пришли некорректные параметры', () => {
+  it('Call an error when it receives incorrect arguments', () => {
     const config = createConfig();
     expect(typeof config).toBe('object');
 
