@@ -27,7 +27,7 @@ const createContainer = function ({ services = [] } = {}) {
      * @param {Function} factory Функция-конструктор
      * @param {*} value Переданная зависимость
      * @param {Array} dependencies Массив зависимостей
-     * @param {boolean} isSingleton Должена ли фабрика иметь только один инстанс
+     * @param {boolean} isSingleton Должна ли зависимость быть представлена только одним экземпляром
      */
     set ({ name, factory, value, dependencies = [], isSingleton = false } = {}) {
       if (!isString(name)) {
