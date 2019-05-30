@@ -1,4 +1,3 @@
-import isArray from 'lodash/isArray';
 import isString from 'lodash/isString';
 
 /**
@@ -8,7 +7,7 @@ import isString from 'lodash/isString';
  * @throws {TypeError} Выдаст ошибку если параметр "services" не массив
  */
 const createContainer = function ({ services = [] } = {}) {
-  if (!isArray(services)) {
+  if (!Array.isArray(services)) {
     throw new TypeError('Параметр "services" должен быть массивом');
   }
 
