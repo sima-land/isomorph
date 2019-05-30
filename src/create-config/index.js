@@ -2,12 +2,12 @@ import isPlainObject from 'lodash/isPlainObject';
 import formatObjectKeys from '../format-object-keys/';
 
 /**
- * Возвращает конфиг из переданных параметров
- * @param {Object} data Объект с данными, которые нужно добавить в конфиг
- * @param {Object} base Базовый объект на основе которого строится конфиг
- * @return {Object} Объект конфига
+ * Собирает объект конфигурации из переданных параметров
+ * @param {Object} data Объект с данными, которые нужно добавить в конфигурацию
+ * @param {Object} base Базовый объект на основе которого строится конфигурация
+ * @return {Object} Объект конфигурации
  */
-export default function makeConfig (data = {}, base = { ...process.env }) {
+export default function createConfig (data = {}, base = { ...process.env }) {
   if (!isPlainObject(data)) {
     throw new TypeError('Параметр "data" должен быть чистым объектом');
   }
