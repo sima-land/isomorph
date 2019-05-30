@@ -10,7 +10,7 @@ describe('createContainer', () => {
         },
         {
           name: 'singleton',
-          factory: () => ({
+          singleton: () => ({
             /**
              * Тестовая функция
              * @return {string} Тестовая строка
@@ -19,7 +19,6 @@ describe('createContainer', () => {
               return 'It`s singleton';
             },
           }),
-          isSingleton: true,
         },
         {
           name: 'factory',
@@ -78,12 +77,8 @@ describe('createContainer', () => {
     expect(() => container.get('test')).toThrowError();
   });
 
-  it('works propably when service not registered incorrect', () => {
+  it('works propably when service registered incorrect', () => {
     const container = createContainer();
-    container.set({
-      name: 'test',
-    });
-
-    expect(() => container.get('test')).toThrowError();
+    expect(() => container.set({ name: 'test' })).toThrowError();
   });
 });

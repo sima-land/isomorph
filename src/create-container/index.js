@@ -29,7 +29,7 @@ const createContainer = function ({ services = [] } = {}) {
      * @param {Array} dependencies Массив зависимостей
      * @param {boolean} isSingleton Должна ли зависимость быть представлена только одним экземпляром
      */
-    set ({ name, factory, value, dependencies = [], isSingleton = false } = {}) {
+    set ({ name, singleton, factory, value, dependencies = [] } = {}) {
       if (!isString(name)) {
         throw new TypeError('Параметр "name" должен быть сторокой');
       }
@@ -38,19 +38,25 @@ const createContainer = function ({ services = [] } = {}) {
         throw new Error('Параметр "name" не должен быть пустым');
       }
 
+      if (factory === undefined && value === undefined && singleton === undefined) {
+        throw Error('Сервис зарегистрирован некорректно, '
+        + 'обязательно должен быть передан один из параметров'
+        + '"factory", "singleton", или "value"');
+      }
+
       registry[name] = {
         name,
+        singleton,
         factory,
         dependencies,
         value,
-        isSingleton,
       };
     },
 
     /**
      * Получает зависимость по ее названию
      * @param {string} name Название зависимости
-     * @return {*} Возвращаемая зависимость
+     * @return {*} Зависимость
      */
     get (name) {
       if (!isString(name)) {
@@ -62,28 +68,28 @@ const createContainer = function ({ services = [] } = {}) {
       }
 
       const service = registry[name];
+      let dependency;
 
       if (!service) {
         throw new Error(`Сервис "${name}" не зарегистрирован`);
       }
 
       if (service.value !== undefined) {
-        return service.value;
+        dependency = service.value;
       }
 
-      if (service.isSingleton && !service.instance) {
-        service.instance = service.factory.apply(null, getDependencies(service));
-      }
-
-      if (service.instance) {
-        return service.instance;
+      if (service.singleton) {
+        if (!service.instance) {
+          service.instance = service.singleton.apply(null, getDependencies(service));
+        }
+        dependency = service.instance;
       }
 
       if (service.factory) {
-        return service.factory.apply(null, getDependencies(service));
+        dependency = service.factory.apply(null, getDependencies(service));
       }
 
-      throw Error('Сервис зарегристрован некорректно, в местод "set" нужно передать "factory" или "value"');
+      return dependency;
     },
   };
 
