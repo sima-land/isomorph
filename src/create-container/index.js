@@ -40,8 +40,7 @@ const createContainer = function ({ services = [] } = {}) {
 
       if (factory === undefined && value === undefined && singleton === undefined) {
         throw Error('Сервис зарегистрирован некорректно, '
-        + 'обязательно должен быть передан один из параметров'
-        + '"factory", "singleton", или "value"');
+        + 'обязательно должен быть передан один из параметров "factory", "singleton", или "value"');
       }
 
       registry[name] = {
