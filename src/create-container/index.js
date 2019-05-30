@@ -5,6 +5,7 @@ import isString from 'lodash/isString';
  * Функция создает IoC Container
  * @param {Array} services Массив сервисов, которые нужно зарегистрировать
  * @return {Object} IoC Container
+ * @throws {TypeError} Выдаст ошибку если параметр "services" не массив
  */
 const createContainer = function ({ services = [] } = {}) {
   if (!isArray(services)) {
@@ -31,6 +32,9 @@ const createContainer = function ({ services = [] } = {}) {
      * @param {*} value Переданная зависимость
      * @param {Array} dependencies Массив зависимостей
      * @param {boolean} isSingleton Должна ли зависимость быть представлена только одним экземпляром
+     * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
+     * @throws {Error} Выдаст ошибку если параметр "name" пустой
+     * @throws {Error} Выдаст ошибку если не передан один из параметров "factory", "singleton" или "value"
      */
     set ({ name, singleton, factory, value, dependencies = [] } = {}) {
       if (!isString(name)) {
@@ -43,7 +47,7 @@ const createContainer = function ({ services = [] } = {}) {
 
       if (factory === undefined && value === undefined && singleton === undefined) {
         throw Error('Сервис зарегистрирован некорректно, '
-        + 'обязательно должен быть передан один из параметров "factory", "singleton", или "value"');
+        + 'обязательно должен быть передан один из параметров "factory", "singleton" или "value"');
       }
 
       registry[name] = {
@@ -59,6 +63,9 @@ const createContainer = function ({ services = [] } = {}) {
      * Получает зависимость по ее названию
      * @param {string} name Название зависимости
      * @return {*} Зависимость
+     * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
+     * @throws {Error} Выдаст ошибку если параметр "name" пустой
+     * @throws {Error} Выдаст ошибку при попытке вызвать незарегистрированный сервис
      */
     get (name) {
       if (!isString(name)) {
