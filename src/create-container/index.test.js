@@ -5,24 +5,25 @@ describe('createContainer', () => {
     const container = createContainer({
       services: [
         {
-          name: 'test',
-          value: 'test',
+          name: 'string',
+          value: 'singleton',
         },
         {
           name: 'singleton',
-          singleton: () => ({
+          singleton: ({ string }) => ({
             /**
              * Тестовая функция
              * @return {string} Тестовая строка
              */
             whatIs () {
-              return 'It`s singleton';
+              return `It is ${string}`;
             },
           }),
+          dependencies: ['string'],
         },
         {
           name: 'factory',
-          factory: singleton => ({
+          factory: ({ singleton } = {}) => ({
             /**
              * Тестовая функция
              * @return {string} Тестовая строка
@@ -39,10 +40,10 @@ describe('createContainer', () => {
     const firstSingleton = container.get('singleton');
     const secondSingleton = container.get('singleton');
 
-    expect(container.get('test')).toBe('test');
-    expect(container.get('singleton').whatIs()).toBe('It`s singleton');
+    expect(container.get('string')).toBe('singleton');
+    expect(container.get('singleton').whatIs()).toBe('It is singleton');
     expect(firstSingleton === secondSingleton).toBeTruthy();
-    expect(container.get('factory').whatIs()).toBe('It`s singleton');
+    expect(container.get('factory').whatIs()).toBe('It is singleton');
   });
 
   it('works propably when "services" is incorrect in constructor', () => {

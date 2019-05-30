@@ -14,11 +14,14 @@ const createContainer = function ({ services = [] } = {}) {
   const registry = {};
 
   /**
-   * Создает массив зависимостей на основе их названий
+   * Создает объект зависимостей на основе их названий
    * @param {Object} service Сервис для которого нужно создать массив зависимостей
-   * @return {Array} Массив зависимостей
+   * @return {Object} Объект зависимостей
    */
-  const getDependencies = service => service.dependencies.map(dependency => container.get(dependency));
+  const getDependencies = service => service.dependencies.reduce((result, dependency) => {
+    result[dependency] = container.get(dependency);
+    return result;
+  }, {});
 
   const container = {
     /**
@@ -79,13 +82,13 @@ const createContainer = function ({ services = [] } = {}) {
 
       if (service.singleton) {
         if (!service.instance) {
-          service.instance = service.singleton.apply(null, getDependencies(service));
+          service.instance = service.singleton.call(null, getDependencies(service));
         }
         dependency = service.instance;
       }
 
       if (service.factory) {
-        dependency = service.factory.apply(null, getDependencies(service));
+        dependency = service.factory.call(null, getDependencies(service));
       }
 
       return dependency;
