@@ -30,6 +30,7 @@ export default function createContainer ({ services = [] } = {}) {
      * Добавляет зависимость в список зависимостей
      * @param {Object} options Опции необходимые для добавления зависимости
      * @param {string} options.name Название зависимости
+     * @param {Function} options.singleton Функция-синглотон
      * @param {Function} options.factory Функция-конструктор
      * @param {*} options.value Переданная зависимость
      * @param {Array} options.dependencies Массив зависимостей
