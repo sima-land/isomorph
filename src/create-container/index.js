@@ -32,12 +32,12 @@ const createContainer = function ({ services = [] } = {}) {
      * @param {Function} options.factory Функция-конструктор
      * @param {*} options.value Переданная зависимость
      * @param {Array} options.dependencies Массив зависимостей
-     * @throws {TypeError} Выдаст ошибку если параметр "name" не строка или пустая строка
+     * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
      * @throws {Error} Выдаст ошибку если не передан ни один из параметров "factory", "singleton" или "value"
      */
     set ({ name, singleton, factory, value, dependencies = [] } = {}) {
       if (!isString(name) || name === '') {
-        throw new TypeError('Параметр "name" должен быть не пустой строкой');
+        throw new Error('Параметр "name" должно быть непустой строкой');
       }
 
       if (factory === undefined && value === undefined && singleton === undefined) {
