@@ -1,4 +1,5 @@
 import isString from 'lodash/isString';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Функция создает IoC-контейнер
@@ -38,6 +39,14 @@ export default function createContainer ({ services = [] } = {}) {
     set ({ name, singleton, factory, value, dependencies = [] } = {}) {
       if (!isString(name) || name === '') {
         throw new Error('Параметр "name" должно быть непустой строкой');
+      }
+
+      if (factory !== undefined && !isFunction(factory)) {
+        throw new TypeError('Параметр "factory" должен быть функцией');
+      }
+
+      if (singleton !== undefined && !isFunction(singleton)) {
+        throw new TypeError('Параметр "singleton" должен быть функцией');
       }
 
       if (factory === undefined && value === undefined && singleton === undefined) {
@@ -87,6 +96,10 @@ export default function createContainer ({ services = [] } = {}) {
           service.instance = new service.singleton(getDependencies(service));
         }
         dependency = service.instance;
+      }
+
+      if (service.value !== undefined) {
+        dependency = service.value;
       }
 
       if (service.factory) {

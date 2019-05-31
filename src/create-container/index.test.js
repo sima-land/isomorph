@@ -1,7 +1,7 @@
 import createContainer from './index';
 
 describe('createContainer', () => {
-  it('work correctly', () => {
+  it('works correctly', () => {
     const container = createContainer({
       services: [
         {
@@ -46,7 +46,7 @@ describe('createContainer', () => {
     expect(container.get('factory').whatIs()).toBe('It is singleton');
   });
 
-  it('work correctly when "services" is incorrect in constructor', () => {
+  it('works correctly when "services" is incorrect in constructor', () => {
     expect(() => createContainer({ services: 2 })).toThrowError();
   });
 
@@ -62,6 +62,16 @@ describe('createContainer', () => {
     expect(() => container.set()).toThrowError();
     expect(() => container.set({ name: '' })).toThrowError();
     expect(() => container.set({ name: 1 })).toThrowError();
+  });
+
+  it('works correctly when "factory" is incorrect in method "set"', () => {
+    const container = createContainer();
+    expect(() => container.set({ name: 'test', factory: 1 })).toThrowError();
+  });
+
+  it('works correctly when "singleton" is incorrect in method "set"', () => {
+    const container = createContainer();
+    expect(() => container.set({ name: 'test', singleton: 1 })).toThrowError();
   });
 
   it('works correctly when "name" is incorrect in method "get"', () => {
