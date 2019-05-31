@@ -33,7 +33,7 @@ const createContainer = function ({ services = [] } = {}) {
      * @param {boolean} isSingleton Должна ли зависимость быть представлена только одним экземпляром
      * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
      * @throws {Error} Выдаст ошибку если параметр "name" пустой
-     * @throws {Error} Выдаст ошибку если не передан хотя бы один из параметров "factory", "singleton" или "value"
+     * @throws {Error} Выдаст ошибку если не передан ни один из параметров "factory", "singleton" или "value"
      */
     set ({ name, singleton, factory, value, dependencies = [] } = {}) {
       if (!isString(name)) {
@@ -88,13 +88,13 @@ const createContainer = function ({ services = [] } = {}) {
 
       if (service.singleton) {
         if (!service.instance) {
-          service.instance = service.singleton.call(null, getDependencies(service));
+          service.instance = service.singleton(getDependencies(service));
         }
         dependency = service.instance;
       }
 
       if (service.factory) {
-        dependency = service.factory.call(null, getDependencies(service));
+        dependency = service.factory(getDependencies(service));
       }
 
       return dependency;
