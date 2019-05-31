@@ -88,13 +88,13 @@ const createContainer = function ({ services = [] } = {}) {
 
       if (service.singleton) {
         if (!service.instance) {
-          service.instance = service.singleton(getDependencies(service));
+          service.instance = new service.singleton(getDependencies(service));
         }
         dependency = service.instance;
       }
 
       if (service.factory) {
-        dependency = service.factory(getDependencies(service));
+        dependency = new service.factory(getDependencies(service));
       }
 
       return dependency;
