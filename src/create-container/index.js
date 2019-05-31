@@ -84,15 +84,12 @@ export default function createContainer ({ services = [] } = {}) {
         throw new Error(`Сервис "${name}" не зарегистрирован`);
       }
 
-      if (service.value !== undefined) {
-        dependency = service.value;
+      if (service.singleton && !service.value) {
+        service.value = service.singleton(getDependencies(service));
       }
 
-      if (service.singleton) {
-        if (!service.instance) {
-          service.instance = new service.singleton(getDependencies(service));
-        }
-        dependency = service.instance;
+      if (service.value !== undefined) {
+        dependency = service.value;
       }
 
       if (service.value !== undefined) {
@@ -100,7 +97,7 @@ export default function createContainer ({ services = [] } = {}) {
       }
 
       if (service.factory) {
-        dependency = new service.factory(getDependencies(service));
+        dependency = service.factory(getDependencies(service));
       }
 
       return dependency;
