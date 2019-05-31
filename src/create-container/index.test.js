@@ -1,7 +1,7 @@
 import createContainer from './index';
 
 describe('createContainer', () => {
-  it('works propably', () => {
+  it('work correctly', () => {
     const container = createContainer({
       services: [
         {
@@ -46,17 +46,17 @@ describe('createContainer', () => {
     expect(container.get('factory').whatIs()).toBe('It is singleton');
   });
 
-  it('works propably when "services" is incorrect in constructor', () => {
+  it('work correctly when "services" is incorrect in constructor', () => {
     expect(() => createContainer({ services: 2 })).toThrowError();
   });
 
-  it('works properly when there are no arguments in constructor', () => {
+  it('works correctly when there are no arguments in constructor', () => {
     const container = createContainer();
     expect(container.hasOwnProperty('set')).toBe(true);
     expect(container.hasOwnProperty('get')).toBe(true);
   });
 
-  it('works propably when "name" is incorrect in method "set"', () => {
+  it('works correctly when "name" is incorrect in method "set"', () => {
     const container = createContainer();
 
     expect(() => container.set()).toThrowError();
@@ -64,7 +64,7 @@ describe('createContainer', () => {
     expect(() => container.set({ name: 1 })).toThrowError();
   });
 
-  it('works propably when "name" is incorrect in method "get"', () => {
+  it('works correctly when "name" is incorrect in method "get"', () => {
     const container = createContainer();
 
     expect(() => container.get()).toThrowError();
@@ -72,13 +72,13 @@ describe('createContainer', () => {
     expect(() => container.get(1)).toThrowError();
   });
 
-  it('works propably when service not registered', () => {
+  it('works correctly when service not registered', () => {
     const container = createContainer();
 
     expect(() => container.get('test')).toThrowError();
   });
 
-  it('works propably when service registered incorrect', () => {
+  it('works correctly when service registered incorrect', () => {
     const container = createContainer();
     expect(() => container.set({ name: 'test' })).toThrowError();
   });
