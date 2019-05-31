@@ -26,11 +26,11 @@ const createContainer = function ({ services = [] } = {}) {
   const container = {
     /**
      * Добавляет зависимость в список зависимостей
-     * @param {string} name Название зависимости
-     * @param {Function} factory Функция-конструктор
-     * @param {*} value Переданная зависимость
-     * @param {Array} dependencies Массив зависимостей
-     * @param {boolean} isSingleton Должна ли зависимость быть представлена только одним экземпляром
+     * @param {Object} options Опции необходимые для добавления зависимости
+     * @param {string} options.name Название зависимости
+     * @param {Function} options.factory Функция-конструктор
+     * @param {*} options.value Переданная зависимость
+     * @param {Array} options.dependencies Массив зависимостей
      * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
      * @throws {Error} Выдаст ошибку если параметр "name" пустой
      * @throws {Error} Выдаст ошибку если не передан ни один из параметров "factory", "singleton" или "value"
