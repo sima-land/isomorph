@@ -38,7 +38,7 @@ export default function createContainer ({ services = [] } = {}) {
      */
     set ({ name, singleton, factory, value, dependencies = [] } = {}) {
       if (!isString(name) || name === '') {
-        throw new Error('Параметр "name" должно быть непустой строкой');
+        throw new Error('Параметр "name" должен быть непустой строкой');
       }
 
       if (factory !== undefined && !isFunction(factory)) {
@@ -68,16 +68,12 @@ export default function createContainer ({ services = [] } = {}) {
      * @param {string} name Название зависимости
      * @return {*} Зависимость
      * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
-     * @throws {Error} Выдаст ошибку если параметр "name" пустой
+     * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
      * @throws {Error} Выдаст ошибку при попытке вызвать незарегистрированный сервис
      */
     get (name) {
-      if (!isString(name)) {
-        throw new TypeError('Параметр "name" должен быть сторокой');
-      }
-
-      if (name === '') {
-        throw new Error('Параметр "name" не должен быть пустым');
+      if (!isString(name) || name === '') {
+        throw new Error('Параметр "name" должен быть непустой строкой');
       }
 
       const service = registry[name];
