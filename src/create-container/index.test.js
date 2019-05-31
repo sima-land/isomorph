@@ -52,6 +52,7 @@ describe('createContainer', () => {
 
   it('works correctly when there are no arguments in constructor', () => {
     const container = createContainer();
+
     expect(container.hasOwnProperty('set')).toBe(true);
     expect(container.hasOwnProperty('get')).toBe(true);
   });
@@ -66,11 +67,13 @@ describe('createContainer', () => {
 
   it('works correctly when "factory" is incorrect in method "set"', () => {
     const container = createContainer();
+
     expect(() => container.set({ name: 'test', factory: 1 })).toThrowError();
   });
 
   it('works correctly when "singleton" is incorrect in method "set"', () => {
     const container = createContainer();
+
     expect(() => container.set({ name: 'test', singleton: 1 })).toThrowError();
   });
 
@@ -90,6 +93,7 @@ describe('createContainer', () => {
 
   it('works correctly when service registered incorrect', () => {
     const container = createContainer();
+
     expect(() => container.set({ name: 'test' })).toThrowError();
   });
 });
