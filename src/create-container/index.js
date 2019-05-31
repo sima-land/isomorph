@@ -7,7 +7,7 @@ import isString from 'lodash/isString';
  * @return {Object} IoC Container
  * @throws {TypeError} Выдаст ошибку если параметр "services" не массив
  */
-const createContainer = function ({ services = [] } = {}) {
+export default function createContainer ({ services = [] } = {}) {
   if (!Array.isArray(services)) {
     throw new TypeError('Параметр "services" должен быть массивом');
   }
@@ -99,6 +99,4 @@ const createContainer = function ({ services = [] } = {}) {
 
   services.forEach(service => container.set(service));
   return container;
-};
-
-export default createContainer;
+}
