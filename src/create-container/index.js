@@ -1,8 +1,9 @@
 import isString from 'lodash/isString';
 
 /**
- * Функция создает IoC Container
- * @param {Array} services Массив сервисов, которые нужно зарегистрировать
+ * Функция создает IoC-контейнер
+ * @param {Object} options Дополнительные опации для IoC-контейнера
+ * @param {Array} options.services Массив сервисов, которые нужно зарегистрировать
  * @return {Object} IoC Container
  * @throws {TypeError} Выдаст ошибку если параметр "services" не массив
  */
