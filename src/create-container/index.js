@@ -92,10 +92,6 @@ export default function createContainer ({ services = [] } = {}) {
         dependency = service.value;
       }
 
-      if (service.value !== undefined) {
-        dependency = service.value;
-      }
-
       if (service.factory) {
         dependency = service.factory(getDependencies(service));
       }
