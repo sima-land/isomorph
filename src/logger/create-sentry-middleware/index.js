@@ -9,14 +9,14 @@ export default function createSentryMiddleware (
   {
     config: {
       sentryDsnServer,
-      version: release,
+      version,
       sentryOptions,
     },
   }
 ) {
   Raven.config(sentryDsnServer, {
     ...sentryOptions,
-    release,
+    version,
   }).install();
 
   return Raven.requestHandler();
