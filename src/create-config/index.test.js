@@ -23,12 +23,8 @@ describe('function createConfig()', () => {
 
   it('works correctly when param is a function', () => {
     const config = createConfig(
-      {
-        three: base => base.one + 2,
-      },
-      {
-        one: 1,
-      }
+      { three: base => base.one + 2 },
+      { one: 1 }
     );
 
     expect(config.three).toBe(3);
