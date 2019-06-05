@@ -1,5 +1,6 @@
 import pino from 'pino';
 import formatTime from '../format-time';
+import isPlainObject from 'lodash/isPlainObject';
 
 /**
  * Модуль создающий экземпляр логгера
@@ -16,8 +17,8 @@ export default function createPinoInstance ({ config } = {}) {
    */
   const loggerCreator = (
     { timestamp,
-      isProduction = true,
-      hasColorize = false,
+      isProduction,
+      hasColorize,
     }
   ) => {
     const logger = pino({
@@ -31,7 +32,7 @@ export default function createPinoInstance ({ config } = {}) {
 
   return loggerCreator({
     timestamp: formatTime,
-    isProduction: config && config.isProduction,
-    hasColorize: config && config.isDevelopment,
+    isProduction: isPlainObject(config) ? config.isProduction : true,
+    hasColorize: isPlainObject(config) ? config.isDevelopment : false,
   });
 }
