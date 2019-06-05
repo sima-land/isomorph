@@ -1,10 +1,11 @@
 import formatTime from './index';
 
+
 describe('formatTime()', () => {
   it('works correctly', () => {
-    const date = new Date();
+    jest.spyOn(Date.prototype, 'toISOString').mockImplementation(() => 'test ISO date');
     const formattedTime = formatTime();
 
-    expect(formattedTime).toBe(`,"time":"${date.toISOString()}"`);
+    expect(formattedTime).toBe(',"time":"test ISO date"');
   });
 });
