@@ -1,6 +1,5 @@
 import Raven from 'raven';
 
-
 /**
  * Конструктор для создания middleware для Sentty
  * @param {Object} options Конфигурация
@@ -10,7 +9,7 @@ export default function createSentryMiddleware (
   {
     config: {
       sentryDsnServer,
-      buildVersion: release,
+      version: release,
       sentryOptions,
     },
   }
