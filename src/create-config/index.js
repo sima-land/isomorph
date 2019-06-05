@@ -1,3 +1,4 @@
+import isFunction from 'lodash/isFunction';
 import isPlainObject from 'lodash/isPlainObject';
 import formatObjectKeys from '../format-object-keys/';
 
@@ -20,7 +21,7 @@ export default function createConfig (data = {}, base = { ...process.env }) {
     const [key, value] = current;
 
     if (!(key in config)) {
-      config[key] = value;
+      config[key] = isFunction(value) ? value(base) : value;
     }
     return config;
   }, formatObjectKeys({ ...base }));

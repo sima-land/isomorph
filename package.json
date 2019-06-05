@@ -50,6 +50,9 @@
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
     "lodash": "^4.17.x",
-    "np": "5.0.x"
+    "np": "5.0.x",
+    "pino": "^5.12.6",
+    "pino-pretty": "^3.1.0",
+    "raven": "^2.6.4"
   }
 }
