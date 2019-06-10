@@ -45,6 +45,7 @@
     "eslint-plugin-import": "2.17.x",
     "eslint-plugin-jest": "22.5.x",
     "eslint-plugin-react": "7.13.x",
+    "express-http-proxy": "^1.5.1",
     "gulp": "4.0.x",
     "husky": "2.3.x",
     "identity-obj-proxy": "3.0.x",
@@ -52,6 +53,7 @@
     "lodash": "^4.17.x",
     "np": "5.0.x",
     "pino": "^5.12.6",
+    "pino-pretty": "^3.1.0",
     "raven": "^2.6.4"
   }
 }
