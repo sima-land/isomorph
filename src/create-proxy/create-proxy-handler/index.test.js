@@ -2,8 +2,8 @@ import createProxyHandler from './index';
 import expressProxy from 'express-http-proxy';
 
 const config = {
-  simalandApiURL: 'https://www.sima-land.ru/api/v3/*',
-  chponkiApiURL: 'https://chponki.sima-land.ru/api/v2/*',
+  simalandApiURL: 'https://www.sima-land.ru',
+  chponkiApiURL: 'https://chponki.sima-land.ru',
   proxy: [
     {
       url: '/api/*',
