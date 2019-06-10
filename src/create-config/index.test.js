@@ -1,7 +1,7 @@
 import createConfig from './index';
 
 describe('function createConfig()', () => {
-  it('works properly', () => {
+  it('works correctly', () => {
     const config = createConfig(
       {
         firstKey: 2,
@@ -21,7 +21,16 @@ describe('function createConfig()', () => {
     });
   });
 
-  it('works properly when there are no arguments', () => {
+  it('works correctly when param is a function', () => {
+    const config = createConfig(
+      { three: base => base.one + 2 },
+      { one: 1 }
+    );
+
+    expect(config.three).toBe(3);
+  });
+
+  it('works correctly when there are no arguments', () => {
     const config = createConfig();
     expect(typeof config).toBe('object');
   });
