@@ -7,7 +7,7 @@
 export default function promWorker ({ config, metrics } = {}) {
   return {
     /**
-     * Запускает таймер
+     * Возвращает текущее время
      * @return {Array} Время начала
      */
     begin () {
