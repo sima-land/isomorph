@@ -6,18 +6,6 @@ const config = createConfig({
   version: base => base.CI_COMMIT_REF_NAME || 'development',
   sentryDsnServer: null,
   sentryOptions: {},
-  simalandApiURL: 'https://www.sima-land.ru/api/v3/*',
-  chponkiApiURL: 'https://chponki.sima-land.ru/api/v2/*',
-  proxy: [
-    {
-      url: '/api/*',
-      header: 'Simaland-Service-Origin',
-      map: {
-        sima: ({ simalandApiURL }) => simalandApiURL,
-        chponki: ({ chponkiApiURL }) => chponkiApiURL,
-      },
-    },
-  ],
 });
 
 export default config;
