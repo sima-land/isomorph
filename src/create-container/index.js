@@ -1,5 +1,6 @@
 import isString from 'lodash/isString';
 import isFunction from 'lodash/isFunction';
+import isPlainObject from 'lodash/isPlainObject';
 
 /**
  * Функция создает IoC-контейнер
@@ -21,7 +22,17 @@ export default function createContainer ({ services = [] } = {}) {
    * @return {Object} Объект зависимостей
    */
   const getDependencies = service => service.dependencies.reduce((result, dependency) => {
-    result[dependency] = container.get(dependency);
+    if (isString(dependency)) {
+      result[dependency] = container.get(dependency);
+    }
+
+    if (isPlainObject(dependency)) {
+      Object.entries(dependency).forEach(dep => {
+        const [necessaryName, necessaryDepName] = dep;
+        result[necessaryName] = container.get(necessaryDepName);
+      });
+    }
+
     return result;
   }, {});
 
