@@ -18,7 +18,7 @@ export default function promWorker ({ config, metrics } = {}) {
      * Считаем время, обсервим, передаем значения лейблов
      * @param {Array} start Время начала
      * @param {string} metricName Название метрики
-     * @param {Object} labels Дополнительные параметры
+     * @param {...*} labels Дополнительные параметры
      */
     end (start, metricName, ...labels) {
       const duration = process.hrtime(start);
@@ -32,7 +32,7 @@ export default function promWorker ({ config, metrics } = {}) {
     /**
      * Инкремент счетчика
      * @param {string} metricName Название метрики
-     * @param {Object} labels Дополнительные параметры
+     * @param {...*} labels Дополнительные параметры
      */
     inc (metricName, ...labels) {
       const metric = metrics[metricName];
