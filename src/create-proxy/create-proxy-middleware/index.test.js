@@ -1,4 +1,4 @@
-import createProxyHandler from './index';
+import createProxyMiddleware from './index';
 import expressProxy from 'express-http-proxy';
 
 const config = {
@@ -18,13 +18,13 @@ const config = {
 const header = config.proxy[0].header;
 const map = config.proxy[0].map;
 
-describe('createProxyHandler()', () => {
+describe('createProxyMiddleware()', () => {
   afterEach(() => {
     expressProxy.mockClear();
   });
 
   it('works correctly with header', () => {
-    const proxy = createProxyHandler(header, map, config);
+    const proxy = createProxyMiddleware(header, map, config);
     const next = jest.fn();
 
     proxy(
@@ -37,7 +37,7 @@ describe('createProxyHandler()', () => {
   });
 
   it('works correctly without header', () => {
-    const proxy = createProxyHandler(header, map, config);
+    const proxy = createProxyMiddleware(header, map, config);
     const next = jest.fn();
 
     proxy(

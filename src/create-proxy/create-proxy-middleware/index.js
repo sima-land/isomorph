@@ -9,7 +9,7 @@ import expressProxy from 'express-http-proxy';
  * @param {Object} config Конфигурация приложения
  * @return {Function} Функция, обрабатывающая запрос
  */
-export default function createProxyHandler (header, map, config) {
+export default function createProxyMiddleware (header, map, config) {
   return (req, res, next) => {
     const headerType = get(req, `headers['${header.toLowerCase()}']`, null);
     const getUrl = headerType ? map[headerType] : null;

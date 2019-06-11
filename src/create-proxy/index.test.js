@@ -1,7 +1,7 @@
 import createProxy from './index';
-import createProxyHandler from './create-proxy-handler';
+import createProxyMiddleware from './create-proxy-middleware';
 
-jest.mock('./create-proxy-handler', () => jest.fn(() => 'test'));
+jest.mock('./create-proxy-middleware', () => jest.fn(() => 'test'));
 const app = { use: jest.fn() };
 
 describe('createProxy()', () => {
@@ -23,7 +23,7 @@ describe('createProxy()', () => {
     const proxy = createProxy({ config });
 
     proxy(app);
-    expect(createProxyHandler).toHaveBeenCalledWith(
+    expect(createProxyMiddleware).toHaveBeenCalledWith(
       'Simaland-Service-Origin',
       config.proxy[0].map,
       config

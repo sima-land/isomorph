@@ -1,4 +1,4 @@
-import createProxyHandler from './create-proxy-handler';
+import createProxyMiddleware from './create-proxy-middleware';
 
 /**
  * Конструктор сервиса проксирования
@@ -20,7 +20,7 @@ export default function createProxy (
     }
 
     proxy.forEach(({ url, header, map }) => {
-      app.use(url, createProxyHandler(header, map, config));
+      app.use(url, createProxyMiddleware(header, map, config));
     });
   };
 }
