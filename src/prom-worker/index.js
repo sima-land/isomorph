@@ -7,7 +7,7 @@
 export default function promWorker ({ config, metrics } = {}) {
   return {
     /**
-     * Запускаем таймер
+     * Запускает таймер
      * @return {Array} Время начала
      */
     begin () {
@@ -15,13 +15,13 @@ export default function promWorker ({ config, metrics } = {}) {
     },
 
     /**
-     * Считаем время, обсервим, передаем значения лейблов
-     * @param {Array} start Время начала
+     * Считает время, обсервит, передает значения лейблов
+     * @param {Array} startTime Время начала
      * @param {string} metricName Название метрики
      * @param {...*} labels Дополнительные параметры
      */
-    end (start, metricName, ...labels) {
-      const duration = process.hrtime(start);
+    end (startTime, metricName, ...labels) {
+      const duration = process.hrtime(startTime);
       const ms = Math.round((duration[0] * 1000) + (duration[1] / 1e6));
       const metric = metrics[metricName];
       labels.length

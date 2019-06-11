@@ -23,18 +23,18 @@ describe('promWorker()', () => {
     jest.spyOn(process, 'hrtime')
       .mockImplementation(() => startHtrtime);
     const instance = promWorker();
-    const start = instance.begin();
+    const startTime = instance.begin();
 
-    expect(start).toStrictEqual(startHtrtime);
+    expect(startTime).toStrictEqual(startHtrtime);
   });
 
   it('method end() works correctly', () => {
     jest.spyOn(process, 'hrtime')
       .mockImplementation(() => endHtrtime);
-    const start = startHtrtime;
+    const startTime = startHtrtime;
     const instance = promWorker({ config, metrics });
 
-    instance.end(start, 'test');
+    instance.end(startTime, 'test');
     expect(observe).toHaveBeenCalledWith(2721983);
     expect(labels).toHaveBeenCalledWith(
       config.version,
@@ -42,7 +42,7 @@ describe('promWorker()', () => {
     );
 
     labels.mockClear();
-    instance.end(start, 'test', 'testParam');
+    instance.end(startTime, 'test', 'testParam');
     expect(labels).toHaveBeenCalledWith(
       config.version,
       config.place,
