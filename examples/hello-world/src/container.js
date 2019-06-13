@@ -1,5 +1,4 @@
 import config from './config';
-import createProxy from '../../../src/create-proxy';
 import httpHelpers from '../../../src/http-helpers';
 import createContainer from '../../../src/create-container';
 import sentryLogger from '../../../src/logger/sentry-logger';
@@ -25,11 +24,6 @@ const singletones = [
   {
     name: 'sentryLogger',
     singleton: sentryLogger,
-  },
-  {
-    name: 'proxy',
-    factory: createProxy,
-    dependencies: ['config'],
   },
 ];
 
