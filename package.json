@@ -25,7 +25,9 @@
   },
   "dependencies": {
     "react": "16.8.x",
-    "react-dom": "16.8.x"
+    "react-dom": "16.8.x",
+    "reducers": "^3.0.0-alpha",
+    "redux": "^4.0.1"
   },
   "devDependencies": {
     "@babel/core": "7.2.x",
