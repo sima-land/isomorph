@@ -1,4 +1,5 @@
 import { createStore, applyMiddleware } from 'redux';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Формирует стор для работы приложения
@@ -19,7 +20,7 @@ const storeCreator = (
   }
 ) => {
   let store = {};
-  if (typeof reducer === 'function' && typeof compose === 'function' && typeof getAppRunner === 'function') {
+  if (isFunction(reducer) && isFunction(compose) && isFunction(getAppRunner)) {
     store = {
       ...createStore(reducer, initialState, compose(applyMiddleware(...Object.values(middlewares)))),
       runApp: getAppRunner(middlewares),
