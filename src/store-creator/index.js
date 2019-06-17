@@ -11,10 +11,10 @@ import { createStore, applyMiddleware } from 'redux';
  */
 const storeCreator = (
   {
+    middlewares = {},
     initialState = {},
     reducer,
     compose,
-    middlewares = {},
     getAppRunner,
   }
 ) => {
