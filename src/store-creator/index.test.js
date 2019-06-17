@@ -16,10 +16,10 @@ describe('function storeCreator()', () => {
     expect(storeCreator(compose, reducer, getAppRunner)).toEqual({});
   });
 
+  const reducer = jest.fn();
+  const compose = jest.fn(arg => arg);
+  const getAppRunner = jest.fn(jest.fn(() => {}));
   it('storeCreator() works properly', () => {
-    const reducer = jest.fn();
-    const compose = jest.fn(arg => arg);
-    const getAppRunner = jest.fn(jest.fn(() => {}));
     storeCreator({
       initialState: {},
       reducer,
@@ -34,9 +34,6 @@ describe('function storeCreator()', () => {
   });
 
   it('storeCreator() works properly with default options', () => {
-    const reducer = jest.fn();
-    const compose = jest.fn(arg => arg);
-    const getAppRunner = jest.fn(jest.fn(() => {}));
     storeCreator({
       compose,
       reducer,
