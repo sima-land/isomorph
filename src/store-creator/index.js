@@ -2,19 +2,30 @@ import { createStore, applyMiddleware } from 'redux';
 
 /**
  * Формирует стор для работы приложения
- * @param {Object} middleware Саги
+ * @param {Object} middlewares Саги
  * @param {Object} initialState Стартовый стэйт приложения
  * @param {Function} reducer Reducer
  * @param {Function} compose Compose для подключения redux-devtools
- * @return {Array} Массив с объектом стора приложения и раннером для запуска саг
+ * @param {Function} getAppRunner Функция высшего порядка
+ * @return {Object} Массив с объектом стора приложения и раннером для запуска саг
  */
 const storeCreator = (
   {
-    initialState,
+    initialState = {},
     reducer,
-    compose = input => input,
-    middleware,
+    compose,
+    middlewares = {},
+    getAppRunner,
   }
-) => createStore(reducer, initialState, compose(applyMiddleware(middleware)));
+) => {
+  let store = {};
+  if (typeof reducer === 'function' && typeof compose === 'function' && typeof getAppRunner === 'function') {
+    store = {
+      ...createStore(reducer, initialState, compose(applyMiddleware(...Object.values(middlewares)))),
+      runApp: getAppRunner(middlewares),
+    };
+  }
+  return store;
+};
 
 export default storeCreator;

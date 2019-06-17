@@ -10,9 +10,10 @@ const values = [
   { name: 'config', value: config },
   { name: 'httpHelpers', value: httpHelpers },
   { name: 'initialState', value: {} },
-  { name: 'middleware', value: [] },
+  { name: 'middlewares', value: {} },
   { name: 'reducer', value: () => 1 },
   { name: 'compose', value: () => 1 },
+  { name: 'getAppRunner', value: () => () => {} },
 ];
 
 const singletones = [
@@ -36,7 +37,7 @@ const factories = [
   {
     name: 'storeCreator',
     factory: storeCreator,
-    dependencies: ['initialState', 'reducer', 'compose', 'middleware'],
+    dependencies: ['initialState', 'reducer', 'compose', 'middlewares', 'getAppRunner'],
   },
 ];
 

@@ -1,29 +1,29 @@
 import storeCreator from './';
-import { createStore, applyMiddleware } from '../../__mocks__/redux';
+import { createStore, applyMiddleware, middlewares } from '../../__mocks__/redux';
 
 describe('function storeCreator()', () => {
+  const reducer = jest.fn();
+  const compose = jest.fn(arg => arg);
+  const getAppRunner = jest.fn(jest.fn(() => {}));
   it('storeCreator() works properly', () => {
-    const compose = jest.fn(arg => arg);
-    const reducer = jest.fn();
     storeCreator({
       initialState: {},
       reducer,
-      middleware: [],
+      middlewares: middlewares,
       compose,
+      getAppRunner,
     });
-    expect(createStore).toHaveBeenCalledWith(reducer, {}, 1);
-    expect(applyMiddleware).toHaveBeenCalledWith([]);
-    expect(compose).toHaveBeenCalledWith(1);
+    expect(createStore).toHaveBeenCalledWith(reducer, {}, middlewares);
+    expect(compose).toHaveBeenCalledWith(middlewares);
+    expect(getAppRunner).toHaveBeenCalledWith(middlewares);
+    expect(applyMiddleware).toHaveBeenCalled();
   });
 
-  it('storeCreator() works properly with default compose', () => {
-    const reducer = jest.fn();
+  it('storeCreator() works properly with default options', () => {
     storeCreator({
-      initialState: {},
+      compose,
       reducer,
-      middleware: [],
+      getAppRunner,
     });
-    expect(createStore).toHaveBeenCalledWith(reducer, {}, 1);
-    expect(applyMiddleware).toHaveBeenCalledWith([]);
   });
 });
