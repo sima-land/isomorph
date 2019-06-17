@@ -10,7 +10,7 @@ const values = [
   { name: 'config', value: config },
   { name: 'httpHelpers', value: httpHelpers },
   { name: 'initialState', value: {} },
-  { name: 'middleware', value: {} },
+  { name: 'middleware', value: [] },
   { name: 'reducer', value: () => 1 },
   { name: 'compose', value: () => 1 },
 ];
@@ -35,7 +35,7 @@ const singletones = [
 const factories = [
   {
     name: 'storeCreator',
-    singleton: storeCreator,
+    factory: storeCreator,
     dependencies: ['initialState', 'reducer', 'compose', 'middleware'],
   },
 ];
