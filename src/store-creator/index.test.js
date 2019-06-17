@@ -2,7 +2,7 @@ import storeCreator from './';
 import { createStore, applyMiddleware } from '../../__mocks__/redux';
 
 describe('function storeCreator()', () => {
-  it('stoneCreator() works properly', () => {
+  it('storeCreator() works properly', () => {
     const compose = jest.fn(arg => arg);
     const reducer = jest.fn();
     storeCreator({
