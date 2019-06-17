@@ -3,13 +3,10 @@ import { createStore, applyMiddleware, middlewares } from '../../__mocks__/redux
 
 describe('function storeCreator()', () => {
   it('storeCreator() returns object when it receives incorrect arguments', () => {
-    const reducer = 123;
-    const compose = '123';
-    const getAppRunner = 321;
     storeCreator({
-      compose,
-      reducer,
-      getAppRunner,
+      compose: 123,
+      reducer: '123',
+      getAppRunner: 321,
     });
     expect(createStore).not.toHaveBeenCalled();
     expect(applyMiddleware).not.toHaveBeenCalled();
