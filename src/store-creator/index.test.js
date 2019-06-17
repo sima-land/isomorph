@@ -26,4 +26,12 @@ describe('function storeCreator()', () => {
       getAppRunner,
     });
   });
+
+  it('storeCreator() returns object when it receives incorrect arguments', () => {
+    storeCreator({
+      compose: {},
+      reducer: {},
+      getAppRunner: {},
+    });
+  });
 });
