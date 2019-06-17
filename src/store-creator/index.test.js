@@ -12,7 +12,7 @@ describe('function storeCreator()', () => {
       compose,
     });
     expect(createStore).toHaveBeenCalledWith(reducer, {}, 1);
-    expect(applyMiddleware).toHaveBeenCalledWith({});
+    expect(applyMiddleware).toHaveBeenCalledWith([]);
     expect(compose).toHaveBeenCalledWith(1);
   });
 });
