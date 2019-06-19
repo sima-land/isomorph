@@ -10,19 +10,8 @@ import createPinoInstance from '../helpers/create-pino-instance';
  * @param {Function} getStatus Хелпер, который получает статус ответа из объекта ответа
  * @return {Function} middleware для express-приложения
  */
-export default function createLoggerMiddleware (
-  {
-    config,
-    config: {
-      version,
-    },
-    httpHelpers: {
-      getXClientIp,
-      getMethod,
-      getStatus,
-    },
-  }
-) {
+export default function createLoggerMiddleware ({ config, config: { version },
+  httpHelpers: { getXClientIp, getMethod, getStatus } }) {
   return configPinoLogger({
     logger: createPinoInstance({ config }),
     staticData: {
