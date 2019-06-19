@@ -4,7 +4,8 @@ import createContainer from '../../../src/create-container';
 import sentryLogger from '../../../src/logger/sentry-logger';
 import createSentryMiddleware from '../../../src/logger/create-sentry-middleware';
 import createLoggerMiddleware from '../../../src/logger/create-logger-middleware';
-import redisCache from '../../../src/cache';
+import redisCache,
+{ reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback } from '../../../src/cache';
 
 const values = [
   { name: 'config', value: config },
@@ -29,7 +30,7 @@ const singletones = [
   {
     name: 'cache',
     singleton: redisCache,
-    dependencies: ['config'],
+    dependencies: ['config', reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback],
   },
 ];
 

@@ -1,5 +1,5 @@
-import redisCache, { cache, reconnectOnErrorFunc, retryStrategyDelay,
-  cacheStatusConnect, cacheStatusReconnecting } from '../cache';
+import redisCache,
+{ reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback } from '../cache';
 import { mockSet, mockGet, mockOn } from '../../__mocks__/ioredis';
 
 describe('redisCache()', () => {
@@ -13,13 +13,14 @@ describe('redisCache()', () => {
       defaultCacheDuration: 300,
       recDelay: 301,
     };
-    const redis = redisCache({ config });
+    const redis = redisCache({ config },
+      reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback);
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
   });
 
   it('redisCache() return Object without config', () => {
-    const redis = redisCache({});
+    const redis = redisCache({}, reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback);
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
   });
@@ -34,10 +35,23 @@ describe('redisCache()', () => {
       defaultCacheDuration: 300,
       recDelay: 301,
     };
-    const redis = redisCache({ config });
+    /**
+     * Функция для тестирования
+     */
+    const onConnect = () => {};
+    /**
+     * Функция для тестирования
+     */
+    const onReconnect = () => {};
+    const getOnConnectCallback = jest.fn(() => onConnect);
+    const getOnReconnectingCallback = jest.fn(() => onReconnect);
+    const redis = redisCache({ config,
+      reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback });
     expect(mockOn).toHaveBeenCalledTimes(2);
-    expect(mockOn).toHaveBeenCalledWith('connect', cacheStatusConnect);
-    expect(mockOn).toHaveBeenCalledWith('reconnecting', cacheStatusReconnecting);
+    expect(mockOn.mock.calls[0][0]).toEqual('connect');
+    expect(mockOn.mock.calls[0][1]).toEqual(onConnect);
+    expect(mockOn.mock.calls[1][0]).toEqual('reconnecting');
+    expect(mockOn.mock.calls[1][1]).toEqual(onReconnect);
     redis.set('testKey', 'testValue');
     expect(mockSet).toBeCalledTimes(1);
     expect(mockSet.mock.calls[0][0]).toEqual('testKey');
@@ -53,7 +67,7 @@ describe('redisCache()', () => {
 describe('reconnectOnErrorFunc()', () => {
   it('reconnectOnErrorFunc() works properly', () => {
     let code = 666;
-    reconnectOnErrorFunc({ code });
+    reconnectOnError({ code });
     const targetError = 'ECONNREFUSED';
     expect(targetError === code).toBeFalsy();
     code = 'ECONNREFUSED';
@@ -63,21 +77,23 @@ describe('reconnectOnErrorFunc()', () => {
 
 describe('retryStrategyDelay()', () => {
   it('retryStrategyDelay() works properly', () => {
-    const delay = retryStrategyDelay(999);
-    expect(delay).toBe(999);
+    const delay = getRetryDelay(999)();
+    expect(delay).toEqual(999);
   });
 });
 
-describe('cacheStatusConnect()', () => {
-  it('cacheStatusConnect() works properly', () => {
-    cacheStatusConnect();
+describe('getOnConnectCallback()', () => {
+  it('getOnConnectCallback() works properly', () => {
+    const cache = {};
+    getOnConnectCallback(cache)();
     expect(cache.status).toBeTruthy();
   });
 });
 
-describe('cacheStatusReconnecting()', () => {
-  it('cacheStatusReconnecting() works properly', () => {
-    cacheStatusReconnecting();
+describe('getOnReconnectingCallback()', () => {
+  it('getOnReconnectingCallback() works properly', () => {
+    const cache = {};
+    getOnReconnectingCallback(cache)();
     expect(cache.status).toBeFalsy();
   });
 });
