@@ -39,12 +39,12 @@ describe('redisCache()', () => {
     expect(mockOn).toHaveBeenCalledWith('connect', cacheStatusConnect);
     expect(mockOn).toHaveBeenCalledWith('reconnecting', cacheStatusReconnecting);
     redis.set('testKey', 'testValue');
-    redis.get('test');
     expect(mockSet).toBeCalledTimes(1);
     expect(mockSet.mock.calls[0][0]).toEqual('testKey');
     expect(mockSet.mock.calls[0][1]).toEqual('testValue');
     expect(mockSet.mock.calls[0][2]).toEqual('EX');
     expect(mockSet.mock.calls[0][3]).toEqual(300);
+    redis.get('test');
     expect(mockGet).toBeCalledTimes(1);
     expect(mockGet.mock.calls[0][0]).toEqual('test');
   });
