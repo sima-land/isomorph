@@ -64,13 +64,14 @@ describe('redisCache()', () => {
   });
 });
 
-describe('reconnectOnErrorFunc()', () => {
-  it('reconnectOnErrorFunc() works properly', () => {
-    let code = 666;
+describe('reconnectOnError()', () => {
+  it('reconnectOnError() works properly', () => {
+    let code = '1xBet';
     reconnectOnError({ code });
     const targetError = 'ECONNREFUSED';
     expect(targetError === code).toBeFalsy();
     code = 'ECONNREFUSED';
+    reconnectOnError({ code });
     expect(targetError === code).toBeTruthy();
   });
 });
