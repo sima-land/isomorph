@@ -1,7 +1,6 @@
 import Redis from 'ioredis';
 import { promisify } from 'util';
 
-export let client;
 export let cache = {};
 /**
  * Устанавливает статус кэша
@@ -41,7 +40,7 @@ export default function redisCache ({ config = {} }) {
   const { redisHost, redisPort, redisPassword, redisDB, redisEnabled, defaultCacheDuration, recDelay } = config ;
 
   if (redisEnabled) {
-    client = new Redis({
+    const client = new Redis({
       host: redisHost,
       port: redisPort,
       password: redisPassword,
