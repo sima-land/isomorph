@@ -13,7 +13,13 @@ describe('redisCache()', () => {
       defaultCacheDuration: 300,
       recDelay: 301,
     };
-    const redis = redisCache(config);
+    const redis = redisCache({ config });
+    expect(mockOn).toHaveBeenCalledTimes(0);
+    expect(redis).toEqual({});
+  });
+
+  it('redisCache() return Object without config', () => {
+    const redis = redisCache({});
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
   });
@@ -28,7 +34,7 @@ describe('redisCache()', () => {
       defaultCacheDuration: 300,
       recDelay: 301,
     };
-    const redis = redisCache(config);
+    const redis = redisCache({ config });
     expect(mockOn).toHaveBeenCalledTimes(2);
     expect(mockOn).toHaveBeenCalledWith('connect', cacheStatusConnect);
     expect(mockOn).toHaveBeenCalledWith('reconnecting', cacheStatusReconnecting);

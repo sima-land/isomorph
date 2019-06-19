@@ -4,13 +4,13 @@ import { promisify } from 'util';
 export let client;
 export let cache = {};
 /**
- * Возвращает статус кэша
+ * Устанавливает статус кэша
  * @return {boolean} Возвращает true при соединении
  */
 export const cacheStatusConnect = () => cache.status = true;
 
 /**
- * Возвращает статус кэша
+ * Устанавливает статус кэша
  * @return {boolean} Возвращает false если происходит reconnect
  */
 export const cacheStatusReconnecting = () => cache.status = false;
@@ -37,8 +37,8 @@ export const retryStrategyDelay = recDelay => recDelay;
  * @param {Object} config Объект с параметрами Redis
  * @return {Object} Объект с методами для работы с Redis
  */
-export default function redisCache (config) {
-  const { redisHost, redisPort, redisPassword, redisDB, redisEnabled, defaultCacheDuration, recDelay } = config;
+export default function redisCache ({ config = {} }) {
+  const { redisHost, redisPort, redisPassword, redisDB, redisEnabled, defaultCacheDuration, recDelay } = config ;
 
   if (redisEnabled) {
     client = new Redis({
