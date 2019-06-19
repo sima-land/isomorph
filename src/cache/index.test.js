@@ -66,13 +66,12 @@ describe('redisCache()', () => {
 
 describe('reconnectOnError()', () => {
   it('reconnectOnError() works properly', () => {
-    let code = '1xBet';
-    reconnectOnError({ code });
-    const targetError = 'ECONNREFUSED';
-    expect(targetError === code).toBeFalsy();
+    let code = 'properly';
+    let reconnect = reconnectOnError({ code });
+    expect(reconnect).toBeFalsy();
     code = 'ECONNREFUSED';
-    reconnectOnError({ code });
-    expect(targetError === code).toBeTruthy();
+    reconnect = reconnectOnError({ code });
+    expect(reconnect).toBeTruthy();
   });
 });
 
