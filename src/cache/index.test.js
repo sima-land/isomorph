@@ -1,5 +1,5 @@
 import redisCache,
-{ reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback } from '../cache';
+{ reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback } from '../cache';
 import { mockSet, mockGet, mockOn } from '../../__mocks__/ioredis';
 
 describe('redisCache()', () => {
@@ -14,13 +14,13 @@ describe('redisCache()', () => {
       recDelay: 301,
     };
     const redis = redisCache({ config },
-      reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback);
+      reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback);
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
   });
 
   it('redisCache() return Object without config', () => {
-    const redis = redisCache({}, reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback);
+    const redis = redisCache({}, reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback);
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
   });
@@ -36,17 +36,17 @@ describe('redisCache()', () => {
       recDelay: 301,
     };
     /**
-     * Функция для тестирования
+     * Мок функции-обработчика события повторного соединения с redis
      */
     const onConnect = () => {};
     /**
-     * Функция для тестирования
+     * Мок функции-обработчика события повторного соединения с redis
      */
     const onReconnect = () => {};
     const getOnConnectCallback = jest.fn(() => onConnect);
     const getOnReconnectingCallback = jest.fn(() => onReconnect);
     const redis = redisCache({ config,
-      reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback });
+      reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback });
     expect(mockOn).toHaveBeenCalledTimes(2);
     expect(mockOn.mock.calls[0][0]).toEqual('connect');
     expect(mockOn.mock.calls[0][1]).toEqual(onConnect);
@@ -77,7 +77,7 @@ describe('reconnectOnErrorFunc()', () => {
 
 describe('retryStrategyDelay()', () => {
   it('retryStrategyDelay() works properly', () => {
-    const delay = getRetryDelay(999)();
+    const delay = getRetryStrategy(999)();
     expect(delay).toEqual(999);
   });
 });

@@ -2,16 +2,16 @@ import Redis from 'ioredis';
 import { promisify } from 'util';
 
 /**
- * Устанавливает статус кэша
+ * Возвращает функцию устанавливающую статус кэша
  * @param {Object} cache Объект кэша
- * @return {Function} Устанавливает статус кэша
+ * @return {Function} Функция устанавливающая статус кэша
  */
 export const getOnConnectCallback = cache => () => cache.status = true;
 
 /**
- * Устанавливает статус кэша
+ * Возвращает функцию устанавливающую статус кэша
  * @param {Object} cache Объект кэша
- * @return {Function} Устанавливает статус кэша
+ * @return {Function} Функция устанавливающая статус кэша
  */
 export const getOnReconnectingCallback = cache => () => cache.status = false;
 
@@ -26,23 +26,23 @@ export const reconnectOnError = ({ code }) => {
 };
 
 /**
- * Возвращает время для повтора перезаписи в redis
+ * Возвращает функцию вощвращающую время для повтора перезаписи в redis
  * @param {number} recDelay Время до перезаписи в redis
- * @return {Function} Время до перезаписи в redis
+ * @return {Function} Функция возвращающая время повторая перезаписи в redis
  */
-export const getRetryDelay = recDelay => () => recDelay;
+export const getRetryStrategy = recDelay => () => recDelay;
 
 /**
  * Кэширует данные в Redis
  * @param {Object} config Объект с параметрами Redis
  * @param {Function} reconnectOnError Переподключение после ошибки
- * @param {Function} getRetryDelay Время повтора перезаписи в redis
- * @param {Function} getOnConnectCallback Устанавливает статус кэша
- * @param {Function} getOnReconnectingCallback Устанавливает статус кэша
+ * @param {Function} getRetryStrategy Возвращает функцию вощвращающую время для повтора перезаписи в redis
+ * @param {Function} getOnConnectCallback Возвращает функцию устанавливающую статус кэша
+ * @param {Function} getOnReconnectingCallback Возвращает функцию устанавливающую статус кэша
  * @return {Object} Объект с методами для работы с Redis
  */
 export default function redisCache ({ config = {},
-  reconnectOnError, getRetryDelay, getOnConnectCallback, getOnReconnectingCallback }) {
+  reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback }) {
   const { redisHost, redisPort, redisPassword, redisDB, redisEnabled, defaultCacheDuration, recDelay } = config ;
   let cache = {};
   if (redisEnabled) {
@@ -52,7 +52,7 @@ export default function redisCache ({ config = {},
       password: redisPassword,
       db: redisDB,
       reconnectOnError,
-      retryStrategy: getRetryDelay(recDelay),
+      retryStrategy: getRetryStrategy(recDelay),
       enableOfflineQueue: false,
     });
 
