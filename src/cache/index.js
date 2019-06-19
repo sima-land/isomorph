@@ -4,14 +4,14 @@ import { promisify } from 'util';
 /**
  * Устанавливает статус кэша
  * @param {Object} cache Объект кэша
- * @return {boolean} Возвращает true при соединении
+ * @return {Function} Устанавливает статус кэша
  */
 export const getOnConnectCallback = cache => () => cache.status = true;
 
 /**
  * Устанавливает статус кэша
  * @param {Object} cache Объект кэша
- * @return {boolean} Возвращает false если происходит reconnect
+ * @return {Function} Устанавливает статус кэша
  */
 export const getOnReconnectingCallback = cache => () => cache.status = false;
 
@@ -28,7 +28,7 @@ export const reconnectOnError = ({ code }) => {
 /**
  * Возвращает время для повтора перезаписи в redis
  * @param {number} recDelay Время до перезаписи в redis
- * @return {number} Время до перезаписи в redis
+ * @return {Function} Время до перезаписи в redis
  */
 export const getRetryDelay = recDelay => () => recDelay;
 
