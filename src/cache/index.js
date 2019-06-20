@@ -37,7 +37,7 @@ export const getRetryStrategy = recDelay => () => recDelay;
  * @param {Object} config Объект с параметрами Redis
  * @param {Function} reconnectOnError Переподключение после ошибки
  * @param {Function} getRetryStrategy Устанавливает время для повтора перезаписи в redis
- * @param {Function} getOnConnectCallback Коллбык функция при коннект статусе
+ * @param {Function} getOnConnectCallback Коллбэк функция при коннект статусе
  * @param {Function} getOnReconnectingCallback Коллбэк функция при реконнект статусе
  * @return {Object} Объект с методами для работы с Redis
  */
