@@ -67,11 +67,9 @@ describe('redisCache()', () => {
 describe('reconnectOnError()', () => {
   it('reconnectOnError() works properly', () => {
     let code = 'properly';
-    let reconnect = reconnectOnError({ code });
-    expect(reconnect).toBeFalsy();
+    expect(reconnectOnError({ code })).toBeFalsy();
     code = 'ECONNREFUSED';
-    reconnect = reconnectOnError({ code });
-    expect(reconnect).toBeTruthy();
+    expect(reconnectOnError({ code })).toBeTruthy();
   });
 });
 
