@@ -10,6 +10,10 @@ import redisCache,
 const values = [
   { name: 'config', value: config },
   { name: 'httpHelpers', value: httpHelpers },
+  { name: 'reconnectOnError', value: reconnectOnError },
+  { name: 'getRetryStrategy', value: getRetryStrategy },
+  { name: 'getOnConnectCallback', value: getOnConnectCallback },
+  { name: 'getOnReconnectingCallback', value: getOnReconnectingCallback },
 ];
 
 const singletones = [
@@ -30,7 +34,8 @@ const singletones = [
   {
     name: 'cache',
     singleton: redisCache,
-    dependencies: ['config', reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback],
+    dependencies: ['config', 'reconnectOnError',
+      'getRetryStrategy', 'getOnConnectCallback', 'getOnReconnectingCallback'],
   },
 ];
 
