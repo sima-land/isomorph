@@ -1,7 +1,7 @@
-import createProxy from './index';
-import createProxyMiddleware from './create-proxy-middleware';
+import createProxy from '..';
+import createProxyMiddleware from '../create-proxy-middleware';
 
-jest.mock('./create-proxy-middleware', () => jest.fn(() => 'test'));
+jest.mock('../create-proxy-middleware', () => jest.fn(() => 'test'));
 const app = { use: jest.fn() };
 
 describe('createProxy()', () => {

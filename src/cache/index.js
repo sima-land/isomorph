@@ -41,19 +41,14 @@ export const getRetryStrategy = recDelay => () => recDelay;
  * @param {Function} getOnReconnectingCallback Коллбэк функция при реконнект статусе
  * @return {Object} Объект с методами для работы с Redis
  */
-export default function redisCache ({ config = {},
+export default function redisCache ({ config: { cacheConfig = {}, recDelay, defaultCacheDuration, redisEnabled } = {},
   reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback }) {
-  const { redisHost, redisPort, redisPassword, redisDB, redisEnabled, defaultCacheDuration, recDelay } = config ;
   let cache = {};
   if (redisEnabled) {
     const client = new Redis({
-      host: redisHost,
-      port: redisPort,
-      password: redisPassword,
-      db: redisDB,
       reconnectOnError,
       retryStrategy: getRetryStrategy(recDelay),
-      enableOfflineQueue: false,
+      ...cacheConfig,
     });
 
     client.on('connect', getOnConnectCallback(cache));

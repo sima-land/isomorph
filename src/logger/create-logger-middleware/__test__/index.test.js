@@ -1,6 +1,6 @@
-import createLoggerMiddleware from './index';
-import createPinoLogger from '../helpers/config-pino-logger';
-import createPinoInstance from '../helpers/create-pino-instance';
+import createLoggerMiddleware from '..';
+import createPinoLogger from '../../helpers/config-pino-logger';
+import createPinoInstance from '../../helpers/create-pino-instance';
 
 const config = { version: 1 };
 const httpHelpers = {
@@ -9,8 +9,8 @@ const httpHelpers = {
   getStatus: jest.fn(),
 };
 
-jest.mock('../helpers/config-pino-logger', () => jest.fn());
-jest.mock('../helpers/create-pino-instance', () => jest.fn());
+jest.mock('../../helpers/config-pino-logger', () => jest.fn());
+jest.mock('../../helpers/create-pino-instance', () => jest.fn());
 
 describe('createLoggerMiddleware', () => {
   it('works correctly', () => {

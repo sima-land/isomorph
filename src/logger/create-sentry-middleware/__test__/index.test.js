@@ -1,5 +1,5 @@
-import createSentryMiddleware from './index';
-import Raven from '../../../__mocks__/raven';
+import createSentryMiddleware from '..';
+import Raven from '../../../../__mocks__/raven';
 
 describe('createSentryMiddleware()', () => {
   it('works correctly', () => {

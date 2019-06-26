@@ -1,9 +1,9 @@
 import configPinoLogger, {
   finishHandler,
-} from './index';
-import isFunction from '../../../../__mocks__/lodash/isFunction';
+} from '..';
+import isFunction from '../../../../../__mocks__/lodash/isFunction';
 
-jest.mock('../hr-time-to-integer', () => ({
+jest.mock('../../hr-time-to-integer', () => ({
   hrtimeToInteger: jest.fn(() => 1234567891011121314),
 }));
 

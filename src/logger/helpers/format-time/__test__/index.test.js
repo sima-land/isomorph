@@ -1,4 +1,4 @@
-import formatTime from './index';
+import formatTime from '..';
 
 
 describe('formatTime()', () => {

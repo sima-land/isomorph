@@ -1,4 +1,4 @@
-import sentryLogger from './index';
+import sentryLogger from '..';
 
 describe('sentryLogger()', function () {
   it('works correctly', () => {

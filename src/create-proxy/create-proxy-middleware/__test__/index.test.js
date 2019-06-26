@@ -1,4 +1,4 @@
-import createProxyMiddleware from './index';
+import createProxyMiddleware from '..';
 import expressProxy from 'express-http-proxy';
 
 const config = {

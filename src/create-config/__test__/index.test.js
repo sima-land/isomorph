@@ -1,4 +1,4 @@
-import createConfig from './index';
+import createConfig from '..';
 
 describe('function createConfig()', () => {
   it('works correctly', () => {

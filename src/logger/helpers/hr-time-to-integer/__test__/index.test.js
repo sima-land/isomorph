@@ -1,4 +1,4 @@
-import { hrtimeToInteger } from './index';
+import { hrtimeToInteger } from '..';
 
 describe('hrtimeToInteger()', () => {
   it('returns timestmap when call with correct parameters', () => {

@@ -1,6 +1,6 @@
-import formatTime from '../format-time';
-import createPinoInstance from './index';
-import pino from '../../../../__mocks__/pino';
+import formatTime from '../../format-time';
+import createPinoInstance from '..';
+import pino from '../../../../../__mocks__/pino';
 
 describe('createPinoInstance()', () => {
   it('creates the instance correctly when run as development', () => {
