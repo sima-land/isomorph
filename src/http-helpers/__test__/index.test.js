@@ -1,4 +1,4 @@
-import { getXClientIp, getMethod, getStatus } from './index';
+import { getXClientIp, getMethod, getStatus } from '..';
 
 describe('getXClientIp', () => {
   it('works correctly', () => {

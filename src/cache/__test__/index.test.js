@@ -1,6 +1,6 @@
 import redisCache,
-{ reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback } from '../cache';
-import { mockSet, mockGet, mockOn } from '../../__mocks__/ioredis';
+{ reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback } from '..';
+import { mockSet, mockGet, mockOn } from '../../../__mocks__/ioredis';
 
 describe('redisCache()', () => {
   it('redisCache() works if redisDisabled', () => {
@@ -27,10 +27,6 @@ describe('redisCache()', () => {
 
   it('redisCache() works if redisEnabled', () => {
     const config = {
-      redisHost: 'foo',
-      redisPort: '8020',
-      redisPassword: 'qwerty',
-      redisDB: 'DB',
       redisEnabled: true,
       defaultCacheDuration: 300,
       recDelay: 301,

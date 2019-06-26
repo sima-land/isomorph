@@ -1,4 +1,4 @@
-import promWorker from './index';
+import promWorker from '..';
 
 const observe = jest.fn();
 const inc = jest.fn();

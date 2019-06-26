@@ -1,4 +1,4 @@
-import createContainer from './index';
+import createContainer from '..';
 
 describe('createContainer', () => {
   it('container creates correctly', () => {

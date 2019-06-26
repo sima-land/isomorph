@@ -1,4 +1,4 @@
-import formatObjectKeys from './index';
+import formatObjectKeys from '..';
 
 describe('function formatObjectKeys()', () => {
   it('works properly', () => {

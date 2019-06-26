@@ -7,6 +7,7 @@ import createSentryMiddleware from '../../../src/logger/create-sentry-middleware
 import createLoggerMiddleware from '../../../src/logger/create-logger-middleware';
 import redisCache,
 { reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback } from '../../../src/cache';
+import { getTracer } from '../../../src/tracer';
 
 const values = [
   { name: 'config', value: config },
@@ -20,6 +21,8 @@ const values = [
   { name: 'getRetryStrategy', value: getRetryStrategy },
   { name: 'getOnConnectCallback', value: getOnConnectCallback },
   { name: 'getOnReconnectingCallback', value: getOnReconnectingCallback },
+  { name: 'metrics', value: {} },
+  { name: 'logger', value: {} },
 ];
 
 const singletones = [
@@ -43,6 +46,12 @@ const singletones = [
     dependencies: ['config', 'reconnectOnError',
       'getRetryStrategy', 'getOnConnectCallback', 'getOnReconnectingCallback'],
   },
+  {
+    name: 'tracer',
+    singleton: getTracer,
+    dependencies: ['config', 'metrics', 'logger'],
+  },
+
 ];
 
 const factories = [

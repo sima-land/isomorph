@@ -1,5 +1,5 @@
-import storeCreator from './';
-import { createStore, applyMiddleware, middlewares } from '../../__mocks__/redux';
+import storeCreator from '..';
+import { createStore, applyMiddleware, middlewares } from '../../../__mocks__/redux';
 
 describe('function storeCreator()', () => {
   it('storeCreator() returns object when it receives incorrect arguments', () => {
