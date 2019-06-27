@@ -1,5 +1,6 @@
 import config from './config';
 import httpHelpers from '../../../src/http-helpers';
+import templates from './templates';
 import storeCreator from '../../../src/store-creator';
 import createContainer from '../../../src/create-container';
 import sentryLogger from '../../../src/logger/sentry-logger';
@@ -16,10 +17,12 @@ import redisCache, {
   getOnReconnectingCallback,
 } from '../../../src/cache';
 import { getTracer } from '../../../src/tracer';
+import { getTemplate } from '../../../src/render/render';
 
 const values = [
   { name: 'config', value: config },
   { name: 'httpHelpers', value: httpHelpers },
+  { name: 'templates', value: templates },
   { name: 'initialState', value: {} },
   { name: 'middlewares', value: {} },
   { name: 'reducer', value: () => 1 },
@@ -99,6 +102,11 @@ const factories = [
     name: 'storeCreator',
     factory: storeCreator,
     dependencies: ['initialState', 'reducer', 'compose', 'middlewares', 'getAppRunner'],
+  },
+  {
+    name: 'getTemplate',
+    singleton: getTemplate,
+    dependencies: ['templates', 'config'],
   },
 ];
 

@@ -27,6 +27,7 @@
     "ioredis": "^4.10.0",
     "prom-client": "^11.5.2",
     "jaeger-client": "^3.15.0",
+    "opentracing": "^0.14.3",
     "react": "16.8.x",
     "react-dom": "16.8.x",
     "redux": "^4.0.1"
