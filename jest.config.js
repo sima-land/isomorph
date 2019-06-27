@@ -12,4 +12,5 @@ module.exports = {
     '^.+\\.(js|jsx)?$': 'babel-jest',
   },
   snapshotSerializers: ['enzyme-to-json/serializer'],
+  clearMocks: true,
 };

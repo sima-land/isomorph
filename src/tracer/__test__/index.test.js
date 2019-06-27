@@ -14,7 +14,7 @@ describe('getTracer()', () => {
   });
   it('returns same tracer instance', () => {
     const sameInstance = getTracer({ config, metrics, logger });
-    expect(initTracerFromEnv).toHaveBeenCalledTimes(2);
+    expect(initTracerFromEnv).toHaveBeenCalledTimes(1);
     expect(sameInstance).toEqual(tracer);
   });
 });

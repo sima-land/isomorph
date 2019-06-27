@@ -2,7 +2,7 @@
   "name": "sima-land-isomorph",
   "version": "0.0.1",
   "description": "Server side rendering for Header service",
-  "main": "index.js",
+  "main": "./build/index.js",
   "repository": "ssh://git@gitlab.sima-land.ru:7888/SL/isomorph.git",
   "author": "www.sima-land.ru team",
   "license": "MIT",
