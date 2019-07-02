@@ -1,8 +1,8 @@
 import React from 'react';
 
 /**
- * Test
- * @return {*} any any
+ * Test.
+ * @return {*} Any any.
  */
 const Test = () => (
   <div>

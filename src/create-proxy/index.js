@@ -1,10 +1,10 @@
 import createProxyMiddleware from './create-proxy-middleware';
 
 /**
- * Конструктор сервиса проксирования
- * @param {Object} config Конфигурация приложения
- * @param {Object} proxy Конфигурация прокси
- * @return {Function} Функция-конструктор
+ * Конструктор сервиса проксирования.
+ * @param {Object} config Конфигурация приложения.
+ * @param {Object} proxy Конфигурация прокси.
+ * @return {Function} Функция-конструктор.
  */
 export default function createProxy (
   {

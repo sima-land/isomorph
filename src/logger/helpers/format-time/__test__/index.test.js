@@ -1,6 +1,5 @@
 import formatTime from '..';
 
-
 describe('formatTime()', () => {
   it('works correctly', () => {
     jest.spyOn(Date.prototype, 'toISOString')

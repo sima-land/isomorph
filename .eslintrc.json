@@ -2,7 +2,8 @@
   "plugins": [
     "react",
     "jest",
-    "import"
+    "import",
+    "jsdoc"
   ],
   "env": {
     "browser": true,
@@ -19,6 +20,7 @@
       "jsx": true
     }
   },
+
   "rules": {
     "eqeqeq": "error",
     "no-var": "error",
@@ -40,6 +42,14 @@
     "no-extra-boolean-cast": "error",
     "array-callback-return": "error",
     "no-useless-constructor": "error",
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1,
+        "maxBOF": 1,
+        "maxEOF": 0
+      }
+    ],
     "array-bracket-spacing": [
       "error",
       "never"
@@ -177,6 +187,17 @@
         "ignoreDestructuring": false
       }
     ],
+    "lines-around-comment": [
+      "error",
+      {
+        "beforeBlockComment": true,
+        "beforeLineComment": true,
+        "allowBlockStart": true,
+        "allowObjectStart": true,
+        "allowArrayStart": true,
+        "allowClassStart": true
+      }
+    ],
     "prefer-const": "error",
     "valid-jsdoc": [
       "error",
@@ -254,7 +275,18 @@
     "jest/valid-expect": "error",
     "import/newline-after-import": [
       "error",
-      { "count": 1 }
+      {
+        "count": 1
+      }
+    ],
+    "jsdoc/require-param": "error",
+    "jsdoc/require-description-complete-sentence": [
+      "error",
+      "always"
+    ],
+    "jsdoc/valid-types": [
+      "error",
+      "always"
     ]
   }
 }

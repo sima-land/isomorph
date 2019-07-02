@@ -1,11 +1,11 @@
 import isFunction from 'lodash/isFunction';
 
 /**
- * Возвращает шаблон, который подходит текущей конфигурации
- * @param {Object} data Данные
- * @property {Object} data.templates Шаблоны
- * @property {Object} data.config Конфигурация со средой выполнения
- * @return {Object} Шаблон совпадающий со средой выполнения
+ * Возвращает шаблон, который подходит текущей конфигурации.
+ * @param {Object} data Данные.
+ * @property {Object} data.templates Шаблоны.
+ * @property {Object} data.config Конфигурация со средой выполнения.
+ * @return {Object} Шаблон совпадающий со средой выполнения.
  */
 export const getTemplate = ({ templates, config } = {}) => {
   for (const templateName in templates) {
@@ -17,9 +17,9 @@ export const getTemplate = ({ templates, config } = {}) => {
 };
 
 /**
- * Проверка templates на валидность
- * @param {Object} templateObject Шаблон
- * @return {Object} [templateObject] Валидный шаблон
+ * Проверка templates на валидность.
+ * @param {Object} templateObject Шаблон.
+ * @return {Object} [templateObject] Валидный шаблон.
  */
 export function validateTemplate (templateObject) {
   const { checker, template } = templateObject || {};
@@ -35,10 +35,10 @@ ${jsonView}
 }
 
 /**
- * Преобразует функцию в строку
- * @param {string} key Ключ объекта
- * @param {*} value Значение объекта
- * @return {*} [value] Приобразованное значение объекта
+ * Преобразует функцию в строку.
+ * @param {string} key Ключ объекта.
+ * @param {*} value Значение объекта.
+ * @return {*} [value] Преобразованное значение объекта.
  */
 export function jsonStringifyReplacer (key, value) {
   if (!JSON.stringify(value)) {

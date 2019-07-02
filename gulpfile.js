@@ -2,14 +2,14 @@ const { src, dest, series } = require('gulp');
 const del = require('del');
 
 /**
- * clean fn
- * @return {*} test
+ * Clean fn.
+ * @return {*} Test.
  */
 const clean = () => del(['build']);
 
 /**
- * move fn
- * @return {*} test
+ * Move fn.
+ * @return {*} Test.
  */
 const move = () => src(['./src/**/*', '!**/*.test.js']).pipe(dest('build'));
 

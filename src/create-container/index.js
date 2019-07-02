@@ -3,10 +3,10 @@ import isFunction from 'lodash/isFunction';
 import isPlainObject from 'lodash/isPlainObject';
 
 /**
- * Функция создает IoC-контейнер
- * @param {Object} options Дополнительные опации для IoC-контейнера
- * @param {Array} options.services Массив сервисов, которые нужно зарегистрировать
- * @return {Object} IoC Container
+ * Функция создает IoC-контейнер.
+ * @param {Object} options Дополнительные опации для IoC-контейнера.
+ * @param {Array} options.services Массив сервисов, которые нужно зарегистрировать.
+ * @return {Object} IoC Container.
  * @throws {TypeError} Выдаст ошибку если параметр "services" не массив
  */
 export default function createContainer ({ services = [] } = {}) {
@@ -17,9 +17,9 @@ export default function createContainer ({ services = [] } = {}) {
   const registry = {};
 
   /**
-   * Создает объект зависимостей на основе их названий
-   * @param {Object} service Сервис для которого нужно создать массив зависимостей
-   * @return {Object} Объект зависимостей
+   * Создает объект зависимостей на основе их названий.
+   * @param {Object} service Сервис для которого нужно создать массив зависимостей.
+   * @return {Object} Объект зависимостей.
    */
   const getDependencies = service => service.dependencies.reduce((result, dependency) => {
     if (isString(dependency)) {
@@ -38,13 +38,13 @@ export default function createContainer ({ services = [] } = {}) {
 
   const container = {
     /**
-     * Добавляет зависимость в список зависимостей
-     * @param {Object} options Опции необходимые для добавления зависимости
-     * @param {string} options.name Название зависимости
-     * @param {Function} options.singleton Функция-синглотон
-     * @param {Function} options.factory Функция-конструктор
-     * @param {*} options.value Переданная зависимость
-     * @param {Array} options.dependencies Массив зависимостей
+     * Добавляет зависимость в список зависимостей.
+     * @param {Object} options Опции необходимые для добавления зависимости.
+     * @param {string} options.name Название зависимости.
+     * @param {Function} options.singleton Функция-синглотон.
+     * @param {Function} options.factory Функция-конструктор.
+     * @param {*} options.value Переданная зависимость.
+     * @param {Array} options.dependencies Массив зависимостей.
      * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
      * @throws {Error} Выдаст ошибку если не передан ни один из параметров "factory", "singleton" или "value"
      */
@@ -76,9 +76,9 @@ export default function createContainer ({ services = [] } = {}) {
     },
 
     /**
-     * Получает зависимость по ее названию
-     * @param {string} name Название зависимости
-     * @return {*} Зависимость
+     * Получает зависимость по ее названию.
+     * @param {string} name Название зависимости.
+     * @return {*} Зависимость.
      * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
      * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
      * @throws {Error} Выдаст ошибку при попытке вызвать незарегистрированный сервис

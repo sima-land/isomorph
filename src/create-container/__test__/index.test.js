@@ -11,9 +11,10 @@ describe('createContainer', () => {
         {
           name: 'singleton',
           singleton: ({ string }) => ({
+
             /**
-             * Тестовая функция
-             * @return {string} Тестовая строка
+             * Тестовая функция.
+             * @return {string} Тестовая строка.
              */
             whatIs () {
               return `It is ${string}`;
@@ -24,9 +25,10 @@ describe('createContainer', () => {
         {
           name: 'factory',
           factory: ({ singleton } = {}) => ({
+
             /**
-             * Тестовая функция
-             * @return {string} Тестовая строка
+             * Тестовая функция.
+             * @return {string} Тестовая строка.
              */
             whatIs () {
               return singleton.whatIs();
@@ -48,9 +50,9 @@ describe('createContainer', () => {
 
   it ('method getDependencies() works correctly when dependency is Object', () => {
     /**
-     * Тестовая функция
-     * @param {Function} getValue Тестовая зависимость
-     * @return {*} Тестовый результат
+     * Тестовая функция.
+     * @param {Function} getValue Тестовая зависимость.
+     * @return {*} Тестовый результат.
      */
     const factory = ({ getValue }) => getValue();
     const container = createContainer({

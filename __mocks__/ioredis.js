@@ -6,7 +6,7 @@ export const mockOn = jest.fn((type, callback) => {
 });
 
 /**
- * Mock функции Redis
+ * Mock функции Redis.
  */
 export default function Redis () {
   this.on = mockOn;
