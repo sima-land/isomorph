@@ -3,7 +3,7 @@ import isFunction from 'lodash/isFunction';
 import { hrtimeToInteger } from '../hr-time-to-integer';
 
 /**
- * Обработчик завершения запроса
+ * Обработчик завершения запроса.
  */
 export const finishHandler = function () {
   this.removeListener('error', finishHandler);
@@ -27,12 +27,12 @@ export const finishHandler = function () {
 };
 
 /**
- * Конфигуратор логгера
- * @param {Object} options Настройки логгера
- * @param {Object} options.logger Экземпляр логгера
- * @param {Object} options.staticData Статические данные
- * @param {Object} options.dynamicData Динамические данные
- * @return {Function} middleware для логгирования запросов
+ * Конфигуратор логгера.
+ * @param {Object} options Настройки логгера.
+ * @param {Object} options.logger Экземпляр логгера.
+ * @param {Object} options.staticData Статические данные.
+ * @param {Object} options.dynamicData Динамические данные.
+ * @return {Function} Middleware для логгирования запросов.
  */
 export default function configPinoLogger (options = {}) {
   if (!options.logger) {
@@ -40,10 +40,10 @@ export default function configPinoLogger (options = {}) {
   }
 
   /**
-   * Функция, возвращаемая middleware
-   * @param {Object} req Запрос
-   * @param {Object} res Ответ
-   * @param {Function} next Функция для передачи контекста следующему middleware
+   * Функция, возвращаемая middleware.
+   * @param {Object} req Запрос.
+   * @param {Object} res Ответ.
+   * @param {Function} next Функция для передачи контекста следующему middleware.
    */
   const middleware = (req, res, next) => {
     res.logData = {

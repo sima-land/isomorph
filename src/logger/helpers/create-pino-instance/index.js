@@ -3,20 +3,21 @@ import formatTime from '../format-time';
 import isPlainObject from 'lodash/isPlainObject';
 
 /**
- * Модуль создающий экземпляр логгера
- * @param {Object} options Зависимости модуля
- * @return {Function} Функция, которая создает логгер
+ * Модуль создающий экземпляр логгера.
+ * @param {Object} options Зависимости модуля.
+ * @return {Function} Функция, которая создает логгер.
  */
 export default function createPinoInstance ({ config } = {}) {
   /**
-   * Функция, которая создает экземпляр логгера
-   * @param {string|number} timestamp Время
-   * @param {boolean} isProduction Является ли production-сборкой
-   * @param {boolean} hasColorize Нужно ли показывать красиво
-   * @return {Function} Экземпляр логгера
+   * Функция, которая создает экземпляр логгера.
+   * @param {string|number} timestamp Время.
+   * @param {boolean} isProduction Является ли production-сборкой.
+   * @param {boolean} hasColorize Нужно ли показывать красиво.
+   * @return {Function} Экземпляр логгера.
    */
   const loggerCreator = (
-    { timestamp,
+    {
+      timestamp,
       isProduction,
       hasColorize,
     }

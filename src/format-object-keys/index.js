@@ -2,9 +2,9 @@ import camelCase from 'lodash/camelCase';
 import isPlainObject from 'lodash/isPlainObject';
 
 /**
- * Переводит ключи объекта в camelCase
- * @param {Object} object Объект ключи которого нужно отформатировать
- * @return {Object} Отформатированный объект
+ * Переводит ключи объекта в camelCase.
+ * @param {Object} object Объект ключи которого нужно отформатировать.
+ * @return {Object} Отформатированный объект.
  */
 export default function formatObjectKeys (object) {
   if (!isPlainObject(object)) {

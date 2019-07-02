@@ -31,12 +31,14 @@ describe('redisCache()', () => {
       defaultCacheDuration: 300,
       recDelay: 301,
     };
+
     /**
-     * Мок функции-обработчика события повторного соединения с redis
+     * Мок функции-обработчика события повторного соединения с redis.
      */
     const onConnect = () => {};
+
     /**
-     * Мок функции-обработчика события повторного соединения с redis
+     * Мок функции-обработчика события повторного соединения с redis.
      */
     const onReconnect = () => {};
     const getOnConnectCallback = jest.fn(() => onConnect);

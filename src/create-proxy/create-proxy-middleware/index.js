@@ -3,11 +3,11 @@ import isFunction from 'lodash/isFunction';
 import expressProxy from 'express-http-proxy';
 
 /**
- * Функция создающая обработчик запроса
- * @param {string} header Отслеживаемый заголовок
- * @param {Array} map Массив обработчика
- * @param {Object} config Конфигурация приложения
- * @return {Function} Функция, обрабатывающая запрос
+ * Функция создающая обработчик запроса.
+ * @param {string} header Отслеживаемый заголовок.
+ * @param {Array} map Массив обработчика.
+ * @param {Object} config Конфигурация приложения.
+ * @return {Function} Функция, обрабатывающая запрос.
  */
 export default function createProxyMiddleware (header, map, config) {
   return (req, res, next) => {

@@ -13,7 +13,9 @@ mainApp.use(container.get('loggerMiddleware'));
 mainApp.use(container.get('sentryMiddleware'));
 mainApp.use(container.get('requestMetricsMiddleware'));
 mainApp.get('/', (request, response) => response.send('Hello World!'));
-mainApp.listen(mainPort);
+
+const server = mainApp.listen(mainPort);
+container.get('decorateGracefulShutdown')(server);
 
 // initialize  prometheus metrics app
 metricsApp.get('/', (request, response) => {

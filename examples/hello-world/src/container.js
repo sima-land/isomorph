@@ -6,6 +6,7 @@ import createContainer from '../../../src/create-container';
 import sentryLogger from '../../../src/logger/sentry-logger';
 import createSentryMiddleware from '../../../src/logger/create-sentry-middleware';
 import createLoggerMiddleware from '../../../src/logger/create-logger-middleware';
+import createPinoInstance from '../../../src/logger/helpers/create-pino-instance';
 import {
   PrometheusMetric,
   createRequestMiddleware,
@@ -16,6 +17,7 @@ import redisCache, {
   getOnConnectCallback,
   getOnReconnectingCallback,
 } from '../../../src/cache';
+import { decorateGracefulShutdown } from '../../../src/graceful-shutdown/';
 import { getTracer } from '../../../src/tracer';
 import { getTemplate } from '../../../src/render/render';
 
@@ -32,6 +34,7 @@ const values = [
   { name: 'getRetryStrategy', value: getRetryStrategy },
   { name: 'getOnConnectCallback', value: getOnConnectCallback },
   { name: 'getOnReconnectingCallback', value: getOnReconnectingCallback },
+  { name: 'processExitTimeout', value: 10000 },
   {
     name: 'requestStartMetrics',
     value: [
@@ -55,6 +58,27 @@ const values = [
 ];
 
 const singletons = [
+  {
+    name: 'pinoLogger',
+    singleton: createPinoInstance,
+    dependencies: ['config'],
+  },
+  {
+    name: 'onExitError',
+    singleton: ({ pinoLogger, config }) => () => {
+      const { isDevelopment = true } = config || {};
+      isDevelopment && pinoLogger.info('Could not close connections in time, forcefully shutting down');
+    },
+    dependencies: ['pinoLogger', 'config'],
+  },
+  {
+    name: 'onExitSuccess',
+    singleton: ({ pinoLogger, config }) => () => {
+      const { isDevelopment = true } = config || {};
+      isDevelopment && pinoLogger.info('Closed out remaining connections.');
+    },
+    dependencies: ['pinoLogger', 'config'],
+  },
   {
     name: 'requestMetricsMiddleware',
     singleton: createRequestMiddleware,
@@ -98,6 +122,23 @@ const singletons = [
 ];
 
 const factories = [
+  {
+    name: 'decorateGracefulShutdown',
+    singleton: ({
+      onExitError: onError,
+      onExitSuccess: onSuccess,
+      processExitTimeout: timeout,
+    }) => server => decorateGracefulShutdown(server, {
+      onError,
+      onSuccess,
+      timeout,
+    }),
+    dependencies: [
+      'processExitTimeout',
+      'onExitError',
+      'onExitSuccess',
+    ],
+  },
   {
     name: 'storeCreator',
     factory: storeCreator,
