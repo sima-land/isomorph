@@ -9,6 +9,7 @@ const metricsApp = express();
 const metricsPort = 3001;
 
 // initialize example app
+mainApp.use(container.get('tracingMiddleware'));
 mainApp.use(container.get('loggerMiddleware'));
 mainApp.use(container.get('sentryMiddleware'));
 mainApp.use(container.get('requestMetricsMiddleware'));
