@@ -18,7 +18,11 @@ import redisCache, {
   getOnReconnectingCallback,
 } from '../../../src/cache';
 import { decorateGracefulShutdown } from '../../../src/graceful-shutdown/';
-import { getTracer } from '../../../src/tracer';
+import {
+  getTracer,
+  traceIncomingRequest,
+  createTracingMiddleware,
+} from '../../../src/tracer';
 import { getTemplate } from '../../../src/render/render';
 
 const values = [
@@ -55,6 +59,10 @@ const values = [
   },
   { name: 'metrics', value: {} },
   { name: 'logger', value: {} },
+  {
+    name: 'onJaegerSpanFinish',
+    value: (req, res, span) => span.finish(),
+  },
 ];
 
 const singletons = [
@@ -114,11 +122,30 @@ const singletons = [
     ],
   },
   {
-    name: 'tracer',
+    name: 'jaegerTracer',
     singleton: getTracer,
     dependencies: ['config', 'metrics', 'logger'],
   },
-
+  {
+    name: 'tracingMiddleware',
+    singleton: ({ createSpan, onSpanFinish }) => createTracingMiddleware(
+      createSpan,
+      onSpanFinish,
+    ),
+    dependencies: [
+      { createSpan: 'createJaegerSpan' },
+      { onSpanFinish: 'onJaegerSpanFinish' },
+    ],
+  },
+  {
+    name: 'createJaegerSpan',
+    singleton: ({ jaegerTracer }) => request => traceIncomingRequest(
+      jaegerTracer,
+      'incoming-http-request',
+      request,
+    ),
+    dependencies: ['jaegerTracer'],
+  },
 ];
 
 const factories = [
