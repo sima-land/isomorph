@@ -19,6 +19,9 @@ const config = createConfig({
       },
     },
   ],
+  mainPort: 4000,
+  metricsPort: 4001,
+  loadDataTimeout: 500,
 });
 
 export default config;

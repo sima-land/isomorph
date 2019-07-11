@@ -1,71 +1,76 @@
 import config from './config';
-import httpHelpers from '../../../src/http-helpers';
+import { getMethod, getStatus, getXClientIp } from '../../../src/helpers/http';
 import templates from './templates';
-import storeCreator from '../../../src/store-creator';
-import createContainer from '../../../src/create-container';
+import { createStoreService } from '../../../src/helpers/saga';
+import create from '../../../src/container';
 import sentryLogger from '../../../src/logger/sentry-logger';
 import createSentryMiddleware from '../../../src/logger/create-sentry-middleware';
 import createLoggerMiddleware from '../../../src/logger/create-logger-middleware';
-import createPinoInstance from '../../../src/logger/helpers/create-pino-instance';
+import createPinoInstance from '../../../src/helpers/logger/create-pino-instance';
 import {
   PrometheusMetric,
-  createRequestMiddleware,
-} from '../../../src/prometheus-helpers/';
+  createMeasureMiddleware,
+} from '../../../src/helpers/prometheus/';
 import redisCache, {
   reconnectOnError,
   getRetryStrategy,
   getOnConnectCallback,
   getOnReconnectingCallback,
 } from '../../../src/cache';
+import { getTemplate, prepareRenderFunction } from '../../../src/helpers/render';
+import isLoadFinish from './redux/selectors/is-load-finish';
+import { reducer } from './redux/reducers';
+import { createRootSaga } from './sagas';
+import { getStateService } from './sagas/get-final-state';
 import { decorateGracefulShutdown } from '../../../src/graceful-shutdown/';
 import {
   getTracer,
   traceIncomingRequest,
   createTracingMiddleware,
-} from '../../../src/tracer';
-import { getTemplate } from '../../../src/render/render';
+} from '../../../src/helpers/tracer';
 
 const values = [
   { name: 'config', value: config },
-  { name: 'httpHelpers', value: httpHelpers },
   { name: 'templates', value: templates },
-  { name: 'initialState', value: {} },
-  { name: 'middlewares', value: {} },
-  { name: 'reducer', value: () => 1 },
-  { name: 'compose', value: () => 1 },
-  { name: 'getAppRunner', value: () => () => {} },
-  { name: 'reconnectOnError', value: reconnectOnError },
-  { name: 'getRetryStrategy', value: getRetryStrategy },
-  { name: 'getOnConnectCallback', value: getOnConnectCallback },
-  { name: 'getOnReconnectingCallback', value: getOnReconnectingCallback },
-  { name: 'processExitTimeout', value: 10000 },
-  {
-    name: 'requestStartMetrics',
-    value: [
-      new PrometheusMetric('Counter', {
-        name: 'request_counter',
-        help: 'request counter',
-        labelNames: ['place', 'route', 'statusCode'],
-      }),
-    ],
-  },
-  {
-    name: 'metricLabelsResolver',
-    value: ({ dependencies: { config }, request, response }) => ({
-      place: config.place || 'dev',
-      route: request.path,
-      statusCode: response.statusCode,
-    }),
-  },
-  { name: 'metrics', value: {} },
-  { name: 'logger', value: {} },
-  {
-    name: 'onJaegerSpanFinish',
-    value: (req, res, span) => span.finish(),
-  },
 ];
 
 const singletons = [
+  {
+    name: 'requestMetricsMiddleware',
+    singleton: createMeasureMiddleware,
+    dependencies: [
+      'config',
+      {
+        name: 'startMetrics',
+        value: [
+          new PrometheusMetric('Counter', {
+            name: 'request_counter',
+            help: 'request counter',
+            labelNames: ['place', 'route', 'statusCode'],
+          }),
+        ],
+      },
+      {
+        name: 'finishMetrics',
+        value: [
+          new PrometheusMetric('Histogram', {
+            name: 'http_response_duration_ms',
+            help: 'Duration of HTTP requests in ms',
+            labelNames: ['place', 'route', 'statusCode'],
+            buckets: [30, 100, 200, 500, 1000, 2500, 5000, 10000],
+          }),
+        ],
+      },
+      {
+        name: 'resolveLabels',
+        value: ({ dependencies: { config }, request, response }) => ({
+          place: config.place || 'dev',
+          route: request.path,
+          statusCode: response.statusCode,
+        }),
+      },
+    ],
+  },
   {
     name: 'pinoLogger',
     singleton: createPinoInstance,
@@ -88,18 +93,52 @@ const singletons = [
     dependencies: ['pinoLogger', 'config'],
   },
   {
-    name: 'requestMetricsMiddleware',
-    singleton: createRequestMiddleware,
+    name: 'renderMetricsMiddleware',
+    singleton: createMeasureMiddleware,
     dependencies: [
       'config',
-      { startMetrics: 'requestStartMetrics' },
-      { resolveLabels: 'metricLabelsResolver' },
+      {
+        name: 'finishMetrics',
+        value: [
+          new PrometheusMetric('Histogram', {
+            name: 'render_duration_ms',
+            help: 'Duration of SSR ms',
+            labelNames: ['version', 'place'],
+            buckets: [0.1, 15, 50, 100, 250, 500, 800, 1500],
+          }),
+        ],
+      },
+      {
+        name: 'resolveLabels',
+        value: ({ dependencies: { config } }) => ({
+          place: config.place || 'dev',
+          version: config.buildVersion || 'development',
+        }),
+      },
+      {
+        name: 'startSubscriber',
+        value: ({ response, callback }) => response.once('render:start', callback),
+      },
+      {
+        name: 'finishSubscriber',
+        value: ({ response, callback }) => response.once('render:finish', callback),
+      },
     ],
   },
   {
     name: 'loggerMiddleware',
     singleton: createLoggerMiddleware,
-    dependencies: ['config', 'httpHelpers'],
+    dependencies: [
+      'config',
+      {
+        name: 'helpers',
+        value: {
+          getXClientIp,
+          getMethod,
+          getStatus,
+        },
+      },
+    ],
   },
   {
     name: 'sentryMiddleware',
@@ -115,16 +154,25 @@ const singletons = [
     singleton: redisCache,
     dependencies: [
       'config',
-      'reconnectOnError',
-      'getRetryStrategy',
-      'getOnConnectCallback',
-      'getOnReconnectingCallback',
+      { name: 'reconnectOnError', value: reconnectOnError },
+      { name: 'getRetryStrategy', value: getRetryStrategy },
+      { name: 'getOnConnectCallback', value: getOnConnectCallback },
+      { name: 'getOnReconnectingCallback', value: getOnReconnectingCallback },
     ],
+  },
+  {
+    name: 'getTemplate',
+    singleton: getTemplate,
+    dependencies: ['config', { name: 'templates', value: templates }],
   },
   {
     name: 'jaegerTracer',
     singleton: getTracer,
-    dependencies: ['config', 'metrics', 'logger'],
+    dependencies: [
+      'config',
+      { name: 'metrics', value: {} },
+      { name: 'logger', value: {} },
+    ],
   },
   {
     name: 'tracingMiddleware',
@@ -134,7 +182,10 @@ const singletons = [
     ),
     dependencies: [
       { createSpan: 'createJaegerSpan' },
-      { onSpanFinish: 'onJaegerSpanFinish' },
+      {
+        name: 'onSpanFinish',
+        value: (req, res, span) => span.finish(),
+      },
     ],
   },
   {
@@ -146,39 +197,76 @@ const singletons = [
     ),
     dependencies: ['jaegerTracer'],
   },
-];
-
-const factories = [
   {
     name: 'decorateGracefulShutdown',
-    singleton: ({
-      onExitError: onError,
-      onExitSuccess: onSuccess,
-      processExitTimeout: timeout,
-    }) => server => decorateGracefulShutdown(server, {
+    singleton: (
+      {
+        onExitError: onError,
+        onExitSuccess: onSuccess,
+        processExitTimeout: timeout,
+      }
+    ) => server => decorateGracefulShutdown(server, {
       onError,
       onSuccess,
       timeout,
     }),
     dependencies: [
-      'processExitTimeout',
+      {
+        name: 'processExitTimeout',
+        value: 10000,
+      },
       'onExitError',
       'onExitSuccess',
     ],
   },
+];
+
+const factories = [
   {
-    name: 'storeCreator',
-    factory: storeCreator,
-    dependencies: ['initialState', 'reducer', 'compose', 'middlewares', 'getAppRunner'],
+    name: 'helloInitialSaga',
+    factory: createRootSaga,
   },
   {
-    name: 'getTemplate',
-    singleton: getTemplate,
-    dependencies: ['templates', 'config'],
+    name: 'helloStore',
+    factory: createStoreService,
+    dependencies: [
+      {
+        name: 'reducer',
+        value: reducer,
+      },
+      {
+        initialSaga: 'helloInitialSaga',
+      },
+      {
+        name: 'isReady',
+        value: isLoadFinish,
+      },
+      {
+        name: 'timeout',
+        value: 100,
+      },
+    ],
+  },
+  {
+    name: 'helloState',
+    factory: getStateService,
+    dependencies: [
+      { store: 'helloStore' },
+    ],
+  },
+  {
+    name: 'helloRouteRender',
+    factory: prepareRenderFunction,
+    dependencies: [
+      {
+        name: 'render',
+        value: ({ output }) => output,
+      },
+    ],
   },
 ];
 
-const container = createContainer({
+const container = create({
   services: [
     ...values,
     ...singletons,
