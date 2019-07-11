@@ -1,22 +1,22 @@
 import createLoggerMiddleware from '..';
-import createPinoLogger from '../../helpers/config-pino-logger';
-import createPinoInstance from '../../helpers/create-pino-instance';
+import createPinoLogger from '../../../helpers/logger/config-pino-logger';
+import createPinoInstance from '../../../helpers/logger/create-pino-instance';
 
 const config = { version: 1 };
-const httpHelpers = {
+const helpers = {
   getXClientIp: jest.fn(),
   getMethod: jest.fn(),
   getStatus: jest.fn(),
 };
 
-jest.mock('../../helpers/config-pino-logger', () => jest.fn());
-jest.mock('../../helpers/create-pino-instance', () => jest.fn());
+jest.mock('../../../helpers/logger/config-pino-logger', () => jest.fn());
+jest.mock('../../../helpers/logger/create-pino-instance', () => jest.fn());
 
 describe('createLoggerMiddleware', () => {
   it('works correctly', () => {
     createLoggerMiddleware({
       config,
-      httpHelpers,
+      helpers,
     });
 
     expect(createPinoLogger).toHaveBeenCalledWith({
@@ -25,9 +25,9 @@ describe('createLoggerMiddleware', () => {
         version: config.version,
       },
       dynamicData: {
-        remote_ip: httpHelpers.getXClientIp,
-        method: httpHelpers.getMethod,
-        status: httpHelpers.getStatus,
+        remote_ip: helpers.getXClientIp,
+        method: helpers.getMethod,
+        status: helpers.getStatus,
       },
     });
     expect(createPinoInstance).toHaveBeenCalledWith({ config });

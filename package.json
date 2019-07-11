@@ -30,7 +30,8 @@
     "opentracing": "^0.14.3",
     "react": "16.8.x",
     "react-dom": "16.8.x",
-    "redux": "^4.0.1"
+    "redux": "^4.0.1",
+    "redux-saga": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "7.2.x",

@@ -1,5 +1,5 @@
-import configPinoLogger from '../helpers/config-pino-logger';
-import createPinoInstance from '../helpers/create-pino-instance';
+import configPinoLogger from '../../helpers/logger/config-pino-logger';
+import createPinoInstance from '../../helpers/logger/create-pino-instance';
 
 /**
  * Конструктор для создания middleware для express-приложения.
@@ -16,12 +16,12 @@ export default function createLoggerMiddleware (
     config: {
       version,
     },
-    httpHelpers: {
+    helpers: {
       getXClientIp,
       getMethod,
       getStatus,
     },
-  }
+  },
 ) {
   return configPinoLogger({
     logger: createPinoInstance({ config }),
