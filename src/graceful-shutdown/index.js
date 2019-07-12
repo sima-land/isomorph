@@ -1,5 +1,5 @@
-import { isNumeric } from '../utils.js';
-import isFunction from 'lodash/isFunction';
+import isFunction from 'lodash.isfunction';
+import isNumeric from '../helpers/utils/is-numeric';
 
 /**
  * Время ожидания до принудительного завершения процесса приложения по умолчанию.

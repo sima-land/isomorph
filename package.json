@@ -1,19 +1,21 @@
 {
-  "name": "sima-land-isomorph",
-  "version": "1.0.0",
-  "description": "Server side rendering for Header service",
+  "name": "@SL/isomorph",
+  "version": "0.0.0",
+  "description": "Server side rendering for frontend microservices",
   "main": "index.js",
   "repository": "ssh://git@gitlab.sima-land.ru:7888/SL/isomorph.git",
   "author": "www.sima-land.ru team",
   "license": "MIT",
-  "private": true,
+  "private": false,
+  "engines": {
+    "node": ">=10.15.3"
+  },
   "publishConfig": {
     "registry": "https://gitlab.sima-land.ru/api/v4/projects/676/packages/npm/"
   },
   "scripts": {
     "dev": "cd ./examples/hello-world/ && yarn && yarn dev",
     "build": "gulp build",
-    "publication": "yarn login && yarn np",
     "lint": "eslint --cache ./ --ext .js,.jsx",
     "test": "jest"
   },
@@ -26,10 +28,16 @@
   "dependencies": {
     "ioredis": "^4.10.0",
     "jaeger-client": "^3.15.0",
-    "prom-client": "^11.5.2",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.get": "^4.4.2",
+    "lodash.isfunction": "^3.0.9",
+    "lodash.isnumber": "^3.0.3",
+    "lodash.isplainobject": "^4.0.6",
+    "lodash.isstring": "^4.0.1",
+    "lodash.mapvalues": "^4.6.0",
+    "lodash.negate": "^3.0.2",
     "opentracing": "^0.14.3",
-    "react": "16.8.x",
-    "react-dom": "16.8.x",
+    "prom-client": "^11.5.2",
     "redux": "^4.0.1",
     "redux-saga": "^1.0.5"
   },
@@ -58,7 +66,6 @@
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
     "lodash": "^4.17.x",
-    "np": "5.0.x",
     "pino": "^5.12.6",
     "pino-pretty": "^3.2.0",
     "raven": "^2.6.4"

@@ -7,10 +7,8 @@ module.exports = {
       statements: 100,
     },
   },
-  setupFiles: ['./jest.setup.js'],
   transform: {
-    '^.+\\.(js|jsx)?$': 'babel-jest',
+    '^.+\\.(js)?$': 'babel-jest',
   },
-  snapshotSerializers: ['enzyme-to-json/serializer'],
   clearMocks: true,
 };
