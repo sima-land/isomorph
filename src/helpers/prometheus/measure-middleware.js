@@ -1,5 +1,5 @@
-import negate from 'lodash/negate';
-import isFunction from 'lodash/isFunction';
+import negate from 'lodash.negate';
+import isFunction from 'lodash.isfunction';
 import { isPrometheusMetric } from './metric-adapter.js';
 import { createObserveMiddleware, defaultStartSubscriber, defaultFinishSubscriber } from '../../observe-middleware';
 

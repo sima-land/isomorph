@@ -1,13 +1,13 @@
 import { getTemplate, validateTemplate, jsonStringifyReplacer, prepareRenderFunction } from '..';
-import { wrapInMeasureEvent } from '../../../utils';
+import wrapInMeasureEvent from '../../utils/wrap-in-measure-event';
 import EventEmitter from 'events';
 
-jest.mock('../../../utils', () => {
-  const original = jest.requireActual('../../../utils');
+jest.mock('../../utils/wrap-in-measure-event', () => {
+  const original = jest.requireActual('../../utils/wrap-in-measure-event');
   return {
     ...original,
     __esModule: true,
-    wrapInMeasureEvent: jest.fn(original.wrapInMeasureEvent),
+    default: jest.fn(original.default),
   };
 });
 

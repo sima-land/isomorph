@@ -1,6 +1,6 @@
 import { waitOnStoreReadiness, prepareOnReady } from '../index';
 import { createStore } from 'redux';
-import isFunction from 'lodash/isFunction';
+import isFunction from 'lodash.isfunction';
 
 jest.unmock('redux');
 jest.useFakeTimers();

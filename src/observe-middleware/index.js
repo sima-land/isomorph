@@ -1,5 +1,5 @@
-import isFunction from 'lodash/isFunction';
-import { getMsFromHRT } from '../utils.js';
+import isFunction from 'lodash.isfunction';
+import getMsFromHRT from '../helpers/utils/get-ms-from-hrt';
 
 /**
  * Немедленно выполняет функцию-обработчик при старте middleware.
