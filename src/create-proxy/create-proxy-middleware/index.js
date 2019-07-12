@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import isFunction from 'lodash/isFunction';
+import get from 'lodash.get';
+import isFunction from 'lodash.isfunction';
 import expressProxy from 'express-http-proxy';
 
 /**

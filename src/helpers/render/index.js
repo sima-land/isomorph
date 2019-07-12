@@ -1,5 +1,5 @@
-import isFunction from 'lodash/isFunction';
-import { wrapInMeasureEvent } from '../../utils';
+import isFunction from 'lodash.isfunction';
+import wrapInMeasureEvent from '../utils/wrap-in-measure-event';
 
 /**
  * Создаёт функцию для рендеринга приложения, навешивая необходимые события.

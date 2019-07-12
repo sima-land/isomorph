@@ -1,0 +1,55 @@
+stages:
+  - prepare
+  - test
+  - publish
+
+prepare:
+  stage: prepare
+  image: node:10.15.3-alpine
+  cache:
+    paths:
+      - node_modules
+  script:
+    - yarn install
+  tags:
+    - sl-frontend
+
+lint:
+  stage: test
+  image: node:10.15.3-alpine
+  cache:
+    paths:
+      - node_modules
+  script:
+    - yarn lint
+  tags:
+    - sl-frontend
+
+test:
+  stage: test
+  image: node:10.15.3-alpine
+  cache:
+    paths:
+      - node_modules
+  script:
+    - yarn test
+  tags:
+    - sl-frontend
+
+publish-package:
+  stage: publish
+  image: node:10.15.3-alpine
+  cache:
+    paths:
+      - node_modules
+  before_script:
+    - echo //gitlab.sima-land.ru/api/v4/projects/676/packages/npm/:_authToken=${NPM_AUTH_TOKEN} > .npmrc
+    - npm version $CI_COMMIT_REF_NAME
+    - yarn build
+  script:
+    - npm publish build
+  only:
+    refs:
+      - tags
+  tags:
+    - sl-frontend

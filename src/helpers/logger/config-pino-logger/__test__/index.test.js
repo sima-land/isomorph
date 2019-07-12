@@ -1,11 +1,7 @@
 import configPinoLogger, {
   finishHandler,
 } from '..';
-import isFunction from '../../../../../__mocks__/lodash/isFunction';
-
-jest.mock('../../hr-time-to-integer', () => ({
-  hrtimeToInteger: jest.fn(() => 1234567891011121314),
-}));
+import isFunction from '../../../../../__mocks__/lodash.isfunction';
 
 let response, request, options, next;
 
@@ -53,6 +49,8 @@ describe('configPinoLogger()', () => {
   });
 
   it('finish handler works correctly', () => {
+    jest.spyOn(process, 'hrtime')
+      .mockReturnValueOnce([1, 11111]);
     const localResponse = {
       ...response,
       logData: {
@@ -61,7 +59,7 @@ describe('configPinoLogger()', () => {
       },
       request,
       log: jest.fn(),
-      startTime: 123456789101112131,
+      startTime: [0, 0],
     };
 
     finishHandler.bind(localResponse)();
@@ -69,7 +67,7 @@ describe('configPinoLogger()', () => {
     expect(localResponse.log).toHaveBeenCalledWith({
       version: 1,
       method: 2,
-      latency: 1111111101910.0093,
+      latency: 1000.011111,
     });
     expect(options.dynamicData.method).toHaveBeenCalledWith({
       request,
