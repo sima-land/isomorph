@@ -1,6 +1,6 @@
-import isString from 'lodash/isString';
-import isFunction from 'lodash/isFunction';
-import isPlainObject from 'lodash/isPlainObject';
+import isString from 'lodash.isstring';
+import isFunction from 'lodash.isfunction';
+import isPlainObject from 'lodash.isplainobject';
 
 /**
  * Создает объект зависимостей на основе их названий.

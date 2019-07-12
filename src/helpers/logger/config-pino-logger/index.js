@@ -1,6 +1,6 @@
-import mapValues from 'lodash/mapValues';
-import isFunction from 'lodash/isFunction';
-import { hrtimeToInteger } from '../hr-time-to-integer';
+import mapValues from 'lodash.mapvalues';
+import isFunction from 'lodash.isfunction';
+import getMsFromHRT from '../../utils/get-ms-from-hrt';
 
 /**
  * Обработчик завершения запроса.
@@ -9,7 +9,6 @@ export const finishHandler = function () {
   this.removeListener('error', finishHandler);
   this.removeListener('finish', finishHandler);
 
-  const NS_PER_MSEC = 1e6;
   const logData = mapValues(
     this.logData,
     value => isFunction(value)
@@ -22,7 +21,7 @@ export const finishHandler = function () {
 
   this.log({
     ...logData,
-    latency: (hrtimeToInteger(process.hrtime()) - this.startTime) / NS_PER_MSEC,
+    latency: getMsFromHRT(process.hrtime(this.startTime)),
   });
 };
 
@@ -51,7 +50,7 @@ export default function configPinoLogger (options = {}) {
       ...options.dynamicData,
     };
     res.log = options.logger.info.bind(options.logger);
-    res.startTime = res.startTime || hrtimeToInteger(process.hrtime());
+    res.startTime = res.startTime || process.hrtime();
     res.request = req;
     res.on('finish', finishHandler);
     res.on('error', finishHandler);

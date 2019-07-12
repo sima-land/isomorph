@@ -1,6 +1,6 @@
-import isFunction from 'lodash/isFunction';
-import isPlainObject from 'lodash/isPlainObject';
-import formatObjectKeys from '../helpers/format-object-keys/';
+import isFunction from 'lodash.isfunction';
+import isPlainObject from 'lodash.isplainobject';
+import formatObjectKeys from '../helpers/utils/format-object-keys';
 
 /**
  * Собирает объект конфигурации из переданных параметров.

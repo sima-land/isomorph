@@ -32,7 +32,7 @@ describe('createObserveMiddleware()', () => {
     middleware(testRequest, testResponse, testNext);
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(onFinish).toHaveBeenCalledTimes(0);
-    expect(onStart).toHaveBeenCalledWith(150002, testRequest, testResponse);
+    expect(onStart).toHaveBeenCalledWith(150002.000001, testRequest, testResponse);
     expect(testResponse.once).toHaveBeenCalledTimes(1);
     expect(testResponse.once.mock.calls[0][0]).toBe('finish');
 
@@ -108,7 +108,7 @@ describe('createObserveMiddleware()', () => {
       callback: expect.any(Function),
     });
     expect(onStart).toHaveBeenCalledTimes(1);
-    expect(onStart).toHaveBeenCalledWith(150002, testRequest, testResponse);
+    expect(onStart).toHaveBeenCalledWith(150002.000001, testRequest, testResponse);
     expect(onFinish).not.toHaveBeenCalled();
   });
 });

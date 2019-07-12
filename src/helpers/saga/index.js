@@ -1,6 +1,6 @@
 import { applyMiddleware, createStore as createReduxStore } from 'redux';
 import createSagaMiddleware, { END } from 'redux-saga';
-import isFunction from 'lodash/isFunction';
+import isFunction from 'lodash.isfunction';
 import { createService } from '../../container';
 import { waitOnStoreReadiness } from '../redux';
 
