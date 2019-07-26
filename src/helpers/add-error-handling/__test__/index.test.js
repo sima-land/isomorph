@@ -2,10 +2,9 @@ import { addErrorHandling } from '..';
 
 describe('addErrorHandling', () => {
   it('should send error "Аргумент handler должен быть функцией." to next', () => {
-    const mockedNext = jest.fn();
-    addErrorHandling()({}, {}, mockedNext);
-    expect(mockedNext).toBeCalledTimes(1);
-    expect(mockedNext).toHaveBeenCalledWith(Error('Аргумент "handler" должен быть функцией.'));
+    expect(() => addErrorHandling()).toThrow(
+      Error('Аргумент "handler" должен быть функцией.')
+    );
   });
   it('should try call handler properly', () => {
     const mockedHandler = jest.fn();

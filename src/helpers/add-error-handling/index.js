@@ -6,10 +6,11 @@ import isFunction from 'lodash.isfunction';
  * @param {Function} [errorHandler] Обработчик ошибки роута Express.
  * @return {Function} Обработчик роута обернутого для отлова ошибок.
  */
-export const addErrorHandling = (handler, errorHandler) => async (request, response, next, ...args) => {
+export const addErrorHandling = (handler, errorHandler) => {
   if (!isFunction(handler)) {
-    await next(new Error('Аргумент "handler" должен быть функцией.'));
-  } else {
+    throw new Error('Аргумент "handler" должен быть функцией.');
+  }
+  return async (request, response, next, ...args) => {
     try {
       await handler(request, response, next, ...args);
     } catch (err) {
@@ -19,5 +20,5 @@ export const addErrorHandling = (handler, errorHandler) => async (request, respo
         await next(err);
       }
     }
-  }
+  };
 };
