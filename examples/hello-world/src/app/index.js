@@ -3,6 +3,7 @@ import PrometheusClient from 'prom-client';
 import express from 'express';
 import { wrapInContext } from '../../../../src/container';
 import helloWorldHandler from '../handlers/hello-world';
+import { addErrorHandling } from '../../../../src/helpers/add-error-handling/index.js';
 
 /**
  * Ининциализирует приложение.
@@ -33,7 +34,7 @@ export const initialize = (
     .use(requestMetricsMiddleware)
     .use(renderMetricsMiddleware)
     .use(tracingMiddleware)
-    .get('/', helloWorldHandler)
+    .get('/', addErrorHandling(helloWorldHandler))
     .use(sentryMiddleware)
     .listen(mainPort);
   gracefulShutdown(server);
