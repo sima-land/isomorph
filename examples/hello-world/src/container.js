@@ -130,12 +130,13 @@ const singletons = [
     singleton: createLoggerMiddleware,
     dependencies: [
       'config',
+      'pinoLogger',
       {
-        name: 'helpers',
+        name: 'dynamicData',
         value: {
-          getXClientIp,
-          getMethod,
-          getStatus,
+          remote_ip: getXClientIp,
+          method: getMethod,
+          status: getStatus,
         },
       },
     ],

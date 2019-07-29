@@ -4,5 +4,6 @@ export const Raven = {
     install: Raven.install,
   })),
   requestHandler: jest.fn(),
+  errorHandler: jest.fn(),
 };
 export default Raven;

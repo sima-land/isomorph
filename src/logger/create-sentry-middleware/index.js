@@ -19,5 +19,5 @@ export default function createSentryMiddleware (
     version,
   }).install();
 
-  return Raven.requestHandler();
+  return Raven.errorHandler();
 }

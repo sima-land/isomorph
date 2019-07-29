@@ -18,6 +18,6 @@ describe('createSentryMiddleware()', () => {
       ...config.sentryOptions,
     });
     expect(Raven.install).toHaveBeenCalled();
-    expect(Raven.requestHandler).toHaveBeenCalled();
+    expect(Raven.errorHandler).toHaveBeenCalled();
   });
 });
