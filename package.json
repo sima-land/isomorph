@@ -37,6 +37,8 @@
     "lodash.mapvalues": "^4.6.0",
     "lodash.negate": "^3.0.2",
     "opentracing": "^0.14.3",
+    "pino": "^5.13.1",
+    "pino-pretty": "^3.2.0",
     "prom-client": "^11.5.2",
     "redux": "^4.0.1",
     "redux-saga": "^1.0.5"
@@ -66,8 +68,6 @@
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
     "lodash": "^4.17.x",
-    "pino": "^5.12.6",
-    "pino-pretty": "^3.2.0",
     "raven": "^2.6.4"
   }
 }

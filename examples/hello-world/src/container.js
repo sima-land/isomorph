@@ -28,6 +28,7 @@ import {
   traceIncomingRequest,
   createTracingMiddleware,
 } from '../../../src/helpers/tracer';
+import Raven from 'raven';
 
 const values = [
   { name: 'config', value: config },
@@ -149,6 +150,9 @@ const singletons = [
   {
     name: 'sentryLogger',
     singleton: sentryLogger,
+    dependencies: [
+      { name: 'sentryLoggerService', value: Raven },
+    ],
   },
   {
     name: 'cache',
