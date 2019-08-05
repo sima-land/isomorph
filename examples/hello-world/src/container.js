@@ -11,12 +11,7 @@ import {
   PrometheusMetric,
   createMeasureMiddleware,
 } from '../../../src/helpers/prometheus/';
-import redisCache, {
-  reconnectOnError,
-  getRetryStrategy,
-  getOnConnectCallback,
-  getOnReconnectingCallback,
-} from '../../../src/cache';
+import createRedisCache from '../../../src/cache';
 import { getTemplate, prepareRenderFunction } from '../../../src/helpers/render';
 import isLoadFinish from './redux/selectors/is-load-finish';
 import { reducer } from './redux/reducers';
@@ -28,6 +23,7 @@ import {
   traceIncomingRequest,
   createTracingMiddleware,
 } from '../../../src/helpers/tracer';
+import wrapInTrace from '../../../src/cacheWrapper/index';
 import Raven from 'raven';
 
 const values = [
@@ -148,6 +144,11 @@ const singletons = [
     dependencies: ['config'],
   },
   {
+    name: 'wrapInTrace',
+    singleton: wrapInTrace,
+    dependencies: ['tracer', 'cache'],
+  },
+  {
     name: 'sentryLogger',
     singleton: sentryLogger,
     dependencies: [
@@ -156,13 +157,9 @@ const singletons = [
   },
   {
     name: 'cache',
-    singleton: redisCache,
+    singleton: createRedisCache,
     dependencies: [
       'config',
-      { name: 'reconnectOnError', value: reconnectOnError },
-      { name: 'getRetryStrategy', value: getRetryStrategy },
-      { name: 'getOnConnectCallback', value: getOnConnectCallback },
-      { name: 'getOnReconnectingCallback', value: getOnReconnectingCallback },
     ],
   },
   {

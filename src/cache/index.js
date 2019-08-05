@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import { promisify } from 'util';
+import { createService } from '../container/index';
 
 /**
  * Создаёт обработчик события подключения к redis для установки статуса готовности кэша к работе.
@@ -35,24 +36,29 @@ export const getRetryStrategy = recDelay => () => recDelay;
 /**
  * Кэширует данные в Redis.
  * @param {Object} config Объект с параметрами Redis.
- * @param {Function} reconnectOnError Переподключение после ошибки.
- * @param {Function} getRetryStrategy Устанавливает время для повтора перезаписи в redis.
- * @param {Function} getOnConnectCallback Коллбэк функция при коннект статусе.
- * @param {Function} getOnReconnectingCallback Коллбэк функция при реконнект статусе.
+ * @param {Function} reconnectAfterError Переподключение после ошибки.
+ * @param {Function} getRepeatStrategy Устанавливает время для повтора перезаписи в redis.
+ * @param {Function} getOnJoinCallback Коллбэк функция при коннект статусе.
+ * @param {Function} getAfterReconnectingCallback Коллбэк функция при реконнект статусе.
  * @return {Object} Объект с методами для работы с Redis.
  */
-export default function redisCache ({ config: { cacheConfig = {}, recDelay, defaultCacheDuration, redisEnabled } = {},
-  reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback }) {
+export const createRedisCache = (
+  config,
+  reconnectAfterError = reconnectOnError,
+  getRepeatStrategy = getRetryStrategy,
+  getOnJoinCallback = getOnConnectCallback,
+  getAfterReconnectingCallback = getOnReconnectingCallback
+) => {
+  const { cacheConfig = {}, recDelay, defaultCacheDuration, redisEnabled } = config;
   let cache = {};
   if (redisEnabled) {
     const client = new Redis({
-      reconnectOnError,
-      retryStrategy: getRetryStrategy(recDelay),
+      reconnectAfterError,
+      retryStrategy: getRepeatStrategy(recDelay),
       ...cacheConfig,
     });
-
-    client.on('connect', getOnConnectCallback(cache));
-    client.on('reconnecting', getOnReconnectingCallback(cache));
+    client.on('connect', getOnJoinCallback(cache));
+    client.on('reconnecting', getAfterReconnectingCallback(cache));
     const getAsync = promisify(client.get).bind(client);
     cache = {
       set: (key, value, duration = defaultCacheDuration) => client.set(key, value, 'EX', duration),
@@ -61,4 +67,28 @@ export default function redisCache ({ config: { cacheConfig = {}, recDelay, defa
     };
   }
   return cache;
-}
+};
+
+/**
+ * Преобразует опции сервиса в аргументы функции.
+ * @param {Object} config Объект с параметрами Redis.
+ * @param {Function} reconnectAfterError Переподключение после ошибки.
+ * @param {Function} getRepeatStrategy Время для повтора перезаписи в redis.
+ * @param {Function} getOnJoinCallback Устанавливает статус кэша.
+ * @param {Function} getAfterReconnectingCallback Устанавливает статус кэша.
+ * @return {Object} Config Объект с параметрами Redis.
+ */
+export const mapServiceOptionsToArgs = ({
+  config,
+  reconnectAfterError,
+  getRepeatStrategy,
+  getOnJoinCallback,
+  getAfterReconnectingCallback,
+}) => [
+  config,
+  reconnectAfterError,
+  getRepeatStrategy,
+  getOnJoinCallback,
+  getAfterReconnectingCallback,
+];
+export default createService(createRedisCache, mapServiceOptionsToArgs);

@@ -1,31 +1,42 @@
-import redisCache,
-{ reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback } from '..';
+import {
+  createRedisCache,
+  reconnectOnError,
+  getRetryStrategy,
+  getOnConnectCallback,
+  getOnReconnectingCallback,
+  mapServiceOptionsToArgs,
+} from '..';
 import { mockSet, mockGet, mockOn } from '../../../__mocks__/ioredis';
 
-describe('redisCache()', () => {
-  it('redisCache() works if redisDisabled', () => {
-    const config = {
-      redisHost: 'foo',
-      redisPort: '8020',
-      redisPassword: 'qwerty',
-      redisDB: 'DB',
-      redisEnabled: false,
-      defaultCacheDuration: 300,
-      recDelay: 301,
-    };
-    const redis = redisCache({ config },
-      reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback);
+describe('createRedisCache()', () => {
+  const config = {
+    cacheConfig: {
+      test: 1,
+    },
+    redisHost: 'foo',
+    redisPort: '8020',
+    redisPassword: 'qwerty',
+    redisDB: 'DB',
+    redisEnabled: false,
+    defaultCacheDuration: 300,
+    recDelay: 301,
+  };
+  it('createRedisCache() return Object without config', () => {
+    const redis = createRedisCache(
+      reconnectOnError,
+      getRetryStrategy,
+      getOnConnectCallback,
+      getOnReconnectingCallback
+    );
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
   });
-
-  it('redisCache() return Object without config', () => {
-    const redis = redisCache({}, reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback);
+  it('createRedisCache() works without callback functions', () => {
+    const redis = createRedisCache(config);
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
   });
-
-  it('redisCache() works if redisEnabled', () => {
+  it('createRedisCache() works if redisEnabled', () => {
     const config = {
       redisEnabled: true,
       defaultCacheDuration: 300,
@@ -43,8 +54,8 @@ describe('redisCache()', () => {
     const onReconnect = () => {};
     const getOnConnectCallback = jest.fn(() => onConnect);
     const getOnReconnectingCallback = jest.fn(() => onReconnect);
-    const redis = redisCache({ config,
-      reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback });
+    const redis = createRedisCache(config,
+      reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback);
     expect(mockOn).toHaveBeenCalledTimes(2);
     expect(mockOn.mock.calls[0][0]).toEqual('connect');
     expect(mockOn.mock.calls[0][1]).toEqual(onConnect);
@@ -91,5 +102,39 @@ describe('getOnReconnectingCallback()', () => {
     const cache = {};
     getOnReconnectingCallback(cache)();
     expect(cache.status).toBeFalsy();
+  });
+});
+
+describe('mapServiceOptionsToArgs()', () => {
+  const config = {
+    cacheConfig: 'test',
+    redisHost: 'foo',
+  };
+  it('mapServiceOptionsToArgs() works with just config', () => {
+    expect(mapServiceOptionsToArgs({ config })).toEqual([{
+      cacheConfig: 'test',
+      redisHost: 'foo',
+    },
+    undefined,
+    undefined,
+    undefined,
+    undefined]);
+  });
+  it('mapServiceOptionsToArgs() works properly', () => {
+    const reconnectAfterError = 't';
+    const getRepeatStrategy = 'e';
+    const getOnJoinCallback = 's';
+    const getAfterReconnectingCallback = 't';
+    expect(mapServiceOptionsToArgs({
+      config, reconnectAfterError,
+      getRepeatStrategy, getOnJoinCallback, getAfterReconnectingCallback,
+    })).toEqual([{
+      cacheConfig: 'test',
+      redisHost: 'foo',
+    },
+    't',
+    'e',
+    's',
+    't']);
   });
 });
