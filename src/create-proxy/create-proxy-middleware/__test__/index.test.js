@@ -1,4 +1,4 @@
-import createProxyMiddleware from '..';
+import createProxyMiddleware, { requestPathResolver } from '..';
 import expressProxy from 'express-http-proxy';
 
 const config = {
@@ -18,6 +18,15 @@ const config = {
 const header = config.proxy[0].header;
 const map = config.proxy[0].map;
 
+describe('requestPathResolver', () => {
+  it('returns original URL from request', () => {
+    expect(requestPathResolver({ originalUrl: '/test/test/' })).toEqual('/test/test/');
+  });
+  it('does not return original URL if request is not passed', () => {
+    expect(requestPathResolver()).toBeUndefined();
+  });
+});
+
 describe('createProxyMiddleware()', () => {
   afterEach(() => {
     expressProxy.mockClear();
@@ -32,7 +41,9 @@ describe('createProxyMiddleware()', () => {
       {},
       next
     );
-    expect(expressProxy).toHaveBeenCalledWith(config.simalandApiURL);
+    expect(expressProxy).toHaveBeenCalledWith(config.simalandApiURL, {
+      proxyReqPathResolver: requestPathResolver,
+    });
     expect(next).not.toHaveBeenCalled();
   });
 
