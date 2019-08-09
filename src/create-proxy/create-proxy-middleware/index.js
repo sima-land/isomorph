@@ -3,6 +3,13 @@ import isFunction from 'lodash.isfunction';
 import expressProxy from 'express-http-proxy';
 
 /**
+ * Обработчик для передачи URL запроса из оригинальной версии с клиента в проксирующий запрос.
+ * @param {Object} request Исходный запрос с клиента.
+ * @return {string} URL исходного запроса.
+ */
+export const requestPathResolver = request => request && request.originalUrl;
+
+/**
  * Функция создающая обработчик запроса.
  * @param {string} header Отслеживаемый заголовок.
  * @param {Array} map Массив обработчика.
@@ -13,7 +20,9 @@ export default function createProxyMiddleware (header, map, config) {
   return (req, res, next) => {
     const headerType = get(req, `headers['${header.toLowerCase()}']`, null);
     const getUrl = headerType ? map[headerType] : null;
-    const proxyInstance = isFunction(getUrl) ? expressProxy(getUrl(config)) : null;
+    const proxyInstance = isFunction(getUrl) ? expressProxy(getUrl(config), {
+      proxyReqPathResolver: requestPathResolver,
+    }) : null;
 
     if (proxyInstance) {
       proxyInstance(req, res, next);

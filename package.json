@@ -26,6 +26,7 @@
     }
   },
   "dependencies": {
+    "express-http-proxy": "^1.5.1",
     "ioredis": "^4.10.0",
     "jaeger-client": "^3.15.0",
     "lodash.camelcase": "^4.3.0",
@@ -67,7 +68,6 @@
     "husky": "2.3.x",
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
-    "lodash": "^4.17.x",
-    "raven": "^2.6.4"
+    "lodash": "^4.17.x"
   }
 }
