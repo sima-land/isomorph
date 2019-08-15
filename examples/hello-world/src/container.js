@@ -22,6 +22,7 @@ import {
   getTracer,
   traceIncomingRequest,
   createTracingMiddleware,
+  getSpanContext,
 } from '../../../src/helpers/tracer';
 import wrapInTrace from '../../../src/cacheWrapper/index';
 import Raven from 'raven';
@@ -146,7 +147,7 @@ const singletons = [
   {
     name: 'wrapInTrace',
     singleton: wrapInTrace,
-    dependencies: ['tracer', 'cache'],
+    dependencies: ['tracer', 'cache', 'context'],
   },
   {
     name: 'sentryLogger',
@@ -265,6 +266,10 @@ const factories = [
         value: ({ output }) => output,
       },
     ],
+  },
+  {
+    name: 'context',
+    factory: getSpanContext,
   },
 ];
 

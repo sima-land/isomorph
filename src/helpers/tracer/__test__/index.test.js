@@ -1,4 +1,4 @@
-import { getTracer, traceIncomingRequest, createTracingMiddleware } from '..';
+import { getTracer, traceIncomingRequest, createTracingMiddleware, getSpanContext } from '..';
 import { initTracerFromEnv, tracer } from '../../../../__mocks__/jaeger-client';
 import { FORMAT_HTTP_HEADERS } from 'opentracing';
 import { createObserveMiddleware } from '../../../observe-middleware/';
@@ -96,5 +96,51 @@ describe('createTracingMiddleware()', () => {
 
     expect(requestStartHandler).not.toThrow();
     expect(requestFinishHandler).not.toThrow();
+  });
+});
+
+describe('getSpanContext', () => {
+  it ('should return null if context empty', () => {
+    const response = {
+      locals: {
+        span: {
+          context: () => {},
+        },
+      },
+    };
+    const context = getSpanContext({ response });
+    expect(context).toBe(null);
+  });
+
+  it ('should return null if context not is function', () => {
+    const response = {
+      locals: {
+        span: {
+          context: 'I am not is function',
+        },
+      },
+    };
+    const context = getSpanContext({ response });
+    expect(context).toBe(null);
+  });
+
+  it ('should return context if there answer', () => {
+    const response = {
+      locals: {
+        span: {
+          context: () => ({ test: true }),
+        },
+      },
+    };
+    const context = getSpanContext({ response });
+    expect(context).toEqual({ test: true });
+  });
+  it ('should return null if not span', () => {
+    const response = {
+      locals: {
+      },
+    };
+    const context = getSpanContext({ response });
+    expect(context).toBe(null);
   });
 });
