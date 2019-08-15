@@ -2,6 +2,7 @@ import { initTracerFromEnv } from 'jaeger-client';
 import { FORMAT_HTTP_HEADERS } from 'opentracing';
 import { createObserveMiddleware } from '../../observe-middleware/';
 import isFunction from 'lodash.isfunction';
+import get from 'lodash.get';
 
 /**
  * Запускает трассировку входящего http-запроса.
@@ -75,4 +76,17 @@ export const createTracingMiddleware = (
       }
     },
   });
+};
+
+/**
+ * Получает контекст из объекта текущего ответа.
+ * @param {Object} response Объект с параметрами текущего ответа.
+ * @return {Object|null} Текущий контекст.
+ */
+export const getSpanContext = ({ response }) => {
+  let context;
+  if (isFunction(get(response, 'locals.span.context'))) {
+    context = response.locals.span.context();
+  }
+  return context || null;
 };
