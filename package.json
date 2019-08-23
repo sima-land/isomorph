@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Server side rendering for frontend microservices",
   "main": "index.js",
-  "repository": "ssh://git@gitlab.sima-land.ru:7888/SL/isomorph.git",
+  "repository": "ssh://git@gitlab.sima-land.ru:7888/dev-dep/dev/isomorph.git",
   "author": "www.sima-land.ru team",
   "license": "MIT",
   "private": false,
