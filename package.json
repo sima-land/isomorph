@@ -1,5 +1,5 @@
 {
-  "name": "@SL/isomorph",
+  "name": "@dev-dep/isomorph",
   "version": "0.0.0",
   "description": "Server side rendering for frontend microservices",
   "main": "index.js",
