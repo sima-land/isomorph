@@ -14,6 +14,7 @@ describe('createPinoInstance()', () => {
     expect(pino).toHaveBeenCalledWith({
       prettyPrint: { colorize: true },
       timestamp: formatTime,
+      useLevelLabels: true,
     });
   });
 
@@ -28,6 +29,7 @@ describe('createPinoInstance()', () => {
     expect(pino).toHaveBeenCalledWith({
       prettyPrint: false,
       timestamp: formatTime,
+      useLevelLabels: true,
     });
   });
 
@@ -38,6 +40,7 @@ describe('createPinoInstance()', () => {
     expect(pino).toHaveBeenCalledWith({
       prettyPrint: false,
       timestamp: formatTime,
+      useLevelLabels: true,
     });
   });
 });
