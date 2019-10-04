@@ -11,11 +11,16 @@ jest.mock('../../../observe-middleware/', () => {
 });
 
 const config = { version: 1 };
-const dynamicData = {
-  remote_ip: jest.fn().mockImplementation(() => '127.0.0.1'),
-  method: jest.fn().mockImplementation(() => 'GET'),
-  status: jest.fn().mockImplementation(() => 200),
-};
+
+/**
+ * Тестовая функция dynamicData.
+ * @return {Object} Объект.
+ */
+const getDynamicData = () => ({
+  remote_ip: '127.0.0.1',
+  method: 'GET',
+  status: 200,
+});
 const pinoLogger = {
   info: jest.fn(),
 };
@@ -26,35 +31,32 @@ describe('createLoggerMiddleware', () => {
       .toThrow(Error('First argument property "pinoLogger" is empty.'));
     expect(() => createLoggerMiddleware({
       config,
-      dynamicData,
+      getDynamicData,
     }))
       .toThrow(Error('First argument property "pinoLogger" is empty.'));
     expect(createObserveMiddleware).toHaveBeenCalledTimes(0);
   });
-  it('should throw error "Every data getter in dynamicData must be Function."', () => {
+  it('should throw error "getDynamicData" must be Function.', () => {
     expect(() => createLoggerMiddleware({
       config,
       pinoLogger,
-      dynamicData: {
-        foo: () => {},
-        bar: 'string',
-      },
+      getDynamicData: {},
     }))
-      .toThrow(TypeError('Every data getter in "dynamicData" must be Function.'));
+      .toThrow(TypeError('"getDynamicData" must be Function.'));
     expect(createObserveMiddleware).toHaveBeenCalledTimes(0);
     expect(() => createLoggerMiddleware({
       config,
       pinoLogger,
-      dynamicData,
+      getDynamicData,
     }))
-      .not.toThrow(TypeError('Every data getter in "dynamicData" must be Function.'));
+      .not.toThrow(TypeError('"getDynamicData" must be Function.'));
     expect(createObserveMiddleware).toHaveBeenCalledTimes(1);
   });
   it('should return result of createObserveMiddleware()', () => {
     const middleware = createLoggerMiddleware({
       config,
       pinoLogger,
-      dynamicData,
+      getDynamicData,
     });
 
     expect(typeof middleware).toBe('function');
@@ -66,7 +68,7 @@ describe('createLoggerMiddleware', () => {
     const middleware = createLoggerMiddleware({
       config,
       pinoLogger,
-      dynamicData,
+      getDynamicData,
     });
     const eventHandlers = [];
     const testRequest = { testRequest: true };
@@ -85,5 +87,22 @@ describe('createLoggerMiddleware', () => {
       status: 200,
       latency: 100002.,
     });
+  });
+
+  it('should call dynamicData width request and response', () => {
+    const spy = jest.fn();
+    const middleware = createLoggerMiddleware({
+      config,
+      pinoLogger,
+      getDynamicData: spy,
+    });
+    const eventHandlers = [];
+    const testRequest = { testRequest: true };
+    const testResponse = { testResponse: true, once: (event, eventHandler) => eventHandlers.push(eventHandler) };
+
+    middleware(testRequest, testResponse, () => {});
+    eventHandlers.forEach(handler => handler());
+
+    expect(spy).toHaveBeenCalledWith(testRequest, testResponse);
   });
 });
