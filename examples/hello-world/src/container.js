@@ -130,12 +130,12 @@ const singletons = [
       'config',
       'pinoLogger',
       {
-        name: 'dynamicData',
-        value: {
-          remote_ip: getXClientIp,
-          method: getMethod,
-          status: getStatus,
-        },
+        name: 'getDynamicData',
+        value: (request, response) => ({
+          remote_ip: getXClientIp({ request }),
+          method: getMethod({ request }),
+          status: getStatus({ response }),
+        }),
       },
     ],
   },

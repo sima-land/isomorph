@@ -1,4 +1,3 @@
-import mapValues from 'lodash.mapvalues';
 import isFunction from 'lodash.isfunction';
 import { createObserveMiddleware } from '../../observe-middleware';
 
@@ -7,29 +6,29 @@ import { createObserveMiddleware } from '../../observe-middleware';
  * @param {Object} dependencies Зависимости.
  * @param {string|number} dependencies.config Конфигурация.
  * @param {Function} dependencies.pinoLogger Экземпляр логгера.
- * @param {Object} dependencies.dynamicData Динамические данные которые необходимо получить после завершения запроса.
+ * @param {Function} dependencies.getDynamicData
+ * Функция, формирующая данные, которые нужно получить после завершения запроса.
  * @return {Function} Middleware для express-приложения.
  */
 export default function createLoggerMiddleware (dependencies = {}) {
   const {
     pinoLogger,
     config = {},
-    dynamicData = {},
+    getDynamicData,
   } = dependencies;
 
   if (!pinoLogger) {
     throw Error('First argument property "pinoLogger" is empty.');
   }
 
-  if (!Object.values(dynamicData).every(isFunction)) {
-    throw TypeError('Every data getter in "dynamicData" must be Function.');
+  if (!isFunction(getDynamicData)) {
+    throw TypeError('"getDynamicData" must be Function.');
   }
 
   return createObserveMiddleware({
     onFinish: (timestamp, request, response) => {
-      const data = mapValues(dynamicData, metric => metric({ request, response }));
       pinoLogger.info({
-        ...data,
+        ...getDynamicData(request, response),
         version: config.version,
         latency: timestamp,
       });
