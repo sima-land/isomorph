@@ -1,4 +1,4 @@
-import { getXClientIp, getMethod, getStatus } from '..';
+import { getXClientIp, getMethod, getStatus, getOriginalUrl } from '..';
 
 describe('getXClientIp', () => {
   it('works correctly', () => {
@@ -67,5 +67,21 @@ describe('getStatus', () => {
     const status = getStatus({ response });
 
     expect(status).toBe(200);
+  });
+});
+
+describe('getOriginalUrl', () => {
+  it('works correctly', () => {
+    /**
+     * Тест.
+     * @return {string} Test.
+     */
+    const someFunction = () => '/test';
+    const request = {
+      originalUrl: someFunction,
+    };
+    const originalUrl = getOriginalUrl({ request });
+
+    expect(originalUrl).toBe(someFunction);
   });
 });
