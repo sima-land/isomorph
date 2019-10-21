@@ -20,3 +20,10 @@ export const getMethod = ({ request }) => request.method;
  * @return {number} Статус ответа.
  */
 export const getStatus = ({ response }) => response.statusCode;
+
+/**
+ * Получает оригинальный url из объекта запроса.
+ * @param {Object} request Запрос.
+ * @return {number} Url запроса.
+ */
+export const getOriginalUrl = ({ request }) => request.originalUrl;
