@@ -1,4 +1,5 @@
 import PrometheusClient from 'prom-client';
+import difference from 'lodash.difference';
 
 /**
  * Список имен конструкторов из пакета "prom-client", пригодных для создания адаптеров.
@@ -37,6 +38,8 @@ export const isPrometheusMetric = value => value instanceof PrometheusMetric;
  * Класс объектов-адаптеров для классов метрик из пакета "prom-client".
  */
 export class PrometheusMetric {
+  labels = {};
+
   /**
    * Инициализирует объект-адаптер метрики.
    * @param {string} metricType Тип метрики, определяемый названием класса из пакета "prom-client".
@@ -56,24 +59,13 @@ export class PrometheusMetric {
    * @return {PrometheusMetric} Экземпляр.
    */
   setLabels (labels = {}) {
+    const newLabels = labels || {};
     if (Array.isArray(this.labelNames)) {
-      const labelValues = [];
-
-      Object.entries(labels || {}).forEach(entry => {
-        const [labelName, labelValue] = entry;
-        const labelNameIndex = this.labelNames.indexOf(labelName);
-        if (labelNameIndex !== -1) {
-          labelValues[labelNameIndex] = labelValue;
-        }
-      });
-
-      if (labelValues.length === this.labelNames.length) {
-        const instance = getOriginalInstance(this);
-        instance.labels(...labelValues);
-      } else {
+      if (difference(this.labelNames, Object.keys(newLabels)).length > 0) {
         throw Error(`Labels count must be equal to labelNames count = ${this.labelNames.length}`);
       }
     }
+    this.labels = newLabels;
 
     return this;
   }
@@ -88,11 +80,11 @@ export class PrometheusMetric {
 
     switch (this.metricType) {
       case 'Counter':
-        instance.inc(1);
+        instance.inc(this.labels, 1);
         break;
       case 'Summary':
       case 'Histogram':
-        instance.observe(value);
+        instance.observe(this.labels, value);
         break;
       case 'Gauge': {
         const isPositive = value > 0;

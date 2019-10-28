@@ -83,20 +83,25 @@ describe('PrometheusMetric', () => {
     expect(testMetric.spot()).toBe(testMetric);
     expect(testMetric.setLabels()).toBe(testMetric);
   });
-  it('setLabels() should create list of labels values when labelNames is Array', () => {
+  it('setLabels() should set labels values when labelNames is Array', () => {
     const testMetric = new PrometheusMetric('Counter', {
       name: 'labels_test',
       help: 'labels test',
       labelNames: ['first', 'second'],
     });
-    jest.spyOn(testMetric[originalMetricKey], 'labels');
-    expect(testMetric[originalMetricKey].labels).toHaveBeenCalledTimes(0);
 
     testMetric.setLabels({ first: 1, second: 2 });
-    expect(testMetric[originalMetricKey].labels).toHaveBeenCalledTimes(1);
-    expect(testMetric[originalMetricKey].labels).toHaveBeenCalledWith(1, 2);
+    expect(testMetric.labels).toEqual({ first: 1, second: 2 });
   });
-  it('setLabels() should throw error when label values count is not equal to labelNames.length', () => {
+  it('setLabels() should set in labels property empty object if labels is null and labelNames is empty', () => {
+    const testMetric = new PrometheusMetric('Counter', {
+      name: 'empty_labels_test',
+      help: 'empty labels test',
+    });
+    testMetric.setLabels(null);
+    expect(testMetric.labels).toEqual({});
+  });
+  it('setLabels() should throw error when labels keys count is different with labelNames', () => {
     const testMetric = new PrometheusMetric('Counter', {
       name: 'labels_error_test',
       help: 'labels error test',
@@ -118,9 +123,9 @@ describe('PrometheusMetric', () => {
     jest.spyOn(testMetric[originalMetricKey], 'inc');
     expect(testMetric[originalMetricKey].inc).toHaveBeenCalledTimes(0);
 
-    testMetric.spot();
+    testMetric.spot(1);
     expect(testMetric[originalMetricKey].inc).toHaveBeenCalledTimes(1);
-    expect(testMetric[originalMetricKey].inc).toHaveBeenCalledWith(1);
+    expect(testMetric[originalMetricKey].inc).toHaveBeenCalledWith({}, 1);
   });
   it('spot() should call instance.inc() or dec() for "Gauge" types', () => {
     const testMetric = new PrometheusMetric('Gauge', {
@@ -153,7 +158,7 @@ describe('PrometheusMetric', () => {
 
       testMetric.spot(12);
       expect(testMetric[originalMetricKey].observe).toHaveBeenCalledTimes(1);
-      expect(testMetric[originalMetricKey].observe).toHaveBeenCalledWith(12);
+      expect(testMetric[originalMetricKey].observe).toHaveBeenCalledWith({}, 12);
     });
   });
 });
