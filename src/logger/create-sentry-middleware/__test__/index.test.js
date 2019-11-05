@@ -5,8 +5,8 @@ describe('createSentryMiddleware()', () => {
   it('works correctly', () => {
     const config = {
       sentryDsnServer: null,
-      version: 'test',
       sentryOptions: {
+        version: 'test',
         test: test,
       },
     };
@@ -14,7 +14,6 @@ describe('createSentryMiddleware()', () => {
     createSentryMiddleware({ config });
 
     expect(Raven.config).toHaveBeenCalledWith(config.sentryDsnServer, {
-      version: 'test',
       ...config.sentryOptions,
     });
     expect(Raven.install).toHaveBeenCalled();
