@@ -12,9 +12,12 @@ const config = {
         sima: ({ simalandApiURL }) => simalandApiURL,
         chponki: ({ chponkiApiURL }) => chponkiApiURL,
       },
+      proxyOptions: 'test',
     },
   ],
 };
+
+const proxyOptions = config.proxy[0].proxyOptions;
 const header = config.proxy[0].header;
 const map = config.proxy[0].map;
 
@@ -33,7 +36,7 @@ describe('createProxyMiddleware()', () => {
   });
 
   it('works correctly with header', () => {
-    const proxy = createProxyMiddleware(header, map, config);
+    const proxy = createProxyMiddleware(header, map, config, proxyOptions);
     const next = jest.fn();
 
     proxy(
@@ -42,7 +45,7 @@ describe('createProxyMiddleware()', () => {
       next
     );
     expect(expressProxy).toHaveBeenCalledWith(config.simalandApiURL, {
-      proxyReqPathResolver: requestPathResolver,
+      proxyReqPathResolver: requestPathResolver, ...proxyOptions,
     });
     expect(next).not.toHaveBeenCalled();
   });

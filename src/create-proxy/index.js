@@ -19,8 +19,8 @@ export default function createProxy (
       throw TypeError('Параметр proxy должен быть массивом');
     }
 
-    proxy.forEach(({ url, header, map }) => {
-      app.use(url, createProxyMiddleware(header, map, config));
+    proxy.forEach(({ url, header, map, proxyOptions }) => {
+      app.use(url, createProxyMiddleware(header, map, config, proxyOptions));
     });
   };
 }

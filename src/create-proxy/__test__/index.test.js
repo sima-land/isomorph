@@ -17,6 +17,7 @@ describe('createProxy()', () => {
             sima: ({ simalandApiURL }) => simalandApiURL,
             chponki: ({ chponkiApiURL }) => chponkiApiURL,
           },
+          proxyOptions: 'test',
         },
       ],
     };
@@ -26,7 +27,8 @@ describe('createProxy()', () => {
     expect(createProxyMiddleware).toHaveBeenCalledWith(
       'Simaland-Service-Origin',
       config.proxy[0].map,
-      config
+      config,
+      'test',
     );
     expect(app.use).toHaveBeenCalledWith('/api/*', 'test');
   });
