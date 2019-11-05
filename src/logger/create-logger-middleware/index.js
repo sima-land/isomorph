@@ -4,7 +4,6 @@ import { createObserveMiddleware } from '../../observe-middleware';
 /**
  * Конструктор для создания middleware для express-приложения.
  * @param {Object} dependencies Зависимости.
- * @param {string|number} dependencies.config Конфигурация.
  * @param {Function} dependencies.pinoLogger Экземпляр логгера.
  * @param {Function} dependencies.getDynamicData
  * Функция, формирующая данные, которые нужно получить после завершения запроса.
@@ -13,7 +12,6 @@ import { createObserveMiddleware } from '../../observe-middleware';
 export default function createLoggerMiddleware (dependencies = {}) {
   const {
     pinoLogger,
-    config = {},
     getDynamicData,
   } = dependencies;
 
@@ -29,7 +27,6 @@ export default function createLoggerMiddleware (dependencies = {}) {
     onFinish: (timestamp, request, response) => {
       pinoLogger.info({
         ...getDynamicData(request, response),
-        version: config.version,
         latency: timestamp,
       });
     },

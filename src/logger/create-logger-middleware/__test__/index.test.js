@@ -10,8 +10,6 @@ jest.mock('../../../observe-middleware/', () => {
   };
 });
 
-const config = { version: 1 };
-
 /**
  * Тестовая функция dynamicData.
  * @return {Object} Объект.
@@ -20,6 +18,7 @@ const getDynamicData = () => ({
   remote_ip: '127.0.0.1',
   method: 'GET',
   status: 200,
+  version: 1,
 });
 const pinoLogger = {
   info: jest.fn(),
@@ -30,7 +29,6 @@ describe('createLoggerMiddleware', () => {
     expect(() => createLoggerMiddleware())
       .toThrow(Error('First argument property "pinoLogger" is empty.'));
     expect(() => createLoggerMiddleware({
-      config,
       getDynamicData,
     }))
       .toThrow(Error('First argument property "pinoLogger" is empty.'));
@@ -38,14 +36,12 @@ describe('createLoggerMiddleware', () => {
   });
   it('should throw error "getDynamicData" must be Function.', () => {
     expect(() => createLoggerMiddleware({
-      config,
       pinoLogger,
       getDynamicData: {},
     }))
       .toThrow(TypeError('"getDynamicData" must be Function.'));
     expect(createObserveMiddleware).toHaveBeenCalledTimes(0);
     expect(() => createLoggerMiddleware({
-      config,
       pinoLogger,
       getDynamicData,
     }))
@@ -54,7 +50,6 @@ describe('createLoggerMiddleware', () => {
   });
   it('should return result of createObserveMiddleware()', () => {
     const middleware = createLoggerMiddleware({
-      config,
       pinoLogger,
       getDynamicData,
     });
@@ -66,7 +61,6 @@ describe('createLoggerMiddleware', () => {
   it('should call info with correct dataset', () => {
     jest.spyOn(process, 'hrtime').mockReturnValue([100, 2000000]);
     const middleware = createLoggerMiddleware({
-      config,
       pinoLogger,
       getDynamicData,
     });
@@ -92,7 +86,6 @@ describe('createLoggerMiddleware', () => {
   it('should call dynamicData width request and response', () => {
     const spy = jest.fn();
     const middleware = createLoggerMiddleware({
-      config,
       pinoLogger,
       getDynamicData: spy,
     });
