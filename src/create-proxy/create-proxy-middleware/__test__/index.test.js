@@ -1,4 +1,4 @@
-import createProxyMiddleware, { requestPathResolver } from '..';
+import createProxyMiddleware, { getRequestPathResolver, getUrlPath } from '..';
 import expressProxy from 'express-http-proxy';
 
 const config = {
@@ -12,7 +12,9 @@ const config = {
         sima: ({ simalandApiURL }) => simalandApiURL,
         chponki: ({ chponkiApiURL }) => chponkiApiURL,
       },
-      proxyOptions: 'test',
+      proxyOptions: {
+        test: 'test',
+      },
     },
   ],
 };
@@ -23,10 +25,16 @@ const map = config.proxy[0].map;
 
 describe('requestPathResolver', () => {
   it('returns original URL from request', () => {
-    expect(requestPathResolver({ originalUrl: '/test/test/' })).toEqual('/test/test/');
+    const requestResolver = getRequestPathResolver('');
+    expect(requestResolver({ originalUrl: '/test/test/' })).toEqual('/test/test/');
+  });
+  it('returns original URL with path from request', () => {
+    const requestResolver = getRequestPathResolver('/sparta');
+    expect(requestResolver({ originalUrl: '/test/test/' })).toEqual('/sparta/test/test/');
   });
   it('does not return original URL if request is not passed', () => {
-    expect(requestPathResolver()).toBeUndefined();
+    const requestResolver = getRequestPathResolver('');
+    expect(requestResolver()).toBeUndefined();
   });
 });
 
@@ -44,8 +52,10 @@ describe('createProxyMiddleware()', () => {
       {},
       next
     );
-    expect(expressProxy).toHaveBeenCalledWith(config.simalandApiURL, {
-      proxyReqPathResolver: requestPathResolver, ...proxyOptions,
+    expect(expressProxy.mock.calls).toHaveLength(1);
+    expect(expressProxy.mock.calls[0][0]).toBe(config.simalandApiURL);
+    expect(expressProxy.mock.calls[0][1]).toMatchObject({
+      proxyReqPathResolver: expect.any(Function), ...proxyOptions,
     });
     expect(next).not.toHaveBeenCalled();
   });
@@ -61,5 +71,15 @@ describe('createProxyMiddleware()', () => {
     );
     expect(expressProxy).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalled();
+  });
+});
+
+describe('getUrlPath()', () => {
+  it('should work correctly', () => {
+    expect(getUrlPath('http://test.ru/sparta/')).toEqual('/sparta');
+    expect(getUrlPath('http://test.ru/sparta')).toEqual('/sparta');
+    expect(getUrlPath('http://test.ru/')).toEqual('');
+    expect(getUrlPath('http://test.ru')).toEqual('');
+    expect(getUrlPath('/')).toEqual('');
   });
 });

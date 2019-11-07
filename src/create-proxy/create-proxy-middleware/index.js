@@ -1,13 +1,16 @@
 import get from 'lodash.get';
+import pipe from 'lodash/fp/pipe';
 import isFunction from 'lodash.isfunction';
 import expressProxy from 'express-http-proxy';
 
+const urlApi = require('url');
+
 /**
- * Обработчик для передачи URL запроса из оригинальной версии с клиента в проксирующий запрос.
- * @param {Object} request Исходный запрос с клиента.
- * @return {string} URL исходного запроса.
+ * Получает обработчик с прокинутым path из config url.
+ * @param {string} path Часть пути после хоста.
+ * @return {Function} Обработчик для передачи URL запроса из оригинальной версии с клиента в проксирующий запрос.
  */
-export const requestPathResolver = request => request && request.originalUrl;
+export const getRequestPathResolver = path => request => request && path + request.originalUrl;
 
 /**
  * Функция создающая обработчик запроса.
@@ -22,8 +25,7 @@ export default function createProxyMiddleware (header, map, config, proxyOptions
     const headerType = get(req, `headers['${header.toLowerCase()}']`, null);
     const getUrl = headerType ? map[headerType] : null;
     const proxyInstance = isFunction(getUrl) ? expressProxy(getUrl(config), {
-      proxyReqPathResolver: requestPathResolver,
-      ...proxyOptions,
+      proxyReqPathResolver: getRequestPathResolver(getUrlPath(getUrl(config))), ...proxyOptions,
     }) : null;
 
     if (proxyInstance) {
@@ -33,3 +35,13 @@ export default function createProxyMiddleware (header, map, config, proxyOptions
     }
   };
 }
+
+/**
+ * Получает path из url без слэша в конце.
+ * @param {string} url.
+ * @return {string} Path или пустую строку.
+ */
+export const getUrlPath = pipe(
+  urlApi.parse,
+  url => url.path && url.path.replace(/\/$/, ''),
+);
