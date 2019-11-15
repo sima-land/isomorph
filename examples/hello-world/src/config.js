@@ -1,14 +1,14 @@
 import createConfig from '../../../src/create-config';
+import useDotEnv from '../../../src/helpers/development/use-dot-env';
+
+useDotEnv(process.env.NODE_ENV);
 
 const config = createConfig({
   serviceName: 'Hello, world!',
-  isDevelopment: base => !base.NODE_ENV,
+  isDevelopment: base => base.NODE_ENV !== 'production',
   isProduction: base => base.NODE_ENV === 'production',
   version: base => base.CI_COMMIT_REF_NAME || 'development',
-  sentryDsnServer: null,
   sentryOptions: {},
-  simalandApiURL: 'https://www.sima-land.ru',
-  chponkiApiURL: 'https://chponki.sima-land.ru',
   proxy: [
     {
       url: '/api/*',
@@ -19,8 +19,6 @@ const config = createConfig({
       },
     },
   ],
-  mainPort: 4000,
-  metricsPort: 4001,
   loadDataTimeout: 500,
 });
 
