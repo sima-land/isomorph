@@ -1,5 +1,11 @@
-import { put, take, delay } from 'redux-saga/effects';
+import { put, take, call } from 'redux-saga/effects';
 import { Types as appTypes, Creators as appCreators } from '../redux/actions/app';
+
+const axiosParams = {
+  params: {
+    fields: 'name',
+  },
+};
 
 /**
  * Инициализирует загрузку данных для рендеринга.
@@ -14,12 +20,14 @@ export function* initDataLoading () {
 
 /**
  * Загружает данные для рендеринга.
+ * @param {Object} options Опции.
+ * @param {Object} options.axiosInstance Инстанс axios.
  */
-export function* loadData () {
-  yield delay(Math.floor(Math.random() * (2000 - 10)) + 10);
+export function* loadData ({ axiosInstance }) {
+  const response = yield call(axiosInstance.get, '/item/123456/', axiosParams);
   yield put(appCreators.setCurrentData(
     {
-      output: 'Hello World!',
+      output: `Hello World! Данные из запроса к API: ${response.data.name}`,
     }
   ));
 }
