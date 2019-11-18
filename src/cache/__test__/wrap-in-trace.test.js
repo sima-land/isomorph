@@ -1,7 +1,7 @@
-import { createRedisCache } from '../../cache/index';
+import { createRedisCache } from '../index';
 import { mockSet } from '../../../__mocks__/ioredis';
-import { mapServiceOptionsToArgs, wrapInTrace } from '../../cacheWrapper/index';
-import { getTracer } from '../../helpers/tracer/index';
+import { mapServiceOptionsToArgs, wrapInTrace } from '../wrap-in-trace';
+import { getTracer } from '../../helpers/tracer';
 
 describe('wrapInTrace()', () => {
   it('wrapInTrace methods works properly', () => {
