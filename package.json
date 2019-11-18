@@ -26,6 +26,7 @@
     }
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "express-http-proxy": "^1.5.1",
     "ioredis": "^4.10.0",
     "jaeger-client": "^3.15.0",
@@ -38,6 +39,7 @@
     "lodash.isstring": "^4.0.1",
     "lodash.mapvalues": "^4.6.0",
     "lodash.negate": "^3.0.2",
+    "middleware-axios": "^1.0.0",
     "opentracing": "^0.14.3",
     "pino": "^5.13.1",
     "pino-pretty": "^3.2.0",

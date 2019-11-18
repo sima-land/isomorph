@@ -1,4 +1,12 @@
-import { getXClientIp, getMethod, getStatus, getOriginalUrl } from '..';
+import {
+  getXClientIp,
+  getMethod,
+  getStatus,
+  getOriginalUrl,
+  validatePostStatus,
+  validateDeleteStatus,
+  isOkStatus,
+} from '..';
 
 describe('getXClientIp', () => {
   it('works correctly', () => {
@@ -83,5 +91,27 @@ describe('getOriginalUrl', () => {
     const originalUrl = getOriginalUrl({ request });
 
     expect(originalUrl).toBe(someFunction);
+  });
+});
+
+describe('function validatePostStatus()', () => {
+  it('returns correct data', () => {
+    expect(validatePostStatus(201)).toBeTruthy();
+    expect(validatePostStatus(500)).toBeFalsy();
+  });
+});
+
+describe('function validateDeleteStatus()', () => {
+  it('returns correct data', () => {
+    expect(validateDeleteStatus(204)).toBeTruthy();
+    expect(validateDeleteStatus(500)).toBeFalsy();
+  });
+});
+
+describe('function isOkStatus()', () => {
+  it('returns correct data', () => {
+    expect(isOkStatus(204)).toBeFalsy();
+    expect(isOkStatus(500)).toBeFalsy();
+    expect(isOkStatus(200)).toBeTruthy();
   });
 });
