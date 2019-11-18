@@ -24,7 +24,7 @@ import {
   createTracingMiddleware,
   getSpanContext,
 } from '../../../src/helpers/tracer';
-import wrapInTrace from '../../../src/cacheWrapper/index';
+import wrapInTrace from '../../../src/cache/wrap-in-trace';
 import Raven from 'raven';
 
 const values = [
