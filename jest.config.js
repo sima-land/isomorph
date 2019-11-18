@@ -1,4 +1,5 @@
 module.exports = {
+  transformIgnorePatterns: ['/node_modules/(?!(middleware-axios)).*/'],
   coverageThreshold: {
     global: {
       branches: 100,
