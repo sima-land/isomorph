@@ -2,7 +2,7 @@ import { applyMiddleware, createStore as createReduxStore } from 'redux';
 import createSagaMiddleware, { END } from 'redux-saga';
 import isFunction from 'lodash.isfunction';
 import { createService } from '../../container';
-import { waitOnStoreReadiness } from '../redux';
+import waitOnStoreReadiness from '../redux/wait-on-store-readiness';
 
 /**
  * Создаёт функцию для обработки успешного завершения подготовки стора.

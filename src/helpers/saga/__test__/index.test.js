@@ -3,7 +3,7 @@ import { createStore as createReduxStore } from 'redux';
 import { call } from 'redux-saga/effects';
 import { END } from 'redux-saga';
 import isFunction from 'lodash.isfunction';
-import { waitOnStoreReadiness } from '../../redux';
+import waitOnStoreReadiness from '../../redux/wait-on-store-readiness';
 
 jest.mock('redux', () => {
   const original = jest.requireActual('redux');
@@ -13,12 +13,12 @@ jest.mock('redux', () => {
   };
 });
 
-jest.mock('../../redux', () => {
-  const original = jest.requireActual('../../redux');
+jest.mock('../../redux/wait-on-store-readiness', () => {
+  const original = jest.requireActual('../../redux/wait-on-store-readiness');
   return {
     ...original,
     __esModule: true,
-    waitOnStoreReadiness: jest.fn(original.waitOnStoreReadiness),
+    default: jest.fn(original.default),
   };
 });
 
