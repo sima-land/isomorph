@@ -57,6 +57,7 @@
     "babel-jest": "23.6.x",
     "babel-loader": "8.0.x",
     "del": "4.1.x",
+    "dotenv": "^8.2.0",
     "enzyme": "3.8.x",
     "enzyme-adapter-react-16": "1.13.x",
     "enzyme-to-json": "3.3.x",
