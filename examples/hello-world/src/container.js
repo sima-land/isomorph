@@ -26,6 +26,9 @@ import {
 } from '../../../src/helpers/tracer';
 import wrapInTrace from '../../../src/cache/wrap-in-trace';
 import Raven from 'raven';
+import axiosInstanceConstructor from '../../../src/helpers/api/create-instance';
+import enhancerConstructor from '../../../src/helpers/api/create-enhancer';
+import createTraceRequestMiddleware from '../../../src/helpers/api/middlewares/trace-request-middleware';
 
 const values = [
   { name: 'config', value: config },
@@ -228,6 +231,9 @@ const factories = [
   {
     name: 'helloInitialSaga',
     factory: createRootSaga,
+    dependencies: [
+      'axiosInstance',
+    ],
   },
   {
     name: 'helloStore',
@@ -270,6 +276,35 @@ const factories = [
   {
     name: 'context',
     factory: getSpanContext,
+  },
+  {
+    name: 'axiosInstance',
+    factory: axiosInstanceConstructor,
+    dependencies: [
+      {
+        name: 'config',
+        value: {
+          baseURL: `${config.simalandApiUrl}/api/v3`,
+        },
+      },
+      {
+        enhancer: 'axiosEnhancer',
+      },
+    ],
+  },
+  {
+    name: 'axiosEnhancer',
+    factory: enhancerConstructor,
+    dependencies: [
+      {
+        name: 'constructors',
+        value: [
+          createTraceRequestMiddleware,
+        ],
+      },
+      'context',
+      { tracer: 'jaegerTracer' },
+    ],
   },
 ];
 
