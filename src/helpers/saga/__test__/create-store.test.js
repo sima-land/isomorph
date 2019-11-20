@@ -1,4 +1,4 @@
-import { createSagaReadyHandler, createStore, mapServiceOptionsToArgs } from '../index';
+import { createSagaReadyHandler, createStore, mapServiceOptionsToArgs } from '../create-store';
 import { createStore as createReduxStore } from 'redux';
 import { call } from 'redux-saga/effects';
 import { END } from 'redux-saga';

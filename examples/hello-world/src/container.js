@@ -1,7 +1,7 @@
 import config from './config';
 import { getMethod, getStatus, getXClientIp } from '../../../src/helpers/http';
 import templates from './templates';
-import { createStoreService } from '../../../src/helpers/saga';
+import { createStoreService } from '../../../src/helpers/saga/create-store';
 import create from '../../../src/container';
 import sentryLogger from '../../../src/logger/sentry-logger';
 import createSentryMiddleware from '../../../src/logger/create-sentry-middleware';
