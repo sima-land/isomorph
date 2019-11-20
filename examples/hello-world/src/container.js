@@ -24,6 +24,7 @@ import {
   createTracingMiddleware,
   getSpanContext,
 } from '../../../src/helpers/tracer';
+import getParams, { parseHttpHeaders } from '../../../src/get-params/get-params';
 import wrapInTrace from '../../../src/cache/wrap-in-trace';
 import Raven from 'raven';
 import axiosInstanceConstructor from '../../../src/helpers/api/create-instance';
@@ -304,6 +305,23 @@ const factories = [
       },
       'context',
       { tracer: 'jaegerTracer' },
+    ],
+  },
+  {
+    name: 'params',
+    factory: getParams,
+    dependencies: [
+      {
+        name: 'getValue',
+        value: parseHttpHeaders,
+      },
+      {
+        name: 'defaultValue',
+        value: {
+          api_host: '',
+        },
+      },
+      'config',
     ],
   },
 ];
