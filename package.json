@@ -45,7 +45,8 @@
     "pino-pretty": "^3.2.0",
     "prom-client": "^11.5.2",
     "redux": "^4.0.1",
-    "redux-saga": "^1.0.5"
+    "redux-saga": "^1.0.5",
+    "reduxsauce": "^1.1.1"
   },
   "devDependencies": {
     "@babel/core": "7.2.x",
