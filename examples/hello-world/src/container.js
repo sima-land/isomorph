@@ -30,11 +30,13 @@ import Raven from 'raven';
 import axiosInstanceConstructor from '../../../src/helpers/api/create-instance';
 import enhancerConstructor from '../../../src/helpers/api/create-enhancer';
 import createTraceRequestMiddleware from '../../../src/helpers/api/middlewares/trace-request-middleware';
+import createCountApiResponseTimeMiddleware from '../../../src/helpers/api/middlewares/count-api-response-time';
 import createCollectCookieMiddleware from '../../../src/helpers/api/middlewares/collect-cookie-middleware';
 
 const values = [
   { name: 'config', value: config },
   { name: 'templates', value: templates },
+  { name: 'timeDataKey', value: 'customKey' },
 ];
 
 const singletons = [
@@ -303,10 +305,12 @@ const factories = [
         value: [
           createTraceRequestMiddleware,
           createCollectCookieMiddleware,
+          createCountApiResponseTimeMiddleware,
         ],
       },
       'context',
       { tracer: 'jaegerTracer' },
+      'timeDataKey',
     ],
   },
   {
