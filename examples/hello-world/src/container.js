@@ -27,6 +27,7 @@ import {
 import getParams, { parseHttpHeaders } from '../../../src/get-params/get-params';
 import wrapInTrace from '../../../src/cache/wrap-in-trace';
 import Raven from 'raven';
+import createPassHeadersMiddleware from '../../../src/helpers/api/middlewares/pass-headers-middleware';
 import axiosInstanceConstructor from '../../../src/helpers/api/create-instance';
 import enhancerConstructor from '../../../src/helpers/api/create-enhancer';
 import createTraceRequestMiddleware from '../../../src/helpers/api/middlewares/trace-request-middleware';
@@ -38,6 +39,7 @@ const values = [
   { name: 'config', value: config },
   { name: 'templates', value: templates },
   { name: 'timeDataKey', value: 'customKey' },
+  { name: 'serviceUserAgent', value: 'simaland-example/1' },
 ];
 
 const singletons = [
@@ -318,14 +320,21 @@ const factories = [
         name: 'constructors',
         value: [
           createTraceRequestMiddleware,
+          createPassHeadersMiddleware,
           createCollectCookieMiddleware,
           createCountApiResponseTimeMiddleware,
         ],
       },
       'context',
+      'ip',
+      'serviceUserAgent',
       { tracer: 'jaegerTracer' },
       'timeDataKey',
     ],
+  },
+  {
+    name: 'ip',
+    factory: getXClientIp,
   },
   {
     name: 'params',
