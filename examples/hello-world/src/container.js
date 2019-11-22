@@ -24,7 +24,7 @@ import {
   createTracingMiddleware,
   getSpanContext,
 } from '../../../src/helpers/tracer';
-import getParams, { parseHttpHeaders } from '../../../src/get-params/get-params';
+import getParams, { parseHttpHeaders } from '../../../src/helpers/get-params';
 import wrapInTrace from '../../../src/cache/wrap-in-trace';
 import Raven from 'raven';
 import createPassHeadersMiddleware from '../../../src/helpers/api/middlewares/pass-headers-middleware';

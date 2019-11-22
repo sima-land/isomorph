@@ -1,20 +1,37 @@
-import { getParams, parseHttpHeaders } from '../get-params';
+import getParams, { parseHttpHeaders, getParams as getParameters } from '../';
 
-describe('getParams', () => {
+describe('getParams default', () => {
+  const defaultValue = {
+    api_host: '',
+  };
+  it('returns default value', () => {
+    expect(getParams(
+      { request: {}, config: {}, getValue: () => {}, modify: null, defaultValue })).toEqual(defaultValue);
+  });
+  it('returns not default value', () => {
+    expect(getParams(
+      { request: {}, config: {}, getValue: () => 'foo', modify: null, defaultValue })).toEqual('foo');
+  });
+  it('returns modified value', () => {
+    expect(getParams({ request: {}, config: {}, getValue: () => 2, modify: v => v * 2 })).toEqual(4);
+  });
+});
+
+describe('getParameters', () => {
   const defaultValue = {
     api_host: '',
   };
   it('did`t throw errors with blank params', () => {
-    expect(getParams()).toEqual();
+    expect(getParameters()).toEqual();
   });
   it('returns default value', () => {
-    expect(getParams({}, {}, () => {}, null, defaultValue)).toEqual(defaultValue);
+    expect(getParameters({}, {}, () => {}, null, defaultValue)).toEqual(defaultValue);
   });
   it('returns not default value', () => {
-    expect(getParams({}, {}, () => 'foo', null, defaultValue)).toEqual('foo');
+    expect(getParameters({}, {}, () => 'foo', null, defaultValue)).toEqual('foo');
   });
   it('returns modified value', () => {
-    expect(getParams({}, {}, () => 2, v => v * 2)).toEqual(4);
+    expect(getParameters({}, {}, () => 2, v => v * 2)).toEqual(4);
   });
 });
 

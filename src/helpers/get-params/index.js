@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 import isFunction from 'lodash/isFunction';
-import { createService } from '../container/index';
+import { createService } from '../../container';
 
 /**
  * Генерирует параметры приложения.
