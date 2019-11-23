@@ -33,7 +33,7 @@ import enhancerConstructor from '../../../src/helpers/api/create-enhancer';
 import createTraceRequestMiddleware from '../../../src/helpers/api/middlewares/trace-request-middleware';
 import createCountApiResponseTimeMiddleware from '../../../src/helpers/api/middlewares/count-api-response-time';
 import createCollectCookieMiddleware from '../../../src/helpers/api/middlewares/collect-cookie-middleware';
-import createSetHeaderMiddleware from '../../../src/create-set-header-middleware/create-set-header-middleware';
+import createSetHeaderMiddleware from '../../../src/set-header-middleware/create';
 
 const values = [
   { name: 'config', value: config },

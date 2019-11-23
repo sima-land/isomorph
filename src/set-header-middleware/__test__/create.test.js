@@ -1,4 +1,4 @@
-import createSetHeaderMiddleware from '../create-set-header-middleware';
+import createSetHeaderMiddleware from '../create';
 
 describe('createSetHeaderMiddleware()', () => {
   it('should create middleware correctly', () => {
