@@ -10,7 +10,7 @@ const axiosParams = {
 /**
  * Инициализирует загрузку данных для рендеринга.
  */
-export function* initDataLoading () {
+export function * initDataLoading () {
   yield put(appCreators.initDataLoading());
   const { data } = yield take(appTypes.SET_CURRENT_DATA);
   if (data && data.output) {
@@ -23,7 +23,7 @@ export function* initDataLoading () {
  * @param {Object} options Опции.
  * @param {Object} options.axiosInstance Инстанс axios.
  */
-export function* loadData ({ axiosInstance }) {
+export function * loadData ({ axiosInstance }) {
   const response = yield call(axiosInstance.get, '/item/123456/', axiosParams);
   yield put(appCreators.setCurrentData(
     {

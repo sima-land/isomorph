@@ -1,4 +1,4 @@
-import config from './config';
+import appConfig from './config';
 import { getMethod, getStatus, getXClientIp } from '../../../src/helpers/http';
 import templates from './templates';
 import { createStoreService } from '../../../src/helpers/saga/create-store';
@@ -36,7 +36,7 @@ import createCollectCookieMiddleware from '../../../src/helpers/api/middlewares/
 import createSetHeaderMiddleware from '../../../src/set-header-middleware/create';
 
 const values = [
-  { name: 'config', value: config },
+  { name: 'config', value: appConfig },
   { name: 'templates', value: templates },
   { name: 'timeDataKey', value: 'customKey' },
   { name: 'serviceUserAgent', value: 'simaland-example/1' },
@@ -304,7 +304,7 @@ const factories = [
       {
         name: 'config',
         value: {
-          baseURL: `${config.simalandApiUrl}/api/v3`,
+          baseURL: `${appConfig.simalandApiUrl}/api/v3`,
         },
       },
       {

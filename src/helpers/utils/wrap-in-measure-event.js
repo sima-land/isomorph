@@ -4,10 +4,11 @@ import isString from 'lodash.isstring';
 
 /**
  * Оборачивает выполнение какой-либо функции в отправку событий начала и конца выполнения.
- * @param {Function} fn Функция, которую необходимо обернуть.
- * @param {string} startEvent Название события начала измерения.
- * @param {string} endEvent Название события конца измерения.
- * @param {EventEmitter} emitter Объект на котором будут отправляться события.
+ * @param {Object} param Параметры.
+ * @param {Function} param.fn Функция, которую необходимо обернуть.
+ * @param {string} param.startEvent Название события начала измерения.
+ * @param {string} param.endEvent Название события конца измерения.
+ * @param {EventEmitter} param.emitter Объект на котором будут отправляться события.
  * @return {Function} Функция обёрнутая в отправку событий.
  */
 export const wrapInMeasureEvent = ({ fn, startEvent, endEvent, emitter }) => {

@@ -1,12 +1,5 @@
 import create, { createService, getDependencies, isStaticDependency, wrapInContext } from '..';
-
-/**
- * Тестовая функция.
- * @param {Function} getValue Тестовая зависимость.
- * @param {*} initialValue Тестовая зависимость.
- * @return {*} Тестовый результат.
- */
-const factory = ({ getValue, initialValue }) => getValue(initialValue);
+import { factory, mockFactory } from '../../../__mocks__/factory';
 
 describe('function create', () => {
   it('creates container correctly', async () => {
@@ -258,13 +251,12 @@ describe('function wrapInContext', () => {
     expect(fn).toHaveBeenCalledWith(5);
   });
 
-  const factory = jest.fn(() => 3);
   const container = create(
     {
       services: [
         {
           name: 'test',
-          factory,
+          factory: mockFactory,
         },
       ],
     }
@@ -275,14 +267,14 @@ describe('function wrapInContext', () => {
     await expect(wrapped()).resolves.toEqual();
     await wrapped(6);
     expect(fn).toHaveBeenCalledWith(6, 3);
-    expect(factory).toHaveBeenCalledWith({});
+    expect(mockFactory).toHaveBeenCalledWith({});
   });
   it('creates wrapped in context function if argsToOptions is not function', async () => {
     const wrapped = wrapInContext({ container, fn, dependencies: ['test'], argsToOptions: 'I am not a function!' });
     await expect(wrapped()).resolves.toEqual();
     await wrapped(7);
     expect(fn).toHaveBeenCalledWith(7, 3);
-    expect(factory).toHaveBeenCalledWith({});
+    expect(mockFactory).toHaveBeenCalledWith({});
   });
 });
 

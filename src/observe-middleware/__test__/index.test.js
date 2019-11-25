@@ -9,8 +9,6 @@ describe('createObserveMiddleware()', () => {
   const testFirstStartTime = [100, 2000000];
   const testSecondStartTime = [150, 2000001];
   const testDuration = [200, 2000000];
-  const startSubscriber = jest.fn(defaultStartSubscriber);
-  const finishSubscriber = jest.fn(defaultFinishSubscriber);
   it('should return function', () => {
     expect(typeof createObserveMiddleware()).toBe('function');
   });
@@ -56,6 +54,7 @@ describe('createObserveMiddleware()', () => {
   });
   it('should work when "startSubscriber" is missed', () => {
     const startSubscriber = null;
+    const finishSubscriber = jest.fn(defaultFinishSubscriber);
     jest.spyOn(process, 'hrtime')
       .mockReturnValueOnce(testFirstStartTime)
       .mockReturnValueOnce(testDuration);
@@ -86,6 +85,7 @@ describe('createObserveMiddleware()', () => {
   });
   it('should work when "finishSubscriber" is missed', () => {
     const finishSubscriber = null;
+    const startSubscriber = jest.fn(defaultStartSubscriber);
     jest.spyOn(process, 'hrtime')
       .mockReturnValueOnce(testFirstStartTime)
       .mockReturnValueOnce(testSecondStartTime);

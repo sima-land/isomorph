@@ -25,8 +25,6 @@ export const traceIncomingRequest = (tracer, key, httpRequest) => tracer.startSp
  * @param {Object} param.config.tracerConfig Конфиг трейсера.
  * @param {string} param.config.serviceName Название сервиса.
  * @param {number} param.config.buildVersion Версия сборки.
- * @param {Object} param.metrics Метрики.
- * @param {Object} param.logger Логгер.
  * @return {Tracer} Объект трейсера.
  */
 export const getTracer = ({

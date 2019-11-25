@@ -10,9 +10,10 @@ import isPlainObject from 'lodash.isplainobject';
 export default function createPinoInstance ({ config } = {}) {
   /**
    * Функция, которая создает экземпляр логгера.
-   * @param {string|number} timestamp Время.
-   * @param {boolean} isProduction Является ли production-сборкой.
-   * @param {boolean} hasColorize Нужно ли выделять цветом.
+   * @param {Object} param Параметры.
+   * @param {string|number} param.timestamp Время.
+   * @param {boolean} param.isProduction Является ли production-сборкой.
+   * @param {boolean} param.hasColorize Нужно ли выделять цветом.
    * @return {Function} Экземпляр логгера.
    */
   const loggerCreator = (
@@ -23,7 +24,7 @@ export default function createPinoInstance ({ config } = {}) {
     }
   ) => {
     const logger = pino({
-      timestamp: timestamp,
+      timestamp,
       prettyPrint: hasColorize && { colorize: true },
       useLevelLabels: true,
     });

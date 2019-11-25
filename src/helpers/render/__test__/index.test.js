@@ -66,18 +66,20 @@ describe('validateTemplate()', () => {
       template: 'I am not Function',
     },
   };
-  const objTest = templates.production;
   const toJsonObject = '\n{\n'
     + '  "checker": "[object Function]",\n'
     + '  "template": "I am not Function"\n'
     + '}';
   it('should return error and incorrect pattern', () => {
+    const objTest = templates.production;
     expect(() => validateTemplate(objTest)).toThrowError(
-      `Template object must contain properties "checker" and "template" that must be a functions.${toJsonObject}`);
+      `Template object must contain properties "checker" and "template" that must be a functions.${toJsonObject}`
+    );
   });
   it('should return error', () => {
     expect(() => validateTemplate()).toThrowError(
-      'Template object must contain properties "checker" and "template" that must be a functions.');
+      'Template object must contain properties "checker" and "template" that must be a functions.'
+    );
   });
   it('should return correct pattern', () => {
     const objTest = templates.development;

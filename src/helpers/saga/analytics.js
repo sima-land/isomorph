@@ -13,7 +13,7 @@ export const checkOkoExists = () =>
  * Отправка аналитики в око.
  * @param {Object} meta Данные для отправки.
  */
-export function* sendAnalytics ({ meta }) {
+export function * sendAnalytics ({ meta }) {
   const isOkoExists = yield call(checkOkoExists);
   const metaIsObject = yield call(isObject, meta);
 

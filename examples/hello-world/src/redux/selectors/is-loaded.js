@@ -5,4 +5,5 @@ import get from 'lodash/get';
  * @param {Object} state Стейт.
  * @return {boolean} Возвращает значение флага.
  */
-export default state => get(state, 'app.isLoaded', false);
+const isLoaded = state => get(state, 'app.isLoaded', false);
+export default isLoaded;

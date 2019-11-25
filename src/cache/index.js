@@ -71,11 +71,12 @@ export const createRedisCache = (
 
 /**
  * Преобразует опции сервиса в аргументы функции.
- * @param {Object} config Объект с параметрами Redis.
- * @param {Function} reconnectAfterError Переподключение после ошибки.
- * @param {Function} getRepeatStrategy Время для повтора перезаписи в redis.
- * @param {Function} getOnJoinCallback Устанавливает статус кэша.
- * @param {Function} getAfterReconnectingCallback Устанавливает статус кэша.
+ * @param {Object} param Параметры.
+ * @param {Object} param.config Объект с параметрами Redis.
+ * @param {Function} param.reconnectAfterError Переподключение после ошибки.
+ * @param {Function} param.getRepeatStrategy Время для повтора перезаписи в redis.
+ * @param {Function} param.getOnJoinCallback Устанавливает статус кэша.
+ * @param {Function} param.getAfterReconnectingCallback Устанавливает статус кэша.
  * @return {Object} Config Объект с параметрами Redis.
  */
 export const mapServiceOptionsToArgs = ({
