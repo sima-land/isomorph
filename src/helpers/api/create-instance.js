@@ -16,8 +16,9 @@ export const createInstance = (config, enhancer) => {
 
 /**
  * Преобразует опции сервиса в аргументы функции.
- * @param {Object} config Конфигурация для axios.
- * @param {Function} enhancer Функция для применения middleware к экземпляру.
+ * @param {Object} param Параметры.
+ * @param {Object} param.config Конфигурация для axios.
+ * @param {Function} param.enhancer Функция для применения middleware к экземпляру.
  * @return {Array} Массив агрументов для использования в функции.
  */
 export const mapServiceOptionsToArgs = (

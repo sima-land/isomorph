@@ -7,7 +7,7 @@ describe('createSentryMiddleware()', () => {
       sentryDsnServer: null,
       sentryOptions: {
         version: 'test',
-        test: test,
+        test,
       },
     };
 

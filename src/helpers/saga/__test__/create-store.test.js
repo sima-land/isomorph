@@ -58,7 +58,7 @@ describe('function createStore', () => {
   /**
    * Тестовая сага.
    */
-  const initialSaga = function* () {
+  const initialSaga = function * () {
     yield call(initialSagaChecker);
   };
 

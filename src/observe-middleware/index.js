@@ -10,8 +10,9 @@ export const defaultStartSubscriber = ({ callback }) => callback();
 
 /**
  * Подписчик на событие завершения процесса.
- * @param {http.ServerResponse} response Ответ сервера.
- * @param {Function} callback Функция-обработчик события.
+ * @param {Object} param Параметры.
+ * @param {http.ServerResponse} param.response Ответ сервера.
+ * @param {Function} param.callback Функция-обработчик события.
  * @return {http.ServerResponse} Имеет ли событие другие обработчики.
  */
 export const defaultFinishSubscriber = ({ response, callback }) => response.once('finish', callback);

@@ -66,9 +66,10 @@ export const createStore = (
 
 /**
  * Преобразует опции сервиса в аргументы функции.
- * @param {Function} reducer Редьюсер.
- * @param {Function} initialSaga Инициализирующая сага.
- * @param {Object} options Остальные, необязательные опции.
+ * @param {Object} param Параметры.
+ * @param {Function} param.reducer Редьюсер.
+ * @param {Function} param.initialSaga Инициализирующая сага.
+ * @param {Object} param.options Остальные, необязательные опции.
  * @return {Array} Массив агрументов для использования в функции.
  */
 export const mapServiceOptionsToArgs = (

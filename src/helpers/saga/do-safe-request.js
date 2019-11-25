@@ -10,7 +10,7 @@ import get from 'lodash/get';
  * @param {Function} [options.captureException] Обработает ошибку.
  * @return {Object} Ответ сервера.
  */
-export default function* doSafeRequest (
+export default function * doSafeRequest (
   performRequest,
   options
 ) {

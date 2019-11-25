@@ -15,17 +15,17 @@ const waitOnStoreReadiness = (
   timeout = 2 ** 30,
 ) => {
   let timer = null;
-  onReady = prepareOnReady(
+  const wrapperOnReady = prepareOnReady(
     store,
     store.subscribe(
       () => {
-        isReady(store) && onReady(timer);
+        isReady(store) && wrapperOnReady(timer);
       }
     ),
     onReady
   );
   timer = setTimeout(
-    onReady,
+    wrapperOnReady,
     timeout
   );
   return store;

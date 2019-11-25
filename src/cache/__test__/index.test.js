@@ -9,18 +9,6 @@ import {
 import { mockSet, mockGet, mockOn } from '../../../__mocks__/ioredis';
 
 describe('createRedisCache()', () => {
-  const config = {
-    cacheConfig: {
-      test: 1,
-    },
-    redisHost: 'foo',
-    redisPort: '8020',
-    redisPassword: 'qwerty',
-    redisDB: 'DB',
-    redisEnabled: false,
-    defaultCacheDuration: 300,
-    recDelay: 301,
-  };
   it('createRedisCache() return Object without config', () => {
     const redis = createRedisCache(
       reconnectOnError,
@@ -32,6 +20,18 @@ describe('createRedisCache()', () => {
     expect(redis).toEqual({});
   });
   it('createRedisCache() works without callback functions', () => {
+    const config = {
+      cacheConfig: {
+        test: 1,
+      },
+      redisHost: 'foo',
+      redisPort: '8020',
+      redisPassword: 'qwerty',
+      redisDB: 'DB',
+      redisEnabled: false,
+      defaultCacheDuration: 300,
+      recDelay: 301,
+    };
     const redis = createRedisCache(config);
     expect(mockOn).toHaveBeenCalledTimes(0);
     expect(redis).toEqual({});
@@ -52,10 +52,10 @@ describe('createRedisCache()', () => {
      * Мок функции-обработчика события повторного соединения с redis.
      */
     const onReconnect = () => {};
-    const getOnConnectCallback = jest.fn(() => onConnect);
-    const getOnReconnectingCallback = jest.fn(() => onReconnect);
+    const getConnectCallback = jest.fn(() => onConnect);
+    const getReconnectingCallback = jest.fn(() => onReconnect);
     const redis = createRedisCache(config,
-      reconnectOnError, getRetryStrategy, getOnConnectCallback, getOnReconnectingCallback);
+      reconnectOnError, getRetryStrategy, getConnectCallback, getReconnectingCallback);
     expect(mockOn).toHaveBeenCalledTimes(2);
     expect(mockOn.mock.calls[0][0]).toEqual('connect');
     expect(mockOn.mock.calls[0][1]).toEqual(onConnect);

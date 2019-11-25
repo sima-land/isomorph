@@ -3,9 +3,9 @@ import wrapInMeasureEvent from '../utils/wrap-in-measure-event';
 
 /**
  * Создаёт функцию для рендеринга приложения, навешивая необходимые события.
- * @param {Function} render Пользовательская функция для рендеринга приложения.
- * @param {http.IncomingMessage} request Запрос.
- * @param {http.ServerResponse} response Ответ.
+ * @param {Object} param Параметры.
+ * @param {Function} param.render Пользовательская функция для рендеринга приложения.
+ * @param {http.ServerResponse} param.response Ответ.
  * @return {Function} Функция, обёрнутая в событие для измерения времени рендеринга.
  */
 export const prepareRenderFunction = (
@@ -63,8 +63,9 @@ ${jsonView}
  * @return {*} [value] Преобразованное значение объекта.
  */
 export function jsonStringifyReplacer (key, value) {
+  let result = value;
   if (!JSON.stringify(value)) {
-    value = Object.prototype.toString.call(value);
+    result = Object.prototype.toString.call(value);
   }
-  return value;
+  return result;
 }

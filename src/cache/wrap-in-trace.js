@@ -38,6 +38,7 @@ export const wrapInTrace = (tracer, context, cache) => ({
 
   /**
    * Геттер статуса кэша.
+   * @return {string} Статус кэша.
    */
   get status () {
     return cache.status;
@@ -46,9 +47,10 @@ export const wrapInTrace = (tracer, context, cache) => ({
 
 /**
  * Преобразует опции сервиса в аргументы функции.
- * @param {Object} tracer Экземпляр jaeger-трейсера.
- * @param {Object} context Контекст спана.
- * @param {Object} cache  Кэш.
+ * @param {Object} param Параметры.
+ * @param {Object} param.tracer Экземпляр jaeger-трейсера.
+ * @param {Object} param.context Контекст спана.
+ * @param {Object} param.cache  Кэш.
  * @return {Object} Config Объект с параметрами Redis.
  */
 export const mapServiceOptionsToArgs = ({ tracer, context = {}, cache }) => [tracer, context, cache];

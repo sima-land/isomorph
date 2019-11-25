@@ -7,7 +7,7 @@ import { initDataLoading, loadData } from './app';
  * @param {Object} options Опции, необходимые для запуска дочерних саг.
  * @return {Function} Инициализирующая сага.
  */
-export const createRootSaga = (options = {}) => function* () {
+export const createRootSaga = (options = {}) => function * () {
   yield all([
     takeLatest(Types.START_APP, initDataLoading, options),
     takeLatest(Types.INIT_DATA_LOADING, loadData, options),

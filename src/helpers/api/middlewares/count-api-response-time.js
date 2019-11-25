@@ -2,8 +2,9 @@ import { getMsFromHRT } from '../../utils/get-ms-from-hrt';
 
 /**
  * Создаёт middleware, собирающий данные о времени ответа запросов в API.
- * @param {Object} response Ответ.
- * @param {string} timeDataKey Ключ свойства в response.locals для сохранения замеров времени.
+ * @param {Object} param Параметры.
+ * @param {Object} param.response Ответ.
+ * @param {string} param.timeDataKey Ключ свойства в response.locals для сохранения замеров времени.
  * @return {function(Object, Function)} Middleware для сохранения времени ответа API.
  */
 const createCountApiResponseTimeMiddleware = ({ response, timeDataKey }) =>

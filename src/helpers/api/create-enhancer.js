@@ -25,8 +25,9 @@ export const createEnhancer = (constructors, params) =>
 
 /**
  * Преобразует опции сервиса в аргументы функции.
- * @param {Array<Function>} constructors Функции-конструкторы middleware.
- * @param {Object} params Параметры для конструкторов.
+ * @param {Object} param Параметры.
+ * @param {Array<Function>} param.constructors Функции-конструкторы middleware.
+ * @param {Object} param.params Параметры для конструкторов.
  * @return {Array} Массив агрументов для использования в функции.
  */
 export const mapServiceOptionsToArgs = (
@@ -41,7 +42,7 @@ export const mapServiceOptionsToArgs = (
 
 /**
  * Функция для сборки middleware в функцию для применения к экземпляру axios для использования в контейнере.
- * @type {function}
+ * @type {Function}
  */
 const enhancerConstructor = createService(
   createEnhancer,
