@@ -17,7 +17,8 @@
     "dev": "cd ./examples/hello-world/ && yarn && yarn dev",
     "build": "gulp build",
     "lint": "eslint --cache ./ --ext .js,.jsx",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --coverage"
   },
   "husky": {
     "hooks": {

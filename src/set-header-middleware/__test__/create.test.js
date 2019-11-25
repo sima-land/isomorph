@@ -1,20 +1,21 @@
 import createSetHeaderMiddleware from '../create';
 
 describe('createSetHeaderMiddleware()', () => {
-  it('should create middleware correctly', () => {
-    const middleware = createSetHeaderMiddleware({
+  const testDependencies = {
+    headers: {
       'Test-Js-Header-Name': '/bundle.js',
       'Test-Css-Header-Name': '/bundle.css',
-    });
+    },
+  };
+
+  it('should create middleware correctly', () => {
+    const middleware = createSetHeaderMiddleware(testDependencies);
 
     expect(middleware).toBeInstanceOf(Function);
   });
 
   it('should set headers', () => {
-    const middleware = createSetHeaderMiddleware({
-      'Test-Js-Header-Name': '/bundle.js',
-      'Test-Css-Header-Name': '/bundle.css',
-    });
+    const middleware = createSetHeaderMiddleware(testDependencies);
     const response = { set: jest.fn() };
     const next = jest.fn();
 
@@ -48,7 +49,7 @@ describe('createSetHeaderMiddleware()', () => {
   });
 
   it('shouldn`t set header if header not pass', () => {
-    const middleware = createSetHeaderMiddleware();
+    const middleware = createSetHeaderMiddleware({});
     const response = { set: jest.fn() };
     const next = jest.fn();
 
