@@ -34,6 +34,7 @@ import createTraceRequestMiddleware from '../../../src/helpers/api/middlewares/t
 import createCountApiResponseTimeMiddleware from '../../../src/helpers/api/middlewares/count-api-response-time';
 import createCollectCookieMiddleware from '../../../src/helpers/api/middlewares/collect-cookie-middleware';
 import createSetHeaderMiddleware from '../../../src/set-header-middleware/create';
+import initializeSentryCreator from '../../../src/logger/initialize-sentry-creator';
 
 const values = [
   { name: 'config', value: appConfig },
@@ -150,9 +151,20 @@ const singletons = [
     ],
   },
   {
+    name: 'sentryLoggerService',
+    value: Raven,
+  },
+  {
+    name: 'initializeSentry',
+    singleton: initializeSentryCreator,
+    dependencies: [
+      'sentryLoggerService',
+      'config',
+    ],
+  },
+  {
     name: 'sentryMiddleware',
     singleton: createSentryMiddleware,
-    dependencies: ['config'],
   },
   {
     name: 'wrapInTrace',
@@ -162,9 +174,7 @@ const singletons = [
   {
     name: 'sentryLogger',
     singleton: sentryLogger,
-    dependencies: [
-      { name: 'sentryLoggerService', value: Raven },
-    ],
+    dependencies: ['sentryLoggerService'],
   },
   {
     name: 'cache',

@@ -11,11 +11,12 @@ import { addErrorHandling } from '../../../../src/helpers/add-error-handling/ind
  * @param {number} config.mainPort Порт для основного сервера приложения.
  * @param {number} config.metricsPort Порт для сервера сбора метрик приложения.
  * @param {Function} loggerMiddleware Промежуточный слой для логгирования.
- * @param {Function} sentryMiddleware Промежуточный слой для перехвата ошибок.
  * @param {Function} requestMetricsMiddleware Промежуточный слой для сбора метрик запросов.
  * @param {Function} renderMetricsMiddleware Промежуточный слой для сбора метрик рендеринга.
+ * @param {Function} sentryMiddleware Промежуточный слой для перехвата ошибок.
  * @param {Function} tracingMiddleware Промежуточный слой для трассировки запросов в приложении.
  * @param {Function} gracefulShutdown Функция для обработки завершения приложения.
+ * @param {Function} initializeSentry Функция для конфигурирования перехватчика ошибок.
  */
 export const initialize = (
   {
@@ -23,12 +24,14 @@ export const initialize = (
     metricsPort = 3001,
   } = {},
   loggerMiddleware,
-  sentryMiddleware,
   requestMetricsMiddleware,
   renderMetricsMiddleware,
+  sentryMiddleware,
   tracingMiddleware,
   gracefulShutdown,
+  initializeSentry,
 ) => {
+  initializeSentry();
   const server = express()
     .use(loggerMiddleware)
     .use(requestMetricsMiddleware)
@@ -55,11 +58,12 @@ export default wrapInContext(
     dependencies: [
       'config',
       'loggerMiddleware',
-      'sentryMiddleware',
       'requestMetricsMiddleware',
       'renderMetricsMiddleware',
+      'sentryMiddleware',
       'tracingMiddleware',
       'decorateGracefulShutdown',
+      'initializeSentry',
     ],
   }
 );
