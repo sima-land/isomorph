@@ -4,8 +4,8 @@ import get from 'lodash/get';
 
 /**
  * Обработчик роута, возвращающий 'Hello World' в ответ.
- * @param {http.IncomingMessage} request Запрос.
- * @param {http.ServerResponse} response Ответ.
+ * @param {import('http').IncomingMessage} request Запрос.
+ * @param {import('http').ServerResponse} response Ответ.
  * @param {Function} next Функция для передачи контроля следующему обработчику.
  * @param {Function} render Функция для рендеринга контента.
  * @param {Object} data Подготовленный стейт приложения.

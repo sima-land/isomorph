@@ -1,5 +1,5 @@
 import create, { createService, getDependencies, isStaticDependency, wrapInContext } from '..';
-import { factory, mockFactory } from '../../../__mocks__/factory';
+import { factory, mockFactory, powFactory } from '../../../__mocks__/factory';
 
 describe('function create', () => {
   it('creates container correctly', async () => {
@@ -204,7 +204,6 @@ describe('function getDependencies', () => {
 describe('function wrapInContext', () => {
   it('creates wrapped in context function', async () => {
     const fn = jest.fn((power, result) => `5 to degree ${power} is ${result}`);
-    const factory = jest.fn(({ num, power }) => num ** power);
     const container = create(
       {
         services: [
@@ -214,7 +213,7 @@ describe('function wrapInContext', () => {
           },
           {
             name: 'secondTestService',
-            factory,
+            factory: powFactory,
             dependencies: [
               {
                 num: 'firstTestService',
@@ -237,7 +236,7 @@ describe('function wrapInContext', () => {
     });
     expect(await wrapped(2)).toBe('5 to degree 2 is 25');
     expect(fn).toHaveBeenCalledWith(2, 25);
-    expect(factory).toHaveBeenCalledWith({ num: 5, power: 2 });
+    expect(powFactory).toHaveBeenCalledWith({ num: 5, power: 2 });
     expect(container.get).toHaveBeenCalledWith('secondTestService', { power: 2 });
     expect(await wrapped(5)).toBe('5 to degree 5 is 3125');
     expect(container.get).toHaveBeenCalledWith('secondTestService', { power: 5 });

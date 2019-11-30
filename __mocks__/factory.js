@@ -1,4 +1,5 @@
 export const mockFactory = jest.fn(() => 3);
+export const powFactory = jest.fn(({ num, power }) => num ** power);
 
 /**
  * Тестовая функция.

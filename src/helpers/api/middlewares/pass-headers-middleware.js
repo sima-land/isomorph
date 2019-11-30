@@ -3,7 +3,7 @@ import isFunction from 'lodash/isFunction';
 /**
  * Создаёт middleware для прокидывания заголовков из запроса приложения в запросы API.
  * @param {Object} options Параметры для создания middleware.
- * @param {IncomingMessage} options.request Запрос приложения.
+ * @param {import('http').IncomingMessage} options.request Запрос приложения.
  * @param {string} options.ip IP входящего запроса.
  * @param {Object} options.serviceUserAgent Конфигурация приложения.
  * @return {function(Object): Promise} Middleware для использования в API.

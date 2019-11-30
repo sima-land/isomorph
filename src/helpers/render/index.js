@@ -5,7 +5,7 @@ import wrapInMeasureEvent from '../utils/wrap-in-measure-event';
  * Создаёт функцию для рендеринга приложения, навешивая необходимые события.
  * @param {Object} param Параметры.
  * @param {Function} param.render Пользовательская функция для рендеринга приложения.
- * @param {http.ServerResponse} param.response Ответ.
+ * @param {import('http').ServerResponse} param.response Ответ.
  * @return {Function} Функция, обёрнутая в событие для измерения времени рендеринга.
  */
 export const prepareRenderFunction = (
