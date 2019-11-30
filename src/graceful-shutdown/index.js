@@ -9,7 +9,7 @@ export const defaultExitTimeout = 20000;
 
 /**
  * Декорирует http-сервер, добавляя остановку при завершении процесса node-приложения.
- * @param {http.Server} server Экземпляр класса http.Server.
+ * @param {import('http').Server} server Экземпляр класса http.Server.
  * @param {Object} [options] Экземпляр класса http.Server.
  * @param {Function} [options.onSuccess] Будет вызвана перед завершением процесса в случае успешного завершения.
  * @param {Function} [options.onError] Будет вызвана перед принудительным завершением процесса.
@@ -27,7 +27,7 @@ export const decorateGracefulShutdown = (server, options) => {
 
 /**
  * Возвращает функцию, которая запускает остановку http-сервера и завершает процесс приложения принудительно.
- * @param {http.Server} server Экземпляр класса http.Server.
+ * @param {import('http').Server} server Экземпляр класса http.Server.
  * @param {Object} [options] Экземпляр класса http.Server.
  * @param {Function} [options.onSuccess] Будет вызвана перед завершением процесса.
  * @param {Function} [options.onError] Будет вызвана перед завершением процесса.

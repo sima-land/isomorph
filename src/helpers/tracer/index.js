@@ -25,7 +25,7 @@ export const traceIncomingRequest = (tracer, key, httpRequest) => tracer.startSp
  * @param {Object} param.config.tracerConfig Конфиг трейсера.
  * @param {string} param.config.serviceName Название сервиса.
  * @param {number} param.config.buildVersion Версия сборки.
- * @return {Tracer} Объект трейсера.
+ * @return {import('opentracing').Tracer} Объект трейсера.
  */
 export const getTracer = ({
   config: {

@@ -12,7 +12,7 @@ describe('function waitOnReadiness', () => {
     unsubscribe = jest.fn(subscribe(...args));
     return unsubscribe;
   });
-  const isReady = jest.fn(store => store.getState().ready);
+  const isReady = jest.fn(testStore => testStore.getState().ready);
   const onReady = jest.fn();
   it('subscribes to the store and waits for its readiness', () => {
     expect(store.subscribe).not.toHaveBeenCalled();

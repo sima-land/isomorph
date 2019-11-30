@@ -8,7 +8,7 @@ import { createService } from '../../container';
 export const applyMiddleware = (...middlewares) =>
   instance =>
     middlewares.reduce(
-      (instance, middleware) => instance.use(middleware),
+      (currentInstance, middleware) => currentInstance.use(middleware),
       instance
     );
 

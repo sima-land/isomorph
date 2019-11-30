@@ -53,6 +53,7 @@
     "reduxsauce": "^1.1.1"
   },
   "devDependencies": {
+    "@dev-dep/linters": "^1.0.1",
     "@babel/core": "7.2.x",
     "@babel/plugin-proposal-class-properties": "7.4.x",
     "@babel/plugin-syntax-bigint": "^7.4.4",

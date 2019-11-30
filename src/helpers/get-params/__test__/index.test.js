@@ -6,11 +6,13 @@ describe('getParams default', () => {
   };
   it('returns default value', () => {
     expect(getParams(
-      { request: {}, config: {}, getValue: () => {}, modify: null, defaultValue })).toEqual(defaultValue);
+      { request: {}, config: {}, getValue: () => {}, modify: null, defaultValue }
+    )).toEqual(defaultValue);
   });
   it('returns not default value', () => {
     expect(getParams(
-      { request: {}, config: {}, getValue: () => 'foo', modify: null, defaultValue })).toEqual('foo');
+      { request: {}, config: {}, getValue: () => 'foo', modify: null, defaultValue }
+    )).toEqual('foo');
   });
   it('returns modified value', () => {
     expect(getParams({ request: {}, config: {}, getValue: () => 2, modify: v => v * 2 })).toEqual(4);
