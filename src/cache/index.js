@@ -49,14 +49,23 @@ export const createRedisCache = (
   getOnJoinCallback = getOnConnectCallback,
   getAfterReconnectingCallback = getOnReconnectingCallback
 ) => {
-  const { cacheConfig = {}, recDelay, defaultCacheDuration, redisEnabled } = config;
+  const {
+    cacheConfig = {},
+    recDelay,
+    defaultCacheDuration,
+    redisEnabled,
+    sentinelEnabled,
+    sentinelConfig,
+  } = config;
   let cache = {};
-  if (redisEnabled) {
-    const client = new Redis({
-      reconnectAfterError,
-      retryStrategy: getRepeatStrategy(recDelay),
-      ...cacheConfig,
-    });
+  if (redisEnabled || sentinelEnabled) {
+    const client = new Redis(
+      redisEnabled ? {
+        reconnectAfterError,
+        retryStrategy: getRepeatStrategy(recDelay),
+        ...cacheConfig,
+      } : sentinelConfig
+    );
     client.on('connect', getOnJoinCallback(cache));
     client.on('reconnecting', getAfterReconnectingCallback(cache));
     const getAsync = promisify(client.get).bind(client);

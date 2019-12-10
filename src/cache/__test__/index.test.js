@@ -71,6 +71,42 @@ describe('createRedisCache()', () => {
     expect(mockGet).toBeCalledTimes(1);
     expect(mockGet.mock.calls[0][0]).toEqual('test');
   });
+  it('createRedisCache() works if sentinelEnabled', () => {
+    const config = {
+      redisEnabled: false,
+      sentinelEnabled: true,
+      defaultCacheDuration: 300,
+      recDelay: 301,
+    };
+
+    /**
+     * Мок функции-обработчика события повторного соединения с redis.
+     */
+    const onConnect = () => {};
+
+    /**
+     * Мок функции-обработчика события повторного соединения с redis.
+     */
+    const onReconnect = () => {};
+    const getConnectCallback = jest.fn(() => onConnect);
+    const getReconnectingCallback = jest.fn(() => onReconnect);
+    const sentinel = createRedisCache(config,
+      reconnectOnError, getRetryStrategy, getConnectCallback, getReconnectingCallback);
+    expect(mockOn).toHaveBeenCalledTimes(2);
+    expect(mockOn.mock.calls[0][0]).toEqual('connect');
+    expect(mockOn.mock.calls[0][1]).toEqual(onConnect);
+    expect(mockOn.mock.calls[1][0]).toEqual('reconnecting');
+    expect(mockOn.mock.calls[1][1]).toEqual(onReconnect);
+    sentinel.set('testKey', 'testValue');
+    expect(mockSet).toBeCalledTimes(1);
+    expect(mockSet.mock.calls[0][0]).toEqual('testKey');
+    expect(mockSet.mock.calls[0][1]).toEqual('testValue');
+    expect(mockSet.mock.calls[0][2]).toEqual('EX');
+    expect(mockSet.mock.calls[0][3]).toEqual(300);
+    sentinel.get('test');
+    expect(mockGet).toBeCalledTimes(1);
+    expect(mockGet.mock.calls[0][0]).toEqual('test');
+  });
 });
 
 describe('reconnectOnError()', () => {
