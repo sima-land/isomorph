@@ -13,7 +13,8 @@ const initializeSentryCreator = (
       sentryDsnServer,
       sentryOptions,
     },
-  }) => () =>
+  }
+) => () =>
   sentryLoggerService.config(
     sentryDsnServer,
     {
