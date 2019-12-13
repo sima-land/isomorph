@@ -138,7 +138,6 @@ const singletons = [
     name: 'loggerMiddleware',
     singleton: createLoggerMiddleware,
     dependencies: [
-      'config',
       'pinoLogger',
       {
         name: 'getDynamicData',
@@ -147,6 +146,13 @@ const singletons = [
           method: getMethod({ request }),
           status: getStatus({ response }),
         }),
+      },
+      {
+        name: 'exclusions',
+        value: [
+          'healthcheck',
+          '/foo/.*',
+        ],
       },
     ],
   },
