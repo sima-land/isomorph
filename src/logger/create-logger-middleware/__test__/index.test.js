@@ -48,6 +48,21 @@ describe('createLoggerMiddleware', () => {
       .not.toThrow(TypeError('"getDynamicData" must be Function.'));
     expect(createObserveMiddleware).toHaveBeenCalledTimes(1);
   });
+  it('should throw error "exclusions" must be array.', () => {
+    expect(() => createLoggerMiddleware({
+      pinoLogger,
+      getDynamicData,
+      exclusions: {},
+    }))
+      .toThrow(TypeError('"exclusions" must be array.'));
+    expect(createObserveMiddleware).toHaveBeenCalledTimes(0);
+    expect(() => createLoggerMiddleware({
+      pinoLogger,
+      getDynamicData,
+    }))
+      .not.toThrow(TypeError('"exclusions" must be array.'));
+    expect(createObserveMiddleware).toHaveBeenCalledTimes(1);
+  });
   it('should return result of createObserveMiddleware()', () => {
     const middleware = createLoggerMiddleware({
       pinoLogger,
@@ -97,5 +112,21 @@ describe('createLoggerMiddleware', () => {
     eventHandlers.forEach(handler => handler());
 
     expect(spy).toHaveBeenCalledWith(testRequest, testResponse);
+  });
+
+  it('shouldn`t call pinoLogger.info method with for url in exclusions array', () => {
+    const middleware = createLoggerMiddleware({
+      pinoLogger,
+      getDynamicData,
+      exclusions: ['test'],
+    });
+    const eventHandlers = [];
+    const testRequest = { testRequest: true, originalUrl: '/test/url' };
+    const testResponse = { testResponse: true, once: (event, eventHandler) => eventHandlers.push(eventHandler) };
+
+    middleware(testRequest, testResponse, () => {});
+    eventHandlers.forEach(handler => handler());
+
+    expect(pinoLogger.info).toHaveBeenCalledTimes(0);
   });
 });
