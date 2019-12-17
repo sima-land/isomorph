@@ -2,10 +2,10 @@ import localStorageCache, {
   isAvailable,
   getItem,
   setItem,
-} from '../';
+} from '../local-storage';
 
-jest.mock('../', () => {
-  const original = jest.requireActual('../');
+jest.mock('../local-storage', () => {
+  const original = jest.requireActual('../local-storage');
   return {
     ...original,
     __esModule: true,

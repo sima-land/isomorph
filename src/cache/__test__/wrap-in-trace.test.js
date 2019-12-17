@@ -1,4 +1,4 @@
-import { createRedisCache } from '../index';
+import { createRedisCache } from '../redis';
 import { mockSet } from '../../../__mocks__/ioredis';
 import { mapServiceOptionsToArgs, wrapInTrace } from '../wrap-in-trace';
 import { getTracer } from '../../helpers/tracer';

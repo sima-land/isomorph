@@ -5,7 +5,7 @@ import {
   getOnConnectCallback,
   getOnReconnectingCallback,
   mapServiceOptionsToArgs,
-} from '..';
+} from '../redis';
 import { mockSet, mockGet, mockOn } from '../../../__mocks__/ioredis';
 
 describe('createRedisCache()', () => {
