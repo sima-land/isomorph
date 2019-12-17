@@ -3,12 +3,22 @@ import isFunction from 'lodash/isFunction';
 import get from 'lodash/get';
 
 /**
+ * @typedef {Object} ServerResponse Ответ сервера
+ * @property {boolean} ok Были ли запрос совершен успешно.
+ * @property {Object|null} error Объект ошибки.
+ * @property {Object|string|null} data Данные ответа.
+ * @property {number|null} status Статус ответа.
+ * @property {Object|null} headers Заголовки.
+ * @property {Object|null} config Конфигурация запроса.
+ */
+
+/**
  * Безопасно запрашивает данные c сервера, с обработкой и логгированием ошибок, обрабатывает ответ.
  * @param {Function} performRequest Функция, выполняющая запрос.
  * @param {Object} [options] Опции.
  * @param {Array} [options.args] Аргументы функции, выполняющей запрос.
  * @param {Function} [options.captureException] Обработает ошибку.
- * @return {Object} Ответ сервера.
+ * @return {ServerResponse} Ответ сервера.
  */
 export default function * doSafeRequest (
   performRequest,
