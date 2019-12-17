@@ -165,8 +165,19 @@ const singletons = [
     singleton: initializeSentryCreator,
     dependencies: [
       'sentryLoggerService',
-      'config',
+      'getSentryDsn',
+      'getSentryOptions',
     ],
+  },
+  {
+    name: 'getSentryDsn',
+    singleton: ({ config }) => () => config.sentryDsnServer,
+    dependencies: ['config'],
+  },
+  {
+    name: 'getSentryOptions',
+    singleton: ({ config }) => () => config.sentryOptions,
+    dependencies: ['config'],
   },
   {
     name: 'sentryMiddleware',
