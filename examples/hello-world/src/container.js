@@ -11,7 +11,7 @@ import {
   PrometheusMetric,
   createMeasureMiddleware,
 } from '../../../src/helpers/prometheus/';
-import createRedisCache from '../../../src/cache';
+import createRedisCache from '../../../src/cache/redis';
 import { getTemplate, prepareRenderFunction } from '../../../src/helpers/render';
 import isLoadFinish from './redux/selectors/is-load-finish';
 import { reducer } from './redux/reducers';
