@@ -23,10 +23,10 @@ const initializeSentryCreator = (
   }
   const sentryDSN = getSentryDsn() || '';
   const sentryOptions = (getSentryOptions && getSentryOptions()) || {};
-  sentryLoggerService.config(
-    sentryDSN,
-    sentryOptions,
-  ).install();
+  sentryLoggerService.init({
+    dsn: sentryDSN,
+    ...sentryOptions,
+  });
 };
 
 export default initializeSentryCreator;

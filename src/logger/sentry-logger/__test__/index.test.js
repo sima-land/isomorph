@@ -5,7 +5,7 @@ describe('sentryLogger()', function () {
     const sentryLoggerService = {
       captureException: jest.fn(),
       captureMessage: jest.fn(),
-      captureBreadcrumb: jest.fn(),
+      addBreadcrumb: jest.fn(),
     };
     const service = sentryLogger({ sentryLoggerService });
 
@@ -16,7 +16,7 @@ describe('sentryLogger()', function () {
     expect(sentryLoggerService.captureMessage).toHaveBeenCalled();
 
     service.captureBreadcrumb();
-    expect(sentryLoggerService.captureBreadcrumb).toHaveBeenCalled();
+    expect(sentryLoggerService.addBreadcrumb).toHaveBeenCalled();
   });
 
   it('works correctly without params', () => {
