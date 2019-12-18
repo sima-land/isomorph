@@ -59,6 +59,7 @@
     "@babel/preset-env": "7.2.x",
     "@babel/preset-react": "7.0.x",
     "@dev-dep/linters": "^1.0.1",
+    "@sentry/node": "5.10.2",
     "@types/jest": "24.0.x",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.x",

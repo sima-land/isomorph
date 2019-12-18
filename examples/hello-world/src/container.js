@@ -26,7 +26,6 @@ import {
 } from '../../../src/helpers/tracer';
 import getParams, { parseHttpHeaders } from '../../../src/helpers/get-params';
 import wrapInTrace from '../../../src/cache/wrap-in-trace';
-import Raven from 'raven';
 import createPassHeadersMiddleware from '../../../src/helpers/api/middlewares/pass-headers-middleware';
 import axiosInstanceConstructor from '../../../src/helpers/api/create-instance';
 import enhancerConstructor from '../../../src/helpers/api/create-enhancer';
@@ -35,6 +34,7 @@ import createCountApiResponseTimeMiddleware from '../../../src/helpers/api/middl
 import createCollectCookieMiddleware from '../../../src/helpers/api/middlewares/collect-cookie-middleware';
 import createSetHeaderMiddleware from '../../../src/set-header-middleware/create';
 import initializeSentryCreator from '../../../src/logger/initialize-sentry-creator';
+import * as Sentry from '@sentry/node';
 
 const values = [
   { name: 'config', value: appConfig },
@@ -158,7 +158,7 @@ const singletons = [
   },
   {
     name: 'sentryLoggerService',
-    value: Raven,
+    value: Sentry,
   },
   {
     name: 'initializeSentry',
