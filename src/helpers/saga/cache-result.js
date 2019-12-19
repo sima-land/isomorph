@@ -50,12 +50,16 @@ export default function * cacheResult ({
   const canDoRequest = isFunction(validateCache) && isFunction(fn);
   let result = isCacheAvailable && (yield call(get, key));
 
+  if (validateCache(result)) {
+    result = JSON.parse(result);
+  }
+
   if (canDoRequest && !validateCache(result)) {
     result = yield call(fn, ...args);
     const isResultValid = isFunction(validateResult) && validateResult(result);
 
     if (isCacheAvailable && isResultValid) {
-      yield call(set, key, result, duration);
+      yield call(set, key, JSON.stringify(result), duration);
     }
   }
 

@@ -8,8 +8,8 @@ export const mockOn = jest.fn((type, callback) => {
 /**
  * Mock функции Redis.
  */
-export default function Redis () {
+export default jest.fn(function Redis () {
   this.on = mockOn;
   this.get = mockGet;
   this.set = mockSet;
-}
+});

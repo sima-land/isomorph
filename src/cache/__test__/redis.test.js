@@ -1,143 +1,230 @@
 import {
   createRedisCache,
+  mapServiceOptionsToArgs,
+} from '../redis';
+import { promisify } from 'util';
+import {
   reconnectOnError,
   getRetryStrategy,
   getOnConnectCallback,
   getOnReconnectingCallback,
-  mapServiceOptionsToArgs,
-} from '../redis';
-import { mockSet, mockGet, mockOn } from '../../../__mocks__/ioredis';
+} from '../helpers';
+import Redis, {
+  mockSet,
+  mockGet,
+  mockOn,
+} from '../../../__mocks__/ioredis';
+
+jest.mock('util', () => {
+  const original = jest.requireActual('util');
+  return {
+    ...original,
+    __esModule: true,
+    promisify: jest.fn(original.promisify),
+  };
+});
+
+jest.mock('../helpers', () => {
+  const original = jest.requireActual('../helpers');
+  return {
+    ...original,
+    __esModule: true,
+    getOnConnectCallback: jest.fn(original.getOnConnectCallback),
+    getOnReconnectingCallback: jest.fn(original.getOnReconnectingCallback),
+    getRetryStrategy: jest.fn(original.getRetryStrategy),
+  };
+});
 
 describe('createRedisCache()', () => {
-  it('createRedisCache() return Object without config', () => {
-    const redis = createRedisCache(
-      reconnectOnError,
-      getRetryStrategy,
-      getOnConnectCallback,
-      getOnReconnectingCallback
-    );
+  const config = {
+    cacheConfig: {
+      test: 1,
+    },
+    redisHost: 'foo',
+    redisPort: '8020',
+    redisPassword: 'qwerty',
+    redisDB: 'DB',
+    redisEnabled: true,
+    defaultCacheDuration: 300,
+    recDelay: 301,
+  };
+
+  it('should return an object when called without config', () => {
+    const cache = createRedisCache();
+
+    expect(Redis).toHaveBeenCalledTimes(0);
     expect(mockOn).toHaveBeenCalledTimes(0);
-    expect(redis).toEqual({});
+    expect(cache).toEqual({
+      status: null,
+    });
   });
-  it('createRedisCache() works without callback functions', () => {
-    const config = {
-      cacheConfig: {
-        test: 1,
-      },
-      redisHost: 'foo',
-      redisPort: '8020',
-      redisPassword: 'qwerty',
-      redisDB: 'DB',
+
+  it('should work if redis and sentinel are disabled', () => {
+    const cache = createRedisCache({
       redisEnabled: false,
-      defaultCacheDuration: 300,
-      recDelay: 301,
-    };
-    const redis = createRedisCache(config);
+      sentinelEnabled: false,
+    });
+
+    expect(Redis).toHaveBeenCalledTimes(0);
     expect(mockOn).toHaveBeenCalledTimes(0);
-    expect(redis).toEqual({});
+    expect(cache).toEqual({
+      status: null,
+    });
   });
-  it('createRedisCache() works if redisEnabled', () => {
-    const config = {
-      redisEnabled: true,
-      defaultCacheDuration: 300,
-      recDelay: 301,
-    };
 
-    /**
-     * Мок функции-обработчика события повторного соединения с redis.
-     */
-    const onConnect = () => {};
+  it('should work with default handlers', () => {
+    const cache = createRedisCache(config);
+    const onConnect = getOnConnectCallback.mock.results[0].value;
+    const onReconnect = getOnReconnectingCallback.mock.results[0].value;
 
-    /**
-     * Мок функции-обработчика события повторного соединения с redis.
-     */
-    const onReconnect = () => {};
-    const getConnectCallback = jest.fn(() => onConnect);
-    const getReconnectingCallback = jest.fn(() => onReconnect);
-    const redis = createRedisCache(config,
-      reconnectOnError, getRetryStrategy, getConnectCallback, getReconnectingCallback);
-    expect(mockOn).toHaveBeenCalledTimes(2);
-    expect(mockOn.mock.calls[0][0]).toEqual('connect');
-    expect(mockOn.mock.calls[0][1]).toEqual(onConnect);
-    expect(mockOn.mock.calls[1][0]).toEqual('reconnecting');
-    expect(mockOn.mock.calls[1][1]).toEqual(onReconnect);
-    redis.set('testKey', 'testValue');
-    expect(mockSet).toBeCalledTimes(1);
-    expect(mockSet.mock.calls[0][0]).toEqual('testKey');
-    expect(mockSet.mock.calls[0][1]).toEqual('testValue');
-    expect(mockSet.mock.calls[0][2]).toEqual('EX');
-    expect(mockSet.mock.calls[0][3]).toEqual(300);
-    redis.get('test');
+    expect(Redis).toBeCalledTimes(1);
+    expect(Redis).toBeCalledWith({
+      reconnectAfterError: reconnectOnError,
+      retryStrategy: getRetryStrategy.mock.results[0].value,
+      test: 1,
+    });
+
+    expect(mockOn).toHaveBeenNthCalledWith(
+      1,
+      'connect',
+      onConnect
+    );
+
+    expect(mockOn).toHaveBeenNthCalledWith(
+      2,
+      'reconnecting',
+      onReconnect
+    );
+
+    expect(cache.status).toBe(null);
+    expect(cache.get).toBeInstanceOf(Function);
+    expect(cache.set).toBeInstanceOf(Function);
+  });
+
+  it('should work with custom handlers', () => {
+    const onConnect = jest.fn();
+    const onReconnect = jest.fn();
+    const retryStrategy = jest.fn();
+    const reconnectAfterError = jest.fn();
+    const getRepeatStrategy = jest.fn(() => retryStrategy);
+    const getOnJoinCallback = jest.fn(() => onConnect);
+    const getAfterReconnectingCallback = jest.fn(() => onReconnect);
+
+    const cache = createRedisCache(
+      config,
+      reconnectAfterError,
+      getRepeatStrategy,
+      getOnJoinCallback,
+      getAfterReconnectingCallback
+    );
+
+    expect(Redis).toBeCalledTimes(1);
+    expect(Redis).toBeCalledWith({
+      reconnectAfterError,
+      retryStrategy,
+      test: 1,
+    });
+
+    expect(mockOn).toHaveBeenNthCalledWith(
+      1,
+      'connect',
+      onConnect
+    );
+
+    expect(mockOn).toHaveBeenNthCalledWith(
+      2,
+      'reconnecting',
+      onReconnect
+    );
+
+    expect(cache.status).toBe(null);
+    expect(cache.get).toBeInstanceOf(Function);
+    expect(cache.set).toBeInstanceOf(Function);
+  });
+
+  it('should change status on connect and reconnect', () => {
+    const cache = createRedisCache(config);
+    const onConnect = getOnConnectCallback.mock.results[0].value;
+    const onReconnect = getOnReconnectingCallback.mock.results[0].value;
+
+    expect(cache.status).toBe(null);
+
+    onConnect();
+    expect(cache.status).toBe(true);
+
+    onReconnect();
+    expect(cache.status).toBe(false);
+  });
+
+  it('should use get function on redis', () => {
+    const cache = createRedisCache(config);
+
+    cache.get('test');
     expect(mockGet).toBeCalledTimes(1);
-    expect(mockGet.mock.calls[0][0]).toEqual('test');
+    expect(mockGet.mock.calls[0][0]).toBe('test');
+    expect(promisify).toBeCalledTimes(1);
+    expect(promisify).toBeCalledWith(mockGet);
   });
-  it('createRedisCache() works if sentinelEnabled', () => {
-    const config = {
+
+  it('should use set function on redis with default duration', () => {
+    const cache = createRedisCache(config);
+
+    cache.set('test', 'something');
+    expect(mockSet).toBeCalledTimes(1);
+    expect(mockSet).toBeCalledWith(
+      'test',
+      'something',
+      'EX',
+      300
+    );
+  });
+
+  it('should use set function on redis with custom duration', () => {
+    const cache = createRedisCache(config);
+
+    cache.set('test', 'something', 3600);
+    expect(mockSet).toBeCalledTimes(1);
+    expect(mockSet).toBeCalledWith(
+      'test',
+      'something',
+      'EX',
+      3600
+    );
+  });
+
+  it('should work with sentinel', () => {
+    const cache = createRedisCache({
+      ...config,
       redisEnabled: false,
       sentinelEnabled: true,
-      defaultCacheDuration: 300,
-      recDelay: 301,
-    };
+      sentinelConfig: {
+        some: 'thing',
+      },
+    });
 
-    /**
-     * Мок функции-обработчика события повторного соединения с redis.
-     */
-    const onConnect = () => {};
+    const onConnect = getOnConnectCallback.mock.results[0].value;
+    const onReconnect = getOnReconnectingCallback.mock.results[0].value;
 
-    /**
-     * Мок функции-обработчика события повторного соединения с redis.
-     */
-    const onReconnect = () => {};
-    const getConnectCallback = jest.fn(() => onConnect);
-    const getReconnectingCallback = jest.fn(() => onReconnect);
-    const sentinel = createRedisCache(config,
-      reconnectOnError, getRetryStrategy, getConnectCallback, getReconnectingCallback);
-    expect(mockOn).toHaveBeenCalledTimes(2);
-    expect(mockOn.mock.calls[0][0]).toEqual('connect');
-    expect(mockOn.mock.calls[0][1]).toEqual(onConnect);
-    expect(mockOn.mock.calls[1][0]).toEqual('reconnecting');
-    expect(mockOn.mock.calls[1][1]).toEqual(onReconnect);
-    sentinel.set('testKey', 'testValue');
-    expect(mockSet).toBeCalledTimes(1);
-    expect(mockSet.mock.calls[0][0]).toEqual('testKey');
-    expect(mockSet.mock.calls[0][1]).toEqual('testValue');
-    expect(mockSet.mock.calls[0][2]).toEqual('EX');
-    expect(mockSet.mock.calls[0][3]).toEqual(300);
-    sentinel.get('test');
-    expect(mockGet).toBeCalledTimes(1);
-    expect(mockGet.mock.calls[0][0]).toEqual('test');
-  });
-});
+    expect(Redis).toBeCalledTimes(1);
+    expect(Redis).toBeCalledWith({
+      some: 'thing',
+    });
 
-describe('reconnectOnError()', () => {
-  it('reconnectOnError() works properly', () => {
-    let code = 'properly';
-    expect(reconnectOnError({ code })).toBeFalsy();
-    code = 'ECONNREFUSED';
-    expect(reconnectOnError({ code })).toBeTruthy();
-  });
-});
+    expect(mockOn).toHaveBeenNthCalledWith(
+      1,
+      'connect',
+      onConnect
+    );
 
-describe('retryStrategyDelay()', () => {
-  it('retryStrategyDelay() works properly', () => {
-    const delay = getRetryStrategy(999)();
-    expect(delay).toEqual(999);
-  });
-});
+    expect(mockOn).toHaveBeenNthCalledWith(
+      2,
+      'reconnecting',
+      onReconnect
+    );
 
-describe('getOnConnectCallback()', () => {
-  it('getOnConnectCallback() works properly', () => {
-    const cache = {};
-    getOnConnectCallback(cache)();
-    expect(cache.status).toBeTruthy();
-  });
-});
-
-describe('getOnReconnectingCallback()', () => {
-  it('getOnReconnectingCallback() works properly', () => {
-    const cache = {};
-    getOnReconnectingCallback(cache)();
-    expect(cache.status).toBeFalsy();
+    expect(cache.status).toBe(null);
+    expect(cache.get).toBeInstanceOf(Function);
+    expect(cache.set).toBeInstanceOf(Function);
   });
 });
 

@@ -13,10 +13,10 @@ describe('cacheResult()', () => {
       status: true,
     };
     const key = 'test';
-    const result = {
+    const result = JSON.stringify({
       ok: true,
       data: { some: 'data' },
-    };
+    });
     const args = [1, 2];
     const gen = cacheResult({
       cache,
@@ -27,7 +27,7 @@ describe('cacheResult()', () => {
     expect(gen.next().value).toEqual(call(cache.get, key));
     expect(gen.next(result)).toEqual({
       done: true,
-      value: result,
+      value: JSON.parse(result),
     });
   });
 
@@ -51,7 +51,7 @@ describe('cacheResult()', () => {
 
     expect(gen.next().value).toEqual(call(cache.get, key));
     expect(gen.next(null).value).toEqual(call(doSafeRequest, ...args));
-    expect(gen.next(apiResult).value).toEqual(call(cache.set, key, apiResult, 3600));
+    expect(gen.next(apiResult).value).toEqual(call(cache.set, key, JSON.stringify(apiResult), 3600));
     expect(gen.next()).toEqual({
       done: true,
       value: apiResult,
@@ -88,13 +88,13 @@ describe('cacheResult()', () => {
     });
     expect(gen.next().value).toEqual(call(cache.get, key));
     expect(gen.next(null).value).toEqual(call(fn));
-    expect(gen.next(apiResult).value).toEqual(call(cache.set, key, apiResult, duration));
+    expect(gen.next(apiResult).value).toEqual(call(cache.set, key, JSON.stringify(apiResult), duration));
     expect(gen.next()).toEqual({
       done: true,
       value: apiResult,
     });
 
-    expect(validateCache).toBeCalledTimes(1);
+    expect(validateCache).toBeCalledTimes(2);
     expect(validateCache).toBeCalledWith(null);
     expect(validateResult).toBeCalledTimes(1);
     expect(validateResult).toBeCalledWith(apiResult);
