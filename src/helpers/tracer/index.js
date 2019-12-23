@@ -20,27 +20,27 @@ export const traceIncomingRequest = (tracer, key, httpRequest) => tracer.startSp
 
 /**
  * Создаёт новый или возвращает существующий экземпляр jaeger-трейсера.
- * @param {Object} param Объект с параметрами.
- * @param {Object} param.config Объект с параметрами.
- * @param {Object} param.config.tracerConfig Конфиг трейсера.
- * @param {string} param.config.serviceName Название сервиса.
- * @param {number} param.config.buildVersion Версия сборки.
+ * @param {Object} dependencies Зависимости.
+ * @param {Object} dependencies.tracerConfig Основные параметры конфигурации трейсера.
+ * @param {string} dependencies.tracerConfig.serviceName Название сервиса.
+ * @param {number} dependencies.tracerConfig.version Версия сборки.
+ * @param {Object} [dependencies.additionalConfig={}] Дополнительные параметры конфигурации трейсера.
  * @return {import('opentracing').Tracer} Объект трейсера.
  */
 export const getTracer = ({
-  config: {
-    tracerConfig = {},
-    buildVersion,
+  tracerConfig: {
+    version,
     serviceName,
   },
+  additionalConfig = {},
 }) => initTracerFromEnv(
   {
     serviceName,
-    ...tracerConfig,
+    ...additionalConfig,
   },
   {
     tags: {
-      [`${serviceName}.version`]: buildVersion,
+      [`${serviceName}.version`]: version,
     },
   }
 );

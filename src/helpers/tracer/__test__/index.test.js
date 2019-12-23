@@ -14,16 +14,20 @@ jest.mock('../../../observe-middleware/', () => {
 
 describe('getTracer()', () => {
   let instance;
-  const config = {};
-  const metrics = {};
-  const logger = {};
+  const tracerConfig = {
+    serviceName: 'hello world',
+    version: 'test',
+  };
   it('at first time creates tracer instance', () => {
-    instance = getTracer({ config, metrics, logger });
-    expect(initTracerFromEnv).toHaveBeenCalledTimes(1);
+    instance = getTracer({ tracerConfig });
+    expect(initTracerFromEnv).toHaveBeenCalledWith(
+      { serviceName: 'hello world' },
+      { tags: { ['hello world.version']: 'test' } }
+    );
     expect(instance).toEqual(tracer);
   });
   it('returns same tracer instance', () => {
-    const sameInstance = getTracer({ config, metrics, logger });
+    const sameInstance = getTracer({ tracerConfig });
     expect(initTracerFromEnv).toHaveBeenCalledTimes(1);
     expect(sameInstance).toEqual(tracer);
   });
