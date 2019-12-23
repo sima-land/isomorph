@@ -10,7 +10,7 @@ describe('wrapInTrace()', () => {
       redisEnabled: true,
     };
     const tracer = getTracer({
-      config: {},
+      tracerConfig: {},
     });
     const cache = createRedisCache(config);
     const wrapTrace = wrapInTrace(tracer, context, cache);

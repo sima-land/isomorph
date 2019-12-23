@@ -121,7 +121,7 @@ const singletons = [
         name: 'resolveLabels',
         value: ({ dependencies: { config } }) => ({
           place: config.place || 'dev',
-          version: config.buildVersion || 'development',
+          version: config.version || 'development',
         }),
       },
       {
@@ -209,10 +209,16 @@ const singletons = [
     name: 'jaegerTracer',
     singleton: getTracer,
     dependencies: [
-      'config',
-      { name: 'metrics', value: {} },
-      { name: 'logger', value: {} },
+      'tracerConfig',
     ],
+  },
+  {
+    name: 'tracerConfig',
+    singleton: ({ config: { version, serviceName } }) => ({
+      serviceName,
+      version,
+    }),
+    dependencies: ['config'],
   },
   {
     name: 'tracingMiddleware',
