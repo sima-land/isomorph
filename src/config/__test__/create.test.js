@@ -1,4 +1,4 @@
-import createConfig from '..';
+import createConfig from '../create';
 
 describe('function createConfig()', () => {
   it('works correctly', () => {
