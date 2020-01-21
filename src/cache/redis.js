@@ -3,10 +3,10 @@ import { promisify } from 'util';
 import { createService } from '../container/index';
 import {
   reconnectOnError,
-  getRetryStrategy,
   getOnConnectCallback,
   getOnReconnectingCallback,
 } from './helpers';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Кэширует данные в Redis.
@@ -20,7 +20,7 @@ import {
 export const createRedisCache = (
   config,
   reconnectAfterError = reconnectOnError,
-  getRepeatStrategy = getRetryStrategy,
+  getRepeatStrategy,
   getOnJoinCallback = getOnConnectCallback,
   getAfterReconnectingCallback = getOnReconnectingCallback
 ) => {
@@ -37,8 +37,8 @@ export const createRedisCache = (
   if (redisEnabled || sentinelEnabled) {
     const client = new Redis(
       redisEnabled ? {
-        reconnectAfterError,
-        retryStrategy: getRepeatStrategy(recDelay),
+        reconnectOnError: reconnectAfterError,
+        retryStrategy: isFunction(getRepeatStrategy) ? getRepeatStrategy(recDelay) : undefined,
         ...cacheConfig,
       } : sentinelConfig
     );

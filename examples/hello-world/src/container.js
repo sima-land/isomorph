@@ -286,6 +286,7 @@ const factories = [
     factory: createRootSaga,
     dependencies: [
       'axiosInstance',
+      'cache',
     ],
   },
   {

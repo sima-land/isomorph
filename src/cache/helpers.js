@@ -21,10 +21,3 @@ export const reconnectOnError = ({ code }) => {
   const targetError = 'ECONNREFUSED';
   return code === targetError;
 };
-
-/**
- * Возвращает функцию возвращающую время для повтора перезаписи в redis.
- * @param {number} recDelay Время до перезаписи в redis.
- * @return {Function} Функция возвращающая время повторая перезаписи в redis.
- */
-export const getRetryStrategy = recDelay => () => recDelay;

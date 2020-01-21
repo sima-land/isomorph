@@ -26,6 +26,13 @@ const config = createConfig({
     },
   ],
   loadDataTimeout: 500,
+  recDelay: 500,
+  cacheConfig: base => ({
+    db: base.REDIS_DB,
+    host: base.REDIS_HOST,
+    port: base.REDIS_PORT,
+    password: base.REDIS_PASSWORD,
+  }),
 });
 
 export default validateConfig(config, {

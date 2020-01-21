@@ -4,6 +4,7 @@ import cacheResult, {
   validateCacheDefault,
 } from '../cache-result';
 import doSafeRequest from '../do-safe-request';
+import { sentryLogger } from '../__mocks__/sentry';
 
 describe('cacheResult()', () => {
   it('should return data from cache', () => {
@@ -163,6 +164,60 @@ describe('cacheResult()', () => {
       done: true,
       value: false,
     });
+  });
+
+  it('should return data from API when cache is available but return error', () => {
+    const cache = {
+      get: jest.fn(),
+      set: jest.fn(),
+      status: true,
+    };
+    const key = 'test';
+    const apiResult = {
+      ok: true,
+      data: { some: 'data' },
+    };
+    const args = [1, 2];
+    const gen = cacheResult({
+      cache,
+      key,
+      args,
+    });
+
+    expect(gen.next().value).toEqual(call(cache.get, key));
+    expect(gen.throw('Redis Error').value).toEqual(call(doSafeRequest, ...args));
+    expect(gen.next(apiResult)).toEqual({
+      done: true,
+      value: apiResult,
+    });
+  });
+
+  it('should capture redis error', () => {
+    const cache = {
+      get: jest.fn(),
+      set: jest.fn(),
+      status: true,
+    };
+    const key = 'test';
+    const apiResult = {
+      ok: true,
+      data: { some: 'data' },
+    };
+    const args = [1, 2];
+    const gen = cacheResult({
+      cache,
+      key,
+      args,
+      captureException: sentryLogger.captureException,
+    });
+
+    expect(gen.next().value).toEqual(call(cache.get, key));
+    expect(gen.throw('Redis Error').value).toEqual(call(doSafeRequest, ...args));
+    expect(gen.next(apiResult)).toEqual({
+      done: true,
+      value: apiResult,
+    });
+    expect(sentryLogger.captureException).toBeCalledWith('Redis Error');
   });
 });
 
