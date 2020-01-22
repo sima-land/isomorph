@@ -1,5 +1,6 @@
 import { put, take, call } from 'redux-saga/effects';
 import { Types as appTypes, Creators as appCreators } from '../redux/actions/app';
+import cacheResult from '../../../../src/helpers/saga/cache-result';
 
 const axiosParams = {
   params: {
@@ -23,11 +24,19 @@ export function * initDataLoading () {
  * @param {Object} options Опции.
  * @param {Object} options.axiosInstance Инстанс axios.
  */
-export function * loadData ({ axiosInstance }) {
-  const response = yield call(axiosInstance.get, '/item/123456/', axiosParams);
-  yield put(appCreators.setCurrentData(
-    {
-      output: `Hello World! Данные из запроса к API: ${response.data.name}`,
-    }
-  ));
+export function * loadData ({ axiosInstance, cache }) {
+  const { ok, data } = yield call(cacheResult, {
+    cache,
+    key: 'data',
+    args: [
+      () => axiosInstance.get('/item/123456/', axiosParams),
+    ],
+  });
+  if (ok) {
+    yield put(appCreators.setCurrentData(
+      {
+        output: `Hello World! Данные из запроса к API: ${data.name}`,
+      }
+    ));
+  }
 }

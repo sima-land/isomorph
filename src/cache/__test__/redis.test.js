@@ -5,7 +5,6 @@ import {
 import { promisify } from 'util';
 import {
   reconnectOnError,
-  getRetryStrategy,
   getOnConnectCallback,
   getOnReconnectingCallback,
 } from '../helpers';
@@ -79,8 +78,8 @@ describe('createRedisCache()', () => {
 
     expect(Redis).toBeCalledTimes(1);
     expect(Redis).toBeCalledWith({
-      reconnectAfterError: reconnectOnError,
-      retryStrategy: getRetryStrategy.mock.results[0].value,
+      reconnectOnError,
+      retryStrategy: undefined,
       test: 1,
     });
 
@@ -120,7 +119,7 @@ describe('createRedisCache()', () => {
 
     expect(Redis).toBeCalledTimes(1);
     expect(Redis).toBeCalledWith({
-      reconnectAfterError,
+      reconnectOnError: reconnectAfterError,
       retryStrategy,
       test: 1,
     });

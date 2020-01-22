@@ -1,7 +1,6 @@
 import {
   getOnConnectCallback,
   getOnReconnectingCallback,
-  getRetryStrategy,
   reconnectOnError,
 } from '../helpers';
 
@@ -11,13 +10,6 @@ describe('reconnectOnError()', () => {
     expect(reconnectOnError({ code })).toBeFalsy();
     code = 'ECONNREFUSED';
     expect(reconnectOnError({ code })).toBeTruthy();
-  });
-});
-
-describe('retryStrategyDelay()', () => {
-  it('retryStrategyDelay() works properly', () => {
-    const delay = getRetryStrategy(999)();
-    expect(delay).toEqual(999);
   });
 });
 

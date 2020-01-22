@@ -30,6 +30,7 @@ export const validateResultDefault = response =>
  * @param {Object} options Настройки кэширования.
  * @param {Cache} options.cache Объект кэша.
  * @param {string} options.key Ключ для сохранения.
+ * @param {Function} options.captureException Обработчик ошибки.
  * @param {Function} options.validateCache Функция для проверки валидности данных кэша.
  * @param {Function} options.validateResult Функция для проверки валидности результата при сохранении в кэш.
  * @param {Function} options.fn Функция для получения данных.
@@ -39,6 +40,7 @@ export const validateResultDefault = response =>
 export default function * cacheResult ({
   cache,
   key,
+  captureException,
   validateCache = validateCacheDefault,
   validateResult = validateResultDefault,
   fn = doSafeRequest,
@@ -46,12 +48,20 @@ export default function * cacheResult ({
   duration = 3600,
 }) {
   const { get, set, status } = cache || {};
-  const isCacheAvailable = status && isFunction(get) && isFunction(set);
+  let isCacheAvailable = status && isFunction(get) && isFunction(set);
   const canDoRequest = isFunction(validateCache) && isFunction(fn);
-  let result = isCacheAvailable && (yield call(get, key));
-
-  if (validateCache(result)) {
-    result = JSON.parse(result);
+  let result;
+  try {
+    result = isCacheAvailable && (yield call(get, key));
+    if (validateCache(result)) {
+      result = JSON.parse(result);
+    }
+  } catch (error) {
+    if (isFunction(captureException)) {
+      captureException(error);
+    }
+    isCacheAvailable = false;
+    result = null;
   }
 
   if (canDoRequest && !validateCache(result)) {
