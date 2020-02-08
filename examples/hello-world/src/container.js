@@ -1,8 +1,7 @@
 import appConfig from './config';
 import { getMethod, getStatus, getXClientIp } from '../../../src/helpers/http';
 import templates from './templates';
-import { createStoreService } from '../../../src/helpers/saga/create-store';
-import create from '../../../src/container';
+import { createSingleton } from '../../../src/container';
 import sentryLogger from '../../../src/logger/sentry-logger';
 import createSentryMiddleware from '../../../src/logger/create-sentry-middleware';
 import createLoggerMiddleware from '../../../src/logger/create-logger-middleware';
@@ -12,27 +11,16 @@ import {
   createMeasureMiddleware,
 } from '../../../src/helpers/prometheus/';
 import createRedisCache from '../../../src/cache/redis';
-import { getTemplate, prepareRenderFunction } from '../../../src/helpers/render';
-import isLoadFinish from './redux/selectors/is-load-finish';
-import { reducer } from './redux/reducers';
-import { createRootSaga } from './sagas';
-import { getStateService } from './sagas/get-final-state';
+import { getTemplate } from '../../../src/helpers/render';
 import { decorateGracefulShutdown } from '../../../src/graceful-shutdown/';
 import {
   getTracer,
   traceIncomingRequest,
   createTracingMiddleware,
-  getSpanContext,
 } from '../../../src/helpers/tracer';
-import getParams, { parseHttpHeaders } from '../../../src/helpers/get-params';
 import wrapInTrace from '../../../src/cache/wrap-in-trace';
-import createPassHeadersMiddleware from '../../../src/helpers/api/middlewares/pass-headers-middleware';
-import axiosInstanceConstructor from '../../../src/helpers/api/create-instance';
-import enhancerConstructor from '../../../src/helpers/api/create-enhancer';
-import createTraceRequestMiddleware from '../../../src/helpers/api/middlewares/trace-request-middleware';
-import createCountApiResponseTimeMiddleware from '../../../src/helpers/api/middlewares/count-api-response-time';
-import createCollectCookieMiddleware from '../../../src/helpers/api/middlewares/collect-cookie-middleware';
 import createSetHeaderMiddleware from '../../../src/set-header-middleware/create';
+import createInject from '../../../src/container/create-inject';
 import initializeSentryCreator from '../../../src/logger/initialize-sentry-creator';
 import * as Sentry from '@sentry/node';
 
@@ -280,121 +268,13 @@ const singletons = [
   },
 ];
 
-const factories = [
-  {
-    name: 'helloInitialSaga',
-    factory: createRootSaga,
-    dependencies: [
-      'axiosInstance',
-      'cache',
-    ],
-  },
-  {
-    name: 'helloStore',
-    factory: createStoreService,
-    dependencies: [
-      {
-        name: 'reducer',
-        value: reducer,
-      },
-      {
-        initialSaga: 'helloInitialSaga',
-      },
-      {
-        name: 'isReady',
-        value: isLoadFinish,
-      },
-      {
-        name: 'timeout',
-        value: 100,
-      },
-    ],
-  },
-  {
-    name: 'helloState',
-    factory: getStateService,
-    dependencies: [
-      { store: 'helloStore' },
-    ],
-  },
-  {
-    name: 'helloRouteRender',
-    factory: prepareRenderFunction,
-    dependencies: [
-      {
-        name: 'render',
-        value: ({ output }) => output,
-      },
-    ],
-  },
-  {
-    name: 'context',
-    factory: getSpanContext,
-  },
-  {
-    name: 'axiosInstance',
-    factory: axiosInstanceConstructor,
-    dependencies: [
-      {
-        name: 'config',
-        value: {
-          baseURL: `${appConfig.simalandApiUrl}/api/v3`,
-        },
-      },
-      {
-        enhancer: 'axiosEnhancer',
-      },
-    ],
-  },
-  {
-    name: 'axiosEnhancer',
-    factory: enhancerConstructor,
-    dependencies: [
-      {
-        name: 'constructors',
-        value: [
-          createTraceRequestMiddleware,
-          createPassHeadersMiddleware,
-          createCollectCookieMiddleware,
-          createCountApiResponseTimeMiddleware,
-        ],
-      },
-      'context',
-      'ip',
-      'serviceUserAgent',
-      { tracer: 'jaegerTracer' },
-      'timeDataKey',
-    ],
-  },
-  {
-    name: 'ip',
-    factory: getXClientIp,
-  },
-  {
-    name: 'params',
-    factory: getParams,
-    dependencies: [
-      {
-        name: 'getValue',
-        value: parseHttpHeaders,
-      },
-      {
-        name: 'defaultValue',
-        value: {
-          api_host: '',
-        },
-      },
-      'config',
-    ],
-  },
-];
-
-const container = create({
+export const getAppContainer = createSingleton({
   services: [
     ...values,
     ...singletons,
-    ...factories,
   ],
 });
 
-export default container;
+const inject = createInject(getAppContainer);
+
+export default inject;

@@ -1,7 +1,6 @@
-import container from '../container';
+import inject from '../container';
 import PrometheusClient from 'prom-client';
 import express from 'express';
-import { wrapInContext } from '../../../../src/container';
 import helloWorldHandler from '../handlers/hello-world';
 import { addErrorHandling } from '../../../../src/helpers/add-error-handling/index.js';
 
@@ -51,10 +50,9 @@ export const initialize = (
     .listen(metricsPort);
 };
 
-export default wrapInContext(
+export default inject(
   {
-    container,
-    fn: initialize,
+    target: initialize,
     dependencies: [
       'config',
       'loggerMiddleware',

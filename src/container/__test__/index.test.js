@@ -1,5 +1,14 @@
-import create, { createService, getDependencies, isStaticDependency, wrapInContext } from '..';
-import { factory, mockFactory, powFactory } from '../../../__mocks__/factory';
+import create, { createFactory, createService, createSingleton } from '..';
+import isContainer from '../is-container';
+
+/**
+ * Тестовая функция.
+ * @param {Object} params Параметры функции.
+ * @param {Function} params.getValue Тестовая зависимость.
+ * @param {*} params.initialValue Тестовая зависимость.
+ * @return {*} Тестовый результат.
+ */
+const factory = ({ getValue, initialValue }) => getValue(initialValue);
 
 describe('function create', () => {
   it('creates container correctly', async () => {
@@ -109,171 +118,50 @@ describe('function create', () => {
 
     expect(() => container.set({ name: 'test' })).toThrowError();
   });
-});
 
-describe('function isStaticDependency', () => {
-  it('should work correctly with static dependency', () => {
-    expect(isStaticDependency({ name: 'test', value: 'test' })).toBe(true);
-  });
-  it('works correctly with renamed dependency', () => {
-    expect(isStaticDependency({ name: 'rename' })).toBe(false);
-  });
-  it('works correctly if dependency.name is not string', () => {
-    expect(isStaticDependency({ name: null, value: 123 })).toBe(false);
-  });
-  it('works correctly if dependency.value is not defined', () => {
-    expect(isStaticDependency({ name: 'test' })).toBe(false);
-  });
-});
-
-describe('function getDependencies', () => {
-  it('resolves mixed types of dependencies correctly', async () => {
-    /**
-     * Тестовая функция.
-     * @return {number} Число.
-     */
-    const firstDependency = () => 1;
-    const secondDependency = jest.fn(value => value ? value : 2);
-    const container = create({
-      services: [
-        { name: 'getValue', value: firstDependency },
-        { name: 'getValueSecond', value: secondDependency },
-        {
-          name: 'factory', factory, dependencies: [
-            { getValue: 'getValueSecond' },
-            { name: 'initialValue', value: 3 },
-          ],
-        },
-      ],
+  it('search dependencies in parent container if parent passed', async () => {
+    const parent = create({
+      services: [{
+        name: 'test',
+        value: 5,
+      }],
     });
-    const { result, getValue, myGetValue } = await getDependencies(
-      container,
-      [
-        {
-          result: 'factory',
-        },
-        'getValue',
-        {
-          myGetValue: 'getValueSecond',
-        },
-      ],
-    );
-    expect(result).toBe(3);
-    expect(getValue).toBe(firstDependency);
-    expect(myGetValue).toBe(secondDependency);
-  });
-  it('resolves direct dependencies correctly', async () => {
     const container = create({
       services: [
         {
-          name: 'result',
-          value: 6,
+          name: 'squaredTest',
+          factory: ({ test }) => test * test,
+          dependencies: ['test'],
         },
       ],
+      parent,
     });
-    const { result } = await getDependencies(container, ['result']);
-    expect(result).toBe(6);
+    expect(await container.get('test')).toBe(5);
+    expect(await container.get('squaredTest')).toBe(25);
+    expect(container.get('')).rejects.toThrow(Error);
   });
-  it('resolves static dependencies correctly', async () => {
-    const container = create();
-    const { result } = await getDependencies(container, [{ name: 'result', value: 4 }]);
-    expect(result).toBe(4);
-  });
-  it('resolves renamed dependencies correctly', async () => {
+  it('can override dependencies defined in parent container', async () => {
+    const parent = create({
+      services: [{
+        name: 'test',
+        value: 5,
+      }],
+    });
     const container = create({
       services: [
         {
-          name: 'someValue',
-          value: 5,
+          name: 'squaredTest',
+          factory: ({ test }) => test * test,
+          dependencies: ['test'],
         },
       ],
+      parent,
     });
-    const { result } = await getDependencies(container, [{ result: 'someValue' }]);
-    expect(result).toBe(5);
-  });
-  it('works without errors if "dependencies" is not defined', async () => {
-    const container = create();
-    await expect(getDependencies(container)).resolves.toEqual({});
-  });
-  it('works without errors if "dependencies" is defined incorrect', async () => {
-    const container = create();
-    await expect(getDependencies(container, [{}])).resolves.toEqual({});
-  });
-});
-
-describe('function wrapInContext', () => {
-  it('creates wrapped in context function', async () => {
-    const fn = jest.fn((power, result) => `5 to degree ${power} is ${result}`);
-    const container = create(
-      {
-        services: [
-          {
-            name: 'firstTestService',
-            value: 5,
-          },
-          {
-            name: 'secondTestService',
-            factory: powFactory,
-            dependencies: [
-              {
-                num: 'firstTestService',
-              },
-            ],
-          },
-        ],
-      }
-    );
-    container.get = jest.fn(container.get);
-    const wrapped = wrapInContext({
-      container,
-      fn,
-      dependencies: [
-        {
-          result: 'secondTestService',
-        },
-      ],
-      argsToOptions: power => ({ power }),
-    });
-    expect(await wrapped(2)).toBe('5 to degree 2 is 25');
-    expect(fn).toHaveBeenCalledWith(2, 25);
-    expect(powFactory).toHaveBeenCalledWith({ num: 5, power: 2 });
-    expect(container.get).toHaveBeenCalledWith('secondTestService', { power: 2 });
-    expect(await wrapped(5)).toBe('5 to degree 5 is 3125');
-    expect(container.get).toHaveBeenCalledWith('secondTestService', { power: 5 });
-  });
-  it('creates wrapped in context function if dependencies is not defined', async () => {
-    const container = create();
-    const fn = jest.fn();
-    const wrapped = wrapInContext({ container, fn, argsToOptions: test => ({ test }) });
-    await expect(wrapped()).resolves.toEqual();
-    await wrapped(5);
-    expect(fn).toHaveBeenCalledWith(5);
-  });
-
-  const container = create(
-    {
-      services: [
-        {
-          name: 'test',
-          factory: mockFactory,
-        },
-      ],
-    }
-  );
-  const fn = jest.fn();
-  it('creates wrapped in context function if argsToOptions is not defined', async () => {
-    const wrapped = wrapInContext({ container, fn, dependencies: ['test'] });
-    await expect(wrapped()).resolves.toEqual();
-    await wrapped(6);
-    expect(fn).toHaveBeenCalledWith(6, 3);
-    expect(mockFactory).toHaveBeenCalledWith({});
-  });
-  it('creates wrapped in context function if argsToOptions is not function', async () => {
-    const wrapped = wrapInContext({ container, fn, dependencies: ['test'], argsToOptions: 'I am not a function!' });
-    await expect(wrapped()).resolves.toEqual();
-    await wrapped(7);
-    expect(fn).toHaveBeenCalledWith(7, 3);
-    expect(mockFactory).toHaveBeenCalledWith({});
+    expect(await container.get('test')).toBe(5);
+    expect(await container.get('squaredTest')).toBe(25);
+    container.set({ name: 'test', value: 6 });
+    expect(await container.get('test')).toBe(6);
+    expect(await container.get('squaredTest')).toBe(36);
   });
 });
 
@@ -296,5 +184,21 @@ describe('function createService', () => {
       thirdTestArg: 3,
     });
     expect(fn).toHaveBeenCalledWith(3, 2, 1);
+  });
+});
+
+describe('function createFactory', () => {
+  it('creates function, which creates different instances of container on every call', () => {
+    const containerFactory = createFactory();
+    expect(containerFactory()).not.toBe(containerFactory());
+    expect(isContainer(containerFactory())).toBe(true);
+  });
+});
+
+describe('function createSingleton', () => {
+  it('creates function, which creates same instance of container on every call', () => {
+    const containerSingleton = createSingleton();
+    expect(containerSingleton()).toBe(containerSingleton());
+    expect(isContainer(containerSingleton())).toBe(true);
   });
 });
