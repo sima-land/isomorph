@@ -1,107 +1,104 @@
 import isString from 'lodash.isstring';
 import isFunction from 'lodash.isfunction';
-import isPlainObject from 'lodash.isplainobject';
-
-/**
- * Создает объект зависимостей на основе их названий.
- * @param {Object} container Экземпляр контейнера в котором должен осуществляться поиск зависимостей.
- * @param {Object} dependencies Список зависимостей.
- * @param {Object} options Дополнительные опции для инициализации зависимостей.
- * @return {Object} Объект зависимостей.
- */
-export const getDependencies = (
-  container,
-  dependencies = [],
-  options = {},
-) => dependencies.reduce(async (prevPromise, dependency) => {
-  const result = await prevPromise;
-  if (isString(dependency)) {
-    result[dependency] = await container.get(dependency, options);
-  }
-
-  if (isPlainObject(dependency)) {
-    if (isStaticDependency(dependency)) {
-      result[dependency.name] = dependency.value;
-    } else {
-      const [necessaryName, necessaryDepName] = Object.entries(dependency).shift() || [];
-      if (necessaryName && necessaryDepName) {
-        result[necessaryName] = await container.get(necessaryDepName, options);
-      }
-    }
-  }
-
-  return result;
-}, Promise.resolve({}));
-
-/**
- * Определяет, является ли зависимость статической, то есть не требующей инициализации.
- * @param {Object} dependency Конфигурация зависимости.
- * @param {string} dependency.name Название зависимости.
- * @param {*} dependency.value Значение зависимости.
- * @return {boolean} Является ли зависимость статической.
- */
-export const isStaticDependency = ({ name, value }) => typeof name === 'string' && typeof value !== 'undefined';
-
-/**
- * Оборачивает функцию в функцию для получения части зависимостей из контейнера.
- * @param {Object} options Опции для конфигурирования контекста.
- * @param {Object} options.container Контейнер в котором будет осуществляться поиск зависимостей.
- * @param {Function} options.fn Функция, в которую будут переданы зависимости.
- * @param {Array} options.dependencies Список зависимостей, которые необходимо добавить.
- * @param {Function} options.argsToOptions Функция для преобразования аргументов вызываемой функции
- * в опции для инициализации зависимостей данной функции.
- * @return {Function} Частично применённая функция для использования,
- * в которую прокинуто получение зависимостей при вызове.
- */
-export const wrapInContext = (
-  {
-    container,
-    fn,
-    dependencies = [],
-    argsToOptions,
-  }
-) => async (...args) => fn(
-  ...args,
-  ...Object.values(
-    await getDependencies(
-      container,
-      dependencies,
-      isFunction(argsToOptions) ? argsToOptions(...args) : {}
-    )
-  )
-);
+import ServiceNotFoundError from './service-not-found-error';
+import getDependencies from './get-dependencies';
+import isContainer from './is-container';
 
 /**
  * Оборачивает функцию для использования в контейнере.
  * @param {Function} fn Функция, которую необходимо обернуть.
- * @param {Function} optionsToArgs Функция для преобразования опций сервиса в аргументы функции.
+ * @param {Function} dependenciesToArgs Функция для преобразования зависимостей сервиса в аргументы функции.
  * @return {Function} Функция-сервис, для использования в контейнере.
  */
 export const createService = (
   fn,
-  optionsToArgs
-) => (dependencies, ...args) => fn(...optionsToArgs(dependencies), ...args);
+  dependenciesToArgs
+) => (dependencies, ...args) => fn(...dependenciesToArgs(dependencies), ...args);
+
+/**
+ * Создаёт функцию для получения синглтона контейнера с заданными параметрами.
+ * @param {Object} options Опции для создания контейнера.
+ * @return {function(): Object} Функция для получения контейнера-синглтона.
+ */
+export const createSingleton = options => {
+  let container;
+  return () => {
+    if (!container) {
+      container = create(options);
+    }
+    return container;
+  };
+};
+
+/**
+ * Создаёт функцию-фабрику для создания нового экземпляра контейнера при её вызове.
+ * @param {Object} options Опции для создания контейнера.
+ * @return {function(): Object} Функция-фабрика для получения экземпляра контейнера с заданными параметрами.
+ */
+export const createFactory = options => () => create(options);
+
+/**
+ * Реализует наследование контейнера от другого контейнера.
+ * @param {Object} container Дочерний контейнер.
+ * @param {Object} parentContainer Родительский контейнер.
+ * @return {Object} Контейнер с поиском зависимости в родителе.
+ */
+const inherit = (
+  container,
+  parentContainer,
+) => {
+  let result = container;
+  if (isContainer(parentContainer)) {
+    result = {
+      ...container,
+
+      /**
+       * Оборачивает получение зависимости для добавления поиска в родительском контейнере.
+       * @param {string} name Название зависимости.
+       * @return {*} Зависимость.
+       * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
+       * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
+       * @throws {ServiceNotFoundError} Выдаст ошибку при попытке вызвать незарегистрированный сервис
+       */
+      async get (name) {
+        let dependency;
+        try {
+          dependency = await container.get(name);
+        } catch (e) {
+          if (e instanceof ServiceNotFoundError) {
+            dependency = await parentContainer.get(name);
+          } else {
+            throw e;
+          }
+        }
+        return dependency;
+      },
+    };
+  }
+  return result;
+};
 
 /**
  * Функция создает IoC-контейнер.
- * @param {Object} options Дополнительные опации для IoC-контейнера.
+ * @param {Object} options Дополнительные опции для IoC-контейнера.
  * @param {Array} options.services Массив сервисов, которые нужно зарегистрировать.
+ * @param {Object} options.parent Родительский контейнер.
  * @return {Object} IoC Container.
  * @throws {TypeError} Выдаст ошибку если параметр "services" не массив
  */
-export default function create ({ services = [] } = {}) {
+export default function create ({ services = [], parent = null } = {}) {
   if (!Array.isArray(services)) {
     throw new TypeError('Параметр "services" должен быть массивом');
   }
 
   const registry = {};
 
-  const container = {
+  const container = inherit({
     /**
      * Добавляет зависимость в список зависимостей.
      * @param {Object} options Опции необходимые для добавления зависимости.
      * @param {string} options.name Название зависимости.
-     * @param {Function} options.singleton Функция-синглотон.
+     * @param {Function} options.singleton Функция-синглтон.
      * @param {Function} options.factory Функция-конструктор.
      * @param {*} options.value Переданная зависимость.
      * @param {Array} options.dependencies Массив зависимостей.
@@ -122,8 +119,8 @@ export default function create ({ services = [] } = {}) {
       }
 
       if (factory === undefined && value === undefined && singleton === undefined) {
-        throw Error(`Сервис зарегистрирован некорректно,
-обязательно должен быть передан один из параметров "factory", "singleton" или "value"`);
+        throw Error(`Сервис ${name} не зарегистрирован,
+так как обязательно должен быть передан один из параметров "factory", "singleton" или "value"`);
       }
 
       registry[name] = {
@@ -138,14 +135,12 @@ export default function create ({ services = [] } = {}) {
     /**
      * Получает зависимость по ее названию.
      * @param {string} name Название зависимости.
-     * @param {Object} options Дополнительные или переопределяющие зависимости,
-     * которые необходимо передать сервису и его зависимостям при инициализации.
      * @return {*} Зависимость.
      * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
      * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
-     * @throws {Error} Выдаст ошибку при попытке вызвать незарегистрированный сервис
+     * @throws {ServiceNotFoundError} Выдаст ошибку при попытке вызвать незарегистрированный сервис
      */
-    async get (name, options = {}) {
+    async get (name) {
       if (!isString(name) || name === '') {
         throw new Error('Параметр "name" должен быть непустой строкой');
       }
@@ -154,14 +149,13 @@ export default function create ({ services = [] } = {}) {
       let dependency;
 
       if (!service) {
-        throw new Error(`Сервис "${name}" не зарегистрирован`);
+        throw new ServiceNotFoundError(`Сервис "${name}" не зарегистрирован`);
       }
 
       if (service.singleton && !service.value) {
         service.value = await service.singleton(
           {
-            ...await getDependencies(container, service.dependencies, options),
-            ...options,
+            ...await getDependencies(container, service.dependencies),
           },
         );
       }
@@ -173,15 +167,14 @@ export default function create ({ services = [] } = {}) {
       if (service.factory) {
         dependency = await service.factory(
           {
-            ...await getDependencies(container, service.dependencies, options),
-            ...options,
+            ...await getDependencies(container, service.dependencies),
           }
         );
       }
 
       return dependency;
     },
-  };
+  }, parent);
 
   services.forEach(service => container.set(service));
 

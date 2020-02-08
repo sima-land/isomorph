@@ -1,5 +1,4 @@
-import container from '../container';
-import { wrapInContext } from '../../../../src/container';
+import inject from './container';
 import get from 'lodash/get';
 
 /**
@@ -14,9 +13,8 @@ export const handler = async (request, response, next, render, data = {}) => {
   response.send(await render(get(data, 'app.data', 'Something went wrong...')));
 };
 
-export default wrapInContext({
-  container,
-  fn: handler,
+export default inject({
+  target: handler,
   dependencies: [
     {
       render: 'helloRouteRender',
@@ -25,5 +23,8 @@ export default wrapInContext({
       data: 'helloState',
     },
   ],
-  argsToOptions: (request, response) => ({ request, response }),
+  registerArgs: (container, request, response) => {
+    container.set({ name: 'request', value: request });
+    container.set({ name: 'response', value: response });
+  },
 });
