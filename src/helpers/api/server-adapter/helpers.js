@@ -33,22 +33,17 @@ export const isHttps = eq('https:');
 
 /**
  * Возвращает экземпляр Buffer созданный из переданных данных.
- * Если переданные данные экземпляр Stream - возвращает неизменные данные.
- * @param {Buffer|import('stream').Readable|ArrayBuffer|string} data Данные.
- * @return {Buffer|import('stream').Readable|undefined} Данные.
+ * @param {Buffer|ArrayBuffer|string} data Данные.
+ * @return {Buffer|undefined} Данные.
  */
-export const prepareData = data => {
+export const prepareDataBuffer = data => {
   let result;
-  if (isStream(data)) {
+  if (isString(data)) {
+    result = Buffer.from(data, 'utf-8');
+  } else if (Buffer.isBuffer(data)) {
     result = data;
-  } else {
-    if (isString(data)) {
-      result = Buffer.from(data, 'utf-8');
-    } else if (Buffer.isBuffer(data)) {
-      result = data;
-    } else if (isArrayBuffer(data)) {
-      result = Buffer.from(new Uint8Array(data));
-    }
+  } else if (isArrayBuffer(data)) {
+    result = Buffer.from(new Uint8Array(data));
   }
   return result;
 };
@@ -59,8 +54,11 @@ export const prepareData = data => {
  * @param {string} base База.
  * @return {URL} Объект URL.
  */
-export const createConcatURL = (input, base) =>
-  new URL(input.replace(/^\/(?!\/)/, ''), base.replace(/\/?$/, '/'));
+export const createConcatURL = (input, base) => {
+  const cleanInput = input ? input.replace(/^\/(?!\/)/, '') : '';
+  const cleanBase = base ? base.replace(/\/?$/, '/') : undefined;
+  return new URL(cleanInput, cleanBase);
+};
 
 /**
  * Возвращает подходящий интерфейс транспорта в зависимости от конфигурации.
