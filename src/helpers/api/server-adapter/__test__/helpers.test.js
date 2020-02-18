@@ -7,6 +7,9 @@ import {
   createConcatURL,
   buildRequestPath,
   uncompressResponse,
+  enhanceError,
+  createError,
+  settle,
 } from '../helpers';
 
 import { Readable } from 'stream';
@@ -243,5 +246,144 @@ describe('uncompressResponse()', () => {
       pipe: spy,
     };
     expect(uncompressResponse(res)).toBe(res);
+  });
+});
+
+describe('enhanceError()', () => {
+  const testError = {
+    message: 'test',
+    name: 'test',
+    description: 'test',
+    number: 123,
+    fileName: 'test.file',
+    lineNumber: 123,
+    columnNumber: 15,
+    stack: {},
+  };
+  const testConfig = {
+    url: 'test',
+  };
+  const testRequest = {
+    test: 'test',
+  };
+  const testResponse = {
+    test: 'test',
+  };
+
+  it('should create enhance error', () => {
+    expect(enhanceError(testError, testConfig, 'ERRCODE', testRequest, testResponse)).toEqual({
+      message: 'test',
+      name: 'test',
+      description: 'test',
+      number: 123,
+      fileName: 'test.file',
+      lineNumber: 123,
+      columnNumber: 15,
+      stack: {},
+      code: 'ERRCODE',
+      isAxiosError: true,
+      config: testConfig,
+      request: testRequest,
+      response: testResponse,
+      toJSON: expect.any(Function),
+    });
+  });
+
+  it('should call toJSON correctly', () => {
+    const fatError = enhanceError(testError, testConfig, 'ERRCODE', testRequest, testResponse);
+    const thinError = enhanceError({ message: 'test', number: 123, stack: {} }, testConfig);
+
+    expect(fatError.toJSON()).toEqual({
+      message: 'test',
+      name: 'test',
+      description: 'test',
+      number: 123,
+      fileName: 'test.file',
+      lineNumber: 123,
+      columnNumber: 15,
+      stack: {},
+      config: testConfig,
+      code: 'ERRCODE',
+    });
+
+    expect(thinError.toJSON()).toEqual({
+      message: 'test',
+      number: 123,
+      stack: {},
+      config: testConfig,
+    });
+  });
+});
+
+describe('createError()', () => {
+  const message = 'error message';
+  const testConfig = {
+    url: 'test',
+  };
+  const testRequest = {
+    test: 'test',
+  };
+  const testResponse = {
+    test: 'test',
+  };
+  it('should create new error', () => {
+    const error = createError(message, testConfig, null, testRequest, testResponse);
+    expect(error).toBeInstanceOf(Error);
+    expect(error.config).toEqual(testConfig);
+    expect(error.request).toEqual(testRequest);
+    expect(error.response).toEqual(testResponse);
+  });
+});
+
+describe('settle()', () => {
+  const resolve = jest.fn();
+  const reject = jest.fn();
+  afterEach(() => {
+    resolve.mockClear();
+    reject.mockClear();
+  });
+
+  it('should resolve if validateStatus is exist', () => {
+    const response = {
+      status: 200,
+      request: {},
+      config: { validateStatus: status => status === 200 },
+    };
+    expect(resolve).not.toBeCalled();
+    expect(reject).not.toBeCalled();
+
+    settle(resolve, reject, response);
+
+    expect(reject).not.toBeCalled();
+    expect(resolve).toBeCalledWith(response);
+  });
+
+  it('should resolve if validateStatus not exist', () => {
+    const response = {
+      status: 200,
+      request: {},
+    };
+    expect(resolve).not.toBeCalled();
+    expect(reject).not.toBeCalled();
+
+    settle(resolve, reject, response);
+
+    expect(reject).not.toBeCalled();
+    expect(resolve).toBeCalledWith(response);
+  });
+
+  it('should reject if status not valid', () => {
+    const response = {
+      status: 404,
+      request: {},
+      config: { validateStatus: status => status === 200 },
+    };
+    expect(resolve).not.toBeCalled();
+    expect(reject).not.toBeCalled();
+
+    settle(resolve, reject, response);
+
+    expect(resolve).not.toBeCalled();
+    expect(reject).toBeCalledWith(Error('Request failed with status code 404'));
   });
 });

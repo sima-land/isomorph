@@ -17,6 +17,8 @@ import createCountApiResponseTimeMiddleware from '../../../../src/helpers/api/mi
 import { getXClientIp } from '../../../../src/helpers/http';
 import getParams, { parseHttpHeaders } from '../../../../src/helpers/get-params';
 import createInject from '../../../../src/container/create-inject';
+import adapter from '../../../../src/helpers/api/server-adapter';
+import createStagesTraceRequestMiddleware from '../../../../src/helpers/api/middlewares/stages-trace-middleware';
 
 const services = [
   {
@@ -81,6 +83,7 @@ const services = [
         name: 'config',
         value: {
           baseURL: `${config.simalandApiUrl}/api/v3`,
+          adapter,
         },
       },
       {
@@ -102,6 +105,7 @@ const services = [
       {
         name: 'constructors',
         value: [
+          createStagesTraceRequestMiddleware, // Должен быть в списке middleware перед createTraceRequestMiddleware
           createTraceRequestMiddleware,
           createPassHeadersMiddleware,
           createCollectCookieMiddleware,
