@@ -1,7 +1,7 @@
 import {
   isStream,
   isEventEmitter,
-  prepareData,
+  prepareDataBuffer,
   createTransport,
   createOptions,
   createConcatURL,
@@ -48,25 +48,21 @@ describe('isEventEmitter()', () => {
   });
 });
 
-describe('prepareData()', () => {
+describe('prepareDataBuffer()', () => {
   it('should return instance of Buffer for buffer, arrayBuffer, string', () => {
     const buff = new Buffer.from('test');
     const arrBuff = new ArrayBuffer(10);
-    expect(prepareData(buff)).toBeInstanceOf(Buffer);
-    expect(prepareData(arrBuff)).toBeInstanceOf(Buffer);
-    expect(prepareData('test')).toBeInstanceOf(Buffer);
-  });
-
-  it('should return stream without changes', () => {
-    const stream = new Readable();
-    expect(prepareData(stream)).toBe(stream);
+    expect(prepareDataBuffer(buff)).toBeInstanceOf(Buffer);
+    expect(prepareDataBuffer(arrBuff)).toBeInstanceOf(Buffer);
+    expect(prepareDataBuffer('test')).toBeInstanceOf(Buffer);
   });
 
   it('should return undefined for other types', () => {
-    expect(prepareData()).not.toBeDefined();
-    expect(prepareData({})).not.toBeDefined();
-    expect(prepareData(123)).not.toBeDefined();
-    expect(prepareData(null)).not.toBeDefined();
+    expect(prepareDataBuffer()).not.toBeDefined();
+    expect(prepareDataBuffer({})).not.toBeDefined();
+    expect(prepareDataBuffer(123)).not.toBeDefined();
+    expect(prepareDataBuffer(null)).not.toBeDefined();
+    expect(prepareDataBuffer(new Readable())).not.toBeDefined();
   });
 });
 
@@ -84,6 +80,10 @@ describe('createConcatURL()', () => {
       .toEqual('https://example.com/a/b/c');
     expect(createConcatURL('https://example.com/a/b/c', 'https://test.com').href)
       .toEqual('https://example.com/a/b/c');
+    expect(createConcatURL('https://example.com/a/b/c').href)
+      .toEqual('https://example.com/a/b/c');
+    expect(createConcatURL('', 'https://example.com/a/b/c').href)
+      .toEqual('https://example.com/a/b/c/');
   });
 });
 
