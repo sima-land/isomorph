@@ -168,3 +168,77 @@ export const uncompressResponse = response => {
     ? response.pipe(zlib.createUnzip())
     : response;
 };
+
+/**
+ * Возвращает ошибку, дополненную свойствами из запроса.
+ * @param {Error} error Ошибка.
+ * @param {Object} config Конфиг.
+ * @param {string} code Код ошибки.
+ * @param {import('http').ClientRequest} request Запрос.
+ * @param {import('http').IncomingMessage} response Ответ.
+ * @return {Error} Расширенная ошибка.
+ */
+export const enhanceError = (error, config, code, request, response) => {
+  const enhance = {
+    config,
+    request,
+    response,
+    isAxiosError: true,
+
+    /**
+     * Возвращает объект для передачи в JSON.stringify().
+     * @return {Object} Объект.
+     */
+    toJSON () {
+      return {
+        message: this.message,
+        name: this.name,
+        description: this.description,
+        number: this.number,
+        fileName: this.fileName,
+        lineNumber: this.lineNumber,
+        columnNumber: this.columnNumber,
+        stack: this.stack,
+        config: this.config,
+        code: this.code,
+      };
+    },
+  };
+
+  if (code) {
+    enhance.code = code;
+  }
+
+  return Object.assign(error, enhance);
+};
+
+/**
+ * Создает расширенную ошибку из текста и параметров запроса.
+ * @param {string} message Текст ошибки.
+ * @param {Array} rest Параметры запроса.
+ * @return {Error} Ошибка.
+ */
+export const createError = (message, ...rest) => enhanceError(new Error(message), ...rest);
+
+/**
+ * Валидирует код ответа и разрешает промис.
+ * @param {Function} resolve Разрешает промис.
+ * @param {Function} reject Отклоняет промис.
+ * @param {import('http').IncomingMessage} response Ответ на запрос.
+ */
+export const settle = (resolve, reject, response) => {
+  const { status, config, request } = response;
+  const { validateStatus } = config || {};
+
+  if (!validateStatus || validateStatus(status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      `Request failed with status code ${status}`,
+      config,
+      null,
+      request,
+      response
+    ));
+  }
+};

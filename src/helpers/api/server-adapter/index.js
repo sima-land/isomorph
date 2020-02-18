@@ -1,7 +1,3 @@
-import axiosSettle from 'axios/lib/core/settle';
-import axiosEnhanceError from 'axios/lib/core/enhanceError';
-import axiosCreateError from 'axios/lib/core/createError';
-
 import {
   isStream,
   isEventEmitter,
@@ -9,6 +5,9 @@ import {
   createOptions,
   createTransport,
   uncompressResponse,
+  enhanceError,
+  createError,
+  settle,
 } from './helpers';
 
 import { REQUEST_STAGES } from './constants';
@@ -45,7 +44,7 @@ const serverAdapter = config => new Promise((resolve, reject) => {
     if (data) {
       headers['Content-Length'] = data.length;
     } else {
-      reject(axiosCreateError(
+      reject(createError(
         'Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream',
         config
       ));
@@ -89,7 +88,7 @@ const serverAdapter = config => new Promise((resolve, reject) => {
           && Buffer.concat(resBuffer).length > maxContentLength
       ) {
         stream.destroy();
-        reject(axiosCreateError(`maxContentLength size of ${maxContentLength} exceeded`, config, null, res.req));
+        reject(createError(`maxContentLength size of ${maxContentLength} exceeded`, config, null, res.req));
       }
     };
 
@@ -102,18 +101,18 @@ const serverAdapter = config => new Promise((resolve, reject) => {
         ? concatBuffer
         : concatBuffer.toString(responseEncoding);
 
-      axiosSettle(resolve, reject, response);
+      settle(resolve, reject, response);
 
       // Регистрируем обработчик завершения запроса.
       needEmit && emitter.emit(REQUEST_STAGES.end);
     };
     if (responseType === 'stream') {
       response.data = stream;
-      axiosSettle(resolve, reject, response);
+      settle(resolve, reject, response);
     } else {
       stream
         .on('data', chunksHandler)
-        .on('error', err => !req.aborted && reject(axiosEnhanceError(err, config, null, res.req)))
+        .on('error', err => !req.aborted && reject(enhanceError(err, config, null, res.req)))
         .on('end', finishHandler);
     }
   });
@@ -128,19 +127,19 @@ const serverAdapter = config => new Promise((resolve, reject) => {
     });
   }
 
-  req.on('error', err => !req.aborted && reject(axiosEnhanceError(err, config, null, req)));
+  req.on('error', err => !req.aborted && reject(enhanceError(err, config, null, req)));
 
   if (timeout) {
     req.setTimeout(timeout, () => {
       req.abort();
-      reject(axiosCreateError(`timeout of ${config.timeout} ms exceeded`, config, 'ECONNABORTED', req));
+      reject(createError(`timeout of ${config.timeout} ms exceeded`, config, 'ECONNABORTED', req));
     });
   }
 
   // Отправка данных запроса.
   if (isStream(data)) {
     data
-      .on('error', err => reject(axiosEnhanceError(err, config, null, req)))
+      .on('error', err => reject(enhanceError(err, config, null, req)))
       .pipe(req);
   } else {
     req.end(data);

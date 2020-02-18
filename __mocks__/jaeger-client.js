@@ -8,7 +8,7 @@ export const testSpan = {
 export const tracer = {
   name: `tracer created at ${Date.now()}`,
   startSpan: jest.fn(() => testSpan),
-  extract: jest.fn(),
+  extract: jest.fn((tag, headers) => headers.tracerId),
   inject: jest.fn((span, tag, headers) => merge(headers, { tracerId: 'test' })),
 };
 export const initTracerFromEnv = jest.fn(() => tracer);
