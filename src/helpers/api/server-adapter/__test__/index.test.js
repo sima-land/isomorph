@@ -155,7 +155,7 @@ describe('adapter', () => {
     });
   });
 
-  it('should emit events', async () => {
+  it('should emit events for https connection', async () => {
     const spy = jest.fn();
     const emitter = {
       emit: spy,
@@ -176,10 +176,31 @@ describe('adapter', () => {
 
     expect(spy).toHaveBeenNthCalledWith(1, REQUEST_STAGES.start);
     expect(spy).toHaveBeenNthCalledWith(2, REQUEST_STAGES.dnsLookupFinish);
-    expect(spy).toHaveBeenNthCalledWith(3, REQUEST_STAGES.tcpConnectionConnect);
-    expect(spy).toHaveBeenNthCalledWith(4, REQUEST_STAGES.tlsHandshakeFinish);
+    expect(spy).toHaveBeenNthCalledWith(3, REQUEST_STAGES.lowerTransportCreated);
+    expect(spy).toHaveBeenNthCalledWith(4, REQUEST_STAGES.transportCreated);
     expect(spy).toHaveBeenNthCalledWith(5, REQUEST_STAGES.firstByteReceived);
     expect(spy).toHaveBeenNthCalledWith(6, REQUEST_STAGES.end);
+  });
+
+  it('should emit events for http connection', async () => {
+    const spy = jest.fn();
+    const emitter = {
+      emit: spy,
+    };
+
+    server = await http.createServer((req, res) => {
+      res.end('test string');
+    }).listen(4444);
+
+    expect(spy).not.toBeCalled();
+
+    await instance.get('http://localhost:4444/', { emitter });
+
+    expect(spy).toHaveBeenNthCalledWith(1, REQUEST_STAGES.start);
+    expect(spy).toHaveBeenNthCalledWith(2, REQUEST_STAGES.dnsLookupFinish);
+    expect(spy).toHaveBeenNthCalledWith(3, REQUEST_STAGES.transportCreated);
+    expect(spy).toHaveBeenNthCalledWith(4, REQUEST_STAGES.firstByteReceived);
+    expect(spy).toHaveBeenNthCalledWith(5, REQUEST_STAGES.end);
   });
 
   it('should handle maxContentLength property', async () => {
