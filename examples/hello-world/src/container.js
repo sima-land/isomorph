@@ -1,5 +1,5 @@
 import appConfig from './config';
-import { getMethod, getStatus, getXClientIp } from '../../../src/helpers/http';
+import { getMethod, getStatus, getXClientIp } from '../../../src/helpers/http/request-getters';
 import templates from './templates';
 import { createSingleton } from '../../../src/container';
 import sentryLogger from '../../../src/logger/sentry-logger';
