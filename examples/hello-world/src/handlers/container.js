@@ -14,7 +14,7 @@ import createTraceRequestMiddleware from '../../../../src/helpers/api/middleware
 import createPassHeadersMiddleware from '../../../../src/helpers/api/middlewares/pass-headers-middleware';
 import createCollectCookieMiddleware from '../../../../src/helpers/api/middlewares/collect-cookie-middleware';
 import createCountApiResponseTimeMiddleware from '../../../../src/helpers/api/middlewares/count-api-response-time';
-import { getXClientIp } from '../../../../src/helpers/http';
+import { getXClientIp } from '../../../../src/helpers/http/request-getters';
 import getParams, { parseHttpHeaders } from '../../../../src/helpers/get-params';
 import createInject from '../../../../src/container/create-inject';
 import adapter from '../../../../src/helpers/api/server-adapter';

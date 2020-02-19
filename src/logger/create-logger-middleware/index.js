@@ -1,7 +1,7 @@
 import isFunction from 'lodash.isfunction';
 import isArray from 'lodash/isArray';
 import { createObserveMiddleware } from '../../observe-middleware';
-import { getOriginalUrl } from '../../helpers/http';
+import { getOriginalUrl } from '../../helpers/http/request-getters';
 import isMatchPatternList from '../../helpers/utils/is-match-pattern-list';
 
 /**
