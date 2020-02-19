@@ -122,8 +122,12 @@ const serverAdapter = config => new Promise((resolve, reject) => {
     req.on('socket', socket => {
       socket
         .on('lookup', () => emitter.emit(REQUEST_STAGES.dnsLookupFinish))
-        .on('connect', () => emitter.emit(REQUEST_STAGES.tcpConnectionConnect))
-        .on('secureConnect', () => emitter.emit(REQUEST_STAGES.tlsHandshakeFinish));
+        .on('connect', () => emitter.emit(
+          req.connection.encrypted
+            ? REQUEST_STAGES.lowerTransportCreated
+            : REQUEST_STAGES.transportCreated
+        ))
+        .on('secureConnect', () => emitter.emit(REQUEST_STAGES.transportCreated));
     });
   }
 
