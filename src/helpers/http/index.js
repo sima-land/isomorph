@@ -1,3 +1,5 @@
+import { isIP } from 'net';
+
 /**
  * Получает IP пользователя из заголовков запроса.
  * @param {Object} request Запрос.
@@ -7,7 +9,7 @@ export const getXClientIp = ({ request }) => {
   const ip = request.headers['x-client-ip']
     || request.headers['x-forwarded-for']
     || request.connection.remoteAddress;
-  return isValidIp(ip) ? ip : '';
+  return isIP(ip) ? ip : '';
 };
 
 /**
@@ -51,15 +53,3 @@ export const validateDeleteStatus = status => status === 204;
  * @return {boolean} Валидность.
  */
 export const isOkStatus = status => status === 200;
-
-/**
- * Проверяет, что переданный аргумент является валидным ip адресом.
- * @param {string} ip Аргумент для валидации.
- * @return {boolean} Валиден или нет.
- */
-export const isValidIp = ip => {
-  const v4pattern = /(^|::f{4}:)(((2[0-5]{2})|(1\d{2})|([1-9]\d)|\d)(\.|$)){4}$/;
-  const v6pattern = /(^(?!(\d*$))|:{2})(([0-9a-fA-F]{1,4}:{1,2}){0,7})([0-9a-fA-F]{1,4})?(:{2})?$/;
-
-  return v4pattern.test(ip) || v6pattern.test(ip);
-};
