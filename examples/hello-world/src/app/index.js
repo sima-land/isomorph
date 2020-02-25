@@ -16,6 +16,7 @@ import { addErrorHandling } from '../../../../src/helpers/add-error-handling/ind
  * @param {Function} tracingMiddleware Промежуточный слой для трассировки запросов в приложении.
  * @param {Function} gracefulShutdown Функция для обработки завершения приложения.
  * @param {Function} initializeSentry Функция для конфигурирования перехватчика ошибок.
+ * @param {Function} renderTracingMiddleware Промежуточный слой для сбора метрик рендеринга.
  */
 export const initialize = (
   {
@@ -29,9 +30,11 @@ export const initialize = (
   tracingMiddleware,
   gracefulShutdown,
   initializeSentry,
+  renderTracingMiddleware,
 ) => {
   initializeSentry();
   const server = express()
+    .use(renderTracingMiddleware)
     .use(loggerMiddleware)
     .use(requestMetricsMiddleware)
     .use(renderMetricsMiddleware)
@@ -62,6 +65,7 @@ export default inject(
       'tracingMiddleware',
       'decorateGracefulShutdown',
       'initializeSentry',
+      'renderTracingMiddleware',
     ],
   }
 );
