@@ -23,6 +23,7 @@ import createSetHeaderMiddleware from '../../../src/set-header-middleware/create
 import createInject from '../../../src/container/create-inject';
 import initializeSentryCreator from '../../../src/logger/initialize-sentry-creator';
 import * as Sentry from '@sentry/node';
+import { createChildTracingMiddleware } from '../../../src/helpers/tracer/create-child-tracing-middleware';
 
 const values = [
   { name: 'config', value: appConfig },
@@ -263,6 +264,27 @@ const singletons = [
           'Js-Header-Name': '/bundle.js',
           'CSS-Header-Name': '/bundle.css',
         },
+      },
+    ],
+  },
+  {
+    name: 'renderTracingMiddleware',
+    singleton: createChildTracingMiddleware,
+    dependencies: [
+      {
+        name: 'spanName',
+        value: 'server-side-rendering',
+      },
+      {
+        tracer: 'jaegerTracer',
+      },
+      {
+        name: 'startSubscriber',
+        value: ({ response, callback }) => response.once('render:start', callback),
+      },
+      {
+        name: 'finishSubscriber',
+        value: ({ response, callback }) => response.once('render:end', callback),
       },
     ],
   },
