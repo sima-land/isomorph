@@ -6,6 +6,7 @@ export const Handlers = {
 const Sentry = {
   init: jest.fn(),
   Handlers,
+  captureException: jest.fn(),
 };
 
 export default Sentry;

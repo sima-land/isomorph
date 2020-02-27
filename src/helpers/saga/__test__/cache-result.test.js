@@ -4,7 +4,7 @@ import cacheResult, {
   validateCacheDefault,
 } from '../cache-result';
 import doSafeRequest from '../do-safe-request';
-import { sentryLogger } from '../__mocks__/sentry';
+import sentryLogger from '../../../../__mocks__/sentry';
 
 describe('cacheResult()', () => {
   it('should return data from cache', () => {

@@ -19,6 +19,7 @@ import getParams, { parseHttpHeaders } from '../../../../src/helpers/get-params'
 import createInject from '../../../../src/container/create-inject';
 import adapter from '../../../../src/helpers/api/server-adapter';
 import createStagesTraceRequestMiddleware from '../../../../src/helpers/api/middlewares/stages-trace-middleware';
+import createSetHttpAgentsMiddleware from '../../../../src/helpers/api/middlewares/set-http-agents-middleware';
 
 const services = [
   {
@@ -110,6 +111,7 @@ const services = [
           createPassHeadersMiddleware,
           createCollectCookieMiddleware,
           createCountApiResponseTimeMiddleware,
+          createSetHttpAgentsMiddleware,
         ],
       },
       'context',
@@ -119,6 +121,8 @@ const services = [
       'timeDataKey',
       'request',
       'response',
+      'httpAgent',
+      'httpsAgent',
     ],
   },
   {

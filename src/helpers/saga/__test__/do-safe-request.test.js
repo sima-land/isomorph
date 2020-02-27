@@ -1,5 +1,5 @@
 import { call } from 'redux-saga/effects';
-import { sentryLogger } from '../__mocks__/sentry';
+import sentryLogger from '../../../../__mocks__/sentry';
 import { data, error, errorWithConfig, errorWithResponse } from '../__fixtures__/do-safe-request';
 import doSafeRequest from '../do-safe-request';
 
