@@ -28,15 +28,40 @@ describe('createStagesTraceRequestMiddleware()', () => {
       expect(next.mock.calls[0][0].emitter.eventNames()).toEqual(Object.values(REQUEST_STAGES));
     });
 
-    it('should create spans', async () => {
+    it('should create all spans', async () => {
       const child = { childOf: 'test' };
       await instance(requestConfig, next);
       expect(tracer.startSpan).toBeCalledTimes(size(omit(REQUEST_STAGES, 'end')));
-      expect(tracer.startSpan).toHaveBeenNthCalledWith(1, 'DNS Lookup', child);
-      expect(tracer.startSpan).toHaveBeenNthCalledWith(2, 'TCP Connection', child);
-      expect(tracer.startSpan).toHaveBeenNthCalledWith(3, 'TLS Handshake', child);
-      expect(tracer.startSpan).toHaveBeenNthCalledWith(4, 'Time to First Byte', child);
-      expect(tracer.startSpan).toHaveBeenNthCalledWith(5, 'Data Loading', child);
+      expect(tracer.startSpan).toHaveBeenNthCalledWith(1, '', child);
+      expect(tracer.startSpan).toHaveBeenNthCalledWith(2, '', child);
+      expect(tracer.startSpan).toHaveBeenNthCalledWith(3, '', child);
+      expect(tracer.startSpan).toHaveBeenNthCalledWith(4, '', child);
+      expect(tracer.startSpan).toHaveBeenNthCalledWith(5, '', child);
+
+      expect(testSpan.setOperationName).toHaveBeenNthCalledWith(1, 'DNS Lookup');
+      expect(testSpan.setOperationName).toHaveBeenNthCalledWith(2, 'TCP Connection');
+      expect(testSpan.setOperationName).toHaveBeenNthCalledWith(3, 'TLS Handshake');
+      expect(testSpan.setOperationName).toHaveBeenNthCalledWith(4, 'Time to First Byte');
+      expect(testSpan.setOperationName).toHaveBeenNthCalledWith(5, 'Data Loading');
+    });
+
+    it('should create part spans if not all events has emit', async () => {
+      const child = { childOf: 'test' };
+
+      const nextFn = jest.fn(({ emitter }) => {
+        emitter.emit(REQUEST_STAGES.start);
+        emitter.emit(REQUEST_STAGES.firstByteReceived);
+        emitter.emit(REQUEST_STAGES.end);
+        return { status: 200 };
+      });
+
+      await instance(requestConfig, nextFn);
+      expect(tracer.startSpan).toBeCalledTimes(2);
+      expect(tracer.startSpan).toHaveBeenNthCalledWith(1, '', child);
+      expect(tracer.startSpan).toHaveBeenNthCalledWith(2, '', child);
+
+      expect(testSpan.setOperationName).toHaveBeenNthCalledWith(1, 'Time to First Byte');
+      expect(testSpan.setOperationName).toHaveBeenNthCalledWith(2, 'Data Loading');
     });
 
     it('should finish span', async () => {

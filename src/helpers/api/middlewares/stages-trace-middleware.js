@@ -27,9 +27,13 @@ const createStagesTraceRequestMiddleware = ({ tracer }) =>
 
     let currentSpan;
     Object.values(REQUEST_STAGES).map(stage => emitter.on(stage, () => {
-      currentSpan && currentSpan.finish();
+      if (currentSpan) {
+        currentSpan
+          .setOperationName(stage.replace('finish:', ''))
+          .finish();
+      }
       if (stage !== REQUEST_STAGES.end) {
-        currentSpan = tracer.startSpan(stage.replace('start:', ''), { childOf: parentSpanContext });
+        currentSpan = tracer.startSpan('', { childOf: parentSpanContext });
       }
     }));
     requestConfig.emitter = emitter;
