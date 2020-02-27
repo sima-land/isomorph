@@ -24,12 +24,16 @@ import createInject from '../../../src/container/create-inject';
 import initializeSentryCreator from '../../../src/logger/initialize-sentry-creator';
 import * as Sentry from '@sentry/node';
 import { createChildTracingMiddleware } from '../../../src/helpers/tracer/create-child-tracing-middleware';
+import http from 'http';
+import https from 'https';
 
 const values = [
   { name: 'config', value: appConfig },
   { name: 'templates', value: templates },
   { name: 'timeDataKey', value: 'customKey' },
   { name: 'serviceUserAgent', value: 'simaland-example/1' },
+  { name: 'httpAgent', value: new http.Agent({ keepAlive: true }) },
+  { name: 'httpsAgent', value: new https.Agent({ keepAlive: true }) },
 ];
 
 const singletons = [

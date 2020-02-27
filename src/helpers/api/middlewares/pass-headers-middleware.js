@@ -6,7 +6,7 @@ import isFunction from 'lodash/isFunction';
  * @param {import('http').IncomingMessage} options.request Запрос приложения.
  * @param {string} options.ip IP входящего запроса.
  * @param {Object} options.serviceUserAgent Конфигурация приложения.
- * @return {function(Object): Promise} Middleware для использования в API.
+ * @return {function(Object, Function): Promise} Middleware для использования в API.
  */
 const createPassHeadersMiddleware = ({ request, ip, serviceUserAgent }) =>
   async (requestConfig, next) => {
