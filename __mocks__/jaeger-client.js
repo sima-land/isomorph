@@ -2,6 +2,7 @@ import merge from 'lodash/merge';
 
 export const testSpan = {
   setTag: jest.fn().mockReturnThis(),
+  setOperationName: jest.fn().mockReturnThis(),
   finish: jest.fn(),
 };
 

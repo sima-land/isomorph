@@ -17,7 +17,7 @@ import { REQUEST_STAGES } from './constants';
  * За образец использован дефолтный адаптер 'axios/lib/adapters/http.js',
  * но без поддержки proxy, socketPath и cancelToken за ненадобностью.
  * Только для NodeJS, на клиенте не использовать.
- * @param {Object} config Конфигурация интсанса Axios.
+ * @param {Object} config Конфигурация инстанса Axios.
  * @return {Promise} Разрешится после запроса к API.
  */
 const serverAdapter = config => new Promise((resolve, reject) => {
@@ -120,14 +120,10 @@ const serverAdapter = config => new Promise((resolve, reject) => {
   // Регистрируем обработчики событий сокета.
   if (needEmit) {
     req.on('socket', socket => {
-      socket
+      socket.connecting && socket
         .on('lookup', () => emitter.emit(REQUEST_STAGES.dnsLookupFinish))
-        .on('connect', () => emitter.emit(
-          req.connection.encrypted
-            ? REQUEST_STAGES.lowerTransportCreated
-            : REQUEST_STAGES.transportCreated
-        ))
-        .on('secureConnect', () => emitter.emit(REQUEST_STAGES.transportCreated));
+        .on('connect', () => emitter.emit(REQUEST_STAGES.tcpConnectionConnect))
+        .on('secureConnect', () => emitter.emit(REQUEST_STAGES.tlsHandshakeFinish));
     });
   }
 
