@@ -20,10 +20,13 @@
     "test": "jest",
     "coverage": "jest --coverage"
   },
+  "lint-staged": {
+    "*.{js,jsx}": ["eslint"]
+  },
   "husky": {
     "hooks": {
       "pre-push": "yarn jest --coverage",
-      "pre-commit": "yarn lint"
+      "pre-commit": "yarn lint-staged"
     }
   },
   "dependencies": {
@@ -79,6 +82,7 @@
     "husky": "2.3.x",
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
+    "lint-staged": "^10.0.8",
     "lodash": "^4.17.x"
   }
 }
