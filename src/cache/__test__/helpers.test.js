@@ -2,7 +2,10 @@ import {
   getOnConnectCallback,
   getOnReconnectingCallback,
   reconnectOnError,
+  keyInLocalStorageExists,
 } from '../helpers';
+
+import localStorageCache from '../local-storage';
 
 describe('reconnectOnError()', () => {
   it('reconnectOnError() works properly', () => {
@@ -26,5 +29,13 @@ describe('getOnReconnectingCallback()', () => {
     const cache = {};
     getOnReconnectingCallback(cache)();
     expect(cache.status).toBeFalsy();
+  });
+});
+
+describe('keyInLocalStorageExists', () => {
+  it('return true/false correctly', () => {
+    localStorageCache.set('test', 'testString');
+    expect(keyInLocalStorageExists('test')).toBeTruthy();
+    expect(keyInLocalStorageExists('nonexistentKey')).toBeFalsy();
   });
 });
