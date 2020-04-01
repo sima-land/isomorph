@@ -2,6 +2,7 @@ import localStorageCache, {
   isAvailable,
   getItem,
   setItem,
+  isQuotaExceeded,
 } from '../local-storage';
 
 jest.mock('../local-storage', () => {
@@ -24,6 +25,7 @@ describe('localStorageCache', () => {
     expect(localStorageCache.get).toBe(getItem);
     expect(localStorageCache.set).toBe(setItem);
     expect(localStorageCache.status).toBe(isAvailable());
+    expect(localStorageCache.quotaExceeded).toBe(isQuotaExceeded);
 
     expect(isAvailable).toBeCalledTimes(1);
   });
@@ -129,5 +131,32 @@ describe('setItem()', () => {
       value,
       expire: defaultDuration * 1000,
     }));
+  });
+});
+
+describe('isQuotaExceeded()', () => {
+  it('ls isQuotaExceeded method works properly', () => {
+    expect(localStorageCache.quotaExceeded({ code: 22 })).toBeTruthy();
+    expect(localStorageCache.quotaExceeded({ code: 100 })).toBeFalsy();
+    expect(localStorageCache.quotaExceeded({
+      code: 1014,
+      name: 'NS_ERROR_DOM_QUOTA_REACHED',
+    })).toBeTruthy();
+    expect(localStorageCache.quotaExceeded({ number: -2147024882 })).toBeTruthy();
+  });
+
+  it(`ls isQuotaExceeded method works properly
+  if error name !== NS_ERROR_DOM_QUOTA_REACHED and error number !== 2147024882`, () => {
+    expect(localStorageCache.quotaExceeded({ code: 22 })).toBeTruthy();
+    expect(localStorageCache.quotaExceeded({ code: 100 })).toBeFalsy();
+    expect(localStorageCache.quotaExceeded({
+      code: 1014,
+      name: 'SOME ERROR NAME',
+    })).toBeFalsy();
+    expect(localStorageCache.quotaExceeded({ number: -123 })).toBeFalsy();
+  });
+
+  it('ls isQuotaExceeded method works properly without error', () => {
+    expect(localStorageCache.quotaExceeded()).toBeFalsy();
   });
 });

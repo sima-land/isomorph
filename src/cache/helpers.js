@@ -1,3 +1,5 @@
+import localStorageCache from './local-storage';
+
 /**
  * Создаёт обработчик события подключения к redis для установки статуса готовности кэша к работе.
  * @param {Object} cache Объект кэша.
@@ -21,3 +23,10 @@ export const reconnectOnError = ({ code }) => {
   const targetError = 'ECONNREFUSED';
   return code === targetError;
 };
+
+/**
+ * Определяет есть ли в localStorage нужная информация.
+ * @param {string} key Ключ.
+ * @return {boolean} Признак наличия ключа.
+ */
+export const keyInLocalStorageExists = key => localStorageCache.status && key in localStorage;
