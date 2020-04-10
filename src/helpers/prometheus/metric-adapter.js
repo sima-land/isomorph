@@ -1,5 +1,5 @@
 import PrometheusClient from 'prom-client';
-import difference from 'lodash.difference';
+import difference from 'lodash/difference';
 
 /**
  * Список имен конструкторов из пакета "prom-client", пригодных для создания адаптеров.

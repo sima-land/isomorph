@@ -1,4 +1,4 @@
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Возвращает функцию с обработкой ошибки обработчика роута Express.

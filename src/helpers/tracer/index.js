@@ -1,8 +1,8 @@
 import { initTracerFromEnv } from 'jaeger-client';
 import { FORMAT_HTTP_HEADERS } from 'opentracing';
 import { createObserveMiddleware } from '../../observe-middleware/';
-import isFunction from 'lodash.isfunction';
-import get from 'lodash.get';
+import isFunction from 'lodash/isFunction';
+import get from 'lodash/get';
 
 /**
  * Запускает трассировку входящего http-запроса.

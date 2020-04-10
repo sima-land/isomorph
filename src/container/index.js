@@ -1,5 +1,5 @@
-import isString from 'lodash.isstring';
-import isFunction from 'lodash.isfunction';
+import isString from 'lodash/isString';
+import isFunction from 'lodash/isFunction';
 import ServiceNotFoundError from './service-not-found-error';
 import getDependencies from './get-dependencies';
 import isContainer from './is-container';

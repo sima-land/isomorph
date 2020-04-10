@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
-import isFunction from 'lodash.isfunction';
-import isString from 'lodash.isstring';
+import isFunction from 'lodash/isFunction';
+import isString from 'lodash/isString';
 
 /**
  * Оборачивает выполнение какой-либо функции в отправку событий начала и конца выполнения.

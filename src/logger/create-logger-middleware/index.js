@@ -1,4 +1,4 @@
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 import isArray from 'lodash/isArray';
 import { createObserveMiddleware } from '../../observe-middleware';
 import { getOriginalUrl } from '../../helpers/http/request-getters';

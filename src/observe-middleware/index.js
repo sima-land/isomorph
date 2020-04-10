@@ -1,4 +1,4 @@
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 import getMsFromHRT from '../helpers/utils/get-ms-from-hrt';
 
 /**

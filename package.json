@@ -21,7 +21,9 @@
     "coverage": "jest --coverage"
   },
   "lint-staged": {
-    "*.{js,jsx}": ["eslint"]
+    "*.{js,jsx}": [
+      "eslint"
+    ]
   },
   "husky": {
     "hooks": {
@@ -34,15 +36,7 @@
     "express-http-proxy": "^1.5.1",
     "ioredis": "^4.10.0",
     "jaeger-client": "^3.15.0",
-    "lodash.camelcase": "^4.3.0",
-    "lodash.difference": "^4.5.0",
-    "lodash.get": "^4.4.2",
-    "lodash.isfunction": "^3.0.9",
-    "lodash.isnumber": "^3.0.3",
-    "lodash.isplainobject": "^4.0.6",
-    "lodash.isstring": "^4.0.1",
-    "lodash.mapvalues": "^4.6.0",
-    "lodash.negate": "^3.0.2",
+    "lodash": "^4.17.15",
     "middleware-axios": "^1.0.0",
     "opentracing": "^0.14.3",
     "pino": "^5.13.1",
@@ -82,7 +76,6 @@
     "husky": "2.3.x",
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
-    "lint-staged": "^10.0.8",
-    "lodash": "^4.17.x"
+    "lint-staged": "^10.0.8"
   }
 }

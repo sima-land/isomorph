@@ -1,5 +1,5 @@
 import { compose } from 'redux';
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Создаёт функцию для композиции нескольких промежуточных обработчиков для применения в сторе

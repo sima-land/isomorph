@@ -1,6 +1,6 @@
 import pino from 'pino';
 import formatTime from '../format-time';
-import isPlainObject from 'lodash.isplainobject';
+import isPlainObject from 'lodash/isPlainObject';
 
 /**
  * Модуль создающий экземпляр логгера.

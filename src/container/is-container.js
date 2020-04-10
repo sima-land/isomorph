@@ -1,5 +1,5 @@
-import isPlainObject from 'lodash.isplainobject';
-import isFunction from 'lodash.isfunction';
+import isPlainObject from 'lodash/isPlainObject';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Проверяет является ли переданный экземпляр контейнером.

@@ -1,5 +1,10 @@
 import prepareOnReady from '../prepare-on-ready';
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
+
+jest.mock('lodash/isFunction', () => {
+  const original = jest.requireActual('lodash/isFunction');
+  return jest.fn(original);
+});
 
 jest.unmock('redux');
 jest.useFakeTimers();

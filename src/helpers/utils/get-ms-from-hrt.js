@@ -1,4 +1,4 @@
-import isNumber from 'lodash.isnumber';
+import isNumber from 'lodash/isNumber';
 
 /**
  * Возвращает количество миллисекунд по переданному результату вызова process.hrtime.
