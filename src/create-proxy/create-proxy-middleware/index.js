@@ -1,6 +1,6 @@
-import get from 'lodash.get';
+import get from 'lodash/get';
 import pipe from 'lodash/fp/pipe';
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 import expressProxy from 'express-http-proxy';
 
 const urlApi = require('url');

@@ -2,7 +2,7 @@ import { createSagaReadyHandler, createStore, mapServiceOptionsToArgs } from '..
 import { createStore as createReduxStore } from 'redux';
 import { call } from 'redux-saga/effects';
 import { END } from 'redux-saga';
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 import waitOnStoreReadiness from '../../redux/wait-on-store-readiness';
 
 jest.mock('redux', () => {
@@ -22,8 +22,8 @@ jest.mock('../../redux/wait-on-store-readiness', () => {
   };
 });
 
-jest.mock('lodash.isfunction', () => {
-  const original = jest.requireActual('lodash.isfunction');
+jest.mock('lodash/isFunction', () => {
+  const original = jest.requireActual('lodash/isFunction');
   return jest.fn(original);
 });
 

@@ -1,4 +1,4 @@
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Оборачивает опциональный обработчик события готовности стора, добавляя отписку и опциональную очистку таймера.

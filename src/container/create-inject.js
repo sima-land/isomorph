@@ -1,4 +1,4 @@
-import isFunction from 'lodash.isfunction';
+import isFunction from 'lodash/isFunction';
 import getDependencies from './get-dependencies';
 import isContainer from './is-container';
 

@@ -1,5 +1,5 @@
-import isFunction from 'lodash.isfunction';
-import isPlainObject from 'lodash.isplainobject';
+import isFunction from 'lodash/isFunction';
+import isPlainObject from 'lodash/isPlainObject';
 import formatObjectKeys from '../helpers/utils/format-object-keys';
 
 /**

@@ -1,5 +1,5 @@
-import isString from 'lodash.isstring';
-import isPlainObject from 'lodash.isplainobject';
+import isString from 'lodash/isString';
+import isPlainObject from 'lodash/isPlainObject';
 
 /**
  * Определяет, является ли зависимость статической, то есть не требующей инициализации.
