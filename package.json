@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "axios": "0.19.2",
+    "core-js": "3",
     "express-http-proxy": "^1.5.1",
     "ioredis": "^4.10.0",
     "jaeger-client": "^3.15.0",
@@ -51,12 +52,13 @@
     "reselect": "^4.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.2.x",
+    "@babel/core": "7.4.5",
     "@babel/plugin-proposal-class-properties": "7.4.x",
     "@babel/plugin-syntax-bigint": "^7.4.4",
-    "@babel/preset-env": "7.2.x",
+    "@babel/preset-env": "7.4.5",
     "@babel/preset-react": "7.0.x",
     "@dev-dep/linters": "^1.0.1",
+    "@sentry/browser": "^5.15.5",
     "@sentry/node": "5.10.2",
     "@types/jest": "24.0.x",
     "babel-core": "7.0.0-bridge.0",
@@ -77,6 +79,7 @@
     "husky": "2.3.x",
     "identity-obj-proxy": "3.0.x",
     "jest": "24.8.x",
-    "lint-staged": "^10.0.8"
+    "lint-staged": "^10.0.8",
+    "sentry-testkit": "^3.2.1"
   }
 }
