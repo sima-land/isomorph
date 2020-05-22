@@ -26,6 +26,7 @@ import * as Sentry from '@sentry/node';
 import { createChildTracingMiddleware } from '../../../src/helpers/tracer/create-child-tracing-middleware';
 import http from 'http';
 import https from 'https';
+import createSentryInstance from '../../../src/logger/create-sentry-instance';
 
 const values = [
   { name: 'config', value: appConfig },
@@ -151,7 +152,11 @@ const singletons = [
   },
   {
     name: 'sentryLoggerService',
-    value: Sentry,
+    singleton: createSentryInstance,
+    dependencies: [{
+      name: 'sentry',
+      value: Sentry,
+    }],
   },
   {
     name: 'initializeSentry',
