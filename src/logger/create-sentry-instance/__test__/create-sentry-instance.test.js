@@ -32,6 +32,7 @@ describe('createSentryInstance', () => {
       captureException: expect.any(Function),
       captureMessage: expect.any(Function),
       addBreadcrumb: expect.any(Function),
+      withScope: expect.any(Function),
     });
   });
 });

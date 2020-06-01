@@ -9,6 +9,7 @@ const CAPTURE_METHODS_KEYS = [
   'captureException',
   'captureMessage',
   'addBreadcrumb',
+  'withScope',
 ];
 
 /**

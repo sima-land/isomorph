@@ -25,6 +25,7 @@ export const createSagaReadyHandler = onReady => store => {
  * @param {Array} options.middleware Список дополнительных middleware.
  * @param {Function} options.onReady Функция которая будет выполнена по готовности store.
  * @param {number} options.timeout Максимальное время ожидания готовности store.
+ * @param {Function} [options.onSagasErrorHandler] Корневой обработчик ошибок в сагах.
  * @return {Object} Объект со store и функцией runSaga для запуска саг.
  */
 export const createStore = (
@@ -37,9 +38,14 @@ export const createStore = (
     middleware = [],
     onReady,
     timeout,
+    onSagasErrorHandler,
   } = {},
 ) => {
-  const sagaMiddleware = createSagaMiddleware();
+  const sagaMiddleware = createSagaMiddleware(
+    isFunction(onSagasErrorHandler)
+      ? { onError: onSagasErrorHandler }
+      : {}
+  );
   let store = createReduxStore(
     reducer,
     initialState,
