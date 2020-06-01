@@ -20,6 +20,7 @@ import createInject from '../../../../src/container/create-inject';
 import adapter from '../../../../src/helpers/api/server-adapter';
 import createStagesTraceRequestMiddleware from '../../../../src/helpers/api/middlewares/stages-trace-middleware';
 import createSetHttpAgentsMiddleware from '../../../../src/helpers/api/middlewares/set-http-agents-middleware';
+import createSentryHandlerForSagas from '../../../../src/helpers/saga/create-sentry-handler-for-sagas';
 
 const services = [
   {
@@ -49,7 +50,13 @@ const services = [
         name: 'timeout',
         value: 100,
       },
+      'onSagasErrorHandler',
     ],
+  },
+  {
+    name: 'onSagasErrorHandler',
+    singleton: createSentryHandlerForSagas,
+    dependencies: [{ sentry: 'sentryLogger' }], // Эта зависимость в родительском контейнере.
   },
   {
     name: 'helloState',

@@ -1,7 +1,7 @@
 import { createSagaReadyHandler, createStore, mapServiceOptionsToArgs } from '../create-store';
 import { createStore as createReduxStore } from 'redux';
 import { call } from 'redux-saga/effects';
-import { END } from 'redux-saga';
+import createSagaMiddleware, { END } from 'redux-saga';
 import isFunction from 'lodash/isFunction';
 import waitOnStoreReadiness from '../../redux/wait-on-store-readiness';
 
@@ -25,6 +25,15 @@ jest.mock('../../redux/wait-on-store-readiness', () => {
 jest.mock('lodash/isFunction', () => {
   const original = jest.requireActual('lodash/isFunction');
   return jest.fn(original);
+});
+
+jest.mock('redux-saga', () => {
+  const original = jest.requireActual('redux-saga');
+  return {
+    ...original,
+    __esModule: true,
+    default: jest.fn(original.default),
+  };
 });
 
 describe('function createSagaReadyHandler', () => {
@@ -136,6 +145,21 @@ describe('function createStore', () => {
       'Third argument property "onReady" is a function, when property "isReady" is not a function. '
       + 'The "onReady" function will never be called.'
     ));
+  });
+  describe('call createSagaMiddleware', () => {
+    it('without error handler', () => {
+      expect(createSagaMiddleware).not.toHaveBeenCalled();
+      createStore(reducer, initialSaga);
+
+      expect(createSagaMiddleware).toHaveBeenCalledWith({});
+    });
+    it('with error handler if "onSagasErrorHandler" is passed', () => {
+      const onSagasErrorHandler = jest.fn();
+      expect(createSagaMiddleware).not.toHaveBeenCalled();
+      createStore(reducer, initialSaga, { onSagasErrorHandler });
+
+      expect(createSagaMiddleware).toHaveBeenCalledWith({ onError: onSagasErrorHandler });
+    });
   });
 });
 
