@@ -9,7 +9,7 @@ import isFunction from 'lodash/isFunction';
  */
 const prepareOnReady = (store, unsubscribe, onReady) => timer => {
   unsubscribe();
-  Number.isInteger(timer) && clearTimeout(timer);
+  timer && clearTimeout(timer);
   isFunction(onReady) && onReady(store);
 };
 

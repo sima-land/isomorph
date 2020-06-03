@@ -25,6 +25,7 @@ export const createSagaReadyHandler = onReady => store => {
  * @param {Array} options.middleware Список дополнительных middleware.
  * @param {Function} options.onReady Функция которая будет выполнена по готовности store.
  * @param {number} options.timeout Максимальное время ожидания готовности store.
+ * @param {Function} [options.onTimeout] Функция обработчик события таймаута ожидания готовности store.
  * @param {Function} [options.onSagasErrorHandler] Корневой обработчик ошибок в сагах.
  * @return {Object} Объект со store и функцией runSaga для запуска саг.
  */
@@ -38,6 +39,7 @@ export const createStore = (
     middleware = [],
     onReady,
     timeout,
+    onTimeout,
     onSagasErrorHandler,
   } = {},
 ) => {
@@ -56,6 +58,7 @@ export const createStore = (
       store,
       isReady,
       createSagaReadyHandler(onReady),
+      onTimeout,
       timeout
     );
   } else if (isFunction(onReady)) {

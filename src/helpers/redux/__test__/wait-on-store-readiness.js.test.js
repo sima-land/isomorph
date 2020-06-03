@@ -14,9 +14,10 @@ describe('function waitOnReadiness', () => {
   });
   const isReady = jest.fn(testStore => testStore.getState().ready);
   const onReady = jest.fn();
+  const onTimeout = jest.fn();
   it('subscribes to the store and waits for its readiness', () => {
     expect(store.subscribe).not.toHaveBeenCalled();
-    expect(waitOnStoreReadiness(store, isReady, onReady, 500)).toEqual(store);
+    expect(waitOnStoreReadiness(store, isReady, onReady, onTimeout, 500)).toEqual(store);
     expect(store.subscribe).toHaveBeenCalledWith(expect.any(Function));
     expect(isReady).not.toHaveBeenCalled();
     expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 500);
@@ -31,18 +32,21 @@ describe('function waitOnReadiness', () => {
     expect(onReady).toHaveBeenCalledWith(store);
     expect(unsubscribe).toHaveBeenCalled();
     expect(clearTimeout).toHaveBeenCalledWith(setTimeout.mock.results[0].value);
+    expect(onTimeout).not.toBeCalled();
   });
   it('subscribes to the store and stops waiting its readiness by timeout', () => {
     expect(store.subscribe).not.toHaveBeenCalled();
-    expect(waitOnStoreReadiness(store, isReady, onReady)).toEqual(store);
+    expect(waitOnStoreReadiness(store, isReady, onReady, onTimeout)).toEqual(store);
     expect(store.subscribe).toHaveBeenCalledWith(expect.any(Function));
     expect(isReady).not.toHaveBeenCalled();
+    expect(onTimeout).not.toBeCalled();
     expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2 ** 30);
     expect(setTimeout).toHaveReturnedWith(expect.any(Number));
     expect(clearTimeout).not.toHaveBeenCalled();
     jest.runAllTimers();
     expect(unsubscribe).toHaveBeenCalled();
     expect(onReady).toHaveBeenCalled();
+    expect(onTimeout).toBeCalledWith(store);
     expect(clearTimeout).not.toHaveBeenCalled();
   });
 });

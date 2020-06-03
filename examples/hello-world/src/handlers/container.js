@@ -22,7 +22,7 @@ import createInject from '../../../../src/container/create-inject';
 import adapter from '../../../../src/helpers/api/server-adapter';
 import createStagesTraceRequestMiddleware from '../../../../src/helpers/api/middlewares/stages-trace-middleware';
 import createSetHttpAgentsMiddleware from '../../../../src/helpers/api/middlewares/set-http-agents-middleware';
-import createSentryHandlerForSagas from '../../../../src/helpers/saga/create-sentry-handler-for-sagas';
+import { createSentryHandlerForSagas, createSentryHandlerForStore } from '../../../../src/logger/handler-creators';
 
 const services = [
   {
@@ -53,12 +53,18 @@ const services = [
         value: 100,
       },
       'onSagasErrorHandler',
+      'onTimeout',
     ],
   },
   {
     name: 'onSagasErrorHandler',
     singleton: createSentryHandlerForSagas,
     dependencies: [{ sentry: 'sentryLogger' }], // Эта зависимость в родительском контейнере.
+  },
+  {
+    name: 'onTimeout',
+    singleton: createSentryHandlerForStore,
+    dependencies: [{ sentry: 'sentryLogger' }],
   },
   {
     name: 'helloState',

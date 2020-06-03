@@ -109,17 +109,20 @@ describe('function createStore', () => {
   });
   it('runs waitOnStoreReadiness if options.isReady was passed', () => {
     const isReady = jest.fn();
+    const onTimeout = jest.fn();
     expect(createReduxStore).not.toHaveBeenCalled();
     expect(reducer).not.toHaveBeenCalled();
     expect(waitOnStoreReadiness).not.toHaveBeenCalled();
     const { store, runSaga } = createStore(reducer, initialSaga, {
       isReady,
+      onTimeout,
     });
 
     // Проверяем, что обсервер запустился с правильными аргументами
     expect(waitOnStoreReadiness.mock.calls[0][0]).toEqual(store);
     expect(waitOnStoreReadiness.mock.calls[0][1]).toEqual(isReady);
     expect(waitOnStoreReadiness.mock.calls[0][2]).toBeInstanceOf(Function);
+    expect(waitOnStoreReadiness.mock.calls[0][3]).toEqual(onTimeout);
 
     // Проверяем интерфейс и работоспособность созданного store
     checkStore(store);
