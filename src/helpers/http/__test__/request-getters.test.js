@@ -3,6 +3,7 @@ import {
   getMethod,
   getStatus,
   getOriginalUrl,
+  getCookie,
 } from '../request-getters';
 
 describe('getXClientIp', () => {
@@ -100,5 +101,32 @@ describe('getOriginalUrl', () => {
     const originalUrl = getOriginalUrl({ request });
 
     expect(originalUrl).toBe(someFunction);
+  });
+});
+
+describe('getCookie', () => {
+  it('should return cookie', () => {
+    const request = {
+      headers: {
+        cookie: 'test',
+      },
+
+      /**
+       * Возвращает содержимое заголовка.
+       * @param {string} propName Имя заголовка.
+       * @return {string} Содержимое.
+       */
+      get (propName) {
+        return this.headers[propName];
+      },
+    };
+
+    expect(getCookie(request)).toEqual('test');
+  });
+
+  it('should return empty string', () => {
+    expect(getCookie()).toEqual('');
+    expect(getCookie(null)).toEqual('');
+    expect(getCookie({})).toEqual('');
   });
 });

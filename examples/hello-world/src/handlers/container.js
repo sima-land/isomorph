@@ -11,10 +11,12 @@ import axiosInstanceConstructor from '../../../../src/helpers/api/create-instanc
 import config from '../config';
 import enhancerConstructor from '../../../../src/helpers/api/create-enhancer';
 import createTraceRequestMiddleware from '../../../../src/helpers/api/middlewares/trace-request-middleware';
-import createPassHeadersMiddleware from '../../../../src/helpers/api/middlewares/pass-headers-middleware';
+import {
+  createPassHeadersMiddleware,
+  prepareRequestHeaders,
+} from '../../../../src/helpers/api/middlewares/pass-headers-middleware';
 import createCollectCookieMiddleware from '../../../../src/helpers/api/middlewares/collect-cookie-middleware';
 import createCountApiResponseTimeMiddleware from '../../../../src/helpers/api/middlewares/count-api-response-time';
-import { getXClientIp } from '../../../../src/helpers/http/request-getters';
 import getParams, { parseHttpHeaders } from '../../../../src/helpers/get-params';
 import createInject from '../../../../src/container/create-inject';
 import adapter from '../../../../src/helpers/api/server-adapter';
@@ -100,9 +102,10 @@ const services = [
     ],
   },
   {
-    name: 'ip',
-    factory: getXClientIp,
+    name: 'headers',
+    factory: prepareRequestHeaders,
     dependencies: [
+      'config',
       'request',
     ],
   },
@@ -122,14 +125,13 @@ const services = [
         ],
       },
       'context',
-      'ip',
-      'serviceUserAgent',
       { tracer: 'jaegerTracer' },
       'timeDataKey',
       'request',
       'response',
       'httpAgent',
       'httpsAgent',
+      'headers',
     ],
   },
   {
