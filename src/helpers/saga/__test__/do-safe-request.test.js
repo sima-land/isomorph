@@ -22,9 +22,7 @@ describe('common saga doSafeRequest', () => {
       error: {
         message: 'Error message',
       },
-      config: null,
       data: null,
-      headers: null,
       ok: false,
       status: null,
     });
@@ -39,7 +37,6 @@ describe('common saga doSafeRequest', () => {
     expect(done).toBeTruthy();
     expect(sentryLogger.captureException).toHaveBeenCalledWith(errorWithConfig);
     expect(value).toEqual({
-      config: null,
       data: null,
       error: {
         config: {
@@ -47,7 +44,6 @@ describe('common saga doSafeRequest', () => {
         },
         message: 'Error message',
       },
-      headers: null,
       ok: false,
       status: null,
     });
@@ -65,8 +61,6 @@ describe('common saga doSafeRequest', () => {
       data,
       status: 200,
       ok: true,
-      headers: null,
-      config: null,
       error: null,
     });
     expect(value.else).toBeUndefined();
@@ -95,10 +89,8 @@ describe('common saga doSafeRequest', () => {
     const { done, value } = gen.throw(errorWithResponse);
     expect(done).toBe(true);
     expect(value).toEqual({
-      config: errorWithResponse.response.config,
       data: errorWithResponse.response.data,
       error: errorWithResponse,
-      headers: errorWithResponse.response.headers,
       ok: false,
       status: errorWithResponse.response.status,
     });
