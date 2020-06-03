@@ -4,7 +4,7 @@ import isPlainObject from 'lodash/isPlainObject';
 import doSafeRequest from './do-safe-request';
 
 /**
- * Проверяет налчие данных запрошенных из кэша.
+ * Проверяет наличие данных, запрошенных из кэша.
  * @param {*} data Данные, запрошенных из кэша.
  * @return {boolean} Получен ли ответ.
  */
@@ -22,7 +22,7 @@ export const validateResultDefault = response =>
  * @typedef {Object} Cache Объект кэша.
  * @property {Function} get Функция, получающая данные из кэша.
  * @property {Function} set Функция, записывающая данные в кэш.
- * @property {boolean} status Статус достпности кэша.
+ * @property {boolean} status Статус доступности кэша.
  */
 
 /**

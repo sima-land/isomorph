@@ -8,12 +8,10 @@ import get from 'lodash/get';
  * @property {Object|null} error Объект ошибки.
  * @property {Object|string|null} data Данные ответа.
  * @property {number|null} status Статус ответа.
- * @property {Object|null} headers Заголовки.
- * @property {Object|null} config Конфигурация запроса.
  */
 
 /**
- * Безопасно запрашивает данные c сервера, с обработкой и логгированием ошибок, обрабатывает ответ.
+ * Безопасно запрашивает данные c сервера, с обработкой и логированием ошибок, обрабатывает ответ.
  * @param {Function} performRequest Функция, выполняющая запрос.
  * @param {Object} [options] Опции.
  * @param {Array} [options.args] Аргументы функции, выполняющей запрос.
@@ -29,7 +27,7 @@ export default function * doSafeRequest (
     captureException,
   } = options || {};
 
-  let response = {};
+  let response;
   let ok = false;
   let originalError = null;
 
@@ -51,7 +49,5 @@ export default function * doSafeRequest (
     error: originalError,
     data: get(response, 'data', null),
     status: get(response, 'status', null),
-    headers: get(response, 'headers', null),
-    config: get(response, 'config', null),
   };
 }
