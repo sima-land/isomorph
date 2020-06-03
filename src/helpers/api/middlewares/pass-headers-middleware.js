@@ -1,27 +1,36 @@
-import isFunction from 'lodash/isFunction';
+import { getXClientIp, getCookie } from '../../http/request-getters';
+import { getServiceHeaders, getServiceUserAgent } from './helpers';
 
 /**
- * Создаёт middleware для прокидывания заголовков из запроса приложения в запросы API.
+ * Создаёт middleware для добавления заголовков в запросы API.
  * @param {Object} options Параметры для создания middleware.
- * @param {import('http').IncomingMessage} options.request Запрос приложения.
- * @param {string} options.ip IP входящего запроса.
- * @param {Object} options.serviceUserAgent Конфигурация приложения.
+ * @param {Object} options.headers Объект заголовков для добавления к запросу в API.
  * @return {function(Object, Function): Promise} Middleware для использования в API.
  */
-const createPassHeadersMiddleware = ({ request, ip, serviceUserAgent }) =>
+export const createPassHeadersMiddleware = ({ headers }) =>
   async (requestConfig, next) => {
     if (!requestConfig.headers) {
       requestConfig.headers = {};
     }
-    const cookie = request && isFunction(request.get) && request.get('cookie');
 
     requestConfig.headers = {
       ...requestConfig.headers,
-      Cookie: cookie || '',
-      'X-Client-Ip': ip || '',
-      'User-Agent': serviceUserAgent || '',
+      ...headers,
     };
+
     await next(requestConfig);
   };
 
-export default createPassHeadersMiddleware;
+/**
+ * Формирует объект заголовков из конфигурации приложения и запроса к приложению.
+ * @param {Object} options Опции сервиса.
+ * @param {Object} options.config Конфигурация приложения.
+ * @param {import('http').IncomingMessage} options.request Запрос приложения.
+ * @return {Object} Заголовки.
+ */
+export const prepareRequestHeaders = ({ config, request }) => ({
+  'X-Client-Ip': getXClientIp({ request }),
+  'User-Agent': getServiceUserAgent(config),
+  Cookie: getCookie(request),
+  ...getServiceHeaders(request),
+});

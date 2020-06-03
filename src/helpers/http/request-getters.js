@@ -1,4 +1,5 @@
 import { isIP } from 'net';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Получает IP пользователя из заголовков запроса.
@@ -32,3 +33,12 @@ export const getStatus = ({ response }) => response.statusCode;
  * @return {number} Url запроса.
  */
 export const getOriginalUrl = ({ request }) => request.originalUrl;
+
+/**
+ * Получает куки из запроса.
+ * @param {Object} request Запрос.
+ * @return {string} Куки.
+ */
+export const getCookie = request => request && isFunction(request.get)
+  ? request.get('cookie')
+  : '';
