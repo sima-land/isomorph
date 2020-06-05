@@ -125,8 +125,21 @@ describe('getCookie', () => {
   });
 
   it('should return empty string', () => {
+    const request = {
+      headers: {},
+
+      /**
+       * Возвращает содержимое заголовка.
+       * @param {string} propName Имя заголовка.
+       * @return {string} Содержимое.
+       */
+      get (propName) {
+        return this.headers[propName];
+      },
+    };
     expect(getCookie()).toEqual('');
     expect(getCookie(null)).toEqual('');
     expect(getCookie({})).toEqual('');
+    expect(getCookie(request)).toEqual('');
   });
 });

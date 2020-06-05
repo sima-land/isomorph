@@ -39,6 +39,4 @@ export const getOriginalUrl = ({ request }) => request.originalUrl;
  * @param {Object} request Запрос.
  * @return {string} Куки.
  */
-export const getCookie = request => request && isFunction(request.get)
-  ? request.get('cookie')
-  : '';
+export const getCookie = request => (request && isFunction(request.get) && request.get('cookie')) || '';
