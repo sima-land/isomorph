@@ -7,6 +7,7 @@ const Sentry = {
   init: jest.fn(),
   Handlers,
   captureException: jest.fn(),
+  configureScope: jest.fn(),
 };
 
 export default Sentry;

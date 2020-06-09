@@ -2,7 +2,7 @@ import inject from '../container';
 import PrometheusClient from 'prom-client';
 import express from 'express';
 import helloWorldHandler from '../handlers/hello-world';
-import { addErrorHandling } from '../../../../src/helpers/add-error-handling/index.js';
+import { addErrorHandling } from '../../../../src/helpers/add-error-handling';
 
 /**
  * Ининциализирует приложение.
@@ -34,13 +34,14 @@ export const initialize = (
 ) => {
   initializeSentry();
   const server = express()
+    .use(sentryMiddleware.request) // Должен быть первым middleware
     .use(renderTracingMiddleware)
     .use(loggerMiddleware)
     .use(requestMetricsMiddleware)
     .use(renderMetricsMiddleware)
     .use(tracingMiddleware)
     .get('/', addErrorHandling(helloWorldHandler))
-    .use(sentryMiddleware)
+    .use(sentryMiddleware.failure) // Должен быть после остальных обработчиков ошибок
     .listen(mainPort);
   gracefulShutdown(server);
 

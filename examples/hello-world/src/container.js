@@ -3,7 +3,7 @@ import { getMethod, getStatus, getXClientIp } from '../../../src/helpers/http/re
 import templates from './templates';
 import { createSingleton } from '../../../src/container';
 import sentryLogger from '../../../src/logger/sentry-logger';
-import createSentryMiddleware from '../../../src/logger/create-sentry-middleware';
+import { createSentryMiddleware } from '../../../src/logger/create-sentry-middleware';
 import createLoggerMiddleware from '../../../src/logger/create-logger-middleware';
 import createPinoInstance from '../../../src/helpers/logger/create-pino-instance';
 import {
@@ -27,6 +27,7 @@ import { createChildTracingMiddleware } from '../../../src/helpers/tracer/create
 import http from 'http';
 import https from 'https';
 import createSentryInstance from '../../../src/logger/create-sentry-instance';
+import { createDefaultScopeConfigurator } from '../../../src/logger/handler-creators';
 
 const values = [
   { name: 'config', value: appConfig },
@@ -165,7 +166,13 @@ const singletons = [
       'sentryLoggerService',
       'getSentryDsn',
       'getSentryOptions',
+      'configureMainScope',
     ],
+  },
+  {
+    name: 'configureMainScope',
+    singleton: createDefaultScopeConfigurator,
+    dependencies: ['config'],
   },
   {
     name: 'getSentryDsn',
