@@ -22,6 +22,7 @@ describe('createTraceRequestMiddleware', () => {
         headers: {
           testHeader: 'test',
         },
+        params: { testParam: 'test' },
       };
       await instance(requestConfig, next);
       expect(tracer.startSpan).toHaveBeenCalledWith('HTTP GET test.ru/test/url', {
@@ -31,8 +32,12 @@ describe('createTraceRequestMiddleware', () => {
         testHeader: 'test',
         tracerId: 'test',
       });
-      expect(testSpan.setTag).toHaveBeenCalledWith(Tags.HTTP_URL, 'test.ru/test/url');
-      expect(testSpan.setTag).toHaveBeenCalledWith(Tags.HTTP_METHOD, 'GET');
+      expect(testSpan.addTags).toHaveBeenCalledWith({
+        [Tags.HTTP_URL]: 'test.ru/test/url',
+        [Tags.HTTP_METHOD]: 'GET',
+        'request.params': { testParam: 'test' },
+        'request.headers': { testHeader: 'test' },
+      });
       expect(testSpan.setTag).toHaveBeenCalledWith(Tags.HTTP_STATUS_CODE, 200);
       expect(next).toHaveBeenCalledWith(requestConfig);
     });

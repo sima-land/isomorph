@@ -39,5 +39,6 @@ describe('getServiceUserAgent', () => {
 
   it('should return empty string without options', () => {
     expect(getServiceUserAgent({})).toEqual('');
+    expect(getServiceUserAgent()).toEqual('');
   });
 });
