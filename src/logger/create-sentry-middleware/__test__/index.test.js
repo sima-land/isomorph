@@ -1,15 +1,20 @@
-import createSentryMiddleware from '..';
+import { createSentryMiddleware } from '..';
 import { Handlers } from '@sentry/node';
 
 jest.mock('@sentry/node', () => {
   const original = jest.requireActual('@sentry/node');
-  original.Handlers.errorHandler = jest.fn();
+  original.Handlers.errorHandler = jest.fn().mockReturnValue('fakeErrorHandlerMiddleware');
+  original.Handlers.requestHandler = jest.fn().mockReturnValue('fakeRequestHandlerMiddleware');
   return original;
 });
 
 describe('createSentryMiddleware()', () => {
   it('works correctly', () => {
-    createSentryMiddleware();
+    const middleware = createSentryMiddleware();
     expect(Handlers.errorHandler).toHaveBeenCalled();
+    expect(middleware).toEqual({
+      request: 'fakeRequestHandlerMiddleware',
+      failure: 'fakeErrorHandlerMiddleware',
+    });
   });
 });

@@ -1,4 +1,8 @@
-import { createSentryHandlerForSagas, createSentryHandlerForStore } from '../index';
+import {
+  createSentryHandlerForSagas,
+  createSentryHandlerForStore,
+  createDefaultScopeConfigurator,
+} from '../index';
 
 describe('createSentryHandlerForSagas', () => {
   const captureExtendedException = jest.fn();
@@ -39,5 +43,26 @@ describe('createSentryHandlerForStore', () => {
     handler();
     expect(captureException.mock.calls[0][0].message)
       .toEqual('Ожидание готовности store было прервано по таймауту');
+  });
+});
+
+describe('createDefaultScopeConfigurator', () => {
+  const testConfig = 'test_config';
+  const instance = createDefaultScopeConfigurator({ config: testConfig });
+
+  it('should create function', () => {
+    expect(instance).toBeInstanceOf(Function);
+    expect(instance).toHaveLength(1);
+  });
+
+  it('instance should call setContext', () => {
+    const setContext = jest.fn();
+    const testScope = {
+      setContext,
+    };
+
+    expect(setContext).not.toBeCalled();
+    instance(testScope);
+    expect(setContext).toBeCalledWith('App config', testConfig);
   });
 });

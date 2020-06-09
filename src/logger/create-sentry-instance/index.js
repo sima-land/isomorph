@@ -10,6 +10,7 @@ const CAPTURE_METHODS_KEYS = [
   'captureMessage',
   'addBreadcrumb',
   'withScope',
+  'configureScope',
 ];
 
 /**
