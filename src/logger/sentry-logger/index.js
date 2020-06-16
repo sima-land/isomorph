@@ -14,11 +14,16 @@ export default function sentryLogger ({ sentryLoggerService } = {}) {
      * Метод перехвата ошибки с дополнительными данными об ошибке.
      * @param {Error} error Ошибка.
      * @param {*} extendedData Дополнительные данные.
-     * @param {string} dataName Наименование дополнительных данных.
+     * @param {Object} [options] Опции.
+     * @param {string} [options.dataName] = 'details' Наименование дополнительных данных.
+     * @param {boolean} [options.dataAsContext] = false Прикрепить ли дополнительные данные как контекст ошибки.
      */
-    captureExtendedException: (error, extendedData, dataName = 'details') => {
+    captureExtendedException: (error, extendedData, options) => {
+      const { dataName = 'details', dataAsContext = false } = options || {};
       sentryLoggerService.withScope(scope => {
-        scope.setExtra(dataName, extendedData);
+        dataAsContext
+          ? scope.setContext(dataName, extendedData)
+          : scope.setExtra(dataName, extendedData);
         sentryLoggerService.captureException(error);
       });
     },

@@ -23,6 +23,10 @@ import adapter from '../../../../src/helpers/api/server-adapter';
 import createStagesTraceRequestMiddleware from '../../../../src/helpers/api/middlewares/stages-trace-middleware';
 import createSetHttpAgentsMiddleware from '../../../../src/helpers/api/middlewares/set-http-agents-middleware';
 import { createSentryHandlerForSagas, createSentryHandlerForStore } from '../../../../src/logger/handler-creators';
+import {
+  createHandleExceptionMiddleware,
+  createAttachBreadcrumbsMiddleware,
+} from '../../../../src/helpers/api/middlewares/error-handlers-middlewares';
 
 const services = [
   {
@@ -128,6 +132,14 @@ const services = [
           createCollectCookieMiddleware,
           createCountApiResponseTimeMiddleware,
           createSetHttpAgentsMiddleware,
+
+          /**
+           * Должен быть перед createHandleExceptionMiddleware.
+           * Возьмет данные ошибки и прокинет её в следующий обработчик.
+           * Не нужен на сервере, там крошки собираются глобальной интеграцией.
+           */
+          createAttachBreadcrumbsMiddleware,
+          createHandleExceptionMiddleware,
         ],
       },
       'context',
@@ -138,6 +150,7 @@ const services = [
       'httpAgent',
       'httpsAgent',
       'headers',
+      { sentry: 'sentryLogger' },
     ],
   },
   {

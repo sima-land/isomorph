@@ -14,7 +14,10 @@ const config = createConfig({
   isDevelopment: base => base.NODE_ENV !== 'production',
   isProduction: base => base.NODE_ENV === 'production',
   version: base => base.CI_COMMIT_REF_NAME || 'development',
-  sentryOptions: {},
+  sentryOptions: {
+    // Глубина нормализации данных ошибки для корректного отображения заголовков запроса при ошибке в апи.
+    normalizeDepth: 4,
+  },
   proxy: [
     {
       url: '/api/*',

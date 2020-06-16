@@ -21,7 +21,7 @@ describe('createSentryHandlerForSagas', () => {
   it('handler should work correctly', () => {
     const error = new Error('test error');
     handler(error, { sagaStack: 'test_stack' });
-    expect(captureExtendedException).toHaveBeenCalledWith(error, 'test_stack', 'Sagas stack');
+    expect(captureExtendedException).toHaveBeenCalledWith(error, 'test_stack', { dataName: 'Sagas stack' });
   });
 });
 
