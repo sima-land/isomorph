@@ -3,20 +3,35 @@ import { FORMAT_HTTP_HEADERS } from 'opentracing';
 import { createObserveMiddleware } from '../../observe-middleware/';
 import isFunction from 'lodash/isFunction';
 import get from 'lodash/get';
+import { createService } from '../../container';
+import isPlainObject from 'lodash/isPlainObject';
+import { getOriginalUrl } from '../http/request-getters';
+import mapValues from 'lodash/fp/mapValues';
+
+const mapValuesWithKey = mapValues.convert({ cap: false });
+
+/**
+ * Возвращает новый объект, в котором заменено значение свойств, имена которых содержат 'Password'.
+ */
+const filterSecrets = mapValuesWithKey((value, key) => key.includes('Password') ? '[Filtered]' : value);
 
 /**
  * Запускает трассировку входящего http-запроса.
- * @param {Function} tracer Функция трассировки.
+ * @param {Object} tracer Экземпляр трейсера.
  * @param {string} key Ключ.
  * @param {Object} httpRequest Запрос.
+ * @param {Object} [payload] Дополнительная информация для добавления к спану.
  * @return {Object} Спан.
  */
-export const traceIncomingRequest = (tracer, key, httpRequest) => tracer.startSpan(
-  key,
-  {
-    childOf: tracer.extract(FORMAT_HTTP_HEADERS, httpRequest.headers),
-  }
-);
+export const traceIncomingRequest = (tracer, key, httpRequest, payload) =>
+  tracer
+    .startSpan(
+      key,
+      {
+        childOf: tracer.extract(FORMAT_HTTP_HEADERS, httpRequest.headers),
+      }
+    )
+    .addTags(isPlainObject(payload) ? payload : {});
 
 /**
  * Создаёт новый или возвращает существующий экземпляр jaeger-трейсера.
@@ -53,8 +68,9 @@ export const getTracer = ({
  * @param {Object} [options] Необязательные опции.
  * @param {string} [options.spanKey='span'] Ключ, под которым будет сохранен span в response.locals.
  * @return {Function} Функция - промежуточный слой для маршрутов.
+ * @private
  */
-export const createTracingMiddleware = (
+export const _createTracingMiddleware = (
   createSpan,
   onSpanFinish,
   { spanKey = 'span' } = {}
@@ -88,3 +104,57 @@ export const getSpanContext = ({ response }) => {
   }
   return context || null;
 };
+
+/**
+ * Функция преобразования зависимостей сервиса в аргументы функции.
+ * @param {Object} dependencies Зависимости.
+ * @return {Array} Массив аргументов.
+ * @private
+ */
+export const _deptToArg = ({ createSpan, onSpanFinish }) => [createSpan, onSpanFinish];
+
+/**
+ * Возвращает сервис для создания промежуточного слоя трассировки.
+ * @return {Function} Сервис.
+ */
+export const tracingMiddlewareCreator = createService(
+  _createTracingMiddleware,
+  _deptToArg
+);
+
+/**
+ * Сервис для создания span-ов трейсинга.
+ * @param {Object} dependencies Параметры сервиса.
+ * @param {Object} dependencies.jaegerTracer Трейсер.
+ * @param {Object} dependencies.config Конфигурация приложения.
+ * @return {Function} Функция для создания спана.
+ */
+export const createSpanCreator = ({ jaegerTracer, config }) => request => traceIncomingRequest(
+  jaegerTracer,
+  'incoming-http-request',
+  request,
+  _getRequestContext(request, config),
+);
+
+/**
+ * Обработчик завершения трейса.
+ * @param {import('http').IncomingMessage} req Запрос.
+ * @param {import('http').ServerResponse} res Ответ.
+ * @param {import('opentracing').Span} span Спан.
+ */
+export const spanFinishHandler = (req, res, span) => {
+  span.finish();
+};
+
+/**
+ * Возвращает контекст, в котором обрабатывается запрос к сервису, для добавления в span.
+ * @param {import('http').IncomingMessage} request Запрос.
+ * @param {Object} config Конфигурация приложения.
+ * @return {Object} Контекст.
+ * @private
+ */
+export const _getRequestContext = (request, config) => ({
+  'request.path': getOriginalUrl({ request }),
+  'request.headers.Simaland-Params': (isFunction(request.get) && request.get('Simaland-Params')) || '',
+  'app.config': isPlainObject(config) ? filterSecrets(config) : '',
+});

@@ -15,8 +15,9 @@ import { getTemplate } from '../../../src/helpers/render';
 import { decorateGracefulShutdown } from '../../../src/graceful-shutdown/';
 import {
   getTracer,
-  traceIncomingRequest,
-  createTracingMiddleware,
+  tracingMiddlewareCreator,
+  createSpanCreator,
+  spanFinishHandler,
 } from '../../../src/helpers/tracer';
 import wrapInTrace from '../../../src/cache/wrap-in-trace';
 import createSetHeaderMiddleware from '../../../src/set-header-middleware/create';
@@ -227,26 +228,22 @@ const singletons = [
   },
   {
     name: 'tracingMiddleware',
-    singleton: ({ createSpan, onSpanFinish }) => createTracingMiddleware(
-      createSpan,
-      onSpanFinish,
-    ),
+    singleton: tracingMiddlewareCreator,
     dependencies: [
       { createSpan: 'createJaegerSpan' },
       {
         name: 'onSpanFinish',
-        value: (req, res, span) => span.finish(),
+        value: spanFinishHandler,
       },
     ],
   },
   {
     name: 'createJaegerSpan',
-    singleton: ({ jaegerTracer }) => request => traceIncomingRequest(
-      jaegerTracer,
-      'incoming-http-request',
-      request,
-    ),
-    dependencies: ['jaegerTracer'],
+    singleton: createSpanCreator,
+    dependencies: [
+      'jaegerTracer',
+      'config',
+    ],
   },
   {
     name: 'decorateGracefulShutdown',
