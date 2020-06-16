@@ -23,25 +23,39 @@ describe('sentryLogger()', function () {
   describe('captureExtendedException', () => {
     const error = new Error('test');
     const setExtra = jest.fn();
-    const scope = { setExtra };
-    it('works correctly', () => {
-      const service = sentryLogger({ sentryLoggerService });
-
-      service.captureExtendedException(error, 'test_data', 'test_name');
-      sentryLoggerService.withScope.mock.calls[0][0](scope);
-
-      expect(sentryLoggerService.withScope).toHaveBeenCalled();
-      expect(setExtra).toHaveBeenCalledWith('test_name', 'test_data');
-      expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
-    });
-    it('works correctly with default data name', () => {
+    const setContext = jest.fn();
+    const scope = { setExtra, setContext };
+    it('works correctly w/o options', () => {
       const service = sentryLogger({ sentryLoggerService });
 
       service.captureExtendedException(error, 'test_data');
       sentryLoggerService.withScope.mock.calls[0][0](scope);
 
       expect(sentryLoggerService.withScope).toHaveBeenCalled();
+      expect(setContext).not.toBeCalled();
       expect(setExtra).toHaveBeenCalledWith('details', 'test_data');
+      expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
+    });
+    it('works correctly with dataName options', () => {
+      const service = sentryLogger({ sentryLoggerService });
+
+      service.captureExtendedException(error, 'test_data', { dataName: 'test_name' });
+      sentryLoggerService.withScope.mock.calls[0][0](scope);
+
+      expect(sentryLoggerService.withScope).toHaveBeenCalled();
+      expect(setContext).not.toBeCalled();
+      expect(setExtra).toHaveBeenCalledWith('test_name', 'test_data');
+      expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
+    });
+    it('works correctly with dataAsContext options', () => {
+      const service = sentryLogger({ sentryLoggerService });
+
+      service.captureExtendedException(error, 'test_data', { dataAsContext: true });
+      sentryLoggerService.withScope.mock.calls[0][0](scope);
+
+      expect(sentryLoggerService.withScope).toHaveBeenCalled();
+      expect(setExtra).not.toBeCalled();
+      expect(setContext).toHaveBeenCalledWith('details', 'test_data');
       expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
     });
   });

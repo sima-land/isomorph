@@ -10,7 +10,7 @@ export const createSentryHandlerForSagas = ({ sentry: { captureExtendedException
    * @param {Error} error Объект ошибки.
    * @param {string} sagaStack Стек вызовов саг.
    */
-  (error, { sagaStack }) => captureExtendedException(error, sagaStack, 'Sagas stack');
+  (error, { sagaStack }) => captureExtendedException(error, sagaStack, { dataName: 'Sagas stack' });
 
 /**
  * Возвращает обработчик ошибки, передающий ошибку Sentry.

@@ -1,5 +1,4 @@
 import { call } from 'redux-saga/effects';
-import isFunction from 'lodash/isFunction';
 import get from 'lodash/get';
 
 /**
@@ -15,7 +14,6 @@ import get from 'lodash/get';
  * @param {Function} performRequest Функция, выполняющая запрос.
  * @param {Object} [options] Опции.
  * @param {Array} [options.args] Аргументы функции, выполняющей запрос.
- * @param {Function} [options.captureException] Обработает ошибку.
  * @return {ServerResponse} Ответ сервера.
  */
 export default function * doSafeRequest (
@@ -24,7 +22,6 @@ export default function * doSafeRequest (
 ) {
   const {
     args = [],
-    captureException,
   } = options || {};
 
   let response;
@@ -37,9 +34,6 @@ export default function * doSafeRequest (
   } catch (error) {
     // пытаемся получить данные ответа из ошибки
     response = error.response;
-    if (isFunction(captureException)) {
-      captureException(error);
-    }
 
     // добавляем в результат объект ошибки
     originalError = error;
