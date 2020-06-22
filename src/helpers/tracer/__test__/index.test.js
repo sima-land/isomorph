@@ -169,8 +169,8 @@ describe('getSpanContext', () => {
 
 describe('_deptToArg()', () => {
   it('should work correctly', () => {
-    const dept = { createSpan: 'createSpan', onSpanFinish: 'onSpanFinish' };
-    expect(_deptToArg(dept)).toEqual(['createSpan', 'onSpanFinish']);
+    const dept = { createSpan: 'createSpan', onSpanFinish: 'onSpanFinish', options: {} };
+    expect(_deptToArg(dept)).toEqual(['createSpan', 'onSpanFinish', {}]);
   });
 });
 
