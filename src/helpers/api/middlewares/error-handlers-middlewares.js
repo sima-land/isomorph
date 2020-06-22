@@ -1,23 +1,24 @@
 import { createService } from '../../../container';
 import isFunction from 'lodash/isFunction';
-import path from 'lodash/fp/path';
+import pathOr from 'lodash/fp/pathOr';
 import pick from 'lodash/pick';
 
-const getStatusCode = path('status');
-const getConfig = path('config');
+const getStatusCode = pathOr('UNKNOWN', 'status');
+const getConfig = pathOr({}, 'config');
 
 /**
  * Отправляет крошки http запроса.
  * @param {Function} sendBreadcrumb Функция отправки крошек.
- * @param {Object} response Объект ответа, содержащий данные о запросе.
+ * @param {Object} response Объект в формате ответа Axios, содержащий данные о запросе.
+ * @param {boolean} asRequest Обработать как событие запроса.
  * @private
  */
-export const _sendHttpBreadcrumb = (sendBreadcrumb, response) => {
-  const statusCode = getStatusCode(response);
-  const { url, baseURL, method, params } = getConfig(response) || {};
+export const _sendHttpBreadcrumb = (sendBreadcrumb, response, asRequest = false) => {
+  const statusCode = asRequest ? 'FETCHING' : getStatusCode(response);
+  const { url, baseURL, method, params } = getConfig(response);
   const fullURL = baseURL ? baseURL.replace(/\/$/, '') + url : url;
   const breadcrumb = {
-    category: 'http',
+    category: asRequest ? 'http.request' : 'http.response',
     type: 'http',
     data: {
       url: fullURL,
@@ -25,7 +26,7 @@ export const _sendHttpBreadcrumb = (sendBreadcrumb, response) => {
       method: method && method.toUpperCase(),
       params,
     },
-    level: statusCode >= 200 && statusCode < 300 ? 'info' : 'error',
+    level: asRequest || (statusCode >= 200 && statusCode < 300) ? 'info' : 'error',
   };
 
   isFunction(sendBreadcrumb) && sendBreadcrumb(breadcrumb);
@@ -48,15 +49,11 @@ const _createAttachBreadcrumbsMiddleware = ({ captureBreadcrumb }) =>
    */
   async (requestConfig, next) => {
     try {
+      _sendHttpBreadcrumb(captureBreadcrumb, { config: requestConfig }, true);
       const apiResponse = await next(requestConfig);
       _sendHttpBreadcrumb(captureBreadcrumb, apiResponse);
     } catch (error) {
-      _sendHttpBreadcrumb(
-        captureBreadcrumb,
-        error && error.isAxiosError
-          ? error.response
-          : { config: requestConfig }
-      );
+      error.isAxiosError && error.response && _sendHttpBreadcrumb(captureBreadcrumb, error.response);
 
       throw error;
     }

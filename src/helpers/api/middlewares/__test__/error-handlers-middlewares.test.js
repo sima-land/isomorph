@@ -16,11 +16,11 @@ describe('_sendHttpBreadcrumb()', () => {
     });
 
     expect(sender).toHaveBeenLastCalledWith({
-      category: 'http',
+      category: 'http.response',
       type: 'http',
       data: {
         url: 'http://test/base/test/',
-        status_code: undefined,
+        status_code: 'UNKNOWN',
         method: undefined,
         params: undefined,
       },
@@ -34,11 +34,11 @@ describe('_sendHttpBreadcrumb()', () => {
     });
 
     expect(sender).toHaveBeenLastCalledWith({
-      category: 'http',
+      category: 'http.response',
       type: 'http',
       data: {
         url: '/test/',
-        status_code: undefined,
+        status_code: 'UNKNOWN',
         method: undefined,
         params: undefined,
       },
@@ -52,7 +52,7 @@ describe('_sendHttpBreadcrumb()', () => {
     });
 
     expect(sender).toHaveBeenLastCalledWith({
-      category: 'http',
+      category: 'http.response',
       type: 'http',
       data: {
         url: undefined,
@@ -73,11 +73,11 @@ describe('_sendHttpBreadcrumb()', () => {
     });
 
     expect(sender).toHaveBeenLastCalledWith({
-      category: 'http',
+      category: 'http.response',
       type: 'http',
       data: {
         url: undefined,
-        status_code: undefined,
+        status_code: 'UNKNOWN',
         method: 'POST',
         params: { test: 'test' },
       },
@@ -85,8 +85,34 @@ describe('_sendHttpBreadcrumb()', () => {
     });
   });
 
+  it('should send breadcrumbs as request breadcrumbs', () => {
+    _sendHttpBreadcrumb(sender, {
+      config: {
+        method: 'post',
+        params: { test: 'test' },
+      },
+    }, true);
+
+    expect(sender).toHaveBeenLastCalledWith({
+      category: 'http.request',
+      type: 'http',
+      data: {
+        url: undefined,
+        status_code: 'FETCHING',
+        method: 'POST',
+        params: { test: 'test' },
+      },
+      level: 'info',
+    });
+  });
+
   it('shouldn`t throw error if sendBreadcrumb is not a function', () => {
     _sendHttpBreadcrumb(null, {});
+    expect(_sendHttpBreadcrumb).not.toThrow();
+  });
+
+  it('shouldn`t throw error if response not pass', () => {
+    _sendHttpBreadcrumb(sender);
     expect(_sendHttpBreadcrumb).not.toThrow();
   });
 });
@@ -114,8 +140,20 @@ describe('createAttachBreadcrumbsMiddleware()', () => {
     });
     await instance(config, next);
     expect(next).toBeCalledWith(config);
-    expect(captureBreadcrumb).toBeCalledWith({
-      category: 'http',
+    expect(captureBreadcrumb).toBeCalledTimes(2);
+    expect(captureBreadcrumb).toHaveBeenNthCalledWith(1, {
+      category: 'http.request',
+      type: 'http',
+      data: {
+        url: '/test/',
+        status_code: 'FETCHING',
+        method: undefined,
+        params: undefined,
+      },
+      level: 'info',
+    });
+    expect(captureBreadcrumb).toHaveBeenNthCalledWith(2, {
+      category: 'http.response',
       type: 'http',
       data: {
         url: '/test/',
@@ -127,7 +165,7 @@ describe('createAttachBreadcrumbsMiddleware()', () => {
     });
   });
 
-  it('should capture breadcrumbs for failure response with axios error', async () => {
+  it('should capture breadcrumbs for axios error with response', async () => {
     const config = { url: '/test/' };
     const error = {
       isAxiosError: true,
@@ -143,8 +181,20 @@ describe('createAttachBreadcrumbsMiddleware()', () => {
       expect(e).toEqual(error);
     }
     expect(next).toBeCalledWith(config);
-    expect(captureBreadcrumb).toBeCalledWith({
-      category: 'http',
+    expect(captureBreadcrumb).toBeCalledTimes(2);
+    expect(captureBreadcrumb).toHaveBeenNthCalledWith(1, {
+      category: 'http.request',
+      type: 'http',
+      data: {
+        url: '/test/',
+        status_code: 'FETCHING',
+        method: undefined,
+        params: undefined,
+      },
+      level: 'info',
+    });
+    expect(captureBreadcrumb).toHaveBeenNthCalledWith(2, {
+      category: 'http.response',
       type: 'http',
       data: {
         url: '/test/',
@@ -156,28 +206,46 @@ describe('createAttachBreadcrumbsMiddleware()', () => {
     });
   });
 
-  it('should capture breadcrumbs for failure response with other error', async () => {
+  it('should capture only request breadcrumb for other error', async () => {
     const config = { url: '/test/' };
-    const expected = {
-      category: 'http',
+    const expectedRequestData = {
+      category: 'http.request',
       type: 'http',
       data: {
         url: '/test/',
-        status_code: undefined,
+        status_code: 'FETCHING',
         method: undefined,
         params: undefined,
       },
-      level: 'error',
+      level: 'info',
     };
     const next = jest.fn();
-    next.mockRejectedValueOnce(null);
+
+    next.mockRejectedValueOnce({ isAxiosError: true });
     try {
       await instance(config, next);
     } catch (e) {
-      expect(e).toEqual(null);
+      expect(e).toEqual({ isAxiosError: true });
     }
     expect(next).toBeCalledWith(config);
-    expect(captureBreadcrumb).toBeCalledWith(expected);
+    expect(captureBreadcrumb).toBeCalledTimes(1);
+    expect(captureBreadcrumb).toHaveBeenLastCalledWith(expectedRequestData);
+
+    next.mockRejectedValueOnce({ response: {
+      config: { url: '/test/' },
+      status: 404,
+    } });
+    try {
+      await instance(config, next);
+    } catch (e) {
+      expect(e).toEqual({ response: {
+        config: { url: '/test/' },
+        status: 404,
+      } });
+    }
+    expect(next).toBeCalledWith(config);
+    expect(captureBreadcrumb).toBeCalledTimes(2);
+    expect(captureBreadcrumb).toHaveBeenLastCalledWith(expectedRequestData);
 
     next.mockRejectedValueOnce(new Error('testError'));
     try {
@@ -186,7 +254,8 @@ describe('createAttachBreadcrumbsMiddleware()', () => {
       expect(e.message).toEqual('testError');
     }
     expect(next).toBeCalledWith(config);
-    expect(captureBreadcrumb).toBeCalledWith(expected);
+    expect(captureBreadcrumb).toBeCalledTimes(3);
+    expect(captureBreadcrumb).toHaveBeenLastCalledWith(expectedRequestData);
   });
 });
 

@@ -111,7 +111,7 @@ export const getSpanContext = ({ response }) => {
  * @return {Array} Массив аргументов.
  * @private
  */
-export const _deptToArg = ({ createSpan, onSpanFinish }) => [createSpan, onSpanFinish];
+export const _deptToArg = ({ createSpan, onSpanFinish, options }) => [createSpan, onSpanFinish, options];
 
 /**
  * Возвращает сервис для создания промежуточного слоя трассировки.
