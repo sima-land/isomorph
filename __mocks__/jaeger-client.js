@@ -4,7 +4,6 @@ export const testSpan = {
   setTag: jest.fn().mockReturnThis(),
   setOperationName: jest.fn().mockReturnThis(),
   finish: jest.fn(),
-  addTags: jest.fn().mockReturnThis(),
 };
 
 export const tracer = {

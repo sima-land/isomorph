@@ -1,7 +1,4 @@
 import { Tags, FORMAT_HTTP_HEADERS } from 'opentracing';
-import propOr from 'lodash/fp/propOr';
-
-const getParams = propOr({}, 'params');
 
 /**
  * Создаёт middleware для трассировки запросов в API.
@@ -26,14 +23,8 @@ const createTraceRequestMiddleware = ({ context, tracer }) =>
     if (!requestConfig.headers) {
       requestConfig.headers = {};
     }
-
-    span.addTags({
-      [Tags.HTTP_URL]: fullUrl,
-      [Tags.HTTP_METHOD]: requestConfig.method.toUpperCase(),
-      'request.params': getParams(requestConfig),
-      'request.headers': { ...requestConfig.headers },
-    });
-
+    span.setTag(Tags.HTTP_URL, fullUrl);
+    span.setTag(Tags.HTTP_METHOD, requestConfig.method.toUpperCase());
     tracer.inject(span, FORMAT_HTTP_HEADERS, requestConfig.headers);
     const response = await next(requestConfig);
     span.setTag(Tags.HTTP_STATUS_CODE, response.status);
