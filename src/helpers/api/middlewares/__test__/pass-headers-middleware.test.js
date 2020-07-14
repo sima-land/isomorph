@@ -17,7 +17,7 @@ jest.mock('../helpers', () => {
   return {
     ...original,
     __esModule: true,
-    getServiceHeaders: jest.fn().mockReturnValue({ 'Simaland-Headers': 'test' }),
+    getServiceHeaders: jest.fn().mockReturnValue({ 'Simaland-Headers': 'test', 'Simaland-Params': 'test' }),
     getServiceUserAgent: jest.fn().mockReturnValue('UserAgent'),
   };
 });
@@ -93,10 +93,22 @@ describe('prepareRequestHeaders', () => {
       'User-Agent': 'UserAgent',
       Cookie: 'cookie',
       'Simaland-Headers': 'test',
+      'Simaland-Params': 'test',
     });
     expect(getXClientIp).toBeCalledWith({ request });
     expect(getCookie).toBeCalledWith(request);
     expect(getServiceHeaders).toBeCalledWith(request);
     expect(getServiceUserAgent).toBeCalledWith(config);
+  });
+
+  it('should exclude headers', () => {
+    const request = { test: 'test_request' };
+    const config = { test: 'test_config' };
+    expect(prepareRequestHeaders({ request, config, exclude: ['Simaland-Params'] })).toEqual({
+      'X-Client-Ip': 'ip',
+      'User-Agent': 'UserAgent',
+      Cookie: 'cookie',
+      'Simaland-Headers': 'test',
+    });
   });
 });
