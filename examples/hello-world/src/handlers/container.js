@@ -117,6 +117,10 @@ const services = [
     dependencies: [
       'config',
       'request',
+      {
+        name: 'exclude',
+        value: 'Simaland-Params',
+      },
     ],
   },
   {

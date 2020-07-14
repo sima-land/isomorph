@@ -1,5 +1,6 @@
 import { getXClientIp, getCookie } from '../../http/request-getters';
 import { getServiceHeaders, getServiceUserAgent } from './helpers';
+import omit from 'lodash/omit';
 
 /**
  * Создаёт middleware для добавления заголовков в запросы API.
@@ -26,11 +27,12 @@ export const createPassHeadersMiddleware = ({ headers }) =>
  * @param {Object} options Опции сервиса.
  * @param {Object} options.config Конфигурация приложения.
  * @param {import('http').IncomingMessage} options.request Запрос приложения.
+ * @param {string|string[]} options.exclude Заголовки, которые требуется исключить из итогового списка.
  * @return {Object} Заголовки.
  */
-export const prepareRequestHeaders = ({ config, request }) => ({
+export const prepareRequestHeaders = ({ config, request, exclude = [] }) => omit({
   'X-Client-Ip': getXClientIp({ request }),
   'User-Agent': getServiceUserAgent(config),
   Cookie: getCookie(request),
   ...getServiceHeaders(request),
-});
+}, exclude);
