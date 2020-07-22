@@ -21,10 +21,6 @@ describe('function create', () => {
         {
           name: 'singleton',
           singleton: ({ string }) => ({
-            /**
-             * Тестовая функция.
-             * @return {string} Тестовая строка.
-             */
             whatIs () {
               return `It is ${string}`;
             },
@@ -34,10 +30,6 @@ describe('function create', () => {
         {
           name: 'factory',
           factory: ({ singleton } = {}) => ({
-            /**
-             * Тестовая функция.
-             * @return {string} Тестовая строка.
-             */
             whatIs () {
               return singleton.whatIs();
             },

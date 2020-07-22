@@ -63,10 +63,6 @@ describe('getXClientIp', () => {
 
 describe('getMethod', () => {
   it('works correctly', () => {
-    /**
-     * Тест.
-     * @return {string} Test.
-     */
     const someFunction = () => 'Test';
     const request = {
       method: someFunction,
