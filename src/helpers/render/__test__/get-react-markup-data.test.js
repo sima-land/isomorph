@@ -12,10 +12,6 @@ jest.mock('react-dom/server', () => {
 });
 
 describe('getReactMarkupData()', () => {
-  /**
-   * Тестовый компонент.
-   * @return {ReactElement} Компонент.
-   */
   const TestComponent = () => (<div>Test</div>);
   const store = {
     getState: jest.fn(() => ({ test: 'test' })),

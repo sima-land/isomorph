@@ -10,10 +10,6 @@ jest.mock('../../../observe-middleware/', () => {
   };
 });
 
-/**
- * Тестовая функция dynamicData.
- * @return {Object} Объект.
- */
 const getDynamicData = () => ({
   remote_ip: '127.0.0.1',
   method: 'GET',
