@@ -14,6 +14,7 @@ describe('function validatePostStatus()', () => {
 describe('function validateDeleteStatus()', () => {
   it('returns correct data', () => {
     expect(validateDeleteStatus(204)).toBeTruthy();
+    expect(validateDeleteStatus(200)).toBeTruthy();
     expect(validateDeleteStatus(500)).toBeFalsy();
   });
 });

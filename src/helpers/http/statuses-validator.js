@@ -10,7 +10,7 @@ export const validatePostStatus = status => status === 201;
  * @param {number} status Статус http ответа.
  * @return {boolean} Валидность.
  */
-export const validateDeleteStatus = status => status === 204;
+export const validateDeleteStatus = status => status === 204 || status === 200;
 
 /**
  * Валидация http статуса 200.
