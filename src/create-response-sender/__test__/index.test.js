@@ -1,0 +1,82 @@
+import createResponseSender from '../';
+
+describe('createResponseSender()', () => {
+  const response = {
+    set: jest.fn(),
+    send: jest.fn(),
+    json: jest.fn(),
+  };
+  const devInstance = createResponseSender({ config: { isProduction: false }, response });
+  const prodInstance = createResponseSender({ config: { isProduction: true }, response });
+
+  it('should return function', () => {
+    [devInstance, prodInstance].forEach(instance => {
+      expect(instance).toBeInstanceOf(Function);
+      expect(instance).toHaveLength(1);
+    });
+  });
+
+  describe('production instance', () => {
+    const options = {
+      markup: 'test_markup',
+      assets: {
+        js: 'path_to_js',
+        css: 'path_to_css',
+      },
+      store: {
+        getState: jest.fn().mockReturnValue({ app: { dataLayer: { products: ['test_data'] } } }),
+      },
+    };
+
+    it('should work correctly', () => {
+      prodInstance(options);
+
+      expect(response.json).toBeCalledWith({
+        markup: 'test_markup',
+        bundle_js: 'path_to_js',
+        bundle_css: 'path_to_css',
+        meta: {
+          products: ['test_data'],
+        },
+      });
+    });
+
+    it('should work correctly without assets', () => {
+      prodInstance({ ...options, assets: {} });
+
+      expect(response.json).toBeCalledWith({
+        markup: 'test_markup',
+        bundle_js: '',
+        bundle_css: '',
+        meta: {
+          products: ['test_data'],
+        },
+      });
+    });
+  });
+
+  describe('development instance', () => {
+    const options = {
+      markup: 'test_markup',
+      headers: {
+        'Simaland-Js-Bundle': 'path_to_js',
+        'Simaland-Css-Bundle': 'path_to_css',
+      },
+    };
+
+    it('should work correctly', () => {
+      devInstance(options);
+
+      expect(response.set).toHaveBeenNthCalledWith(1, { 'Simaland-Js-Bundle': 'path_to_js' });
+      expect(response.set).toHaveBeenNthCalledWith(2, { 'Simaland-Css-Bundle': 'path_to_css' });
+      expect(response.send).toBeCalledWith('test_markup');
+    });
+
+    it('should work correctly without assets', () => {
+      devInstance({ ...options, headers: {} });
+
+      expect(response.set).not.toBeCalled();
+      expect(response.send).toBeCalledWith('test_markup');
+    });
+  });
+});
