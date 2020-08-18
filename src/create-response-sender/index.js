@@ -31,7 +31,7 @@ export default function createResponseSender ({ config: { isProduction }, respon
    * Функция ответа на запрос в формате JSON.
    * @param {Object} options Опции.
    * @param {string} options.markup Разметка.
-   * @param {{css: string, js: string}} options.assets Ссылки на ресурсы приложения.
+   * @param {{css: string, js: string, criticalJs: string[]}} options.assets Ссылки на ресурсы приложения.
    * @param {Object} options.store Стор приложения.
    */
   const jsonSender = ({
@@ -39,6 +39,7 @@ export default function createResponseSender ({ config: { isProduction }, respon
     assets: {
       css,
       js,
+      criticalJs,
     },
     store,
   }) => {
@@ -46,6 +47,7 @@ export default function createResponseSender ({ config: { isProduction }, respon
       markup,
       bundle_css: css || '',
       bundle_js: js || '',
+      critical_js: criticalJs || [],
       meta: getDataLayer(store.getState()),
     };
 
