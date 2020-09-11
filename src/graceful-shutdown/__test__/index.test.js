@@ -2,7 +2,10 @@ import {
   createCloseHandler,
   createShutdownHandler,
   decorateGracefulShutdown,
+  gracefulShutdownCreator,
+  onExitHandlerCreator,
 } from '../index.js';
+import { EventEmitter } from 'events';
 
 describe('createCloseHandler()', () => {
   it('should return function', () => {
@@ -79,5 +82,76 @@ describe('decorateGracefulShutdown()', () => {
     expect(process.exit).toHaveBeenCalledTimes(0);
     jest.runOnlyPendingTimers();
     expect(process.exit).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('onExitHandlerCreator', () => {
+  const logger = { info: jest.fn() };
+  it('creates onExitHandler without getConfig data correctly', () => {
+    const handler = onExitHandlerCreator({
+      logger,
+      message: 'Some error message',
+    });
+    expect(logger.info).not.toHaveBeenCalled();
+    handler();
+    expect(logger.info).toHaveBeenCalledWith('Some error message');
+  });
+  it('creates onExitHandler with getConfig data correctly', () => {
+    const handler = onExitHandlerCreator({
+      logger,
+      config: {
+        isDevelopment: false,
+      },
+      message: 'Some error message',
+    });
+    expect(logger.info).not.toHaveBeenCalled();
+    handler();
+    expect(logger.info).not.toHaveBeenCalled();
+  });
+});
+
+jest.mock('../index', () => {
+  const original = jest.requireActual('../index');
+  return {
+    ...original,
+    decorateGracefulShutdown: jest.fn(original.decorateGracefulShutdown),
+  };
+});
+
+describe('gracefulShutdownCreator', () => {
+  it('creates function for applying graceful shutdown to server', () => {
+    const onExitError = jest.fn();
+    const onExitSuccess = jest.fn();
+    const applyShutdown = gracefulShutdownCreator({
+      onExitError,
+      onExitSuccess,
+      processExitTimeout: 1000,
+    });
+    expect(applyShutdown).toBeInstanceOf(Function);
+    expect(applyShutdown).toHaveLength(1);
+  });
+  it('creates function, which apply graceful shutdown to server and add handlers on process events', () => {
+    const realProcessOn = process.on;
+    process.on = jest.fn();
+    const realProcessExit = process.exit;
+    process.exit = jest.fn();
+    const onExitError = jest.fn();
+    const onExitSuccess = jest.fn();
+    const applyShutdown = gracefulShutdownCreator({
+      onExitError,
+      onExitSuccess,
+      processExitTimeout: 1000,
+    });
+    expect(decorateGracefulShutdown).not.toHaveBeenCalled();
+    const server = new EventEmitter();
+    server.close = jest.fn(callback => callback());
+    applyShutdown(server);
+    expect(server.close).not.toHaveBeenCalled();
+    expect(onExitSuccess).not.toHaveBeenCalled();
+    process.on.mock.calls[0][1]();
+    expect(onExitSuccess).toHaveBeenCalled();
+    expect(process.exit).toHaveBeenCalled();
+    process.on = realProcessOn;
+    process.exit = realProcessExit;
   });
 });

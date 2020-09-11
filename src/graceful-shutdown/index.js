@@ -62,3 +62,36 @@ export const createCloseHandler = (exitCode = 0, onClose) => () => {
   isFunction(onClose) && onClose(exitCode);
   process.exit(exitCode);
 };
+
+/**
+ * Создаёт обработчики событий завершения приложения.
+ * @param {Object} options Опции.
+ * @param {Object} options.logger Логгер.
+ * @param {Object} [options.config] Конфигурация приложения.
+ * @param {string} options.message Сообщение, которое будет залоггировано в консоль.
+ * @return {Function} Обработчик завершения приложения.
+ */
+export const onExitHandlerCreator = ({ logger, config, message }) => () => {
+  const { isDevelopment = true } = config || {};
+  isDevelopment && logger.info(message);
+};
+
+/**
+ * Сервис для реализации лёгкого завершения приложения.
+ * @param {Object} options Опции.
+ * @param {Function} options.onExitError Обработчик завершения с ошибкой.
+ * @param {Function} options.onExitSuccess Обработчик успешного завершения.
+ * @param {number} options.processExitTimeout Максимальное время, отведённое приложению на завершение.
+ * @return {Function} Функция, реализующая лёгкое завершение приложения.
+ */
+export const gracefulShutdownCreator = (
+  {
+    onExitError: onError,
+    onExitSuccess: onSuccess,
+    processExitTimeout: timeout,
+  }
+) => server => decorateGracefulShutdown(server, {
+  onError,
+  onSuccess,
+  timeout,
+});

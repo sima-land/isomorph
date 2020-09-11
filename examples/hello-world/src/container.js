@@ -12,7 +12,7 @@ import {
 } from '../../../src/helpers/prometheus/';
 import createRedisCache from '../../../src/cache/redis';
 import { getTemplate } from '../../../src/helpers/render';
-import { decorateGracefulShutdown } from '../../../src/graceful-shutdown/';
+import { gracefulShutdownCreator, onExitHandlerCreator } from '../../../src/graceful-shutdown/';
 import {
   getTracer,
   tracingMiddlewareCreator,
@@ -85,19 +85,31 @@ const singletons = [
   },
   {
     name: 'onExitError',
-    singleton: ({ pinoLogger, config }) => () => {
-      const { isDevelopment = true } = config || {};
-      isDevelopment && pinoLogger.info('Could not close connections in time, forcefully shutting down');
-    },
-    dependencies: ['pinoLogger', 'config'],
+    singleton: onExitHandlerCreator,
+    dependencies: [
+      {
+        logger: 'pinoLogger',
+      },
+      'config',
+      {
+        name: 'message',
+        value: 'Could not close connections in time, forcefully shutting down',
+      },
+    ],
   },
   {
     name: 'onExitSuccess',
-    singleton: ({ pinoLogger, config }) => () => {
-      const { isDevelopment = true } = config || {};
-      isDevelopment && pinoLogger.info('Closed out remaining connections.');
-    },
-    dependencies: ['pinoLogger', 'config'],
+    singleton: onExitHandlerCreator,
+    dependencies: [
+      {
+        logger: 'pinoLogger',
+      },
+      'config',
+      {
+        name: 'message',
+        value: 'Closed out remaining connections.',
+      },
+    ],
   },
   {
     name: 'renderMetricsMiddleware',
@@ -261,17 +273,7 @@ const singletons = [
   },
   {
     name: 'decorateGracefulShutdown',
-    singleton: (
-      {
-        onExitError: onError,
-        onExitSuccess: onSuccess,
-        processExitTimeout: timeout,
-      }
-    ) => server => decorateGracefulShutdown(server, {
-      onError,
-      onSuccess,
-      timeout,
-    }),
+    singleton: gracefulShutdownCreator,
     dependencies: [
       {
         name: 'processExitTimeout',
