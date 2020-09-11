@@ -153,8 +153,19 @@ export const spanFinishHandler = (req, res, span) => {
  * @return {Object} Контекст.
  * @private
  */
-export const _getRequestContext = (request, config) => ({
-  'request.path': getOriginalUrl({ request }),
-  'request.headers.Simaland-Params': (isFunction(request.get) && request.get('Simaland-Params')) || '',
-  'app.config': isPlainObject(config) ? filterSecrets(config) : '',
-});
+export const _getRequestContext = (request, config) => {
+  const context = {
+    'request.path': getOriginalUrl({ request }),
+    'app.config': isPlainObject(config) ? filterSecrets(config) : '',
+  };
+
+  if (isPlainObject(request.headers) && isFunction(request.get)) {
+    Object.keys(request.headers).forEach(key => {
+      if (key.toLowerCase().startsWith('simaland-')) {
+        context[`request.headers.${key}`] = request.get(key);
+      }
+    });
+  }
+
+  return context;
+};
