@@ -23,6 +23,7 @@ import wrapInTrace from '../../../src/cache/wrap-in-trace';
 import createSetHeaderMiddleware from '../../../src/set-header-middleware/create';
 import createInject from '../../../src/container/create-inject';
 import initializeSentryCreator from '../../../src/logger/initialize-sentry-creator';
+import { getDynamicData } from '../../../src/get-dynamic-data';
 import getDevComposeCreator from '../../../src/helpers/redux/get-dev-compose-creator';
 import * as Sentry from '@sentry/node';
 import { createChildTracingMiddleware } from '../../../src/helpers/tracer/create-child-tracing-middleware';
@@ -151,6 +152,14 @@ const singletons = [
           '/foo/.*',
         ],
       },
+    ],
+  },
+  {
+    name: 'getDynamicData',
+    singleton: getDynamicData,
+    dependencies: [
+      'config',
+      'timeDataKey',
     ],
   },
   {
