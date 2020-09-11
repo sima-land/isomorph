@@ -179,6 +179,8 @@ describe('_getRequestContext()', () => {
     originalUrl: '/foo',
     headers: {
       'Simaland-Params': 'test',
+      'Simaland-User-Agent': 'test',
+      'Foo-Bar-Baz': 'test',
     },
 
     /**
@@ -195,6 +197,7 @@ describe('_getRequestContext()', () => {
     expect(_getRequestContext(request, { test: 'test', redisPassword: 'secret' })).toEqual({
       'request.path': '/foo',
       'request.headers.Simaland-Params': 'test',
+      'request.headers.Simaland-User-Agent': 'test',
       'app.config': {
         test: 'test',
         redisPassword: '[Filtered]',
@@ -206,12 +209,14 @@ describe('_getRequestContext()', () => {
     expect(_getRequestContext(request)).toEqual({
       'request.path': '/foo',
       'request.headers.Simaland-Params': 'test',
+      'request.headers.Simaland-User-Agent': 'test',
       'app.config': '',
     });
 
     expect(_getRequestContext(request, 'bad config')).toEqual({
       'request.path': '/foo',
       'request.headers.Simaland-Params': 'test',
+      'request.headers.Simaland-User-Agent': 'test',
       'app.config': '',
     });
   });
@@ -219,7 +224,6 @@ describe('_getRequestContext()', () => {
   it('should return correct context if Simaland-Params headers not defined', () => {
     expect(_getRequestContext({ ...request, headers: {} }, { test: 'test' })).toEqual({
       'request.path': '/foo',
-      'request.headers.Simaland-Params': '',
       'app.config': { test: 'test' },
     });
   });
@@ -227,7 +231,6 @@ describe('_getRequestContext()', () => {
   it('should return correct context if get method not a function', () => {
     expect(_getRequestContext({ ...request, get: null }, { test: 'test' })).toEqual({
       'request.path': '/foo',
-      'request.headers.Simaland-Params': '',
       'app.config': { test: 'test' },
     });
   });
@@ -250,7 +253,6 @@ describe('createSpanCreator()', () => {
       expect(tracer.extract).toHaveBeenCalledWith(FORMAT_HTTP_HEADERS, 1);
       expect(testSpan.addTags).toBeCalledWith({
         'app.config': { test: 'test' },
-        'request.headers.Simaland-Params': '',
         'request.path': '/test',
       });
     });
