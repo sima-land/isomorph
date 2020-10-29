@@ -10,6 +10,7 @@ import {
   PrometheusMetric,
   createMeasureMiddleware,
 } from '../../../src/helpers/prometheus/';
+import { labelsResolver } from '../../../src/helpers/metrics';
 import createRedisCache from '../../../src/cache/redis';
 import { getTemplate } from '../../../src/helpers/render';
 import { gracefulShutdownCreator, onExitHandlerCreator } from '../../../src/graceful-shutdown/';
@@ -70,11 +71,7 @@ const singletons = [
       },
       {
         name: 'resolveLabels',
-        value: ({ dependencies: { config }, request, response }) => ({
-          place: config.place || 'dev',
-          route: request.path,
-          statusCode: response.statusCode,
-        }),
+        value: labelsResolver,
       },
     ],
   },
@@ -129,10 +126,7 @@ const singletons = [
       },
       {
         name: 'resolveLabels',
-        value: ({ dependencies: { config } }) => ({
-          place: config.place || 'dev',
-          version: config.version || 'development',
-        }),
+        value: labelsResolver,
       },
       {
         name: 'startSubscriber',

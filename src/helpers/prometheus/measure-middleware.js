@@ -1,6 +1,7 @@
 import negate from 'lodash/negate';
 import isFunction from 'lodash/isFunction';
 import { isPrometheusMetric } from './metric-adapter.js';
+import { labelsResolver } from '../metrics';
 import { createObserveMiddleware, defaultStartSubscriber, defaultFinishSubscriber } from '../../observe-middleware';
 
 /**
@@ -13,7 +14,7 @@ import { createObserveMiddleware, defaultStartSubscriber, defaultFinishSubscribe
  */
 export const createMeasureMiddleware = (dependencies = {}) => {
   const {
-    resolveLabels = Object,
+    resolveLabels = labelsResolver,
     startMetrics = [],
     finishMetrics = [],
     startSubscriber = defaultStartSubscriber,
