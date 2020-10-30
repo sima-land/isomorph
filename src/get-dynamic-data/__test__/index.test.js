@@ -6,7 +6,6 @@ describe('getDynamicData()', () => {
       config: {
         version: 'test',
       },
-      timeDataKey: 'logData',
     })({
       headers: {
         'x-client-ip': '::1',
