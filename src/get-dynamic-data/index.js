@@ -16,7 +16,7 @@ export const getApiLogData = ({ response, timeDataKey }) => response.locals[time
  * @param {string} dependencies.timeDataKey Поле в response.local, из которого следует запрашивать log data.
  * @return {Object} Объект с данными.
  */
-export const getDynamicData = ({ config, timeDataKey }) => (request, response) => ({
+export const getDynamicData = ({ config, timeDataKey = 'logData' }) => (request, response) => ({
   remote_ip: getXClientIp({ request }),
   method: getMethod({ request }),
   status: getStatus({ response }),
