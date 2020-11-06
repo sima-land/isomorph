@@ -61,17 +61,11 @@ describe('createResponseSender()', () => {
   describe('development instance', () => {
     const options = {
       markup: 'test_markup',
-      headers: {
-        'Simaland-Js-Bundle': 'path_to_js',
-        'Simaland-Css-Bundle': 'path_to_css',
-      },
     };
 
     it('should work correctly', () => {
       devInstance(options);
 
-      expect(response.set).toHaveBeenNthCalledWith(1, { 'Simaland-Js-Bundle': 'path_to_js' });
-      expect(response.set).toHaveBeenNthCalledWith(2, { 'Simaland-Css-Bundle': 'path_to_css' });
       expect(response.send).toBeCalledWith('test_markup');
     });
 
