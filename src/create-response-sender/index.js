@@ -14,18 +14,8 @@ export default function createResponseSender ({ config: { isProduction }, respon
    * Функция ответа на запрос в формате HTML.
    * @param {Object} options Опции.
    * @param {string} options.markup Разметка.
-   * @param {Object} options.headers Объект заголовков.
    */
-  const htmlSender = ({
-    markup,
-    headers,
-  }) => {
-    Object.entries(headers).forEach(([key, value]) => {
-      response.set({ [key]: value });
-    });
-
-    response.send(markup);
-  };
+  const htmlSender = ({ markup }) => { response.send(markup); };
 
   /**
    * Функция ответа на запрос в формате JSON.
