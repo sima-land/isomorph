@@ -16,15 +16,17 @@ export const isStaticDependency = ({ name, value }) =>
  * Создает объект зависимостей на основе их названий.
  * @param {Object} container Экземпляр контейнера в котором должен осуществляться поиск зависимостей.
  * @param {Object} dependencies Список зависимостей.
+ * @param {string} serviceName Названия сервиса.
  * @return {Object} Объект зависимостей.
  */
 const getDependencies = (
   container,
   dependencies = [],
+  serviceName,
 ) => dependencies.reduce(async (prevPromise, dependency) => {
   const result = await prevPromise;
   if (isString(dependency)) {
-    result[dependency] = await container.get(dependency);
+    result[dependency] = await container.get(dependency, serviceName);
   }
 
   if (isPlainObject(dependency)) {

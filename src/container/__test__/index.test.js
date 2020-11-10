@@ -99,12 +99,6 @@ describe('function create', () => {
     await expect(container.get(1)).rejects.toThrowError();
   });
 
-  it('works correctly when service not registered', async () => {
-    const container = create();
-
-    await expect(container.get('test')).rejects.toThrowError();
-  });
-
   it('works correctly when service registered incorrect', () => {
     const container = create();
 
@@ -154,6 +148,63 @@ describe('function create', () => {
     container.set({ name: 'test', value: 6 });
     expect(await container.get('test')).toBe(6);
     expect(await container.get('squaredTest')).toBe(36);
+  });
+
+  it('works correctly when errors in child container', async () => {
+    const container = create({
+      services: [
+        {
+          name: 'singleton',
+          singleton: ({ string }) => ({
+            whatIs () {
+              return `It is ${string}`;
+            },
+          }),
+          dependencies: ['string'],
+        },
+        {
+          name: 'factory',
+          factory: ({ singleton } = {}) => ({
+            whatIs () {
+              return singleton.whatIs();
+            },
+          }),
+          dependencies: ['singleton'],
+        },
+      ],
+    });
+    await expect(container.get('singleton')).rejects.toThrowError(
+      'Не найдена зависимость "string" в цепочке вызовов "/singleton"'
+    );
+    await expect(container.get('factory')).rejects.toThrowError(
+      'Не найдена зависимость "string" в цепочке вызовов "/factory/singleton"'
+    );
+    await expect(container.get('string')).rejects.toThrowError('Сервис "string" не зарегистрирован');
+  });
+
+  it('works correctly when errors in parent container', async () => {
+    const parent = create({
+      services: [
+        {
+          name: 'squaredTest',
+          factory: ({ test }) => test * test,
+          dependencies: ['test'],
+        },
+      ],
+    });
+    const container = create({
+      services: [
+        {
+          name: 'string',
+          value: 'singleton',
+        },
+      ],
+      parent,
+    });
+    await expect(container.get('squaredTest')).rejects.toThrowError(
+      'Не найдена зависимость "test" в цепочке вызовов "/squaredTest"'
+    );
+    await expect(container.get('test')).rejects.toThrowError('Сервис "test" не зарегистрирован');
   });
 });
 
