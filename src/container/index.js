@@ -3,6 +3,7 @@ import isFunction from 'lodash/isFunction';
 import ServiceNotFoundError from './service-not-found-error';
 import getDependencies from './get-dependencies';
 import isContainer from './is-container';
+import isNotEmptyString from '../helpers/utils/is-not-empty-string';
 
 /**
  * Оборачивает функцию для использования в контейнере.
@@ -135,12 +136,13 @@ export default function create ({ services = [], parent = null } = {}) {
     /**
      * Получает зависимость по ее названию.
      * @param {string} name Название зависимости.
+     * @param {string} serviceName Название сервиса.
      * @return {*} Зависимость.
      * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
      * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
      * @throws {ServiceNotFoundError} Выдаст ошибку при попытке вызвать незарегистрированный сервис
      */
-    async get (name) {
+    async get (name, serviceName = '') {
       if (!isString(name) || name === '') {
         throw new Error('Параметр "name" должен быть непустой строкой');
       }
@@ -149,13 +151,17 @@ export default function create ({ services = [], parent = null } = {}) {
       let dependency;
 
       if (!service) {
-        throw new ServiceNotFoundError(`Сервис "${name}" не зарегистрирован`);
+        throw new ServiceNotFoundError(
+          isNotEmptyString(serviceName)
+            ? `Не найдена зависимость "${name}" в цепочке вызовов "${serviceName}"`
+            : `Сервис "${name}" не зарегистрирован`
+        );
       }
 
       if (service.singleton && !service.value) {
         service.value = await service.singleton(
           {
-            ...await getDependencies(container, service.dependencies),
+            ...await getDependencies(container, service.dependencies, `${serviceName}/${name}`),
           },
         );
       }
@@ -167,7 +173,7 @@ export default function create ({ services = [], parent = null } = {}) {
       if (service.factory) {
         dependency = await service.factory(
           {
-            ...await getDependencies(container, service.dependencies),
+            ...await getDependencies(container, service.dependencies, `${serviceName}/${name}`),
           }
         );
       }
