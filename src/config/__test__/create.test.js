@@ -1,7 +1,7 @@
 import createConfig from '../create';
 
 describe('function createConfig()', () => {
-  it('works correctly', () => {
+  it('works correctly if format keys true', () => {
     const config = createConfig(
       {
         firstKey: 2,
@@ -16,6 +16,28 @@ describe('function createConfig()', () => {
 
     expect(config).toStrictEqual({
       firstKey: 1,
+      secondKey: 3,
+      fourthKey: 5,
+    });
+  });
+
+  it('works correctly if format keys false', () => {
+    const config = createConfig(
+      {
+        firstKey: 2,
+        secondKey: 3,
+        fourthKey: 4,
+      },
+      {
+        FIRST_KEY: 1,
+        fourthKey: 5,
+      },
+      false
+    );
+
+    expect(config).toStrictEqual({
+      FIRST_KEY: 1,
+      firstKey: 2,
       secondKey: 3,
       fourthKey: 5,
     });

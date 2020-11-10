@@ -6,9 +6,14 @@ import formatObjectKeys from '../helpers/utils/format-object-keys';
  * Собирает объект конфигурации из переданных параметров.
  * @param {Object} data Объект с данными, которые нужно добавить в конфигурацию.
  * @param {Object} base Базовый объект на основе которого строится конфигурация.
+ * @param {boolean} needFormatKeys Признак форматирования ключей объекта.
  * @return {Object} Объект конфигурации.
  */
-export default function createConfig (data = {}, base = { ...process.env }) {
+export default function createConfig (
+  data = {},
+  base = { ...process.env },
+  needFormatKeys = true
+) {
   if (!isPlainObject(data)) {
     throw new TypeError('Параметр "data" должен быть чистым объектом');
   }
@@ -24,5 +29,5 @@ export default function createConfig (data = {}, base = { ...process.env }) {
       config[key] = isFunction(value) ? value(base) : value;
     }
     return config;
-  }, formatObjectKeys({ ...base }));
+  }, needFormatKeys ? formatObjectKeys({ ...base }) : base);
 }
