@@ -17,6 +17,7 @@ const move = () => src([
   './src/**/*',
   '!./src/**/__test__/**',
   '!./src/**/*.test.js',
+  '!./src/**/__example__/**',
 ]).pipe(dest('build'));
 
 const build = series(clean, move);
