@@ -11,14 +11,16 @@ const createExternalConfig = (
   containersGlobalKey
 ) =>
     `promise new Promise(resolve => {
-  const scriptElement = document.createElement('script');
-  scriptElement.onload = () => {
-    scriptElement.remove();
-    resolve(window['${containersGlobalKey}']['${serviceName}']);
-  };
-  scriptElement.src = window['${remoteEntriesGlobalKey}']['${serviceName}'];
-  scriptElement.async = true;
-  document.head.append(scriptElement);
+  if (window['${remoteEntriesGlobalKey}']) {
+    const scriptElement = document.createElement('script');
+    scriptElement.onload = () => {
+      scriptElement.remove();
+      resolve(window['${containersGlobalKey}']['${serviceName}']);
+    };
+    scriptElement.src = window['${remoteEntriesGlobalKey}']['${serviceName}'];
+    scriptElement.async = true;
+    document.head.append(scriptElement);
+  }
 })`;
 
 module.exports = { createExternalConfig };
