@@ -7,14 +7,16 @@ describe('createExternalConfig', () => {
       'remote-entries',
       'containers'
     )).toEqual(['promise new Promise(resolve => {',
-      '  const scriptElement = document.createElement(\'script\');',
-      '  scriptElement.onload = () => {',
-      '    scriptElement.remove();',
-      '    resolve(window[\'containers\'][\'service-name\']);',
-      '  };',
-      '  scriptElement.src = window[\'remote-entries\'][\'service-name\'];',
-      '  scriptElement.async = true;',
-      '  document.head.append(scriptElement);',
+      '  if (window[\'remote-entries\']) {',
+      '    const scriptElement = document.createElement(\'script\');',
+      '    scriptElement.onload = () => {',
+      '      scriptElement.remove();',
+      '      resolve(window[\'containers\'][\'service-name\']);',
+      '    };',
+      '    scriptElement.src = window[\'remote-entries\'][\'service-name\'];',
+      '    scriptElement.async = true;',
+      '    document.head.append(scriptElement);',
+      '  }',
       '})'].join('\n'));
   });
 });
