@@ -11,10 +11,8 @@ import axiosInstanceConstructor from '../../../../src/helpers/api/create-instanc
 import config from '../config';
 import enhancerConstructor from '../../../../src/helpers/api/create-enhancer';
 import createTraceRequestMiddleware from '../../../../src/helpers/api/middlewares/trace-request-middleware';
-import {
-  createPassHeadersMiddleware,
-  prepareRequestHeaders,
-} from '../../../../src/helpers/api/middlewares/pass-headers-middleware';
+import { createPassHeadersMiddleware } from '../../../../src/helpers/api/middlewares/pass-headers-middleware';
+import { prepareRequestHeaders } from '../../../../src/helpers/api/middlewares/prepare-request-headers';
 import createCollectCookieMiddleware from '../../../../src/helpers/api/middlewares/collect-cookie-middleware';
 import createCountApiResponseTimeMiddleware from '../../../../src/helpers/api/middlewares/count-api-response-time';
 import getParams, { parseHttpHeaders } from '../../../../src/helpers/get-params';
