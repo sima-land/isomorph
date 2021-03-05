@@ -1,5 +1,12 @@
 const { ModuleFederationPlugin } = require('webpack').container;
+const WebpackError = require('webpack').WebpackError;
 const { createExternalConfig } = require('./utils');
+
+const LIBRARY_ERROR_TEXT = [
+  'Property "library" set internally as "global" and not overridden.',
+  'For override global variable name use "containersGlobalKey" property.',
+  'For override "library" type use ModuleFederationPlugin.',
+].join(' ');
 
 /** @typedef {string} Remote Имя удаленного сервиса (обычно совпадает с именем в git). */
 /** @typedef {import('webpack').ModuleFederationPluginOptions} MFPluginOriginalOptions */
@@ -27,7 +34,26 @@ class EnhancedModuleFederationPlugin {
    * @param {EnhancedModuleFederationPluginOptions} options Опции.
    */
   constructor (options) {
-    this._options = options;
+    const {
+      name,
+      library,
+      remoteEntriesGlobalKey = '__RemoteEntriesList__',
+      containersGlobalKey = '__FederationContainers__',
+    } = options;
+
+    if (library) {
+      throw new WebpackError(LIBRARY_ERROR_TEXT);
+    }
+
+    this._options = {
+      ...options,
+      remoteEntriesGlobalKey,
+      containersGlobalKey,
+      library: {
+        type: 'global',
+        name: [containersGlobalKey, name],
+      },
+    };
   }
 
   /**
@@ -35,10 +61,9 @@ class EnhancedModuleFederationPlugin {
    */
   apply (compiler) {
     const {
-      name,
       remotes,
-      remoteEntriesGlobalKey = '__RemoteEntriesList__',
-      containersGlobalKey = '__FederationContainers__',
+      remoteEntriesGlobalKey,
+      containersGlobalKey,
       useInDevelopment = false,
       ...originalOptions
     } = this._options;
@@ -56,11 +81,6 @@ class EnhancedModuleFederationPlugin {
     compiler.hooks.environment.tap('EnhancedModuleFederationPlugin', () => {
       if (useInDevelopment || compiler.options.mode === 'production') {
         new ModuleFederationPlugin({
-          name,
-          library: {
-            type: 'global',
-            name: [containersGlobalKey, name],
-          },
           ...remotes && { remotes: configuredRemotes },
           ...originalOptions,
         }).apply(compiler);
