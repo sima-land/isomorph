@@ -38,6 +38,14 @@ describe('EnhancedModuleFederationPlugin', () => {
       expect(moduleFederationMock.applyImplementation).toBeCalledWith(compiler);
     });
 
+    it('shouldn`t creat and throw error, if library property pass to plugin', () => {
+      expect(() => new EnhancedMFPlugin({ library: 'test' })).toThrowError([
+        'Property "library" set internally as "global" and not overridden.',
+        'For override global variable name use "containersGlobalKey" property.',
+        'For override "library" type use ModuleFederationPlugin.',
+      ].join(' '));
+    });
+
     it('shouldn`t creat for other case', () => {
       const compiler = { ...compilerHooks, options: { mode: 'development' } };
       const instance = new EnhancedMFPlugin({});
@@ -131,6 +139,21 @@ describe('EnhancedModuleFederationPlugin', () => {
           './Two': './path/to/two.js',
         },
       });
+    });
+
+    it('for several call "apply" method', () => {
+      const compiler = { ...compilerHooks, options: { mode: 'production' } };
+      const instance = new EnhancedMFPlugin({
+        name: 'service-name',
+      });
+
+      instance.apply(compiler);
+      instance.apply(compiler);
+
+      const calls = moduleFederationMock.constructorImplementation.mock.calls;
+      for (const key of Object.keys(calls[0][0])) {
+        expect(calls[1][0][key] === calls[0][0][key]).toBe(true);
+      }
     });
   });
 });

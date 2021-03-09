@@ -17,4 +17,5 @@ module.exports = {
     applyImplementation,
     constructorImplementation,
   },
+  WebpackError: Error,
 };
