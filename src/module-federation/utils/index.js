@@ -10,16 +10,22 @@ const createExternalConfig = (
   remoteEntriesGlobalKey,
   containersGlobalKey
 ) =>
-    `promise new Promise(resolve => {
+    `promise new Promise((resolve, reject) => {
   if (window['${remoteEntriesGlobalKey}']) {
     const scriptElement = document.createElement('script');
     scriptElement.onload = () => {
       scriptElement.remove();
       resolve(window['${containersGlobalKey}']['${serviceName}']);
     };
+    scriptElement.onerror = () => {
+      scriptElement.remove();
+      reject(new Error('Failed loading remoteEntry for "${serviceName}".'));
+    };
     scriptElement.src = window['${remoteEntriesGlobalKey}']['${serviceName}'];
     scriptElement.async = true;
     document.head.append(scriptElement);
+  } else {
+    reject(new ReferenceError('Object "${remoteEntriesGlobalKey}" unavailable.'));
   }
 })`;
 
