@@ -10,7 +10,7 @@ describe('ErrorBoundary', () => {
   };
   it('should render children component', () => {
     const wrapper = mount(
-      <ErrorBoundary>
+      <ErrorBoundary fallback={null}>
         <div>Normal component</div>
       </ErrorBoundary>
     );
@@ -37,7 +37,7 @@ describe('ErrorBoundary', () => {
     const handlerException = jest.fn();
 
     const wrapper = mount(
-      <ErrorBoundary captureException={handlerException}>
+      <ErrorBoundary captureException={handlerException} fallback={null}>
           <>
             <div>Normal component</div>
             <FailedComponent />
@@ -51,16 +51,6 @@ describe('ErrorBoundary', () => {
 });
 
 describe('SafeSuspense', () => {
-  it('should render w/o props', () => {
-    const wrapper = shallow(
-      <SafeSuspense>
-        <div>Normal component</div>
-      </SafeSuspense>
-    );
-
-    expect(wrapper).toMatchSnapshot();
-  });
-
   it('should render with props', () => {
     const wrapper = shallow(
       <SafeSuspense

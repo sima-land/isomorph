@@ -7,7 +7,7 @@ export class ErrorBoundary extends React.Component {
   /**
    * @param {Object} props Свойства компонента.
    * @param {import('react').ReactNode} props.children Дочерний компонент.
-   * @param {import('react').ReactNode} [props.fallback=null] Запасной элемент, если возникла ошибка.
+   * @param {import('react').ReactNode} props.fallback Запасной элемент, если возникла ошибка.
    * @param {Function} [props.captureException] Функция для логирования ошибки.
    */
   constructor (props) {
@@ -33,7 +33,7 @@ export class ErrorBoundary extends React.Component {
   render () {
     const {
       children,
-      fallback = null,
+      fallback,
     } = this.props;
 
     return this.state.hasError ? fallback : children;
@@ -44,13 +44,13 @@ export class ErrorBoundary extends React.Component {
  * Обертка над Suspense c перехватом ошибок.
  * @param {Object} props Свойства компонента.
  * @param {import('react').ReactNode} props.children Дочерний компонент.
- * @param {import('react').ReactNode} [props.fallback=null] Запасной элемент, если возникла ошибка.
+ * @param {import('react').ReactNode} props.fallback Запасной элемент, если возникла ошибка.
  * @param {Function} [props.captureException] Функция для логирования ошибки.
  * @return {ReactElement} Элемент.
  */
 export const SafeSuspense = ({
   children,
-  fallback = null,
+  fallback,
   captureException,
 }) => (
   <React.Suspense fallback={fallback}>

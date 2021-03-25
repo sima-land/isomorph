@@ -53,6 +53,7 @@
     "@sentry/browser": "^5.15.5",
     "@sentry/node": "5.10.2",
     "@types/jest": "24.0.x",
+    "@types/react": "^16.14.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.x",
     "babel-jest": "23.6.x",
