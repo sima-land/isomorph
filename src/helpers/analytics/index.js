@@ -1,19 +1,47 @@
-import isObject from 'lodash/isObject';
+import { useRef } from 'react';
+import { call } from 'redux-saga/effects';
+import { shallowEqual } from 'react-redux';
 import isFunction from 'lodash/isFunction';
 
 /**
- * Определяет существует ли око.
- * @return {boolean} Да/нет.
+ * Отправка аналитики в око.
+ * @param {Object} eventData Данные события для отправки.
  */
-export const isOkoExists = () =>
-  typeof window !== 'undefined' && isObject(window.oko) && isFunction(window.oko.push);
+export const okoPush = eventData => {
+  isFunction(window.oko?.push) && window.oko.push(eventData);
+};
 
 /**
- * Отправка аналитики в око.
- * @param {Object} meta Данные для отправки.
+ * Эффект для отправки события в ОКО.
+ * @param {Object} data Данные события для отправки в ОКО.
  */
-export const sendAnalytics = ({ meta }) => {
-  if (isOkoExists() && isObject(meta)) {
-    window.oko.push(meta);
+export function * sendAnalytics (data) {
+  yield call(okoPush, data);
+}
+
+/**
+ * Хук, возвращающий функцию, которая отправит аналитику в ОКО.
+ * @param {Object} data Данные события для отправки в ОКО.
+ * @return {Function} Функция.
+ */
+export const useAnalytics = data => {
+  const dataRef = useRef();
+  const fnRef = useRef();
+
+  if (!dataRef.current) {
+    dataRef.current = { ...data };
   }
+
+  if (!fnRef.current) {
+    fnRef.current = () => okoPush(dataRef.current);
+  }
+
+  if (!shallowEqual(data, dataRef.current)) {
+    throw Error([
+      'useAnalytics: Данные для аналитики изменились.',
+      'Если необходимо использовать динамические данные, вынесите логику из React-компонента.',
+    ].join('\n'));
+  }
+
+  return fnRef.current;
 };
