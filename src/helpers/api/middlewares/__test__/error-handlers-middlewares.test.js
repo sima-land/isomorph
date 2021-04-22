@@ -3,6 +3,7 @@ import {
   _deptToArg,
   createAttachBreadcrumbsMiddleware,
   createHandleExceptionMiddleware,
+  _getLevelFromConfig,
 } from '../error-handlers-middlewares';
 
 describe('_sendHttpBreadcrumb()', () => {
@@ -307,6 +308,43 @@ describe('createHandleExceptionMiddleware()', () => {
       {
         dataName: 'Request details',
         dataAsContext: true,
+        level: 'Warning',
+      }
+    );
+  });
+
+  it('should capture exception for failure response with log level config', async () => {
+    const config = {
+      url: '/test/',
+      baseURL: '/base/',
+      headers: 'test_headers',
+      data: 'test_data',
+      method: 'get',
+      params: 'test_params',
+      otherProp: 'test',
+      logLevelConfig: { default: 'Error', 422: 'Warning' },
+    };
+    const error = {
+      isAxiosError: true,
+      response: { status: 422 },
+    };
+    const next = jest.fn().mockRejectedValue(error);
+    await instance(config, next);
+    expect(next).toBeCalledWith(config);
+    expect(captureExtendedException).toBeCalledWith(
+      error,
+      {
+        url: '/test/',
+        baseURL: '/base/',
+        headers: 'test_headers',
+        data: 'test_data',
+        method: 'get',
+        params: 'test_params',
+      },
+      {
+        dataName: 'Request details',
+        dataAsContext: true,
+        level: 'Warning',
       }
     );
   });
@@ -321,5 +359,15 @@ describe('createHandleExceptionMiddleware()', () => {
       expect(e).toBeUndefined();
     }
     expect.assertions(0);
+  });
+});
+
+describe('_getLevelFromConfig', () => {
+  it('should return default value', () => {
+    expect(_getLevelFromConfig(undefined, undefined)).toEqual('Warning');
+    expect(_getLevelFromConfig(undefined, { default: 'Error' })).toEqual('Error');
+  });
+  it('should return corresponding to status value', () => {
+    expect(_getLevelFromConfig(422, { default: 'Error', 422: 'Warning' })).toEqual('Warning');
   });
 });

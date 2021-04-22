@@ -78,6 +78,8 @@ const _createHandleExceptionMiddleware = ({ captureExtendedException }) =>
     try {
       await next(requestConfig);
     } catch (error) {
+      const { status } = error.response || {};
+      const { logLevelConfig } = requestConfig;
       isFunction(captureExtendedException) && captureExtendedException(
         error,
         pick(
@@ -87,10 +89,27 @@ const _createHandleExceptionMiddleware = ({ captureExtendedException }) =>
         {
           dataName: 'Request details',
           dataAsContext: true,
+          level: _getLevelFromConfig(status, logLevelConfig),
         }
       );
     }
   };
+
+/**
+ * Функция преобразования конфига уровней логирования запроса в уровень логирования Sentry.
+ * @param {number} statusCode Код ответа сервера.
+ * @param {Object} logLevelConfig Конфиг уровней логирования. `{ default: 'Error', 422: 'Warning', 419: 'Error' }`.
+ * @return {string} Log level.
+ * @private
+ */
+export const _getLevelFromConfig = (statusCode, logLevelConfig = {}) => {
+  let level = logLevelConfig.default || 'Warning';
+  if (statusCode && logLevelConfig[statusCode]) {
+    level = logLevelConfig[statusCode];
+  }
+
+  return level;
+};
 
 /**
  * Функция преобразования зависимостей сервиса в аргументы функции.

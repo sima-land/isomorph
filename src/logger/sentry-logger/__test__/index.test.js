@@ -24,7 +24,8 @@ describe('sentryLogger()', function () {
     const error = new Error('test');
     const setExtra = jest.fn();
     const setContext = jest.fn();
-    const scope = { setExtra, setContext };
+    const setLevel = jest.fn();
+    const scope = { setExtra, setContext, setLevel };
     it('works correctly w/o options', () => {
       const service = sentryLogger({ sentryLoggerService });
 
@@ -34,17 +35,19 @@ describe('sentryLogger()', function () {
       expect(sentryLoggerService.withScope).toHaveBeenCalled();
       expect(setContext).not.toBeCalled();
       expect(setExtra).toHaveBeenCalledWith('details', 'test_data');
+      expect(setLevel).not.toBeCalled();
       expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
     });
     it('works correctly with dataName options', () => {
       const service = sentryLogger({ sentryLoggerService });
 
-      service.captureExtendedException(error, 'test_data', { dataName: 'test_name' });
+      service.captureExtendedException(error, 'test_data', { dataName: 'test_name', level: 'Warning' });
       sentryLoggerService.withScope.mock.calls[0][0](scope);
 
       expect(sentryLoggerService.withScope).toHaveBeenCalled();
       expect(setContext).not.toBeCalled();
       expect(setExtra).toHaveBeenCalledWith('test_name', 'test_data');
+      expect(setLevel).toHaveBeenCalledWith('Warning');
       expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
     });
     it('works correctly with dataAsContext options', () => {
@@ -56,6 +59,7 @@ describe('sentryLogger()', function () {
       expect(sentryLoggerService.withScope).toHaveBeenCalled();
       expect(setExtra).not.toBeCalled();
       expect(setContext).toHaveBeenCalledWith('details', 'test_data');
+      expect(setLevel).not.toBeCalled();
       expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
     });
   });
