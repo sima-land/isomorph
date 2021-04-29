@@ -1,5 +1,3 @@
-import { Severity } from '@sentry/node';
-
 /**
  * Сервис для логирования ошибок в Sentry.
  * @param {Object} [options] Опции.
@@ -19,7 +17,7 @@ export default function sentryLogger ({ sentryLoggerService } = {}) {
      * @param {Object} [options] Опции.
      * @param {string} [options.dataName] = 'details' Наименование дополнительных данных.
      * @param {boolean} [options.dataAsContext] = false Прикрепить ли дополнительные данные как контекст ошибки.
-     * @param {Severity} [options.level] Уровень логирования.
+     * @param {string} [options.level] Уровень логирования.
      */
     captureExtendedException: (error, extendedData, options) => {
       const { dataName = 'details', dataAsContext = false, level } = options || {};
