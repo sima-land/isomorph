@@ -25,7 +25,7 @@ const createInject = getContainer => ({
   }
   return target(
     ...args,
-    ...Object.values(await getDependencies(container, dependencies)),
+    ...Object.values(await getDependencies(container, dependencies))
   );
 };
 

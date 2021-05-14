@@ -70,5 +70,5 @@ export const deptToArg = ({ sentry }) => [sentry];
 
 export default createService(
   createSentryInstance,
-  deptToArg,
+  deptToArg
 );

@@ -1,3 +1,4 @@
+__mocks__/**/*
 examples/*/node_modules/*
 examples/*/build/*
 src/**/*.ts

@@ -89,6 +89,8 @@ describe('function createInject', () => {
   it('throws error if getContainer does not return container', async () => {
     const badInject = createInject(() => {});
     const errorThrowWrapped = badInject({ target });
+
+    // eslint-disable-next-line jest/valid-expect
     expect(errorThrowWrapped()).rejects.toThrow(TypeError);
   });
 });

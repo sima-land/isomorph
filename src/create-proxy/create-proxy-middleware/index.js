@@ -38,10 +38,10 @@ export default function createProxyMiddleware (header, map, config, proxyOptions
 
 /**
  * Получает path из url без слэша в конце.
- * @param {string} url.
+ * @param {string} url Url.
  * @return {string} Path или пустую строку.
  */
 export const getUrlPath = pipe(
   urlApi.parse,
-  url => url.path && url.path.replace(/\/$/, ''),
+  url => url.path && url.path.replace(/\/$/, '')
 );

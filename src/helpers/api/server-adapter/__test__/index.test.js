@@ -2,12 +2,10 @@
 /**
  * @jest-environment node
  */
-
 import adapter from '../index';
 import { REQUEST_STAGES } from '../constants';
 import { create } from 'axios';
 import http from 'http';
-
 import https from 'https';
 import { Readable } from 'stream';
 import { uncompressResponse, createOptions } from '../helpers';
@@ -23,8 +21,9 @@ jest.mock('../helpers', () => {
   };
 });
 
-let server;
 describe('adapter', () => {
+  let server;
+
   afterEach(() => {
     if (server) {
       server.close();
@@ -112,18 +111,24 @@ describe('adapter', () => {
     });
   });
 
-  it('should reject if request stream throw error', done => {
-    const streamData = new Readable();
+  it('should reject if request stream throws error', done => {
+    const streamData = new Readable({
+      read: () => {},
+    });
+
     server = http.createServer((req, res) => {
       req.pipe(res);
     }).listen(4444, () => {
-      instance.post(
-        'http://localhost:4444/',
-        streamData,
-      ).catch(err => {
-        expect(err.message).toEqual('The _read() method is not implemented');
+      const p = instance.post('http://localhost:4444/', streamData);
+
+      p.catch(err => {
+        expect(err.message).toBe('SUPER MEGA TEST ERROR');
         done();
       });
+
+      setTimeout(() => {
+        streamData.emit('error', new Error('SUPER MEGA TEST ERROR'));
+      }, 1000);
     });
   });
 

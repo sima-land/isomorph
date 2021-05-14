@@ -15,7 +15,7 @@ const waitOnStoreReadiness = (
   isReady,
   onReady,
   onTimeout,
-  timeout = 2 ** 30,
+  timeout = 2 ** 30
 ) => {
   let timer = null;
   const wrapperOnReady = prepareOnReady(

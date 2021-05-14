@@ -1,16 +1,6 @@
 module.exports = {
-  presets: [
-    [
-      '@babel/preset-env',
-      {
-        useBuiltIns: 'usage',
-        corejs: 3,
-        targets: {
-          node: 'current',
-        },
-      },
-    ],
-    '@babel/preset-react',
+  extends: '../../babel.config.js',
+  plugins: [
+    'lodash',
   ],
-  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-object-rest-spread', 'lodash'],
 };

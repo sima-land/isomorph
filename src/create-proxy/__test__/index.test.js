@@ -28,7 +28,7 @@ describe('createProxy()', () => {
       'Simaland-Service-Origin',
       config.proxy[0].map,
       config,
-      'test',
+      'test'
     );
     expect(app.use).toHaveBeenCalledWith('/api/*', 'test');
   });

@@ -55,7 +55,7 @@ describe('function getDependencies', () => {
         {
           myGetValue: 'getValueSecond',
         },
-      ],
+      ]
     );
     expect(result).toBe(3);
     expect(getValue).toBe(firstDependency);

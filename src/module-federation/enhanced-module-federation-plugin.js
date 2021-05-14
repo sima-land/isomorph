@@ -9,10 +9,10 @@ const LIBRARY_ERROR_TEXT = [
 ].join(' ');
 
 /** @typedef {string} Remote Имя удаленного сервиса (обычно совпадает с именем в git). */
-/** @typedef {import('webpack').ModuleFederationPluginOptions} MFPluginOriginalOptions */
+/** @typedef {import('webpack').ModuleFederationPluginOptions} MFPluginOriginalOptions Опции. */
 
 /**
- * @typedef EnhancedModuleFederationPluginOptions
+ * @typedef EnhancedModuleFederationPluginOptions Опции.
  * @param {string} name Имя сервиса.
  * @param {string} filename Имя удаленной точки входа.
  * @param {Object<string, Remote>} [remotes] Удаленные сервисы.

@@ -6,6 +6,7 @@ import {
   originalMetricKey,
   PrometheusMetric,
 } from '../metric-adapter.js';
+import { has } from 'lodash';
 
 describe('metric adapter logger', () => {
   const invalidValues = Object.freeze([
@@ -19,7 +20,7 @@ describe('metric adapter logger', () => {
   ]);
   it('availableMetricTypes should contains strings from "prom-client" namespace', () => {
     availableMetricTypes.forEach(metricType => {
-      expect(PrometheusClient.hasOwnProperty(metricType)).toBe(true);
+      expect(has(PrometheusClient, metricType)).toBe(true);
     });
   });
   it('originalMetricKey must be a symbol', () => {
