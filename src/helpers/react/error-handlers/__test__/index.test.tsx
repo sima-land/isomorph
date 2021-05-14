@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { ErrorBoundary, SafeSuspense } from '../index';
+import { ErrorBoundary, SafeSuspense } from '..';
 
 describe('ErrorBoundary', () => {
   const error = new Error('Test error');
@@ -37,7 +37,7 @@ describe('ErrorBoundary', () => {
     const handlerException = jest.fn();
 
     const wrapper = mount(
-      <ErrorBoundary captureException={handlerException} fallback={null}>
+      <ErrorBoundary fallback={null} captureException={handlerException}>
         <>
           <div>Normal component</div>
           <FailedComponent />
@@ -53,10 +53,7 @@ describe('ErrorBoundary', () => {
 describe('SafeSuspense', () => {
   it('should render with props', () => {
     const wrapper = shallow(
-      <SafeSuspense
-        fallback={<div>Fallback</div>}
-        captureException={jest.fn()}
-      >
+      <SafeSuspense fallback={<div>Fallback</div>} captureException={jest.fn()}>
         <div>Normal component</div>
       </SafeSuspense>
     );
