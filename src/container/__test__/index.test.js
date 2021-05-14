@@ -1,5 +1,6 @@
 import create, { createFactory, createService, createSingleton } from '..';
 import isContainer from '../is-container';
+import { has } from 'lodash';
 
 /**
  * Тестовая функция.
@@ -67,8 +68,8 @@ describe('function create', () => {
   it('works correctly when there are no arguments in constructor', () => {
     const container = create();
 
-    expect(container.hasOwnProperty('set')).toBe(true);
-    expect(container.hasOwnProperty('get')).toBe(true);
+    expect(has(container, 'set')).toBe(true);
+    expect(has(container, 'get')).toBe(true);
   });
 
   it('works correctly when "name" is incorrect in method "set"', () => {
@@ -124,6 +125,8 @@ describe('function create', () => {
     });
     expect(await container.get('test')).toBe(5);
     expect(await container.get('squaredTest')).toBe(25);
+
+    // eslint-disable-next-line jest/valid-expect
     expect(container.get('')).rejects.toThrow(Error);
   });
   it('can override dependencies defined in parent container', async () => {

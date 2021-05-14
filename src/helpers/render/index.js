@@ -8,12 +8,10 @@ import wrapInMeasureEvent from '../utils/wrap-in-measure-event';
  * @param {import('http').ServerResponse} param.response Ответ.
  * @return {Function} Функция, обёрнутая в событие для измерения времени рендеринга.
  */
-export const prepareRenderFunction = (
-  {
-    render,
-    response,
-  },
-) => wrapInMeasureEvent(
+export const prepareRenderFunction = ({
+  render,
+  response,
+}) => wrapInMeasureEvent(
   {
     fn: render,
     startEvent: 'render:start',
@@ -25,8 +23,8 @@ export const prepareRenderFunction = (
 /**
  * Возвращает шаблон, который подходит текущей конфигурации.
  * @param {Object} data Данные.
- * @property {Object} data.templates Шаблоны.
- * @property {Object} data.config Конфигурация со средой выполнения.
+ * @param {Object} data.templates Шаблоны.
+ * @param {Object} data.config Конфигурация со средой выполнения.
  * @return {Object} Шаблон совпадающий со средой выполнения.
  */
 export const getTemplate = ({ templates, config } = {}) => {

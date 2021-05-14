@@ -69,7 +69,7 @@ describe('createObserveMiddleware()', () => {
     middleware(
       testRequest,
       testResponse,
-      () => {},
+      () => {}
     );
     expect(finishSubscriber).toHaveBeenCalledWith({
       request: testRequest,
@@ -100,7 +100,7 @@ describe('createObserveMiddleware()', () => {
     middleware(
       testRequest,
       testResponse,
-      () => {},
+      () => {}
     );
     expect(startSubscriber).toHaveBeenCalledWith({
       request: testRequest,

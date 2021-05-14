@@ -112,7 +112,9 @@ const serverAdapter = config => new Promise((resolve, reject) => {
     } else {
       stream
         .on('data', chunksHandler)
-        .on('error', err => !req.aborted && reject(enhanceError(err, config, null, res.req)))
+        .on('error', err => {
+          !req.aborted && reject(enhanceError(err, config, null, res.req));
+        })
         .on('end', finishHandler);
     }
   });
@@ -127,7 +129,9 @@ const serverAdapter = config => new Promise((resolve, reject) => {
     });
   }
 
-  req.on('error', err => !req.aborted && reject(enhanceError(err, config, null, req)));
+  req.on('error', err => {
+    !req.aborted && reject(enhanceError(err, config, null, req));
+  });
 
   if (timeout) {
     req.setTimeout(timeout, () => {
@@ -139,7 +143,9 @@ const serverAdapter = config => new Promise((resolve, reject) => {
   // Отправка данных запроса.
   if (isStream(data)) {
     data
-      .on('error', err => reject(enhanceError(err, config, null, req)))
+      .on('error', err => {
+        reject(enhanceError(err, config, null, req));
+      })
       .pipe(req);
   } else {
     req.end(data);

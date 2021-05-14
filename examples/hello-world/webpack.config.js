@@ -1,5 +1,6 @@
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
+const NodemonPlugin = require('nodemon-webpack-plugin');
 
 module.exports = {
   name: 'server',
@@ -7,13 +8,13 @@ module.exports = {
   target: 'node',
   devtool: 'source-map',
   externals: nodeExternals(),
-  entry: ['./src/index.js'],
+  entry: './src/index.js',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, './build/'),
   },
   resolve: {
-    extensions: ['.js', '.json', '.jsx'],
+    extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
   },
   module: {
     rules: [
@@ -22,6 +23,14 @@ module.exports = {
         loader: 'babel-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.(ts|tsx)$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+      },
     ],
   },
+  plugins: [
+    new NodemonPlugin(),
+  ],
 };

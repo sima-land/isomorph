@@ -5,7 +5,7 @@ stages:
 
 prepare:
   stage: prepare
-  image: node:10.15.3-alpine
+  image: node:14.16.0-alpine
   cache:
     paths:
       - node_modules
@@ -16,7 +16,7 @@ prepare:
 
 lint:
   stage: test
-  image: node:10.15.3-alpine
+  image: node:14.16.0-alpine
   cache:
     paths:
       - node_modules
@@ -27,7 +27,7 @@ lint:
 
 test:
   stage: test
-  image: node:10.15.3-alpine
+  image: node:14.16.0-alpine
   cache:
     paths:
       - node_modules
@@ -38,7 +38,7 @@ test:
 
 publish-package:
   stage: publish
-  image: node:10.15.3-alpine
+  image: node:14.16.0-alpine
   cache:
     paths:
       - node_modules

@@ -38,10 +38,10 @@ describe('ErrorBoundary', () => {
 
     const wrapper = mount(
       <ErrorBoundary captureException={handlerException} fallback={null}>
-          <>
-            <div>Normal component</div>
-            <FailedComponent />
-          </>
+        <>
+          <div>Normal component</div>
+          <FailedComponent />
+        </>
       </ErrorBoundary>
     );
 

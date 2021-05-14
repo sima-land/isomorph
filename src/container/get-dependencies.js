@@ -22,7 +22,7 @@ export const isStaticDependency = ({ name, value }) =>
 const getDependencies = (
   container,
   dependencies = [],
-  serviceName,
+  serviceName
 ) => dependencies.reduce(async (prevPromise, dependency) => {
   const result = await prevPromise;
   if (isString(dependency)) {

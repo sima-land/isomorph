@@ -53,6 +53,7 @@ exports[`ErrorBoundary should render fallback component 1`] = `
 
 exports[`SafeSuspense should render with props 1`] = `
 <Suspense
+  captureException={[MockFunction]}
   fallback={
     <div>
       Fallback

@@ -133,7 +133,7 @@ export const createSpanCreator = ({ jaegerTracer, config }) => request => traceI
   jaegerTracer,
   'incoming-http-request',
   request,
-  _getRequestContext(request, config),
+  _getRequestContext(request, config)
 );
 
 /**

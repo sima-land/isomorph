@@ -1,5 +1,15 @@
 module.exports = {
-  transformIgnorePatterns: ['/node_modules/(?!(middleware-axios)).*/'],
+  preset: 'ts-jest/presets/js-with-babel',
+  setupFiles: ['./.jest/setup.js'],
+  globals: {
+    'ts-jest': {
+      tsConfig: '<rootDir>/tsconfig.jest.json',
+      babelConfig: require('./babel.config'),
+    },
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(middleware-axios))/',
+  ],
   coverageThreshold: {
     global: {
       branches: 100,
@@ -8,10 +18,8 @@ module.exports = {
       statements: 100,
     },
   },
-  transform: {
-    '^.+\\.(jsx?)?$': 'babel-jest',
-  },
   clearMocks: true,
-  setupFiles: ['./jest.setup.js'],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
+  snapshotSerializers: [
+    'enzyme-to-json/serializer',
+  ],
 };

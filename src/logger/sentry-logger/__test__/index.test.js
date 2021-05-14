@@ -1,4 +1,5 @@
 import sentryLogger from '..';
+import { has } from 'lodash';
 
 describe('sentryLogger()', function () {
   const sentryLoggerService = {
@@ -67,9 +68,9 @@ describe('sentryLogger()', function () {
   it('works correctly without params', () => {
     const service = sentryLogger();
 
-    expect(service.hasOwnProperty('captureException')).toBeTruthy();
-    expect(service.hasOwnProperty('captureMessage')).toBeTruthy();
-    expect(service.hasOwnProperty('captureBreadcrumb')).toBeTruthy();
-    expect(service.hasOwnProperty('captureExtendedException')).toBeTruthy();
+    expect(has(service, 'captureException')).toBeTruthy();
+    expect(has(service, 'captureMessage')).toBeTruthy();
+    expect(has(service, 'captureBreadcrumb')).toBeTruthy();
+    expect(has(service, 'captureExtendedException')).toBeTruthy();
   });
 });

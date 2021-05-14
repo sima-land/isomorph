@@ -46,7 +46,7 @@ export const createFactory = options => () => create(options);
  */
 const inherit = (
   container,
-  parentContainer,
+  parentContainer
 ) => {
   let result = container;
   if (isContainer(parentContainer)) {
@@ -57,9 +57,9 @@ const inherit = (
        * Оборачивает получение зависимости для добавления поиска в родительском контейнере.
        * @param {string} name Название зависимости.
        * @return {*} Зависимость.
-       * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
-       * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
-       * @throws {ServiceNotFoundError} Выдаст ошибку при попытке вызвать незарегистрированный сервис
+       * @throws {TypeError} Выдаст ошибку если параметр "name" не строка.
+       * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка.
+       * @throws {ServiceNotFoundError} Выдаст ошибку при попытке вызвать незарегистрированный сервис.
        */
       async get (name) {
         let dependency;
@@ -85,7 +85,7 @@ const inherit = (
  * @param {Array} options.services Массив сервисов, которые нужно зарегистрировать.
  * @param {Object} options.parent Родительский контейнер.
  * @return {Object} IoC Container.
- * @throws {TypeError} Выдаст ошибку если параметр "services" не массив
+ * @throws {TypeError} Выдаст ошибку если параметр "services" не массив.
  */
 export default function create ({ services = [], parent = null } = {}) {
   if (!Array.isArray(services)) {
@@ -103,8 +103,8 @@ export default function create ({ services = [], parent = null } = {}) {
      * @param {Function} options.factory Функция-конструктор.
      * @param {*} options.value Переданная зависимость.
      * @param {Array} options.dependencies Массив зависимостей.
-     * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
-     * @throws {Error} Выдаст ошибку если не передан ни один из параметров "factory", "singleton" или "value"
+     * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка.
+     * @throws {Error} Выдаст ошибку если не передан ни один из параметров "factory", "singleton" или "value".
      */
     set ({ name, singleton, factory, value, dependencies = [] } = {}) {
       if (!isString(name) || name === '') {
@@ -138,9 +138,9 @@ export default function create ({ services = [], parent = null } = {}) {
      * @param {string} name Название зависимости.
      * @param {string} serviceName Название сервиса.
      * @return {*} Зависимость.
-     * @throws {TypeError} Выдаст ошибку если параметр "name" не строка
-     * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка
-     * @throws {ServiceNotFoundError} Выдаст ошибку при попытке вызвать незарегистрированный сервис
+     * @throws {TypeError} Выдаст ошибку если параметр "name" не строка.
+     * @throws {Error} Выдаст ошибку если параметр "name" не строка или пустая строка.
+     * @throws {ServiceNotFoundError} Выдаст ошибку при попытке вызвать незарегистрированный сервис.
      */
     async get (name, serviceName = '') {
       if (!isString(name) || name === '') {
@@ -162,7 +162,7 @@ export default function create ({ services = [], parent = null } = {}) {
         service.value = await service.singleton(
           {
             ...await getDependencies(container, service.dependencies, `${serviceName}/${name}`),
-          },
+          }
         );
       }
 

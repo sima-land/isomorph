@@ -2,7 +2,7 @@ import { call } from 'redux-saga/effects';
 import get from 'lodash/get';
 
 /**
- * @typedef {Object} ServerResponse Ответ сервера
+ * @typedef {Object} ServerResponse Ответ сервера.
  * @property {boolean} ok Были ли запрос совершен успешно.
  * @property {Object|null} error Объект ошибки.
  * @property {Object|string|null} data Данные ответа.

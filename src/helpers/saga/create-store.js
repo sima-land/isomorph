@@ -41,7 +41,7 @@ export const createStore = (
     timeout,
     onTimeout,
     onSagasErrorHandler,
-  } = {},
+  } = {}
 ) => {
   const sagaMiddleware = createSagaMiddleware(
     isFunction(onSagasErrorHandler)
@@ -98,5 +98,5 @@ export const mapServiceOptionsToArgs = (
  */
 export const createStoreService = createService(
   createStore,
-  mapServiceOptionsToArgs,
+  mapServiceOptionsToArgs
 );
