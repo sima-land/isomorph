@@ -21,7 +21,7 @@
     "dev": "cd ./examples/hello-world/ && yarn && yarn dev",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --clearCache && jest --coverage"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -53,6 +53,7 @@
     "@dev-dep/linters": "^1.0.11",
     "@sentry/browser": "^5.15.5",
     "@sentry/node": "5.10.2",
+    "@types/enzyme": "^3.10.8",
     "@types/jest": "^26.0.23",
     "@types/react": "^16.14.0",
     "@typescript-eslint/eslint-plugin": "^4.23.0",
