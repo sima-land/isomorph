@@ -75,8 +75,14 @@ describe('useAnalytics', () => {
 describe('okoPush', () => {
   beforeAll(() => {
     (window as any).oko = {
-      push: jest.fn(data => {
+      checkContext: () => 123,
+
+      push: jest.fn(function (data) {
+        // имитируем реальную работу window.oko.push: в процессе удаляет data.n
         delete data.n;
+
+        // имитируем реальную работу window.oko.push: в процессе вызывает другие методы с this
+        this.checkContext();
       }),
     };
   });
@@ -106,5 +112,11 @@ describe('okoPush', () => {
       prop1: 1,
       prop2: 2,
     });
+  });
+
+  it('should handle window.oko.push absence', () => {
+    delete (window as any).oko;
+
+    expect(() => okoPush({ n: 'test-123' })).not.toThrow();
   });
 });

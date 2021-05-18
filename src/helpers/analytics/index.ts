@@ -10,10 +10,8 @@ export type OkoEvent = Record<string, any>;
  * @param eventData Данные события для отправки.
  */
 export const okoPush = (eventData: OkoEvent) => {
-  const send = get(window, ['oko', 'push']);
-
   // копируем объект так как window.oko.push меняет свой аргумент в процессе выполнения
-  isFunction(send) && send({ ...eventData });
+  isFunction((window as any).oko?.push) && (window as any).oko.push({ ...eventData });
 };
 
 /**
