@@ -15,7 +15,7 @@ describe('sendAnalytics', () => {
 });
 
 describe('useAnalytics', () => {
-  const TestComponent = ({ prop }) => {
+  const TestComponent = ({ prop }: any) => {
     const fn = useAnalytics({
       n: 'test-event',
       prop,
@@ -25,11 +25,13 @@ describe('useAnalytics', () => {
   };
 
   beforeAll(() => {
-    window.oko = { push: jest.fn() };
+    (window as any).oko = {
+      push: jest.fn(),
+    };
   });
 
   afterAll(() => {
-    delete window.oko;
+    delete (window as any).oko;
   });
 
   it('should call', () => {
@@ -39,14 +41,14 @@ describe('useAnalytics', () => {
 
     render(<TestComponent prop={123} />, container);
 
-    expect(window.oko.push).toHaveBeenCalledTimes(0);
+    expect((window as any).oko.push).toHaveBeenCalledTimes(0);
 
     act(() => {
       Simulate.click(container.querySelector('[data-testid="test-block"]'));
     });
 
-    expect(window.oko.push).toHaveBeenCalledTimes(1);
-    expect(window.oko.push).toHaveBeenCalledWith({
+    expect((window as any).oko.push).toHaveBeenCalledTimes(1);
+    expect((window as any).oko.push).toHaveBeenCalledWith({
       n: 'test-event',
       prop: 123,
     });
@@ -67,5 +69,42 @@ describe('useAnalytics', () => {
       'useAnalytics: Данные для аналитики изменились.',
       'Если необходимо использовать динамические данные, вынесите логику из React-компонента.',
     ].join('\n')));
+  });
+});
+
+describe('okoPush', () => {
+  beforeAll(() => {
+    (window as any).oko = {
+      push: jest.fn(data => {
+        delete data.n;
+      }),
+    };
+  });
+
+  afterAll(() => {
+    delete (window as any).oko;
+  });
+
+  it('should handle window.oko.push mutates object argument', () => {
+    const testData = {
+      n: 'test-event',
+      prop1: 1,
+      prop2: 2,
+    };
+
+    expect((window as any).oko.push).toBeCalledTimes(0);
+
+    okoPush(testData);
+
+    expect((window as any).oko.push).toBeCalledTimes(1);
+    expect((window as any).oko.push.mock.calls[0][0]).toEqual({
+      prop1: 1,
+      prop2: 2,
+    });
+    expect(testData).toEqual({
+      n: 'test-event',
+      prop1: 1,
+      prop2: 2,
+    });
   });
 });

@@ -1,32 +1,37 @@
 import { useRef } from 'react';
 import { call } from 'redux-saga/effects';
 import { shallowEqual } from 'react-redux';
-import isFunction from 'lodash/isFunction';
+import { get, isFunction } from 'lodash';
+
+export type OkoEvent = Record<string, any>;
 
 /**
  * Отправка аналитики в око.
- * @param {Object} eventData Данные события для отправки.
+ * @param eventData Данные события для отправки.
  */
-export const okoPush = eventData => {
-  isFunction(window.oko?.push) && window.oko.push(eventData);
+export const okoPush = (eventData: OkoEvent) => {
+  const send = get(window, ['oko', 'push']);
+
+  // копируем объект так как window.oko.push меняет свой аргумент в процессе выполнения
+  isFunction(send) && send({ ...eventData });
 };
 
 /**
  * Эффект для отправки события в ОКО.
- * @param {Object} data Данные события для отправки в ОКО.
+ * @param data Данные события для отправки в ОКО.
  */
-export function * sendAnalytics (data) {
+export function * sendAnalytics (data: OkoEvent) {
   yield call(okoPush, data);
 }
 
 /**
  * Хук, возвращающий функцию, которая отправит аналитику в ОКО.
- * @param {Object} data Данные события для отправки в ОКО.
- * @return {Function} Функция.
+ * @param data Данные события для отправки в ОКО.
+ * @return Функция.
  */
-export const useAnalytics = data => {
-  const dataRef = useRef();
-  const fnRef = useRef();
+export const useAnalytics = (data: OkoEvent) => {
+  const dataRef = useRef<OkoEvent>();
+  const fnRef = useRef<() => void>();
 
   if (!dataRef.current) {
     dataRef.current = { ...data };
