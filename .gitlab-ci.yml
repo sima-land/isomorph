@@ -32,7 +32,7 @@ test:
     paths:
       - node_modules
   script:
-    - yarn test
+    - yarn test:ci
   tags:
     - sl-frontend
 
