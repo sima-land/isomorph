@@ -3,10 +3,22 @@ stages:
   - test
   - publish
 
+.cache_only_pull_template: &cache_only_pull
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules
+    policy: pull
+
 prepare:
   stage: prepare
   image: node:14.16.0-alpine
   cache:
+    key:
+      files:
+        - yarn.lock
     paths:
       - node_modules
   script:
@@ -17,9 +29,7 @@ prepare:
 lint:
   stage: test
   image: node:14.16.0-alpine
-  cache:
-    paths:
-      - node_modules
+  <<: *cache_only_pull
   script:
     - yarn lint
   tags:
@@ -28,9 +38,7 @@ lint:
 test:
   stage: test
   image: node:14.16.0-alpine
-  cache:
-    paths:
-      - node_modules
+  <<: *cache_only_pull
   script:
     - yarn test:ci
   tags:
@@ -39,9 +47,7 @@ test:
 publish-package:
   stage: publish
   image: node:14.16.0-alpine
-  cache:
-    paths:
-      - node_modules
+  <<: *cache_only_pull
   before_script:
     - echo //gitlab.sima-land.ru/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN} > .npmrc
     - npm version $CI_COMMIT_REF_NAME
