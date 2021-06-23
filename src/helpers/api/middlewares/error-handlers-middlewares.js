@@ -98,12 +98,12 @@ const _createHandleExceptionMiddleware = ({ captureExtendedException }) =>
 /**
  * Функция преобразования конфига уровней логирования запроса в уровень логирования Sentry.
  * @param {number} statusCode Код ответа сервера.
- * @param {Object} logLevelConfig Конфиг уровней логирования. `{ default: 'Error', 422: 'Warning', 419: 'Error' }`.
+ * @param {Object} logLevelConfig Конфиг уровней логирования. `{ default: 'error', 422: 'warning', 419: 'error' }`.
  * @return {string} Log level.
  * @private
  */
 export const _getLevelFromConfig = (statusCode, logLevelConfig = {}) => {
-  let level = logLevelConfig.default || 'Warning';
+  let level = logLevelConfig.default || 'warning';
   if (statusCode && logLevelConfig[statusCode]) {
     level = logLevelConfig[statusCode];
   }

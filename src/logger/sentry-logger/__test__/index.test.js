@@ -42,13 +42,13 @@ describe('sentryLogger()', function () {
     it('works correctly with dataName options', () => {
       const service = sentryLogger({ sentryLoggerService });
 
-      service.captureExtendedException(error, 'test_data', { dataName: 'test_name', level: 'Warning' });
+      service.captureExtendedException(error, 'test_data', { dataName: 'test_name', level: 'warning' });
       sentryLoggerService.withScope.mock.calls[0][0](scope);
 
       expect(sentryLoggerService.withScope).toHaveBeenCalled();
       expect(setContext).not.toBeCalled();
       expect(setExtra).toHaveBeenCalledWith('test_name', 'test_data');
-      expect(setLevel).toHaveBeenCalledWith('Warning');
+      expect(setLevel).toHaveBeenCalledWith('warning');
       expect(sentryLoggerService.captureException).toHaveBeenCalledWith(error);
     });
     it('works correctly with dataAsContext options', () => {
