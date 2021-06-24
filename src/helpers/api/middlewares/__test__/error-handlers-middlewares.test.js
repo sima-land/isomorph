@@ -308,7 +308,7 @@ describe('createHandleExceptionMiddleware()', () => {
       {
         dataName: 'Request details',
         dataAsContext: true,
-        level: 'Warning',
+        level: 'warning',
       }
     );
   });
@@ -322,7 +322,7 @@ describe('createHandleExceptionMiddleware()', () => {
       method: 'get',
       params: 'test_params',
       otherProp: 'test',
-      logLevelConfig: { default: 'Error', 422: 'Warning' },
+      logLevelConfig: { default: 'error', 422: 'warning' },
     };
     const error = {
       isAxiosError: true,
@@ -344,7 +344,7 @@ describe('createHandleExceptionMiddleware()', () => {
       {
         dataName: 'Request details',
         dataAsContext: true,
-        level: 'Warning',
+        level: 'warning',
       }
     );
   });
@@ -364,10 +364,10 @@ describe('createHandleExceptionMiddleware()', () => {
 
 describe('_getLevelFromConfig', () => {
   it('should return default value', () => {
-    expect(_getLevelFromConfig(undefined, undefined)).toEqual('Warning');
-    expect(_getLevelFromConfig(undefined, { default: 'Error' })).toEqual('Error');
+    expect(_getLevelFromConfig(undefined, undefined)).toEqual('warning');
+    expect(_getLevelFromConfig(undefined, { default: 'error' })).toEqual('error');
   });
   it('should return corresponding to status value', () => {
-    expect(_getLevelFromConfig(422, { default: 'Error', 422: 'Warning' })).toEqual('Warning');
+    expect(_getLevelFromConfig(422, { default: 'error', 422: 'warning' })).toEqual('warning');
   });
 });
