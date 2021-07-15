@@ -1,17 +1,13 @@
 {
-  "name": "@dev-dep/isomorph",
+  "name": "@sima-land/isomorph",
   "version": "0.0.0",
-  "description": "Server side rendering for frontend microservices",
-  "main": "index.js",
-  "repository": "ssh://git@gitlab.sima-land.ru:7888/dev-dep/dev/isomorph.git",
+  "description": "SSR utils for frontend microservices",
+  "repository": "ssh://git@github.com:sima-land/isomorph.git",
   "author": "www.sima-land.ru team",
   "license": "MIT",
   "private": false,
   "engines": {
     "node": ">=10.15.3"
-  },
-  "publishConfig": {
-    "registry": "https://gitlab.sima-land.ru/api/v4/projects/676/packages/npm/"
   },
   "scripts": {
     "build:before": "rimraf build",
@@ -52,7 +48,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.14.2",
     "@babel/preset-env": "^7.14.2",
     "@babel/preset-react": "^7.13.13",
-    "@dev-dep/linters": "^1.0.11",
+    "@sima-land/linters": "^1.0.12",
     "@sentry/browser": "^5.15.5",
     "@sentry/node": "5.10.2",
     "@types/enzyme": "^3.10.8",

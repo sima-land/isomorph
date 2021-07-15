@@ -1,3 +1,3 @@
 module.exports = {
-  extends: '@dev-dep/linters/stylelint',
+  extends: '@sima-land/linters/stylelint',
 };

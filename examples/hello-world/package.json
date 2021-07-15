@@ -1,8 +1,8 @@
 {
   "name": "sima-land-isomorph",
   "version": "0.0.1",
-  "description": "@dev-dep/isomorph library usage example",
-  "repository": "ssh://git@gitlab.sima-land.ru:7888/SL/isomorph.git",
+  "description": "@sima-land/isomorph library usage example",
+  "repository": "git@github.com:sima-land/isomorph.git",
   "author": "www.sima-land.ru team",
   "license": "MIT",
   "private": true,
