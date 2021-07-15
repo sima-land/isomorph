@@ -3,7 +3,7 @@ module.exports = {
   setupFiles: ['./.jest/setup.js'],
   globals: {
     'ts-jest': {
-      tsConfig: '<rootDir>/tsconfig.jest.json',
+      tsconfig: '<rootDir>/tsconfig.jest.json',
       babelConfig: require('./babel.config'),
     },
   },

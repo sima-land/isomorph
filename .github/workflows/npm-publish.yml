@@ -15,9 +15,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: |
-          yarn install
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+        run: yarn install
 
       - name: Lint
         run: |
