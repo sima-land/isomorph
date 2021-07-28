@@ -1,4 +1,5 @@
 module.exports = {
+  testEnvironment: 'jsdom',
   preset: 'ts-jest/presets/js-with-babel',
   setupFiles: ['./.jest/setup.js'],
   globals: {

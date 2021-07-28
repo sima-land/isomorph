@@ -1,41 +1,39 @@
 import prepareOnReady from '../prepare-on-ready';
-import isFunction from 'lodash/isFunction';
 
-jest.mock('lodash/isFunction', () => {
-  const original = jest.requireActual('lodash/isFunction');
-  return jest.fn(original);
-});
-
-jest.unmock('redux');
-jest.useFakeTimers();
+jest.useFakeTimers('modern');
 
 describe('function prepareOnReady', () => {
-  const store = {};
   const unsubscribe = jest.fn();
-  const onReady = jest.fn();
+
+  // временно, https://github.com/facebook/jest/issues/11500
+  beforeAll(() => {
+    jest.spyOn(global, 'clearTimeout');
+  });
+  afterAll(() => {
+    global.clearTimeout.mockRestore();
+  });
+
   it('creates handler which unsubscribe, clears timeout and invoke specified callback', () => {
-    const handler = prepareOnReady(store, unsubscribe, onReady);
+    const spy = jest.fn();
+
+    const handler = prepareOnReady({}, unsubscribe, spy);
+
     expect(unsubscribe).not.toHaveBeenCalled();
-    expect(onReady).not.toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
     expect(clearTimeout).not.toHaveBeenCalled();
+
     handler(123456);
     expect(unsubscribe).toHaveBeenCalled();
-    expect(onReady).toHaveBeenCalledWith(store);
+    expect(spy).toHaveBeenCalledWith({});
     expect(clearTimeout).toHaveBeenCalledWith(123456);
   });
+
   it('creates handler which does not invoke clearTimeout '
     + 'if identifier of timeout has not been passed on calling', () => {
-    const handler = prepareOnReady(store, unsubscribe, 'i am not a function');
+    const handler = prepareOnReady({}, unsubscribe);
+
     expect(clearTimeout).not.toHaveBeenCalled();
     handler(123456);
     expect(clearTimeout).toHaveBeenCalledWith(123456);
-  });
-  it('creates handler which does not invoke specified callback '
-    + 'if it has not been passed on creation or it is not a function', () => {
-    const handler = prepareOnReady(store, unsubscribe, 'i am not a function');
-    expect(isFunction).not.toHaveBeenCalled();
-    handler(123456);
-    expect(isFunction).toHaveBeenCalledWith('i am not a function');
-    expect(isFunction).toHaveReturnedWith(false);
   });
 });
