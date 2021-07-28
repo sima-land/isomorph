@@ -15,6 +15,17 @@ describe('function waitOnReadiness', () => {
   const isReady = jest.fn(testStore => testStore.getState().ready);
   const onReady = jest.fn();
   const onTimeout = jest.fn();
+
+  // временно, https://github.com/facebook/jest/issues/11500
+  beforeAll(() => {
+    jest.spyOn(global, 'setTimeout');
+    jest.spyOn(global, 'clearTimeout');
+  });
+  afterAll(() => {
+    global.setTimeout.mockRestore();
+    global.clearTimeout.mockRestore();
+  });
+
   it('subscribes to the store and waits for its readiness', () => {
     expect(store.subscribe).not.toHaveBeenCalled();
     expect(waitOnStoreReadiness(store, isReady, onReady, onTimeout, 500)).toEqual(store);
@@ -34,6 +45,7 @@ describe('function waitOnReadiness', () => {
     expect(clearTimeout).toHaveBeenCalledWith(setTimeout.mock.results[0].value);
     expect(onTimeout).not.toBeCalled();
   });
+
   it('subscribes to the store and stops waiting its readiness by timeout', () => {
     expect(store.subscribe).not.toHaveBeenCalled();
     expect(waitOnStoreReadiness(store, isReady, onReady, onTimeout)).toEqual(store);

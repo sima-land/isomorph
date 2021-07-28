@@ -1,5 +1,3 @@
-import isFunction from 'lodash/isFunction';
-
 /**
  * Оборачивает опциональный обработчик события готовности стора, добавляя отписку и опциональную очистку таймера.
  * @param {Object} store Стор.
@@ -7,10 +5,12 @@ import isFunction from 'lodash/isFunction';
  * @param {Function|*} onReady Опциональный обработчик события готовности стора.
  * @return {Function} Обёрнутый обработчик готовности стора.
  */
-const prepareOnReady = (store, unsubscribe, onReady) => timer => {
+const prepareOnReady = (store, unsubscribe, onReady) => timerId => {
   unsubscribe();
-  timer && clearTimeout(timer);
-  isFunction(onReady) && onReady(store);
+
+  timerId && clearTimeout(timerId);
+
+  onReady && onReady(store);
 };
 
 export default prepareOnReady;
