@@ -9,7 +9,7 @@ module.exports = {
     },
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(middleware-axios))/',
+    '/node_modules/',
   ],
   coverageThreshold: {
     global: {

@@ -1,20 +1,11 @@
 import { createInstance, mapServiceOptionsToArgs } from '../create-instance';
-import { create } from 'axios';
-import { wrapInstance } from 'middleware-axios';
-
-jest.mock('axios', () => {
-  const original = jest.requireActual('axios');
-  return {
-    ...original,
-    create: jest.fn(original.create),
-  };
-});
+import { create } from 'middleware-axios';
 
 jest.mock('middleware-axios', () => {
   const original = jest.requireActual('middleware-axios');
   return {
     ...original,
-    wrapInstance: jest.fn(original.wrapInstance),
+    create: jest.fn(original.create),
   };
 });
 
@@ -25,8 +16,7 @@ describe('createInstance', () => {
     };
     const instance = createInstance(config);
     expect(create).toHaveBeenCalledWith(config);
-    expect(wrapInstance).toHaveBeenCalledWith(create.mock.results[0].value);
-    expect(instance).toEqual(wrapInstance.mock.results[0].value);
+    expect(instance).toEqual(create.mock.results[0].value);
   });
   it('creates wrapped axios instance with enhancer correctly', () => {
     const config = {

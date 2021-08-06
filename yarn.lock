@@ -2383,7 +2383,7 @@ autoprefixer@^9.8.6:
     postcss "^7.0.32"
     postcss-value-parser "^4.1.0"
 
-axios@0.19.2, axios@^0.19.0:
+axios@0.19.2:
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
   integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
@@ -5441,13 +5441,10 @@ micromatch@^4.0.4:
     braces "^3.0.1"
     picomatch "^2.2.3"
 
-middleware-axios@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/middleware-axios/-/middleware-axios-1.0.0.tgz#048edcd72b7ec57f06d4b27bdae6853853358d62"
-  integrity sha512-utoCJn4MjiQlrDmo5ktLm8GeayVFMH8FL0CWYd/ZtTr0kMx60CxIbL3bE5p8OT8fsC4Ytuex5ombe3hGE++Law==
-  dependencies:
-    axios "^0.19.0"
-    lodash "^4.17.15"
+middleware-axios@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/middleware-axios/-/middleware-axios-2.0.0.tgz#f6197f54d8e7b6d93380dc384879a56f3527798c"
+  integrity sha512-LeFyafZez8ts4+xe8lppmT8hatNoHh1uPqukNQqNurKmopJOIup5d7AY63cBOklstlKokqtretzom8rj3g54Rg==
 
 mime-db@1.40.0:
   version "1.40.0"
