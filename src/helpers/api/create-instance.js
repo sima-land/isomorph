@@ -1,5 +1,4 @@
-import { create } from 'axios';
-import { wrapInstance } from 'middleware-axios';
+import { create } from 'middleware-axios';
 import isFunction from 'lodash/isFunction';
 import { createService } from '../../container';
 
@@ -10,7 +9,7 @@ import { createService } from '../../container';
  * @return {Object} Экземпляр axios с применёнными middleware.
  */
 export const createInstance = (config, enhancer) => {
-  const instance = wrapInstance(create(config));
+  const instance = create(config);
   return isFunction(enhancer) ? enhancer(instance) : instance;
 };
 
