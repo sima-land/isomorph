@@ -15,7 +15,9 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: yarn install
+        run: |
+          yarn install
+          npm i -g npm@7 --registry=https://registry.npmjs.org
 
       - name: Lint
         run: |
@@ -28,6 +30,7 @@ jobs:
       - name: Build package
         run: |
           npm --no-git-tag-version version ${GITHUB_REF#refs/*/}
+          npm set-script prepare ""
           yarn build
 
       - name: Publish build
