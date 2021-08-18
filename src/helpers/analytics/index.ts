@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import { call } from 'redux-saga/effects';
-import { shallowEqual } from 'react-redux';
-import { get, isFunction } from 'lodash';
+import { isEqual, isFunction } from 'lodash';
 
 export type OkoEvent = Record<string, any>;
 
@@ -39,7 +38,7 @@ export const useAnalytics = (data: OkoEvent) => {
     fnRef.current = () => okoPush(dataRef.current);
   }
 
-  if (!shallowEqual(data, dataRef.current)) {
+  if (!isEqual(data, dataRef.current)) {
     throw Error([
       'useAnalytics: Данные для аналитики изменились.',
       'Если необходимо использовать динамические данные, вынесите логику из React-компонента.',

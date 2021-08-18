@@ -70,6 +70,34 @@ describe('useAnalytics', () => {
       'Если необходимо использовать динамические данные, вынесите логику из React-компонента.',
     ].join('\n')));
   });
+
+  it('should do not throw for complex object structure', () => {
+    const ComplexTest = () => {
+      const fn = useAnalytics({
+        n: 'custom',
+        category: 'balance_goods',
+        custom_str: ['minus'],
+      });
+
+      return <div data-testid='test-block' onClick={fn} />;
+    };
+
+    const container = document.createElement('div');
+
+    document.body.append(container);
+
+    act(() => {
+      render(<ComplexTest />, container);
+    });
+
+    const secondRender = () => {
+      act(() => {
+        render(<ComplexTest />, container);
+      });
+    };
+
+    expect(secondRender).not.toThrow();
+  });
 });
 
 describe('okoPush', () => {
