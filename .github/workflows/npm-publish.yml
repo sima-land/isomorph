@@ -23,7 +23,7 @@ jobs:
           yarn type-check
 
       - name: Test
-        run: yarn test:ci
+        run: yarn coverage --forceExit
 
       - name: Build package
         run: |
