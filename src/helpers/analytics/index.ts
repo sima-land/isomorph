@@ -35,7 +35,7 @@ export const useAnalytics = (data: OkoEvent) => {
   }
 
   if (!fnRef.current) {
-    fnRef.current = () => okoPush(dataRef.current);
+    fnRef.current = () => okoPush(dataRef.current as OkoEvent);
   }
 
   if (!isEqual(data, dataRef.current)) {

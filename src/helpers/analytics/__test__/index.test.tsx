@@ -44,7 +44,7 @@ describe('useAnalytics', () => {
     expect((window as any).oko.push).toHaveBeenCalledTimes(0);
 
     act(() => {
-      Simulate.click(container.querySelector('[data-testid="test-block"]'));
+      Simulate.click(container.querySelector('[data-testid="test-block"]') as HTMLElement);
     });
 
     expect((window as any).oko.push).toHaveBeenCalledTimes(1);
@@ -105,7 +105,7 @@ describe('okoPush', () => {
     (window as any).oko = {
       checkContext: () => 123,
 
-      push: jest.fn(function (data) {
+      push: jest.fn(function (this: any, data) {
         // имитируем реальную работу window.oko.push: в процессе удаляет data.n
         delete data.n;
 
