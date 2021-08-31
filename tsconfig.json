@@ -10,7 +10,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "moduleResolution": "node",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strict": true
   },
   "include": [
     "./src/**/*"

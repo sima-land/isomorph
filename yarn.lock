@@ -1910,6 +1910,15 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
+"@types/jaeger-client@^3.18.2":
+  version "3.18.2"
+  resolved "https://registry.yarnpkg.com/@types/jaeger-client/-/jaeger-client-3.18.2.tgz#d5f10c8b6e2507652159d480cb2d20addd62f9b1"
+  integrity sha512-HxN32IfZkG+zAW0geprNamroSdNl8DGrSvpN2gvJuAO/oDaJK4W+Z04fDHcWBvG4RbhwKBtBywfRNvx0z34Bag==
+  dependencies:
+    "@types/node" "*"
+    opentracing "~0.14.3"
+    prom-client "~11.3.0 || ^12.0.0 || ^13.0.0"
+
 "@types/jest@^26.0.24":
   version "26.0.24"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.24.tgz#943d11976b16739185913a1936e0de0c4a7d595a"
@@ -6016,6 +6025,11 @@ opentracing@^0.14.3:
   resolved "https://registry.yarnpkg.com/opentracing/-/opentracing-0.14.3.tgz#23e3ad029fa66a653926adbe57e834469f8550aa"
   integrity sha1-I+OtAp+mamU5Jq2+V+g0Rp+FUKo=
 
+opentracing@~0.14.3:
+  version "0.14.5"
+  resolved "https://registry.yarnpkg.com/opentracing/-/opentracing-0.14.5.tgz#891fa92cd90a24e64f99bc964370227310926c85"
+  integrity sha512-XLKtEfHxqrWyF1fzxznsv78w3csW41ucHnjiKnfzZLD5FN8UBDZZL1i4q0FR29zjxXhm+2Hop+5Vr/b8tKIvEg==
+
 optionator@^0.8.1:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/optionator/-/optionator-0.8.2.tgz#364c5e409d3f4d6301d6c0b4c05bba50180aeb64"
@@ -6415,6 +6429,13 @@ prom-client@^11.5.2:
   version "11.5.3"
   resolved "https://registry.yarnpkg.com/prom-client/-/prom-client-11.5.3.tgz#5fedfce1083bac6c2b223738e966d0e1643756f8"
   integrity sha512-iz22FmTbtkyL2vt0MdDFY+kWof+S9UB/NACxSn2aJcewtw+EERsen0urSkZ2WrHseNdydsvcxCTAnPcSMZZv4Q==
+  dependencies:
+    tdigest "^0.1.1"
+
+"prom-client@~11.3.0 || ^12.0.0 || ^13.0.0":
+  version "13.2.0"
+  resolved "https://registry.yarnpkg.com/prom-client/-/prom-client-13.2.0.tgz#99d13357912dd400f8911b77df19f7b328a93e92"
+  integrity sha512-wGr5mlNNdRNzEhRYXgboUU2LxHWIojxscJKmtG3R8f4/KiWqyYgXTLHs0+Ted7tG3zFT7pgHJbtomzZ1L0ARaQ==
   dependencies:
     tdigest "^0.1.1"
 

@@ -80,6 +80,36 @@ describe('createTraceRequestMiddleware', () => {
     expect(fakeTracer.startSpan.mock.calls[0][0])
       .toBe('HTTP PUT www.sima-land.ru/api/v2/something/{id}/some-bff/123456');
   });
+
+  it('should replace ids from url to template parts (without specified method)', async () => {
+    const startedSpan = {
+      addTags: jest.fn(),
+      setTag: jest.fn(),
+      finish: jest.fn(),
+    };
+
+    const fakeTracer = {
+      startSpan: jest.fn(() => startedSpan),
+      inject: jest.fn(),
+    };
+
+    const middleware = createTraceRequestMiddleware({
+      tracer: fakeTracer,
+      context: { mock: true },
+    });
+
+    expect(fakeTracer.startSpan).toBeCalledTimes(0);
+
+    await middleware({
+      method: undefined,
+      baseURL: 'www.sima-land.ru/',
+      url: 'api/v2/something/123456/some-bff/123456',
+    }, () => ({ status: 200 }));
+
+    expect(fakeTracer.startSpan).toBeCalledTimes(1);
+    expect(fakeTracer.startSpan.mock.calls[0][0])
+      .toBe('HTTP GET www.sima-land.ru/api/v2/something/{id}/some-bff/123456');
+  });
 });
 
 describe('hideFirstId', () => {
