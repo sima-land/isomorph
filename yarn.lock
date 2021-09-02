@@ -5664,10 +5664,10 @@ micromatch@^4.0.4:
     braces "^3.0.1"
     picomatch "^2.2.3"
 
-middleware-axios@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/middleware-axios/-/middleware-axios-2.0.0.tgz#f6197f54d8e7b6d93380dc384879a56f3527798c"
-  integrity sha512-LeFyafZez8ts4+xe8lppmT8hatNoHh1uPqukNQqNurKmopJOIup5d7AY63cBOklstlKokqtretzom8rj3g54Rg==
+middleware-axios@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/middleware-axios/-/middleware-axios-2.1.1.tgz#c2b2845e88bb1a7b91768297fb249e1c6e83ea18"
+  integrity sha512-xZXrGL3ejHO+ahG9CEkTFAW1UpgHkOXzADLpYMfaXVg1g2yojqczobokvilpNT+sFO5UczSXpuKeP+qmCqsQAQ==
 
 mime-db@1.40.0:
   version "1.40.0"
