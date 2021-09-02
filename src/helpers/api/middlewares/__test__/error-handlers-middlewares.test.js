@@ -267,7 +267,7 @@ describe('createHandleExceptionMiddleware()', () => {
 
   it('should create instance', () => {
     expect(instance).toBeInstanceOf(Function);
-    expect(instance).toHaveLength(2);
+    expect(instance).toHaveLength(3);
   });
 
   it('shouldn`t capture exception for success response', async () => {

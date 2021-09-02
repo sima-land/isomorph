@@ -11,9 +11,12 @@ import { Tracer, Tags, FORMAT_HTTP_HEADERS, SpanContext } from 'opentracing';
 const createTraceRequestMiddleware = ({ tracer, context }: {
   tracer: Tracer;
   context: SpanContext;
-}): Middleware<any> => async function (config, next) {
+}): Middleware<any> => async function (config, next, defaults) {
+    const url = config.url || defaults.url || '';
+    const baseURL = config.baseURL || defaults.baseURL || '';
     const methodName = (config.method || 'GET').toUpperCase();
-    const [readyUrl, foundId] = hideFirstId(`${config.baseURL}${config.url}`);
+
+    const [readyUrl, foundId] = hideFirstId(`${baseURL}${url}`);
 
     const span = tracer.startSpan(`HTTP ${methodName} ${readyUrl}`, {
       childOf: context,

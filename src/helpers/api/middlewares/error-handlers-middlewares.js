@@ -1,22 +1,19 @@
 import { createService } from '../../../container';
-import isFunction from 'lodash/isFunction';
-import pathOr from 'lodash/fp/pathOr';
 import pick from 'lodash/pick';
-
-const getStatusCode = pathOr('UNKNOWN', 'status');
-const getConfig = pathOr({}, 'config');
 
 /**
  * Отправляет крошки http запроса.
  * @param {Function} sendBreadcrumb Функция отправки крошек.
- * @param {Object} response Объект в формате ответа Axios, содержащий данные о запросе.
+ * @param {Object} response Объект в формате ответа Axios, содержащий данные об ответе.
  * @param {boolean} asRequest Обработать как событие запроса.
  * @private
  */
 export const _sendHttpBreadcrumb = (sendBreadcrumb, response, asRequest = false) => {
-  const statusCode = asRequest ? 'FETCHING' : getStatusCode(response);
-  const { url, baseURL, method, params } = getConfig(response);
-  const fullURL = baseURL ? baseURL.replace(/\/$/, '') + url : url;
+  const statusCode = asRequest ? 'FETCHING' : response?.status || 'UNKNOWN';
+  const { url, baseURL, method, params } = response?.config || {};
+
+  const fullURL = baseURL ? `${baseURL.replace(/\/$/, '')}${url}` : url;
+
   const breadcrumb = {
     category: asRequest ? 'http.request' : 'http.response',
     type: 'http',
@@ -29,7 +26,7 @@ export const _sendHttpBreadcrumb = (sendBreadcrumb, response, asRequest = false)
     level: asRequest || (statusCode >= 200 && statusCode < 300) ? 'info' : 'error',
   };
 
-  isFunction(sendBreadcrumb) && sendBreadcrumb(breadcrumb);
+  sendBreadcrumb && sendBreadcrumb(breadcrumb);
 };
 
 /**
@@ -67,23 +64,17 @@ const _createAttachBreadcrumbsMiddleware = ({ captureBreadcrumb }) =>
  * @private
  */
 const _createHandleExceptionMiddleware = ({ captureExtendedException }) =>
-
-  /**
-   * Middleware для отправки исключения в сервис логирования.
-   * @param {Object} requestConfig Конфигурация запроса API.
-   * @param {Function} next Функция для передачи контекста выполнения следующему middleware.
-   * @return {Promise} Промис.
-   */
-  async (requestConfig, next) => {
+  async (config, next, defaults) => {
     try {
-      await next(requestConfig);
+      await next(config);
     } catch (error) {
       const { status } = error.response || {};
-      const { logLevelConfig } = requestConfig;
-      isFunction(captureExtendedException) && captureExtendedException(
+      const { logLevelConfig } = config;
+
+      captureExtendedException && captureExtendedException(
         error,
         pick(
-          requestConfig,
+          { ...defaults, ...config },
           ['url', 'baseURL', 'method', 'headers', 'params', 'data']
         ),
         {
@@ -104,6 +95,7 @@ const _createHandleExceptionMiddleware = ({ captureExtendedException }) =>
  */
 export const _getLevelFromConfig = (statusCode, logLevelConfig = {}) => {
   let level = logLevelConfig.default || 'warning';
+
   if (statusCode && logLevelConfig[statusCode]) {
     level = logLevelConfig[statusCode];
   }
