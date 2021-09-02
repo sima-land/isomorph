@@ -44,10 +44,12 @@ const _createAttachBreadcrumbsMiddleware = ({ captureBreadcrumb }) =>
    * @param {Function} next Функция для передачи контекста выполнения следующему middleware.
    * @return {Promise} Промис.
    */
-  async (requestConfig, next) => {
+  async (config, next, defaults) => {
     try {
-      _sendHttpBreadcrumb(captureBreadcrumb, { config: requestConfig }, true);
-      const apiResponse = await next(requestConfig);
+      _sendHttpBreadcrumb(captureBreadcrumb, { config: { ...defaults, ...config } }, true);
+
+      const apiResponse = await next(config);
+
       _sendHttpBreadcrumb(captureBreadcrumb, apiResponse);
     } catch (error) {
       error.isAxiosError && error.response && _sendHttpBreadcrumb(captureBreadcrumb, error.response);

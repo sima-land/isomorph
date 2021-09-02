@@ -130,7 +130,7 @@ describe('createAttachBreadcrumbsMiddleware()', () => {
   const instance = createAttachBreadcrumbsMiddleware(dept);
   it('should create instance', () => {
     expect(instance).toBeInstanceOf(Function);
-    expect(instance).toHaveLength(2);
+    expect(instance).toHaveLength(3);
   });
 
   it('should capture breadcrumbs for success response', async () => {
