@@ -1,4 +1,5 @@
-import { Middleware } from 'middleware-axios';
+import type { AxiosRequestConfig } from 'axios';
+import type { Middleware } from 'middleware-axios';
 import { Tracer, Tags, FORMAT_HTTP_HEADERS, SpanContext } from 'opentracing';
 
 /**
@@ -11,11 +12,10 @@ import { Tracer, Tags, FORMAT_HTTP_HEADERS, SpanContext } from 'opentracing';
 const createTraceRequestMiddleware = ({ tracer, context }: {
   tracer: Tracer;
   context: SpanContext;
-}): Middleware<any> => async function (config, next) {
-    const methodName = (config.method || 'GET').toUpperCase();
-    const [readyUrl, foundId] = hideFirstId(`${config.baseURL}${config.url}`);
+}): Middleware<any> => async function (config, next, defaults) {
+    const { method, url, foundId } = getRequestInfo(config, defaults);
 
-    const span = tracer.startSpan(`HTTP ${methodName} ${readyUrl}`, {
+    const span = tracer.startSpan(`HTTP ${method} ${url}`, {
       childOf: context,
     });
 
@@ -24,8 +24,8 @@ const createTraceRequestMiddleware = ({ tracer, context }: {
     }
 
     span.addTags({
-      [Tags.HTTP_URL]: readyUrl,
-      [Tags.HTTP_METHOD]: methodName,
+      [Tags.HTTP_URL]: url,
+      [Tags.HTTP_METHOD]: method,
       'request.params': { ...config.params },
       'request.headers': { ...config.headers },
 
@@ -40,6 +40,31 @@ const createTraceRequestMiddleware = ({ tracer, context }: {
     span.setTag(Tags.HTTP_STATUS_CODE, response.status);
     span.finish();
   };
+
+/**
+ * Формирует базовые данные запроса.
+ * Заменяет первое найденное число в url на "{id}", возвращая его в результате.
+ * @param config Axios-конфиг запроса.
+ * @param defaults Базовый конфиг экземпляра Axios.
+ * @return Базовые данные запроса.
+ */
+const getRequestInfo = (
+  config: AxiosRequestConfig,
+  defaults: AxiosRequestConfig
+): {
+  method: string;
+  url: string;
+  foundId?: number;
+} => {
+  const method = (config.method || 'GET').toUpperCase();
+  const baseURL = config.baseURL || defaults.baseURL || '';
+
+  // ВАЖНО: абстрагируем id только в url игнорируя baseURL
+  const [url, foundId] = hideFirstId(config.url || defaults.url || '');
+  const readyUrl = `${baseURL}${url}`;
+
+  return { method, url: readyUrl, foundId };
+};
 
 /**
  * Преобразует строку вида:
