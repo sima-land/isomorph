@@ -102,13 +102,13 @@ describe('createTraceRequestMiddleware', () => {
 
     await middleware({
       method: undefined,
-      baseURL: 'www.sima-land.ru/',
+      baseURL: 'foo-bar-2112.sima-land.ru/',
       url: 'api/v2/something/123456/some-bff/123456',
     }, () => ({ status: 200 }));
 
     expect(fakeTracer.startSpan).toBeCalledTimes(1);
     expect(fakeTracer.startSpan.mock.calls[0][0])
-      .toBe('HTTP GET www.sima-land.ru/api/v2/something/{id}/some-bff/123456');
+      .toBe('HTTP GET foo-bar-2112.sima-land.ru/api/v2/something/{id}/some-bff/123456');
   });
 
   it('should handle url/baseURL missing in config/defaults', async () => {
