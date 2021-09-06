@@ -26,7 +26,7 @@
     "express-http-proxy": "^1.5.1",
     "ioredis": "^4.10.0",
     "jaeger-client": "^3.15.0",
-    "middleware-axios": "^2.0.0",
+    "middleware-axios": "^2.1.1",
     "opentracing": "^0.14.3",
     "pino": "^5.13.1",
     "pino-pretty": "^3.2.0",

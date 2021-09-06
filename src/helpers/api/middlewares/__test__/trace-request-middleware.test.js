@@ -110,6 +110,39 @@ describe('createTraceRequestMiddleware', () => {
     expect(fakeTracer.startSpan.mock.calls[0][0])
       .toBe('HTTP GET foo-bar-2112.sima-land.ru/api/v2/something/{id}/some-bff/123456');
   });
+
+  it('should handle url/baseURL missing in config/defaults', async () => {
+    const startedSpan = {
+      addTags: jest.fn(),
+      setTag: jest.fn(),
+      finish: jest.fn(),
+    };
+
+    const fakeTracer = {
+      startSpan: jest.fn(() => startedSpan),
+      inject: jest.fn(),
+    };
+
+    const middleware = createTraceRequestMiddleware({
+      tracer: fakeTracer,
+      context: { mock: true },
+    });
+
+    expect(fakeTracer.startSpan).toBeCalledTimes(0);
+
+    await middleware({
+      method: undefined,
+      baseURL: undefined,
+      url: undefined,
+    }, () => ({ status: 200 }), {
+      baseURL: undefined,
+      url: undefined,
+    });
+
+    expect(fakeTracer.startSpan).toBeCalledTimes(1);
+    expect(fakeTracer.startSpan.mock.calls[0][0])
+      .toBe('HTTP GET ');
+  });
 });
 
 describe('hideFirstId', () => {
