@@ -1,15 +1,13 @@
 module.exports = {
   testEnvironment: 'jsdom',
-  preset: 'ts-jest/presets/js-with-babel',
   setupFiles: ['./.jest/setup.js'],
-  globals: {
-    'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.jest.json',
-      babelConfig: require('./babel.config'),
-    },
-  },
+  globalSetup: './.jest/global-setup.js',
   transformIgnorePatterns: [
     '/node_modules/',
+  ],
+  clearMocks: true,
+  snapshotSerializers: [
+    'enzyme-to-json/serializer',
   ],
   coverageThreshold: {
     global: {
@@ -19,8 +17,4 @@ module.exports = {
       statements: 100,
     },
   },
-  clearMocks: true,
-  snapshotSerializers: [
-    'enzyme-to-json/serializer',
-  ],
 };
