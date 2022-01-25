@@ -1,22 +1,11 @@
 import React, { createElement } from 'react';
 import { render } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { call } from '@redux-saga/core/effects';
-import { okoPush, sendAnalytics, useAnalytics } from '..';
+import { okoPush, useOkoPush } from '../oko';
 
-describe('sendAnalytics', () => {
-  const testEvent = { n: 'test-event', key: 'value' };
-
-  const gen = sendAnalytics({ n: 'test-event', key: 'value' });
-
-  it('should yield call with send function', () => {
-    expect(gen.next().value).toEqual(call(okoPush, testEvent));
-  });
-});
-
-describe('useAnalytics', () => {
+describe('useOkoPush', () => {
   const TestComponent = ({ prop }: any) => {
-    const fn = useAnalytics({
+    const fn = useOkoPush({
       n: 'test-event',
       prop,
     });
@@ -73,7 +62,7 @@ describe('useAnalytics', () => {
 
   it('should do not throw for complex object structure', () => {
     const ComplexTest = () => {
-      const fn = useAnalytics({
+      const fn = useOkoPush({
         n: 'custom',
         category: 'balance_goods',
         custom_str: ['minus'],
