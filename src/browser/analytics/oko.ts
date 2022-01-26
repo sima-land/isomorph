@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { call } from 'redux-saga/effects';
 import { isEqual, isFunction } from 'lodash';
 
 export type OkoEvent = Record<string, any>;
@@ -9,24 +8,18 @@ export type OkoEvent = Record<string, any>;
  * @param eventData Данные события для отправки.
  */
 export const okoPush = (eventData: OkoEvent) => {
-  // копируем объект так как window.oko.push меняет свой аргумент в процессе выполнения
-  isFunction((window as any).oko?.push) && (window as any).oko.push({ ...eventData });
-};
+  const win: any = window;
 
-/**
- * Эффект для отправки события в ОКО.
- * @param data Данные события для отправки в ОКО.
- */
-export function * sendAnalytics (data: OkoEvent) {
-  yield call(okoPush, data);
-}
+  // копируем объект так как window.oko.push меняет свой аргумент в процессе выполнения
+  isFunction(win.oko?.push) && win.oko.push({ ...eventData });
+};
 
 /**
  * Хук, возвращающий функцию, которая отправит аналитику в ОКО.
  * @param data Данные события для отправки в ОКО.
  * @return Функция.
  */
-export const useAnalytics = (data: OkoEvent) => {
+export const useOkoPush = (data: OkoEvent) => {
   const dataRef = useRef<OkoEvent>();
   const fnRef = useRef<() => void>();
 
