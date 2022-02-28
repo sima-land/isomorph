@@ -1,76 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ErrorBoundary should call captureException 1`] = `
-<ErrorBoundary
-  captureException={
-    [MockFunction] {
-      "calls": Array [
-        Array [
-          [Error: Test error],
-          Object {
-            "componentStack": "
-    in FailedComponent
-    in ErrorBoundary (created by WrapperComponent)
-    in WrapperComponent",
-          },
-        ],
-      ],
-      "results": Array [
-        Object {
-          "type": "return",
-          "value": undefined,
-        },
-      ],
-    }
-  }
-  fallback={null}
-/>
-`;
+exports[`ErrorBoundary should call captureException 1`] = `<div />`;
 
 exports[`ErrorBoundary should render children component 1`] = `
-<ErrorBoundary
-  fallback={null}
->
+<div>
   <div>
     Normal component
   </div>
-</ErrorBoundary>
+</div>
 `;
 
 exports[`ErrorBoundary should render fallback component 1`] = `
-<ErrorBoundary
-  fallback={
-    <div>
-      Fallback
-    </div>
-  }
->
+<div>
   <div>
     Fallback
   </div>
-</ErrorBoundary>
+</div>
 `;
 
 exports[`SafeSuspense should render with props 1`] = `
-<Suspense
-  captureException={[MockFunction]}
-  fallback={
-    <div>
-      Fallback
-    </div>
-  }
->
-  <ErrorBoundary
-    captureException={[MockFunction]}
-    fallback={
-      <div>
-        Fallback
-      </div>
-    }
-  >
-    <div>
-      Normal component
-    </div>
-  </ErrorBoundary>
-</Suspense>
+<div>
+  <div>
+    Normal component
+  </div>
+</div>
 `;

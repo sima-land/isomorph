@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 import { ErrorBoundary, SafeSuspense } from '..';
 
 describe('ErrorBoundary', () => {
@@ -8,19 +8,20 @@ describe('ErrorBoundary', () => {
   const FailedComponent = () => {
     throw error;
   };
+
   it('should render children component', () => {
-    const wrapper = mount(
+    const { container } = render(
       <ErrorBoundary fallback={null}>
         <div>Normal component</div>
       </ErrorBoundary>
     );
 
-    expect(wrapper.text()).toContain('Normal component');
-    expect(wrapper).toMatchSnapshot();
+    expect(container.textContent).toContain('Normal component');
+    expect(container).toMatchSnapshot();
   });
 
   it('should render fallback component', () => {
-    const wrapper = mount(
+    const { container } = render(
       <ErrorBoundary fallback={<div>Fallback</div>}>
         <>
           <div>Normal component</div>
@@ -29,14 +30,14 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    expect(wrapper.text()).toContain('Fallback');
-    expect(wrapper).toMatchSnapshot();
+    expect(container.textContent).toContain('Fallback');
+    expect(container).toMatchSnapshot();
   });
 
   it('should call captureException', () => {
     const handlerException = jest.fn();
 
-    const wrapper = mount(
+    const { container } = render(
       <ErrorBoundary fallback={null} captureException={handlerException}>
         <>
           <div>Normal component</div>
@@ -46,18 +47,18 @@ describe('ErrorBoundary', () => {
     );
 
     expect(handlerException).toBeCalledWith(error, { componentStack: expect.any(String) });
-    expect(wrapper).toMatchSnapshot();
+    expect(container).toMatchSnapshot();
   });
 });
 
 describe('SafeSuspense', () => {
   it('should render with props', () => {
-    const wrapper = shallow(
+    const { container } = render(
       <SafeSuspense fallback={<div>Fallback</div>} captureException={jest.fn()}>
         <div>Normal component</div>
       </SafeSuspense>
     );
 
-    expect(wrapper).toMatchSnapshot();
+    expect(container).toMatchSnapshot();
   });
 });

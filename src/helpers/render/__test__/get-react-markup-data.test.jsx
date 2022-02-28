@@ -4,6 +4,7 @@ import getReactMarkupData from '../get-react-markup-data';
 
 jest.mock('react-dom/server', () => {
   const original = jest.requireActual('react-dom/server');
+
   return {
     ...original,
     __esModule: true,
