@@ -14,9 +14,9 @@
     "build:before": "rimraf build",
     "build:main": "tsc --project tsconfig.build.json",
     "build:after": "node ./dist.js",
-    "build": "yarn build:before && yarn build:main && yarn build:after",
+    "build": "npm run build:before && npm run build:main && npm run build:after",
     "type-check": "tsc -p . --noEmit",
-    "dev": "cd ./examples/hello-world/ && yarn && yarn dev",
+    "dev": "cd ./examples/hello-world/ && npm run && npm run dev",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
     "coverage": "jest --clearCache && jest --coverage"
