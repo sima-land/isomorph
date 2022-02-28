@@ -5,7 +5,7 @@ import helloWorldHandler from '../handlers/hello-world';
 import { addErrorHandling } from '../../../../src/helpers/add-error-handling';
 
 /**
- * Ининциализирует приложение.
+ * Инициализирует приложение.
  * @param {Object} config Конфигурация приложения.
  * @param {number} config.mainPort Порт для основного сервера приложения.
  * @param {number} config.metricsPort Порт для сервера сбора метрик приложения.

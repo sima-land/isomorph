@@ -6,9 +6,6 @@ module.exports = {
     '/node_modules/',
   ],
   clearMocks: true,
-  snapshotSerializers: [
-    'enzyme-to-json/serializer',
-  ],
   coverageThreshold: {
     global: {
       branches: 100,
