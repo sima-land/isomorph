@@ -16,7 +16,6 @@
     "build:after": "node ./dist.js",
     "build": "npm run build:before && npm run build:main && npm run build:after",
     "type-check": "tsc -p . --noEmit",
-    "dev": "cd ./examples/hello-world/ && npm run && npm run dev",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
     "coverage": "jest --clearCache && jest --coverage"
