@@ -1,7 +1,7 @@
 import { Env } from '@humanwhocodes/env';
-import { IBaseConfig } from './types';
+import { BaseConfig } from './types';
 
-export function createBaseConfig(source: Env): IBaseConfig {
+export function createBaseConfig(source: Env): BaseConfig {
   const env = source.require('NODE_ENV');
   const appName = source.require('APP_NAME');
   const appVersion = source.require('APP_VERSION');
