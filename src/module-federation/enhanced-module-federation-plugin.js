@@ -44,9 +44,6 @@ const REMOTE_ERROR_TEXT = [
  * Плагин ModuleFederation будет добавлен в production режиме.
  */
 class EnhancedModuleFederationPlugin {
-  /** @type {EnhancedModuleFederationPluginOptions} */
-  #options;
-
   /**
    * @param {EnhancedModuleFederationPluginOptions} options Опции.
    */
@@ -71,7 +68,7 @@ class EnhancedModuleFederationPlugin {
       });
     }
 
-    this.#options = {
+    this._options = {
       ...options,
       remoteEntriesGlobalKey,
       containersGlobalKey,
@@ -92,7 +89,7 @@ class EnhancedModuleFederationPlugin {
       containersGlobalKey,
       useInDevelopment = false,
       ...originalOptions
-    } = this.#options;
+    } = this._options;
 
     const configuredRemotes = {};
 
@@ -116,14 +113,6 @@ class EnhancedModuleFederationPlugin {
         }).apply(compiler);
       }
     });
-  }
-
-  /**
-   * Геттер опций.
-   * @return {EnhancedModuleFederationPluginOptions} Опции плагина.
-   */
-  get options () {
-    return this.#options;
   }
 }
 

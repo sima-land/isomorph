@@ -230,20 +230,4 @@ describe('EnhancedModuleFederationPlugin', () => {
       }
     });
   });
-
-  it('should provide options getter', () => {
-    const options = {
-      name: 'service-name',
-      filename: 'path/to/RemoteEntry.js',
-      containersGlobalKey: 'test',
-      remoteEntriesGlobalKey: 'test',
-    };
-
-    const instance = new EnhancedMFPlugin(options);
-
-    expect(instance.options).toEqual({ ...options, library: {
-      type: 'global',
-      name: ['test', 'service-name'],
-    } });
-  });
 });
