@@ -8,14 +8,28 @@ const LIBRARY_ERROR_TEXT = [
   'For override "library" type use ModuleFederationPlugin.',
 ].join(' ');
 
-/** @typedef {string} Remote Имя удаленного сервиса (обычно совпадает с именем в git). */
+const REMOTE_ERROR_TEXT = [
+  'The value of the remote element must be a string,',
+  'or an object with field `name` for dynamic resolution of `remoteEntry`.',
+  'Set `remoteEntryPath` field to object for a static path to `remoteEntry`.',
+].join(' ');
+
+/** @typedef {string} RemoteName Имя удаленного сервиса (обычно совпадает с именем в git). */
+
+/**
+ * @typedef {Object} RemoteProperty Опции подключения удаленного сервиса.
+ * @property {RemoteName} name Имя удаленного сервиса.
+ * @property {string} remoteEntryPath Статический путь к remoteEntry удаленного сервиса.
+ * @property {string} [version] Версия удаленного сервиса в формате semver.
+ */
+
 /** @typedef {import('webpack').ModuleFederationPluginOptions} MFPluginOriginalOptions Опции. */
 
 /**
  * @typedef EnhancedModuleFederationPluginOptions Опции.
  * @param {string} name Имя сервиса.
  * @param {string} filename Имя удаленной точки входа.
- * @param {Object<string, Remote>} [remotes] Удаленные сервисы.
+ * @param {Object<string, RemoteName | RemoteProperty>} [remotes] Удаленные сервисы.
  * @param {MFPluginOriginalOptions.exposes} [exposes] Предоставляемые сервисы.
  * @param {MFPluginOriginalOptions.shared} [shared] Общие зависимости.
  * @param {string} [remoteEntriesGlobalKey = '__RemoteEntriesList__'] Ключ свойства в глобальном объекте,
@@ -37,12 +51,21 @@ class EnhancedModuleFederationPlugin {
     const {
       name,
       library,
+      remotes,
       remoteEntriesGlobalKey = '__RemoteEntriesList__',
       containersGlobalKey = '__FederationContainers__',
     } = options;
 
     if (library) {
       throw new WebpackError(LIBRARY_ERROR_TEXT);
+    }
+
+    if (remotes) {
+      Object.values(remotes).forEach(value => {
+        if (typeof value !== 'string' && !value?.name) {
+          throw new WebpackError(REMOTE_ERROR_TEXT);
+        }
+      });
     }
 
     this._options = {
@@ -70,12 +93,16 @@ class EnhancedModuleFederationPlugin {
 
     const configuredRemotes = {};
 
-    remotes && Object.keys(remotes).forEach(key => {
-      configuredRemotes[key] = { external: createExternalConfig(
-        remotes[key],
+    remotes && Object.entries(remotes).forEach(([key, value]) => {
+      const serviceName = value?.name || value;
+      const remoteEntryPath = value?.remoteEntryPath;
+
+      configuredRemotes[key] = { external: createExternalConfig({
+        serviceName,
+        remoteEntryPath,
         remoteEntriesGlobalKey,
-        containersGlobalKey
-      ) };
+        containersGlobalKey,
+      }) };
     });
 
     compiler.hooks.environment.tap('EnhancedModuleFederationPlugin', () => {

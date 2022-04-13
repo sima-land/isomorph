@@ -2,7 +2,7 @@ const EnhancedMFPlugin = require('../enhanced-module-federation-plugin');
 const { moduleFederationMock } = require('../../../__mocks__/webpack');
 
 jest.mock('../utils', () => ({
-  createExternalConfig: jest.fn(Array.of),
+  createExternalConfig: jest.fn(arg => arg),
 }));
 
 beforeEach(() => {
@@ -46,6 +46,14 @@ describe('EnhancedModuleFederationPlugin', () => {
       ].join(' '));
     });
 
+    it('shouldn`t creat and throw error, if remotes property incorrect', () => {
+      expect(() => new EnhancedMFPlugin({ remotes: { remoteOne: {} } })).toThrowError([
+        'The value of the remote element must be a string,',
+        'or an object with field `name` for dynamic resolution of `remoteEntry`.',
+        'Set `remoteEntryPath` field to object for a static path to `remoteEntry`.',
+      ].join(' '));
+    });
+
     it('shouldn`t creat for other case', () => {
       const compiler = { ...compilerHooks, options: { mode: 'development' } };
       const instance = new EnhancedMFPlugin({});
@@ -76,10 +84,18 @@ describe('EnhancedModuleFederationPlugin', () => {
         },
         remotes: {
           firstRemote: {
-            external: ['first-remote-service', '__RemoteEntriesList__', '__FederationContainers__'],
+            external: {
+              serviceName: 'first-remote-service',
+              remoteEntriesGlobalKey: '__RemoteEntriesList__',
+              containersGlobalKey: '__FederationContainers__',
+            },
           },
           secondRemote: {
-            external: ['second-remote-service', '__RemoteEntriesList__', '__FederationContainers__'],
+            external: {
+              serviceName: 'second-remote-service',
+              remoteEntriesGlobalKey: '__RemoteEntriesList__',
+              containersGlobalKey: '__FederationContainers__',
+            },
           },
         },
       });
@@ -106,10 +122,68 @@ describe('EnhancedModuleFederationPlugin', () => {
         },
         remotes: {
           firstRemote: {
-            external: ['first-remote-service', 'remotes-entry-key', 'containers-key'],
+            external: {
+              serviceName: 'first-remote-service',
+              remoteEntriesGlobalKey: 'remotes-entry-key',
+              containersGlobalKey: 'containers-key',
+            },
           },
           secondRemote: {
-            external: ['second-remote-service', 'remotes-entry-key', 'containers-key'],
+            external: {
+              serviceName: 'second-remote-service',
+              remoteEntriesGlobalKey: 'remotes-entry-key',
+              containersGlobalKey: 'containers-key',
+            },
+          },
+        },
+      });
+    });
+
+    it('for various remote type', () => {
+      const compiler = { ...compilerHooks, options: { mode: 'production' } };
+      const instance = new EnhancedMFPlugin({
+        name: 'service-name',
+        remotes: {
+          firstRemote: 'first-remote-service',
+          secondRemote: {
+            name: 'second-remote-service',
+          },
+          thirdRemote: {
+            name: 'third-remote-service',
+            remoteEntryPath: '//example.com/path/to/RemoteEntry.js',
+          },
+        },
+      });
+
+      instance.apply(compiler);
+      expect(moduleFederationMock.constructorImplementation).toBeCalledWith({
+        name: 'service-name',
+        library: {
+          type: 'global',
+          name: ['__FederationContainers__', 'service-name'],
+        },
+        remotes: {
+          firstRemote: {
+            external: {
+              serviceName: 'first-remote-service',
+              remoteEntriesGlobalKey: '__RemoteEntriesList__',
+              containersGlobalKey: '__FederationContainers__',
+            },
+          },
+          secondRemote: {
+            external: {
+              serviceName: 'second-remote-service',
+              remoteEntriesGlobalKey: '__RemoteEntriesList__',
+              containersGlobalKey: '__FederationContainers__',
+            },
+          },
+          thirdRemote: {
+            external: {
+              serviceName: 'third-remote-service',
+              remoteEntriesGlobalKey: '__RemoteEntriesList__',
+              containersGlobalKey: '__FederationContainers__',
+              remoteEntryPath: '//example.com/path/to/RemoteEntry.js',
+            },
           },
         },
       });

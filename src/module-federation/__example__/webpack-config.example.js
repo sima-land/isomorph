@@ -35,7 +35,14 @@ const HostServiceConfig = {
       {
         name: 'host-service-name',
         remotes: {
-          remoteService: 'remote-service-name',
+          firstRemoteService: 'first-remote-service-name', // Путь к remote entry определяется в рантайме
+          secondRemoteService: {
+            name: 'second-remote-service-name', // Путь к remote entry определяется в рантайме
+          },
+          thirdRemoteService: {
+            name: 'third-remote-service-name',
+            remoteEntryPath: '//path/to/remoteEntry.js', // Путь к remote entry задан явно
+          },
         },
       }
     ),
