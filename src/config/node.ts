@@ -2,6 +2,10 @@ import { Env } from '@humanwhocodes/env';
 import { config } from 'dotenv';
 import { defineEnvironment } from './utils';
 
+/**
+ * Возвращает "источник" для конфигурации.
+ * @return Источник.
+ */
 export function createConfigSource(): Env {
   // определяем среду
   const envName = defineEnvironment();

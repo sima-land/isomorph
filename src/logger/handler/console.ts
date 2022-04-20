@@ -3,6 +3,11 @@ import pino from 'pino';
 import pinoPretty from 'pino-pretty';
 import { LoggerEventHandler } from '../types';
 
+/**
+ * Возвращает новый handler для logger'а для вывода событий в терминал.
+ * @param config Конфиг.
+ * @return Handler.
+ */
 export function createConsoleHandler(config: BaseConfig): LoggerEventHandler {
   const isProd = config.env === 'production';
 

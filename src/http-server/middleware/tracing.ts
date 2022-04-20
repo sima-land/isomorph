@@ -3,6 +3,11 @@ import { trace, context } from '@opentelemetry/api';
 import type { Tracer } from '../../tracer/types';
 import type { Handler } from 'express';
 
+/**
+ * Возвращает новый middleware для трассировки стадий входящего запроса.
+ * @param tracer Tracer.
+ * @return Middleware.
+ */
 export function tracingMiddleware(tracer: Tracer): Handler {
   return (req, res, next) => {
     const rootSpan = tracer.startSpan('response');

@@ -6,6 +6,12 @@ export interface CookieStore {
   asHeader: () => string;
 }
 
+/**
+ * Возвращает новый middleware для работы с cookie на сервере.
+ * @param request Входящий запрос.
+ * @param response Исходящий ответ.
+ * @return Middleware.
+ */
 export function collectCookieMiddleware(request: Request, response: Response): Middleware<any> {
   const store = createCookieStore(request.get('cookie'));
 
@@ -25,9 +31,15 @@ export function collectCookieMiddleware(request: Request, response: Response): M
   };
 }
 
+/**
+ * Возвращает новое хранилище cookie.
+ * @param initialCookie Начальное значение cookie.
+ * @return Хранилище cookie.
+ */
 export function createCookieStore(initialCookie?: string): CookieStore {
   const data: Record<string, { name: string; value: string }> = {};
 
+  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
   function setItem(cookieItem: string) {
     const [cookieName, cookieValue] = cookieItem.split('=').map(item => item.trim());
 
@@ -42,6 +54,7 @@ export function createCookieStore(initialCookie?: string): CookieStore {
     }
   }
 
+  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
   function set(setCookieHeaderValues: string[]): void {
     for (const item of setCookieHeaderValues) {
       const [cookie] = item.split(';');
@@ -49,6 +62,7 @@ export function createCookieStore(initialCookie?: string): CookieStore {
     }
   }
 
+  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
   function asHeader(): string {
     return Object.values(data)
       .map(cookie => `${cookie.name}=${cookie.value}`)

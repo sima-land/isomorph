@@ -3,6 +3,12 @@ import type { Middleware } from 'middleware-axios';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
+/**
+ * Возвращает новый middleware для трассировки исходящих запросов.
+ * @param tracer Трейсер.
+ * @param rootContext Контекст.
+ * @return Middleware.
+ */
 export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middleware<any> {
   return async function (config, next, defaults) {
     const { method, url, foundId } = getRequestInfo(config, defaults);

@@ -8,6 +8,10 @@ export interface DefaultNodeMetrics {
   renderDuration: PromClient.Histogram<typeof ConventionalLabels.SSR[number]>;
 }
 
+/**
+ * Возвращает новое express-приложение, настроенное для выдачи информации о метриках.
+ * @return Приложение.
+ */
 export function createMetricsHttpApp(): Application {
   const app = express();
 
@@ -23,6 +27,10 @@ export function createMetricsHttpApp(): Application {
   return app;
 }
 
+/**
+ * Возвращает набор готовых метрик по умолчанию для приложений.
+ * @return Набор метрик.
+ */
 export function createDefaultMetrics(): DefaultNodeMetrics {
   return {
     requestCount: new PromClient.Counter({

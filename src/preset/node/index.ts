@@ -17,7 +17,12 @@ import { createDefaultMetrics, createMetricsHttpApp } from '../../metrics/node';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { create } from 'middleware-axios';
 import Express from 'express';
+import { Handlers } from '@sentry/node';
 
+/**
+ * Наполняет переданный контейнер зависимостями по умолчанию для Node.js приложений.
+ * @param container Контейнер.
+ */
 export function presetNodeApp(container: Container): void {
   container.set(Token.Config.source, createConfigSource);
 
@@ -62,10 +67,9 @@ export function presetNodeApp(container: Container): void {
     const metrics = createDefaultMetrics();
 
     return {
+      start: [Handlers.requestHandler()],
       logging: [loggingMiddleware(config, logger)],
-
       tracing: [tracingMiddleware(tracer)],
-
       metrics: [
         responseMetricsMiddleware(config, {
           counter: metrics.requestCount,
@@ -75,6 +79,7 @@ export function presetNodeApp(container: Container): void {
           histogram: metrics.renderDuration,
         }),
       ],
+      finish: [Handlers.errorHandler()],
     };
   });
 

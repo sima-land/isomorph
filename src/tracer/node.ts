@@ -8,6 +8,12 @@ import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import { Resource } from '@opentelemetry/resources';
 
+/**
+ * Возвращает новый tracer - объект для трассировки стадий различных процессов.
+ * @param config Конфиг.
+ * @param exporter Экспортер данных трассировки.
+ * @return Tracer.
+ */
 export function createTracer(config: BaseConfig, exporter: SpanExporter): Tracer {
   // @todo доделать по инструкции: https://selvaganesh93.medium.com/tracing-node-js-application-with-opentelemetry-jaeger-ui-9523c0ac8453
   const provider = new NodeTracerProvider({

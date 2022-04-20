@@ -4,6 +4,12 @@ import type { Logger, ConventionalFluentInfo } from '../../logger/types';
 import { getXClientIp } from '../utils';
 import { toMilliseconds } from '../../utils/number';
 
+/**
+ * Возвращает новый middleware для логирования запросов.
+ * @param config Конфиг.
+ * @param logger Logger.
+ * @return Middleware.
+ */
 export function loggingMiddleware(config: BaseConfig, logger: Logger): Handler {
   return function (req, res, next) {
     const start = process.hrtime.bigint();

@@ -5,6 +5,12 @@ import { toMilliseconds } from '../../utils/number';
 import { RESPONSE_EVENT } from '../constants';
 import { ConventionalLabels } from '../../metrics/constants';
 
+/**
+ * Возвращает новый middleware для формирования метрик входящего запроса.
+ * @param config Конфиг.
+ * @param metrics Метрики - счетчик запросов и гистограмма длительности ответа.
+ * @return Middleware.
+ */
 export function responseMetricsMiddleware(
   config: BaseConfig,
   metrics: {
@@ -12,6 +18,7 @@ export function responseMetricsMiddleware(
     histogram: PromClient.Histogram<typeof ConventionalLabels.HTTP_RESPONSE[number]>;
   },
 ): Handler {
+  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
   function resolveLabels(
     req: Request,
     res: Response,
@@ -39,6 +46,12 @@ export function responseMetricsMiddleware(
   };
 }
 
+/**
+ * Возвращает новый middleware для формирования метрик рендеринга верстки.
+ * @param config Конфиг.
+ * @param metrics Метрики - гистограмма длительности рендеринга.
+ * @return Middleware.
+ */
 export function renderMetricsMiddleware(
   config: BaseConfig,
   metrics: {
