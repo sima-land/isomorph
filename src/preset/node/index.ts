@@ -1,5 +1,6 @@
-import type { Container } from '../../container/types';
+import type { Preset } from '../types';
 import { KnownToken as Token } from '../../tokens';
+import { createPreset } from '..';
 import { createConfigSource } from '../../config/node';
 import { createBaseConfig } from '../../config';
 import { createLogger } from '../../logger';
@@ -20,68 +21,84 @@ import Express from 'express';
 import { Handlers } from '@sentry/node';
 
 /**
- * Наполняет переданный контейнер зависимостями по умолчанию для Node.js приложений.
- * @param container Контейнер.
+ * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
+ * @return Preset.
  */
-export function presetNodeApp(container: Container): void {
-  container.set(Token.Config.source, createConfigSource);
+export function PresetNode(): Preset {
+  return createPreset([
+    [Token.Config.source, createConfigSource],
 
-  container.set(Token.Config.base, resolve => createBaseConfig(resolve(Token.Config.source)));
+    [
+      Token.Config.base,
+      resolve => {
+        const source = resolve(Token.Config.source);
 
-  container.set(Token.logger, resolve => {
-    const source = resolve(Token.Config.source);
-    const config = resolve(Token.Config.base);
+        return createBaseConfig(source);
+      },
+    ],
 
-    const sentry = createSentryLib({
-      dsn: source.get('SENTRY_DSN'),
-      release: source.get('SENTRY_RELEASE'),
-      environment: source.get('SENTRY_ENVIRONMENT'),
-    });
+    [
+      Token.logger,
+      resolve => {
+        const source = resolve(Token.Config.source);
+        const config = resolve(Token.Config.base);
+        const sentry = createSentryLib({
+          dsn: source.get('SENTRY_DSN'),
+          release: source.get('SENTRY_RELEASE'),
+          environment: source.get('SENTRY_ENVIRONMENT'),
+        });
 
-    const logger = createLogger();
+        const logger = createLogger();
+        logger.subscribe(createConsoleHandler(config));
+        logger.subscribe(createSentryHandler(sentry));
 
-    logger.subscribe(createConsoleHandler(config));
-    logger.subscribe(createSentryHandler(sentry));
+        return logger;
+      },
+    ],
 
-    return logger;
-  });
+    [Token.Http.Server.factory, () => Express],
 
-  container.set(Token.Http.Server.factory, () => Express);
+    [Token.Http.Client.factory, () => create],
 
-  container.set(Token.Http.Client.factory, () => create);
+    [
+      Token.tracer,
+      resolve => {
+        const source = resolve(Token.Config.source);
 
-  container.set(Token.tracer, resolve => {
-    const source = resolve(Token.Config.source);
+        const exporter = new JaegerExporter({
+          endpoint: source.require('JAEGER_ENDPOINT'),
+        });
 
-    const exporter = new JaegerExporter({
-      endpoint: source.require('JAEGER_ENDPOINT'),
-    });
+        return createTracer(resolve(Token.Config.base), exporter);
+      },
+    ],
 
-    return createTracer(resolve(Token.Config.base), exporter);
-  });
+    [
+      Token.Http.Server.Defaults.middleware,
+      resolve => {
+        const config = resolve(Token.Config.base);
+        const logger = resolve(Token.logger);
+        const tracer = resolve(Token.tracer);
+        const metrics = createDefaultMetrics();
 
-  container.set(Token.Http.Server.Defaults.middleware, resolve => {
-    const config = resolve(Token.Config.base);
-    const logger = resolve(Token.logger);
-    const tracer = resolve(Token.tracer);
-    const metrics = createDefaultMetrics();
+        return {
+          start: [Handlers.requestHandler()],
+          logging: [loggingMiddleware(config, logger)],
+          tracing: [tracingMiddleware(tracer)],
+          metrics: [
+            responseMetricsMiddleware(config, {
+              counter: metrics.requestCount,
+              histogram: metrics.responseDuration,
+            }),
+            renderMetricsMiddleware(config, {
+              histogram: metrics.renderDuration,
+            }),
+          ],
+          finish: [Handlers.errorHandler()],
+        };
+      },
+    ],
 
-    return {
-      start: [Handlers.requestHandler()],
-      logging: [loggingMiddleware(config, logger)],
-      tracing: [tracingMiddleware(tracer)],
-      metrics: [
-        responseMetricsMiddleware(config, {
-          counter: metrics.requestCount,
-          histogram: metrics.responseDuration,
-        }),
-        renderMetricsMiddleware(config, {
-          histogram: metrics.renderDuration,
-        }),
-      ],
-      finish: [Handlers.errorHandler()],
-    };
-  });
-
-  container.set(Token.Metrics.httpApp, createMetricsHttpApp);
+    [Token.Metrics.httpApp, createMetricsHttpApp],
+  ]);
 }
