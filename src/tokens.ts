@@ -4,15 +4,14 @@ import type { DefaultMiddleware, ResponseContext } from './http-server/types';
 import type { SagaRunner } from './saga-runner/types';
 import type { Logger } from './logger/types';
 import type { HttpClientFactory } from './http-client/types';
-import type { BaseConfig } from './config/types';
-import type { Env } from '@humanwhocodes/env';
+import type { ConfigSource, BaseConfig } from './config/types';
 import type { Tracer } from './tracer/types';
 import type { Cache } from './cache/types';
 
 export const KnownToken = {
   // config
   Config: {
-    source: createToken<Env>('config.source'),
+    source: createToken<ConfigSource>('config.source'),
     base: createToken<BaseConfig>('config.base'),
   },
 

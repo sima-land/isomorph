@@ -1,3 +1,4 @@
+import type { ConfigSource } from './types';
 import { Env } from '@humanwhocodes/env';
 import { config } from 'dotenv';
 import { defineEnvironment } from './utils';
@@ -6,7 +7,7 @@ import { defineEnvironment } from './utils';
  * Возвращает "источник" для конфигурации.
  * @return Источник.
  */
-export function createConfigSource(): Env {
+export function createConfigSource(): ConfigSource {
   // определяем среду
   const envName = defineEnvironment();
 
