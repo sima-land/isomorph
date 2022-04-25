@@ -10,13 +10,12 @@ export const LIBRARY_ERROR_TEXT = [
 
 export const REMOTE_ERROR_TEXT = [
   'The value of the remote element must be a string,',
-  'or an object with field `name` for dynamic resolution of `remoteEntry`.',
-  'Set `remoteEntryPath` field to object for a static path to `remoteEntry`.',
+  'or an object with field "name" for dynamic resolution of "remoteEntry".',
+  'Set "remoteEntryPath" field to object for a static path to "remoteEntry".',
 ].join(' ');
 
 /**
- * Создает плагин ModuleFederation с опциями, необходимыми для оркестрации удаленных модулей на клиенте.
- * Плагин ModuleFederation будет добавлен в production режиме.
+ * Создает плагин ModuleFederation с опциями, необходимыми для оркестрации удаленных модулей в браузере.
  */
 export class ModuleFederationPlugin {
   /**
