@@ -2,6 +2,7 @@ import type { Store } from '@reduxjs/toolkit';
 import type { Logger } from '../logger/types';
 import type { SagaRunner } from './types';
 import createSagaMiddleware, { Saga, END } from 'redux-saga';
+import { SentryError } from '../error-tracker/utils';
 
 /**
  * Возвращает новый runner для redux-saga.
@@ -10,9 +11,12 @@ import createSagaMiddleware, { Saga, END } from 'redux-saga';
  */
 export function createSagaRunner(logger: Logger): SagaRunner {
   const middleware = createSagaMiddleware({
-    onError: error => {
-      // @todo сделать что-то вроде new SentryError({ context, meta, level })
-      logger.error(error);
+    onError: (error, { sagaStack }) => {
+      logger.error(
+        new SentryError(error.message, {
+          extra: { key: 'Saga stack', data: sagaStack },
+        }),
+      );
     },
   });
 
@@ -20,7 +24,7 @@ export function createSagaRunner(logger: Logger): SagaRunner {
     middleware,
 
     // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
-    prepare(store: Store, { timeout = 1000 }: { timeout?: number } = {}) {
+    prepare(store: Store, { timeout }: { timeout?: number } = {}) {
       return {
         // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
         async run<S extends Saga>(saga: S, ...args: Parameters<S>) {
@@ -36,15 +40,17 @@ export function createSagaRunner(logger: Logger): SagaRunner {
               }),
 
             // если сага не выполнилась за положенное время - прерываем
-            new Promise<void>(resolve => {
-              setTimeout(() => {
-                if (!ready) {
-                  logger.error(Error('Сага прервана по таймауту'));
-                  store.dispatch(END);
-                }
-                resolve();
-              }, timeout);
-            }),
+            typeof timeout === 'number' &&
+              Number.isFinite(timeout) &&
+              new Promise<void>(resolve => {
+                setTimeout(() => {
+                  if (!ready) {
+                    logger.error(Error('Сага прервана по таймауту'));
+                    store.dispatch(END);
+                  }
+                  resolve();
+                }, timeout);
+              }),
           ]);
         },
       };
