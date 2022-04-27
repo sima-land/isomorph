@@ -6,6 +6,11 @@ export interface ResponseContext {
   next: NextFunction;
 }
 
+export interface PageAssets {
+  js: string;
+  css: string;
+}
+
 export interface ConventionalJson {
   markup: string;
   bundle_js: string;

@@ -1,8 +1,6 @@
-import type { Container as OwjaContainer } from '@owja/ioc';
-
 export interface Token<T> {
   readonly _key: symbol;
-  readonly _resolve: (container: OwjaContainer) => T;
+  readonly _resolve: (registry: Map<symbol, any>) => T;
 }
 
 export interface Resolve {

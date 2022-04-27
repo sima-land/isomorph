@@ -1,5 +1,5 @@
-import type { Container, Resolve, Provider, Token } from './types';
-import { Container as OwjaContainer } from '@owja/ioc';
+/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+import type { Container, Provider, Token } from './types';
 
 /**
  * Возвращает новый токен.
@@ -11,8 +11,23 @@ export function createToken<T = never>(name?: string): Token<T> {
 
   return {
     _key: key,
-    _resolve: (container: OwjaContainer) => container.get(key),
+    _resolve: (registry: Map<symbol, any>) => registry.get(key) as T,
   };
+}
+
+export class NothingBoundError extends Error {
+  constructor(key: symbol) {
+    super(`Nothing bound to ${String(key)}`);
+    this.name = 'NothingBoundError';
+  }
+}
+
+export class CircularDependencyError extends Error {
+  constructor(trace: Token<any>[]) {
+    const names = trace.map(token => String(token._key)).join(' >> ');
+    super(`Circular dependency found, trace: ${names}`);
+    this.name = 'CircularDependencyError';
+  }
 }
 
 /**
@@ -20,51 +35,45 @@ export function createToken<T = never>(name?: string): Token<T> {
  * @return DI-контейнер.
  */
 export function createContainer(): Container {
-  // @todo избавиться от @owja/ioc так как он немного неправильно выводит ошибки
-  const container = new OwjaContainer();
+  const cache = new Map<symbol, any>();
+  const registry = new Map<symbol, Provider<any>>();
 
-  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
-  const resolve: Resolve = token => token._resolve(container);
-
-  return {
-    set: <T>(token: Token<T>, provider: Provider<T>) => {
-      container
-        .bind<T>(token._key)
-        .toFactory(() => provider(resolve))
-        .inSingletonScope();
-    },
-
-    get: resolve,
-  };
-}
-
-/**
- * Возвращает новый дочерний контейнер.
- * При отсутствии зарегистрированного сервиса, он будет искаться в родительском контейнере.
- * @param parent Родительский контейнер.
- * @return DI-контейнер.
- */
-export function attachContainer(parent: Container): Container {
-  const child = createContainer();
-
-  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
-  const resolve: Resolve = token => {
-    try {
-      return child.get(token);
-    } catch (error) {
-      if (typeof error === 'string' && error.startsWith('nothing bound to')) {
-        return parent.get(token);
-      } else {
-        throw error;
-      }
+  function resolve<T>(token: Token<T>, chain: Token<any>[]): T {
+    if (chain.includes(token)) {
+      throw new CircularDependencyError([...chain, token]);
+    } else {
+      chain.push(token);
     }
-  };
 
-  return {
-    set: (token, provider) => {
-      child.set(token, () => provider(resolve));
+    if (cache.has(token._key)) {
+      return cache.get(token._key);
+    } else if (registry.has(token._key)) {
+      const provider = registry.get(token._key);
+
+      if (typeof provider !== 'function') {
+        throw new Error('Provider is not a function');
+      }
+
+      const value = provider(otherToken => resolve(otherToken, chain));
+
+      // всегда как singleton
+      cache.set(token._key, value);
+
+      return value;
+    } else {
+      throw new NothingBoundError(token._key);
+    }
+  }
+
+  const container = {
+    set<T>(token: Token<T>, provider: Provider<T>): void {
+      registry.set(token._key, provider);
     },
 
-    get: resolve,
+    get<T>(token: Token<T>): T {
+      return resolve(token, []);
+    },
   };
+
+  return container;
 }
