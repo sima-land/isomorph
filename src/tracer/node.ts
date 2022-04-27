@@ -7,6 +7,7 @@ import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import { Resource } from '@opentelemetry/resources';
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 
 /**
  * Возвращает новый tracer - объект для трассировки стадий различных процессов.
@@ -26,6 +27,10 @@ export function createTracer(config: BaseConfig, exporter: SpanExporter): Tracer
 
   // @todo выяснить, почему не сходятся типы и приходится оставлять as any
   provider.addSpanProcessor(new BatchSpanProcessor(exporter) as any);
+
+  provider.register({
+    propagator: new JaegerPropagator(),
+  });
 
   registerInstrumentations({
     instrumentations: [new ExpressInstrumentation(), new HttpInstrumentation()],
