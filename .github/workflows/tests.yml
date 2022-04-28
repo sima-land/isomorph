@@ -28,4 +28,4 @@ jobs:
         run: npm run lint
 
       - name: Test
-        run: npm run coverage -- --forceExit
+        run: npm run test:coverage -- --forceExit
