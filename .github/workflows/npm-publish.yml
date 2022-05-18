@@ -25,7 +25,7 @@ jobs:
           npm run type-check
 
       - name: Test
-        run: npm run coverage -- --forceExit
+        run: npm run test:coverage
 
       - name: Build package
         run: |
