@@ -11,6 +11,16 @@ export interface PageAssets {
   css: string;
 }
 
+export interface PageTemplateData {
+  markup: string;
+  assets: PageAssets;
+  type: 'json' | 'html';
+}
+
+export interface PageTemplate {
+  (data: PageTemplateData): string;
+}
+
 export interface ConventionalJson {
   markup: string;
   bundle_js: string;

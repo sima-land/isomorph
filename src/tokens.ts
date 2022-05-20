@@ -1,6 +1,11 @@
 import { createToken } from './container';
 import type { Application } from 'express';
-import type { DefaultMiddleware, PageAssets, ResponseContext } from './http-server/types';
+import type {
+  DefaultMiddleware,
+  PageAssets,
+  PageTemplate,
+  ResponseContext,
+} from './http-server/types';
 import type { SagaRunner } from './saga-runner/types';
 import type { Logger } from './logger/types';
 import type { HttpClientFactory } from './http-client/types';
@@ -44,6 +49,7 @@ export const KnownToken = {
 
   // scope: page response
   Response: {
+    template: createToken<PageTemplate>('response/template'),
     context: createToken<ResponseContext>('response/context'),
     assets: createToken<PageAssets>('response/assets'),
     prepare: createToken<() => JSX.Element | Promise<JSX.Element>>('response/prepare'),

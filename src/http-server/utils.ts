@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { ConventionalJson, PageAssets } from './types';
+import type { ConventionalJson, PageAssets, PageTemplate, PageTemplateData } from './types';
 import { isIP } from 'net';
 
 /**
@@ -36,6 +36,7 @@ export class PageResponse {
   private type: 'html' | 'json';
   private html: string;
   private assets: PageAssets;
+  private _template: PageTemplate;
 
   static create() {
     return new PageResponse();
@@ -51,10 +52,15 @@ export class PageResponse {
     return result;
   }
 
+  static defaultTemplate({ markup }: PageTemplateData) {
+    return markup;
+  }
+
   constructor() {
     this.type = 'html';
     this.html = '';
     this.assets = { js: '', css: '' };
+    this._template = PageResponse.defaultTemplate;
   }
 
   markup(html: string) {
@@ -67,7 +73,7 @@ export class PageResponse {
     return this;
   }
 
-  style(url: string) {
+  styles(url: string) {
     this.assets.css = url;
     return this;
   }
@@ -77,11 +83,22 @@ export class PageResponse {
     return this;
   }
 
+  template(template: PageTemplate) {
+    this._template = template;
+    return this;
+  }
+
   send(res: Response) {
+    const templateData: PageTemplateData = {
+      type: this.type,
+      markup: this.html,
+      assets: this.assets,
+    };
+
     switch (this.type) {
       case 'json': {
         const result: ConventionalJson = {
-          markup: this.html,
+          markup: this._template(templateData),
           bundle_js: this.assets.js,
           bundle_css: this.assets.css,
         };
@@ -93,8 +110,7 @@ export class PageResponse {
         res.setHeader('simaland-bundle-js', this.assets.js);
         res.setHeader('simaland-bundle-css', this.assets.css);
 
-        // @todo dev-шаблон?
-        res.send(this.html);
+        res.send(this._template(templateData));
         break;
       }
       default:

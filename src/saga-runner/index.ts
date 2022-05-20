@@ -13,6 +13,7 @@ export function createSagaRunner(logger: Logger): SagaRunner {
   const middleware = createSagaMiddleware({
     onError: (error, { sagaStack }) => {
       logger.error(
+        // @todo убрать отсюда упоминание sentry, вынести в провайдер, возможно заменить аргумент logger на onError
         new SentryError(error.message, {
           extra: { key: 'Saga stack', data: sagaStack },
         }),
