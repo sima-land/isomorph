@@ -1,5 +1,5 @@
 import { RESPONSE_EVENT } from '../constants';
-import { propagation, ROOT_CONTEXT } from '@opentelemetry/api';
+import { propagation, ROOT_CONTEXT, trace } from '@opentelemetry/api';
 import type { Tracer } from '../../tracer/types';
 import type { Handler } from 'express';
 
@@ -10,8 +10,9 @@ import type { Handler } from 'express';
  */
 export function tracingMiddleware(tracer: Tracer): Handler {
   return (req, res, next) => {
-    const rootContext = propagation.extract(ROOT_CONTEXT, req.headers);
-    const rootSpan = tracer.startSpan('response', undefined, rootContext);
+    const externalContext = propagation.extract(ROOT_CONTEXT, req.headers);
+    const rootSpan = tracer.startSpan('response', undefined, externalContext);
+    const rootContext = trace.setSpan(externalContext, rootSpan);
 
     res.locals.tracing = {
       rootSpan,
