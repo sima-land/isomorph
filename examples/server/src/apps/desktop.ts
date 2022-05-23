@@ -22,7 +22,7 @@ export function DesktopApp() {
 const provideApi: Provider<Api> = resolve => {
   const ctx = resolve(KnownToken.Response.context);
   const config = resolve(KnownToken.Config.base);
-  const tracer = resolve(KnownToken.tracer);
+  const tracer = resolve(KnownToken.Tracing.tracer);
   const createClient = resolve(KnownToken.Http.Client.factory);
 
   return createApi({
