@@ -1,6 +1,5 @@
 import { RESPONSE_EVENT } from '../constants';
-import { propagation, ROOT_CONTEXT, trace } from '@opentelemetry/api';
-import type { Tracer } from '../../tracer/types';
+import { propagation, ROOT_CONTEXT, trace, Tracer } from '@opentelemetry/api';
 import type { Handler } from 'express';
 
 /**
