@@ -13,6 +13,7 @@ import type { ConfigSource, BaseConfig } from './config/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { Cache } from './cache/types';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/tracing';
+import type { Resource } from '@opentelemetry/resources';
 
 export const KnownToken = {
   // config
@@ -32,6 +33,7 @@ export const KnownToken = {
     tracer: createToken<Tracer>('tracing.tracer'),
     spanExporter: createToken<SpanExporter>('tracing.span-exporter'),
     tracerProvider: createToken<BasicTracerProvider>('tracing.tracer-provider'),
+    tracerProviderResource: createToken<Resource>('tracing.tracer-provider-resource'),
   },
 
   // metrics

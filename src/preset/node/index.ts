@@ -27,8 +27,8 @@ import Express from 'express';
 import { Handlers } from '@sentry/node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { getConventionalResource } from '../../tracing/utils';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -42,6 +42,7 @@ export function PresetNode(): Preset {
     [Token.Tracing.tracer, provideTracer],
     [Token.Tracing.spanExporter, provideSpanExporter],
     [Token.Tracing.tracerProvider, provideTracerProvider],
+    [Token.Tracing.tracerProviderResource, provideTracerProviderResource],
     [Token.Http.Client.factory, () => create],
     [Token.Http.Server.factory, () => Express],
     [Token.Http.Server.Defaults.middleware, provideDefaultMiddleware],
@@ -91,24 +92,26 @@ export const provideSpanExporter: Provider<SpanExporter> = resolve => {
 };
 
 export const provideTracerProvider: Provider<BasicTracerProvider> = resolve => {
-  const config = resolve(Token.Config.base);
   const exporter = resolve(Token.Tracing.spanExporter);
+  const resource = resolve(Token.Tracing.tracerProviderResource);
 
   const provider = new NodeTracerProvider({
-    resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: config.appName,
-      [SemanticResourceAttributes.SERVICE_VERSION]: config.appVersion,
-      [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: config.env,
-    }),
+    resource,
   });
 
-  // @todo разобраться с as any
-  provider.addSpanProcessor(new BatchSpanProcessor(exporter) as any);
+  provider.addSpanProcessor(new BatchSpanProcessor(exporter) as any); // @todo разобраться с as any
 
-  provider.register({ propagator: new JaegerPropagator() });
+  provider.register({
+    propagator: new JaegerPropagator(),
+  });
 
-  // @todo разобраться с as any
-  return provider as any;
+  return provider as any; // @todo разобраться с as any
+};
+
+export const provideTracerProviderResource: Provider<Resource> = resolve => {
+  const config = resolve(Token.Config.base);
+
+  return getConventionalResource(config);
 };
 
 export const provideDefaultMiddleware: Provider<DefaultMiddleware> = resolve => {
