@@ -1,15 +1,13 @@
 /* eslint-disable require-jsdoc */
-import type { Preset } from '../types';
-import type { Provider } from '../../container/types';
 import type { BaseConfig } from '../../config/types';
 import type { Logger } from '../../logger/types';
 import type { Tracer } from '@opentelemetry/api';
-import { BasicTracerProvider, BatchSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
 import type { DefaultMiddleware } from '../../http-server/types';
+import { Provider, Preset, createPreset } from '../../di';
+import { BasicTracerProvider, BatchSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
 import { KnownToken as Token } from '../../tokens';
-import { createPreset } from '..';
 import { createConfigSource } from '../../config/node';
-import { createBaseConfig } from '../../config';
+import { createBaseConfig } from '../../config/base';
 import { createLogger } from '../../logger';
 import { createConsoleHandler } from '../../logger/handler/console';
 import { createSentryHandler } from '../../logger/handler/sentry';

@@ -1,12 +1,9 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { Preset } from '../types';
-import type { Provider, Resolve } from '../../container/types';
 import type { SagaRunner } from '../../saga-runner/types';
 import type { PageTemplate } from '../../http-server/types';
 import type { Handler } from 'express';
-import { Application } from '../../container/application';
+import { Application, Preset, Provider, Resolve, CURRENT_APP, createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
-import { createPreset } from '..';
 import { renderToString } from 'react-dom/server';
 import { createSagaRunner } from '../../saga-runner';
 import { RESPONSE_EVENT } from '../../http-server/constants';
@@ -75,7 +72,7 @@ export const provideMain: Provider<() => void> = resolve => {
 
 export function HandlerProvider(appFactory: () => Application) {
   return function provider(resolve: Resolve): Handler {
-    const parent = resolve(Application.self);
+    const parent = resolve(CURRENT_APP);
 
     return function handler(req, res, next) {
       const app = appFactory();
