@@ -1,14 +1,13 @@
-import type { Provider } from '@sima-land/isomorph/container/types';
 import type { PageAssets } from '@sima-land/isomorph/http-server/types';
+import { Provider, createApplication } from '@sima-land/isomorph/di';
 import { PresetResponse } from '@sima-land/isomorph/preset/node/response';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 import { Token } from '../tokens';
 import { Api, createApi } from '../services/api';
 import { prepareDesktopPage } from '../pages/desktop';
-import { Application } from '@sima-land/isomorph/container/application';
 
 export function DesktopApp() {
-  const app = new Application();
+  const app = createApplication();
 
   app.preset(PresetResponse());
 

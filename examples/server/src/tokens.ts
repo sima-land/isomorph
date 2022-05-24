@@ -1,4 +1,4 @@
-import { createToken } from '@sima-land/isomorph/container';
+import { createToken } from '@sima-land/isomorph/di';
 import type { Application, Handler } from 'express';
 import type { Api } from './services/api';
 import type { Config } from './services/config';

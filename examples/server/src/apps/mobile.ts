@@ -1,12 +1,11 @@
-import type { Resolve } from '@sima-land/isomorph/container/types';
 import type { PageAssets } from '@sima-land/isomorph/http-server/types';
+import { Resolve, createApplication } from '@sima-land/isomorph/di';
 import { PresetResponse } from '@sima-land/isomorph/preset/node/response';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 import { prepareMobilePage } from '../pages/mobile';
-import { Application } from '@sima-land/isomorph/container/application';
 
-export function MobileApp(): Application {
-  const app = new Application();
+export function MobileApp() {
+  const app = createApplication();
 
   app.preset(PresetResponse());
 
