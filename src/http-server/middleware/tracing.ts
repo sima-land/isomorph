@@ -44,7 +44,7 @@ export function tracingMiddleware(tracer: Tracer): Handler {
  */
 export function getConventionalRequestAttrs(req: Request): Record<string, string | undefined> {
   const result: Record<string, string | undefined> = {
-    'request.path': req.path,
+    'request.path': req.originalUrl,
   };
 
   for (const headerName in req.headers) {
