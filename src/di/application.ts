@@ -1,24 +1,28 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { Container, Provider, Resolve, Token } from './types';
-import type { Preset } from '../preset/types';
-import { createContainer, createToken, NothingBoundError } from '.';
+import type {
+  Application,
+  Container,
+  Provider,
+  Resolve,
+  Token,
+  Binding,
+  ExtractType,
+  Preset,
+} from './types';
+import { NothingBoundError } from './errors';
+import { createToken } from './token';
+import { createContainer } from './container';
 
-type ExtractType<T extends readonly Token<any>[]> = {
-  [index in keyof T]: T[index] extends T[number] ? ReturnType<T[index]['_resolve']> : never;
-};
+/**
+ * Токен, с помощью которого можно достать из приложения само приложение.
+ */
+export const CURRENT_APP = createToken('application/self');
 
-interface Binding<T> {
-  toValue: (value: T) => void;
-  toProvider: (provider: Provider<T>) => void;
-}
-
-export class Application {
+class ApplicationImplementation implements Application {
   private container?: Container;
   private parent?: Application;
   private presets: Preset[];
   private providers: Map<Token<any>, Provider<any>>;
-
-  static readonly self = createToken('application/self');
 
   constructor() {
     this.providers = new Map();
@@ -59,7 +63,7 @@ export class Application {
   private configureContainer(): Container {
     const container = createContainer();
 
-    container.set(Application.self, () => this);
+    container.set(CURRENT_APP, () => this);
 
     for (const preset of this.presets) {
       preset.apply(this);
@@ -88,4 +92,8 @@ export class Application {
   ): void {
     fn(...(tokens.map(token => this.get(token)) as any));
   }
+}
+
+export function createApplication(): Application {
+  return new ApplicationImplementation();
 }

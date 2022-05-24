@@ -1,4 +1,4 @@
-import { createToken } from './container';
+import { createToken } from './di';
 import type { Application } from 'express';
 import type {
   DefaultMiddleware,

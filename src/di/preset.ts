@@ -1,6 +1,6 @@
-import type { Application } from '../container/application';
-import type { Provider, Token } from '../container/types';
-import type { Preset, PresetEntry } from './types';
+import type { Application, Provider, Token, Preset } from './types';
+
+type PresetEntry<T = any> = [Token<T>, Provider<T>];
 
 /**
  * Возвращает новый "preset" приложения - набор предустановленных компонентов которые можно переопределять.
