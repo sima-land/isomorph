@@ -28,6 +28,9 @@ export const KnownToken = {
   // logging
   logger: createToken<Logger>('logger'),
 
+  // saga runner
+  sagaRunner: createToken<SagaRunner>('saga-runner'),
+
   // tracing
   Tracing: {
     tracer: createToken<Tracer>('tracing.tracer'),
@@ -62,6 +65,5 @@ export const KnownToken = {
     prepare: createToken<() => JSX.Element | Promise<JSX.Element>>('response/prepare'),
     render: createToken<(element: JSX.Element) => string | Promise<string>>('response/render'),
     main: createToken<() => void>('response/main'),
-    sagaRunner: createToken<SagaRunner>('response/saga-runner'),
   },
 } as const;

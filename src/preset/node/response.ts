@@ -16,7 +16,7 @@ import { PageResponse } from '../../http-server/utils';
  */
 export function PresetResponse(): Preset {
   return createPreset([
-    [KnownToken.Response.sagaRunner, provideSagaRunner],
+    [KnownToken.sagaRunner, provideSagaRunner],
     [KnownToken.Response.render, provideRender],
     [KnownToken.Response.template, provideTemplate],
     [KnownToken.Response.main, provideMain],
@@ -70,6 +70,11 @@ export const provideMain: Provider<() => void> = resolve => {
   };
 };
 
+/**
+ * Возвращает express-handler, создающий дочернее di-приложение при запросе.
+ * @param appFactory Фабрика di-приложения запроса.
+ * @return Обработчик.
+ */
 export function HandlerProvider(appFactory: () => Application) {
   return function provider(resolve: Resolve): Handler {
     const parent = resolve(CURRENT_APP);
