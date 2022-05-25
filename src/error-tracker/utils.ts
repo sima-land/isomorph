@@ -1,4 +1,4 @@
-import { SentryErrorData } from './types';
+import { SentryErrorData, SentryBreadcrumbData } from './types';
 
 /**
  * Ошибка с данными для Sentry.
@@ -14,5 +14,19 @@ export class SentryError extends Error {
     super(message);
     this.data = data;
     this.name = 'SentryError';
+  }
+}
+
+/**
+ * Хлебная крошка для Sentry.
+ */
+export class SentryBreadcrumb {
+  data: SentryBreadcrumbData;
+
+  /**
+   * @param data Данные.
+   */
+  constructor(data: SentryBreadcrumbData) {
+    this.data = data;
   }
 }

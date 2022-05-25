@@ -1,4 +1,4 @@
-import type { Client, Severity, Context, Extra } from '@sentry/types';
+import type { Client, Severity, Context, Extra, Breadcrumb } from '@sentry/types';
 import type { withScope as withScopeBrowser } from '@sentry/browser';
 import type { withScope as withScopeNode } from '@sentry/node';
 
@@ -20,3 +20,5 @@ export interface SentryErrorData {
     data: Extra | null;
   };
 }
+
+export type SentryBreadcrumbData = Breadcrumb;

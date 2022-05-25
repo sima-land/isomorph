@@ -1,6 +1,6 @@
 import type { SentryLib } from '../../error-tracker/types';
 import type { LoggerEventHandler } from '../types';
-import { SentryError } from '../../error-tracker/utils';
+import { SentryBreadcrumb, SentryError } from '../../error-tracker/utils';
 
 /**
  * Возвращает новый handler для logger'а для отправки событий в Sentry.
@@ -9,6 +9,7 @@ import { SentryError } from '../../error-tracker/utils';
  */
 export function createSentryHandler(sentry: SentryLib): LoggerEventHandler {
   return event => {
+    // error
     if (event.type === 'error') {
       const error = event.data;
 
@@ -33,6 +34,15 @@ export function createSentryHandler(sentry: SentryLib): LoggerEventHandler {
       } else {
         sentry.client.captureException(error);
       }
+    }
+
+    // breadcrumb
+    if (event.data instanceof SentryBreadcrumb) {
+      const breadcrumb = event.data.data;
+
+      sentry.withScope(scope => {
+        scope.addBreadcrumb(breadcrumb);
+      });
     }
   };
 }
