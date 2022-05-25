@@ -34,10 +34,11 @@ const provideApi: Provider<Api> = resolve => {
 };
 
 const providePrepare: Provider<() => Promise<JSX.Element>> = resolve => {
+  const config = resolve(KnownToken.Config.base);
   const api = resolve(Token.Response.api);
-  const sagaRunner = resolve(KnownToken.Response.sagaRunner);
+  const sagaRunner = resolve(KnownToken.sagaRunner);
 
-  return () => prepareDesktopPage({ api, sagaRunner });
+  return () => prepareDesktopPage({ api, sagaRunner, config });
 };
 
 const provideAssets: Provider<PageAssets> = resolve => {
