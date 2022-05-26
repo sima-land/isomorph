@@ -11,6 +11,7 @@ import { defaultIntegrations } from '@sentry/browser';
 import type { SagaRunner } from '../../saga-runner/types';
 import type { Logger } from '../../logger/types';
 import type { BaseConfig } from '../../config/types';
+import { create } from 'middleware-axios';
 
 export function PresetBrowser() {
   return createPreset([
@@ -18,6 +19,7 @@ export function PresetBrowser() {
     [KnownToken.Config.base, provideBaseConfig],
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaRunner, provideSagaRunner],
+    [KnownToken.Http.Client.factory, () => create],
   ]);
 }
 
@@ -32,9 +34,9 @@ function provideLogger(resolve: Resolve): Logger {
 
   // @todo брать клиент и библиотеку из di-контейнера
   const sentry = createSentryLib({
-    dsn: source.get('SENTRY_CLIENT_DSN'),
-    release: source.get('SENTRY_RELEASE'),
-    environment: source.get('SENTRY_ENVIRONMENT'),
+    dsn: source.require('SENTRY_CLIENT_DSN'),
+    release: source.require('SENTRY_RELEASE'),
+    environment: source.require('SENTRY_ENVIRONMENT'),
     integrations: defaultIntegrations,
   });
 

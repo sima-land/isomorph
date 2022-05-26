@@ -58,14 +58,15 @@ export const provideLogger: Provider<Logger> = resolve => {
   const source = resolve(Token.Config.source);
   const config = resolve(Token.Config.base);
 
-  // @todo брать клиент и библиотеку из контейнера
+  // @todo брать клиент и библиотеку из di-контейнера
   const sentry = createSentryLib({
-    dsn: source.get('SENTRY_SERVER_DSN'),
-    release: source.get('SENTRY_RELEASE'),
-    environment: source.get('SENTRY_ENVIRONMENT'),
+    dsn: source.require('SENTRY_SERVER_DSN'),
+    release: source.require('SENTRY_RELEASE'),
+    environment: source.require('SENTRY_ENVIRONMENT'),
   });
 
   const logger = createLogger();
+
   logger.subscribe(createConsoleHandler(config));
   logger.subscribe(createSentryHandler(sentry));
 
