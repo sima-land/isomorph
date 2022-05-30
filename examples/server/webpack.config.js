@@ -1,6 +1,7 @@
 const path = require('path');
 const NodemonPlugin = require('nodemon-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
+const { EnvPlugin } = require('@sima-land/isomorph/utils/webpack');
 
 module.exports = {
   watch: true,
@@ -27,5 +28,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [new NodemonPlugin()],
+  plugins: [new NodemonPlugin(), new EnvPlugin()],
 };
