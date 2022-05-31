@@ -11,7 +11,6 @@ import { createBaseConfig } from '../../config/base';
 import { createLogger } from '../../logger';
 import { createConsoleHandler } from '../../logger/handler/console';
 import { createSentryHandler } from '../../logger/handler/sentry';
-import { createSentryLib } from '../../error-tracker/node';
 import { loggingMiddleware } from '../../http-server/middleware/logging';
 import { tracingMiddleware } from '../../http-server/middleware/tracing';
 import {
@@ -22,7 +21,7 @@ import { createDefaultMetrics, createMetricsHttpApp } from '../../metrics/node';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { create } from 'middleware-axios';
 import Express from 'express';
-import { Handlers } from '@sentry/node';
+import { Handlers, NodeClient, Hub, defaultIntegrations } from '@sentry/node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
@@ -58,17 +57,18 @@ export const provideLogger: Provider<Logger> = resolve => {
   const source = resolve(Token.Config.source);
   const config = resolve(Token.Config.base);
 
-  // @todo брать клиент и библиотеку из di-контейнера
-  const sentry = createSentryLib({
+  const client = new NodeClient({
     dsn: source.require('SENTRY_SERVER_DSN'),
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('SENTRY_ENVIRONMENT'),
+    integrations: [...defaultIntegrations],
   });
+  const hub = new Hub(client);
 
   const logger = createLogger();
 
   logger.subscribe(createConsoleHandler(config));
-  logger.subscribe(createSentryHandler(sentry));
+  logger.subscribe(createSentryHandler(hub));
 
   return logger;
 };

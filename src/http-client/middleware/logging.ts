@@ -11,7 +11,7 @@ import { Severity } from '@sentry/types';
  */
 export function loggingMiddleware(logger: Logger): Middleware<any> {
   return async function (config, next, defaults) {
-    const { baseURL, url, method = 'GET', params, data, headers } = { ...defaults, ...config };
+    const { baseURL, url, method = 'get', params, data } = { ...defaults, ...config };
     const readyMethod = method.toUpperCase();
     const readyURL = baseURL ? `${baseURL.replace(/\/$/, '')}${url}` : url;
 
@@ -22,7 +22,6 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
           type: 'http',
           data: {
             url: readyURL,
-            status_code: 'FETCHING',
             method: readyMethod,
             params,
           },
@@ -50,15 +49,18 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
         const statusCode = error.response?.status || 'UNKNOWN';
 
         logger.error(
-          new SentryError('HTTP request failed', {
+          new SentryError(`HTTP request failed with status code ${statusCode}`, {
             level: severityFromStatus(error.response?.status),
             context: {
               key: 'Request details',
               data: {
                 url,
                 baseURL,
-                method,
-                headers,
+                method: readyMethod,
+                headers: {
+                  ...config.headers,
+                  ...defaults.headers[readyMethod.toLowerCase() as keyof typeof defaults.headers],
+                },
                 params,
                 data,
               },

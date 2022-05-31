@@ -3,11 +3,10 @@ import { createPreset, Resolve } from '../../di';
 import { KnownToken } from '../../tokens';
 import { createBaseConfig } from '../../config/base';
 import { createConfigSource } from '../../config/browser';
-import { createSentryLib } from '../../error-tracker/browser';
 import { createLogger } from '../../logger';
 import { createSentryHandler } from '../../logger/handler/sentry';
 import { createSagaRunner } from '../../saga-runner';
-import { defaultIntegrations } from '@sentry/browser';
+import { BrowserClient, defaultIntegrations, Hub } from '@sentry/browser';
 import type { SagaRunner } from '../../saga-runner/types';
 import type { Logger } from '../../logger/types';
 import type { BaseConfig } from '../../config/types';
@@ -32,17 +31,18 @@ function provideBaseConfig(resolve: Resolve): BaseConfig {
 function provideLogger(resolve: Resolve): Logger {
   const source = resolve(KnownToken.Config.source);
 
-  // @todo брать клиент и библиотеку из di-контейнера
-  const sentry = createSentryLib({
+  const client = new BrowserClient({
     dsn: source.require('SENTRY_CLIENT_DSN'),
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('SENTRY_ENVIRONMENT'),
-    integrations: defaultIntegrations,
+    integrations: [...defaultIntegrations],
   });
+
+  const hub = new Hub(client);
 
   const logger = createLogger();
 
-  logger.subscribe(createSentryHandler(sentry));
+  logger.subscribe(createSentryHandler(hub));
 
   return logger;
 }

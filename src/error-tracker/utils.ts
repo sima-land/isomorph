@@ -13,7 +13,6 @@ export class SentryError extends Error {
   constructor(message: string, data: SentryErrorData = {}) {
     super(message);
     this.data = data;
-    this.name = 'SentryError';
   }
 }
 
