@@ -1,7 +1,7 @@
 import type { BaseConfig } from '../../config/types';
+import type { LoggerEventHandler } from '../types';
 import pino from 'pino';
 import pinoPretty from 'pino-pretty';
-import { LoggerEventHandler } from '../types';
 
 /**
  * Возвращает новый handler для logger'а для вывода событий в терминал.
@@ -22,10 +22,17 @@ export function createConsoleHandler(config: BaseConfig): LoggerEventHandler {
       : pinoPretty({ colorize: true }),
   );
 
-  return function (event) {
+  return function handler(event) {
     switch (event.type) {
+      case 'log':
       case 'info':
         logger.info(event.data);
+        break;
+      case 'warn':
+        logger.warn(event.data);
+        break;
+      case 'debug':
+        logger.debug(event.data);
         break;
       case 'error':
         logger.error(event.data);
