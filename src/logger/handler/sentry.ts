@@ -40,9 +40,7 @@ export function createSentryHandler(hub: Hub): LoggerEventHandler {
     if (event.data instanceof SentryBreadcrumb) {
       const breadcrumb = event.data.data;
 
-      hub.withScope(scope => {
-        scope.addBreadcrumb(breadcrumb);
-      });
+      hub.addBreadcrumb(breadcrumb);
     }
   };
 }
