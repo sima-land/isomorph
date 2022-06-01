@@ -25,7 +25,9 @@ import { Handlers, NodeClient, Hub, defaultIntegrations } from '@sentry/node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
-import { getConventionalResource } from '../../tracing/utils';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { getConventionalResource } from '../../tracing';
+import { hostname } from 'os';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -111,7 +113,11 @@ export const provideTracerProvider: Provider<BasicTracerProvider> = resolve => {
 export const provideTracerProviderResource: Provider<Resource> = resolve => {
   const config = resolve(Token.Config.base);
 
-  return getConventionalResource(config);
+  return getConventionalResource(config).merge(
+    new Resource({
+      [SemanticResourceAttributes.HOST_NAME]: hostname(),
+    }),
+  );
 };
 
 export const provideDefaultMiddleware: Provider<DefaultMiddleware> = resolve => {
