@@ -2,7 +2,7 @@
 import type { SagaRunner } from '../../saga-runner/types';
 import type { PageTemplate } from '../../http-server/types';
 import type { Handler } from 'express';
-import { Application, Preset, Provider, Resolve, CURRENT_APP, createPreset } from '../../di';
+import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { renderToString } from 'react-dom/server';
 import { createSagaRunner } from '../../saga-runner';
@@ -23,12 +23,12 @@ export function PresetResponse(): Preset {
   ]);
 }
 
-export const provideSagaRunner: Provider<SagaRunner> = resolve => {
+export function provideSagaRunner(resolve: Resolve): SagaRunner {
   const logger = resolve(KnownToken.logger);
   return createSagaRunner(logger);
-};
+}
 
-export const provideRender: Provider<(el: JSX.Element) => string | Promise<string>> = resolve => {
+export function provideRender(resolve: Resolve): (element: JSX.Element) => string {
   const { res } = resolve(KnownToken.Response.context);
 
   return function render(element: JSX.Element): string {
@@ -40,9 +40,9 @@ export const provideRender: Provider<(el: JSX.Element) => string | Promise<strin
 
     return result;
   };
-};
+}
 
-export const provideTemplate: Provider<PageTemplate> = resolve => {
+export function provideTemplate(resolve: Resolve): PageTemplate {
   const config = resolve(KnownToken.Config.base);
 
   return function template(data) {
@@ -50,9 +50,9 @@ export const provideTemplate: Provider<PageTemplate> = resolve => {
       ? pageTemplate({ ...data, title: `[dev] ${config.appName}` })
       : data.markup;
   };
-};
+}
 
-export const provideMain: Provider<() => void> = resolve => {
+export function provideMain(resolve: Resolve): VoidFunction {
   const context = resolve(KnownToken.Response.context);
   const assets = resolve(KnownToken.Response.assets);
   const prepare = resolve(KnownToken.Response.prepare);
@@ -68,7 +68,7 @@ export const provideMain: Provider<() => void> = resolve => {
       .template(template)
       .send(context.res);
   };
-};
+}
 
 /**
  * Возвращает express-handler, создающий дочернее di-приложение при запросе.

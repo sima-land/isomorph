@@ -1,9 +1,9 @@
-/* eslint-disable require-jsdoc */
+/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import type { BaseConfig } from '../../config/types';
 import type { Logger } from '../../logger/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { DefaultMiddleware } from '../../http-server/types';
-import { Provider, Preset, createPreset } from '../../di';
+import { Resolve, Preset, createPreset } from '../../di';
 import { BasicTracerProvider, BatchSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
 import { KnownToken as Token } from '../../tokens';
 import { createConfigSource } from '../../config/node';
@@ -49,13 +49,13 @@ export function PresetNode(): Preset {
   ]);
 }
 
-export const provideBaseConfig: Provider<BaseConfig> = resolve => {
+export function provideBaseConfig(resolve: Resolve): BaseConfig {
   const source = resolve(Token.Config.source);
 
   return createBaseConfig(source);
-};
+}
 
-export const provideLogger: Provider<Logger> = resolve => {
+export function provideLogger(resolve: Resolve): Logger {
   const source = resolve(Token.Config.source);
   const config = resolve(Token.Config.base);
 
@@ -73,16 +73,16 @@ export const provideLogger: Provider<Logger> = resolve => {
   logger.subscribe(createSentryHandler(hub));
 
   return logger;
-};
+}
 
-export const provideTracer: Provider<Tracer> = resolve => {
+export function provideTracer(resolve: Resolve): Tracer {
   const config = resolve(Token.Config.base);
   const provider = resolve(Token.Tracing.tracerProvider);
 
   return provider.getTracer(config.appName, config.appVersion);
-};
+}
 
-export const provideSpanExporter: Provider<SpanExporter> = resolve => {
+export function provideSpanExporter(resolve: Resolve): SpanExporter {
   const source = resolve(Token.Config.source);
 
   const exporter = new JaegerExporter({
@@ -91,9 +91,9 @@ export const provideSpanExporter: Provider<SpanExporter> = resolve => {
   });
 
   return exporter;
-};
+}
 
-export const provideTracerProvider: Provider<BasicTracerProvider> = resolve => {
+export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
   const exporter = resolve(Token.Tracing.spanExporter);
   const resource = resolve(Token.Tracing.tracerProviderResource);
 
@@ -108,9 +108,9 @@ export const provideTracerProvider: Provider<BasicTracerProvider> = resolve => {
   });
 
   return provider as any; // @todo разобраться с as any
-};
+}
 
-export const provideTracerProviderResource: Provider<Resource> = resolve => {
+export function provideTracerProviderResource(resolve: Resolve): Resource {
   const config = resolve(Token.Config.base);
 
   return getConventionalResource(config).merge(
@@ -118,9 +118,9 @@ export const provideTracerProviderResource: Provider<Resource> = resolve => {
       [SemanticResourceAttributes.HOST_NAME]: hostname(),
     }),
   );
-};
+}
 
-export const provideDefaultMiddleware: Provider<DefaultMiddleware> = resolve => {
+export function provideDefaultMiddleware(resolve: Resolve): DefaultMiddleware {
   const config = resolve(Token.Config.base);
   const logger = resolve(Token.logger);
   const tracer = resolve(Token.Tracing.tracer);
@@ -142,4 +142,4 @@ export const provideDefaultMiddleware: Provider<DefaultMiddleware> = resolve => 
     ],
     finish: [Handlers.errorHandler()],
   };
-};
+}

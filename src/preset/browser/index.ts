@@ -22,13 +22,13 @@ export function PresetBrowser() {
   ]);
 }
 
-function provideBaseConfig(resolve: Resolve): BaseConfig {
+export function provideBaseConfig(resolve: Resolve): BaseConfig {
   const source = resolve(KnownToken.Config.source);
 
   return createBaseConfig(source);
 }
 
-function provideLogger(resolve: Resolve): Logger {
+export function provideLogger(resolve: Resolve): Logger {
   const source = resolve(KnownToken.Config.source);
 
   const client = new BrowserClient({
@@ -47,7 +47,7 @@ function provideLogger(resolve: Resolve): Logger {
   return logger;
 }
 
-function provideSagaRunner(resolve: Resolve): SagaRunner {
+export function provideSagaRunner(resolve: Resolve): SagaRunner {
   const logger = resolve(KnownToken.logger);
 
   return createSagaRunner(logger);
