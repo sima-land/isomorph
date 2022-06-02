@@ -2,7 +2,7 @@ import type { Store } from '@reduxjs/toolkit';
 import type { Logger } from '../logger/types';
 import type { SagaRunner } from './types';
 import createSagaMiddleware, { Saga, END } from 'redux-saga';
-import { SentryError } from '../error-tracker/utils';
+import { SentryError } from '../error-tracking';
 
 /**
  * Возвращает новый runner для redux-saga.
@@ -46,7 +46,7 @@ export function createSagaRunner(logger: Logger): SagaRunner {
               new Promise<void>(resolve => {
                 setTimeout(() => {
                   if (!ready) {
-                    logger.error(Error('Сага прервана по таймауту'));
+                    logger.error(Error(`Сага прервана по таймауту (${timeout} миллисекунд)`));
                     store.dispatch(END);
                   }
                   resolve();

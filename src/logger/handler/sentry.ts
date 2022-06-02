@@ -1,6 +1,6 @@
 import type { LoggerEventHandler } from '../types';
 import type { Hub } from '@sentry/types';
-import { SentryBreadcrumb, SentryError } from '../../error-tracker/utils';
+import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 
 /**
  * Возвращает новый handler для logger'а для отправки событий в Sentry.

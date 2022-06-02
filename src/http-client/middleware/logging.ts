@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import { Middleware } from 'middleware-axios';
 import { Logger } from '../../logger/types';
-import { SentryBreadcrumb, SentryError } from '../../error-tracker/utils';
+import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 import { Severity } from '@sentry/types';
 
 /**

@@ -1,4 +1,4 @@
-import { SentryError } from '../utils';
+import { SentryError } from '..';
 
 describe('SentryError', () => {
   it('name should be just "Error"', () => {
