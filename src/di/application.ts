@@ -30,6 +30,7 @@ class ApplicationImplementation implements Application {
   }
 
   bind<T>(token: Token<T>): Binding<T> {
+    // @todo вынести реализацию Binding в отдельный класс (в целях оптимизации)
     return {
       toValue: value => {
         this.providers.set(token, () => value);
