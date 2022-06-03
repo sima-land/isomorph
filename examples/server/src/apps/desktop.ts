@@ -1,5 +1,5 @@
 import type { PageAssets } from '@sima-land/isomorph/http-server/types';
-import { Provider, createApplication } from '@sima-land/isomorph/di';
+import { Provider, createApplication, Resolve } from '@sima-land/isomorph/di';
 import { PresetResponse } from '@sima-land/isomorph/preset/node/response';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 import { Token } from '../tokens';
@@ -18,7 +18,7 @@ export function DesktopApp() {
   return app;
 }
 
-const provideApi: Provider<Api> = resolve => {
+function provideApi(resolve: Resolve): Api {
   const ctx = resolve(KnownToken.Response.context);
   const config = resolve(KnownToken.Config.base);
   const tracer = resolve(KnownToken.Tracing.tracer);
@@ -33,15 +33,15 @@ const provideApi: Provider<Api> = resolve => {
     logger,
     createClient,
   });
-};
+}
 
-const providePrepare: Provider<() => Promise<JSX.Element>> = resolve => {
+function providePrepare(resolve: Resolve): () => Promise<JSX.Element> {
   const config = resolve(KnownToken.Config.base);
   const api = resolve(Token.Response.api);
-  const sagaRunner = resolve(KnownToken.sagaRunner);
+  const sagaMiddleware = resolve(KnownToken.sagaMiddleware);
 
-  return () => prepareDesktopPage({ api, sagaRunner, config });
-};
+  return () => prepareDesktopPage({ api, config, sagaMiddleware });
+}
 
 const provideAssets: Provider<PageAssets> = resolve => {
   const source = resolve(KnownToken.Config.source);

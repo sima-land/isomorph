@@ -9,19 +9,17 @@ export function MobileApp() {
 
   app.preset(PresetResponse());
 
-  app.bind(KnownToken.Response.assets).toProvider(Provide.assets);
+  app.bind(KnownToken.Response.assets).toProvider(provideAssets);
   app.bind(KnownToken.Response.prepare).toValue(prepareMobilePage);
 
   return app;
 }
 
-const Provide = {
-  assets(resolve: Resolve): PageAssets {
-    const source = resolve(KnownToken.Config.source);
+function provideAssets(resolve: Resolve): PageAssets {
+  const source = resolve(KnownToken.Config.source);
 
-    return {
-      js: source.get('MOBILE_CLIENT_ASSET_JS') || '',
-      css: source.get('MOBILE_CLIENT_ASSET_CSS') || '',
-    };
-  },
-};
+  return {
+    js: source.get('MOBILE_CLIENT_ASSET_JS') || '',
+    css: source.get('MOBILE_CLIENT_ASSET_CSS') || '',
+  };
+}

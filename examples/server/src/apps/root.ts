@@ -1,5 +1,5 @@
 import type { Application as ExpressApp } from 'express';
-import { Provider, createApplication } from '@sima-land/isomorph/di';
+import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { Config, createConfig } from '../services/config';
 import { PresetNode } from '@sima-land/isomorph/preset/node';
 import { KnownToken } from '@sima-land/isomorph/tokens';
@@ -22,13 +22,13 @@ export function RootApp() {
   return app;
 }
 
-const provideConfig: Provider<Config> = resolve => {
+function provideConfig(resolve: Resolve): Config {
   const source = resolve(KnownToken.Config.source);
 
   return createConfig(source);
-};
+}
 
-const provideHttpApp: Provider<ExpressApp> = resolve => {
+function provideHttpApp(resolve: Resolve): ExpressApp {
   const desktop = resolve(Token.Root.desktopHandler);
   const mobile = resolve(Token.Root.mobileHandler);
   const createServer = resolve(KnownToken.Http.Server.factory);
@@ -39,4 +39,4 @@ const provideHttpApp: Provider<ExpressApp> = resolve => {
     handler: { desktop, mobile },
     middleware,
   });
-};
+}
