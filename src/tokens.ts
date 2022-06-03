@@ -6,7 +6,7 @@ import type {
   PageTemplate,
   ResponseContext,
 } from './http-server/types';
-import type { SagaRunner } from './saga-runner/types';
+import type { SagaExtendedMiddleware } from './utils/redux-saga';
 import type { Logger } from './logger/types';
 import type { HttpClientFactory } from './http-client/types';
 import type { ConfigSource, BaseConfig } from './config/types';
@@ -29,7 +29,7 @@ export const KnownToken = {
   logger: createToken<Logger>('logger'),
 
   // saga runner
-  sagaRunner: createToken<SagaRunner>('saga-runner'),
+  sagaMiddleware: createToken<SagaExtendedMiddleware>('saga-middleware'),
 
   // tracing
   Tracing: {

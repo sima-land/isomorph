@@ -1,14 +1,13 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { SagaRunner } from '../../saga-runner/types';
 import type { PageTemplate } from '../../http-server/types';
 import type { Handler } from 'express';
 import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { renderToString } from 'react-dom/server';
-import { createSagaRunner } from '../../saga-runner';
 import { RESPONSE_EVENT } from '../../http-server/constants';
 import { pageTemplate } from '../../http-server/template';
 import { PageResponse } from '../../http-server/utils';
+import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -16,16 +15,17 @@ import { PageResponse } from '../../http-server/utils';
  */
 export function PresetResponse(): Preset {
   return createPreset([
-    [KnownToken.sagaRunner, provideSagaRunner],
+    [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Response.render, provideRender],
     [KnownToken.Response.template, provideTemplate],
     [KnownToken.Response.main, provideMain],
   ]);
 }
 
-export function provideSagaRunner(resolve: Resolve): SagaRunner {
+export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware {
   const logger = resolve(KnownToken.logger);
-  return createSagaRunner(logger);
+
+  return createSagaMiddleware(logger);
 }
 
 export function provideRender(resolve: Resolve): (element: JSX.Element) => string {

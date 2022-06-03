@@ -3,21 +3,19 @@ import { createPreset, Resolve } from '../../di';
 import { KnownToken } from '../../tokens';
 import { createBaseConfig } from '../../config/base';
 import { createConfigSource } from '../../config/browser';
-import { createLogger } from '../../logger';
+import { Logger, createLogger } from '../../logger';
 import { createSentryHandler } from '../../logger/handler/sentry';
-import { createSagaRunner } from '../../saga-runner';
+import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
 import { BrowserClient, defaultIntegrations, Hub } from '@sentry/browser';
-import type { SagaRunner } from '../../saga-runner/types';
-import type { Logger } from '../../logger/types';
-import type { BaseConfig } from '../../config/types';
 import { create } from 'middleware-axios';
+import type { BaseConfig } from '../../config/types';
 
 export function PresetBrowser() {
   return createPreset([
     [KnownToken.Config.source, createConfigSource],
     [KnownToken.Config.base, provideBaseConfig],
     [KnownToken.logger, provideLogger],
-    [KnownToken.sagaRunner, provideSagaRunner],
+    [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Http.Client.factory, () => create],
   ]);
 }
@@ -47,8 +45,8 @@ export function provideLogger(resolve: Resolve): Logger {
   return logger;
 }
 
-export function provideSagaRunner(resolve: Resolve): SagaRunner {
+export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware {
   const logger = resolve(KnownToken.logger);
 
-  return createSagaRunner(logger);
+  return createSagaMiddleware(logger);
 }
