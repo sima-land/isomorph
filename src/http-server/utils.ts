@@ -35,12 +35,8 @@ export function getServiceHeaders(req: Request): Record<string, string | undefin
 export class PageResponse {
   private type: 'html' | 'json';
   private html: string;
-  private assets: PageAssets;
+  private _assets: PageAssets;
   private _template: PageTemplate;
-
-  static create() {
-    return new PageResponse();
-  }
 
   static defineFormat(req: Request): PageResponse['type'] {
     let result: PageResponse['type'] = 'html';
@@ -59,7 +55,7 @@ export class PageResponse {
   constructor() {
     this.type = 'html';
     this.html = '';
-    this.assets = { js: '', css: '' };
+    this._assets = { js: '', css: '' };
     this._template = PageResponse.defaultTemplate;
   }
 
@@ -68,13 +64,8 @@ export class PageResponse {
     return this;
   }
 
-  script(url: string) {
-    this.assets.js = url;
-    return this;
-  }
-
-  styles(url: string) {
-    this.assets.css = url;
+  assets(assets: PageAssets) {
+    this._assets = assets;
     return this;
   }
 
@@ -92,23 +83,33 @@ export class PageResponse {
     const templateData: PageTemplateData = {
       type: this.type,
       markup: this.html,
-      assets: this.assets,
+      assets: this._assets,
     };
 
     switch (this.type) {
       case 'json': {
         const result: ConventionalJson = {
           markup: this._template(templateData),
-          bundle_js: this.assets.js,
-          bundle_css: this.assets.css,
+          bundle_js: this._assets.js,
+          bundle_css: this._assets.css,
+          critical_js: this._assets.criticalJs,
+          critical_css: this._assets.criticalCss,
         };
 
         res.json(result);
         break;
       }
       case 'html': {
-        res.setHeader('simaland-bundle-js', this.assets.js);
-        res.setHeader('simaland-bundle-css', this.assets.css);
+        res.setHeader('simaland-bundle-js', this._assets.js);
+        res.setHeader('simaland-bundle-css', this._assets.css);
+
+        if (this._assets.criticalJs) {
+          res.setHeader('simaland-critical-js', this._assets.criticalJs);
+        }
+
+        if (this._assets.criticalCss) {
+          res.setHeader('simaland-critical-css', this._assets.criticalCss);
+        }
 
         res.send(this._template(templateData));
         break;

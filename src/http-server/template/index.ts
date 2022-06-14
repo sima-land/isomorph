@@ -19,8 +19,14 @@ export const pageTemplate = compile(`
       line-height: inherit;
     }
   </style>
+  <% if (assets.criticalCss) { %>
+    <link rel="stylesheet" href="<%= assets.criticalCss %>">
+  <% } %>
   <% if (assets.css) { %>
     <link rel="stylesheet" href="<%= assets.css %>">
+  <% } %>
+  <% if (assets.criticalJs) { %>
+    <script src="<%= assets.criticalJs %>"></script>
   <% } %>
 </head>
 <body>

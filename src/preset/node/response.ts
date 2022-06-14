@@ -60,10 +60,9 @@ export function provideMain(resolve: Resolve): VoidFunction {
   const template = resolve(KnownToken.Response.template);
 
   return async function main() {
-    PageResponse.create()
+    new PageResponse()
       .markup(await render(await prepare()))
-      .script(assets.js)
-      .styles(assets.css)
+      .assets(assets)
       .format(PageResponse.defineFormat(context.req))
       .template(template)
       .send(context.res);

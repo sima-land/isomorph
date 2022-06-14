@@ -9,6 +9,8 @@ export interface ResponseContext {
 export interface PageAssets {
   js: string;
   css: string;
+  criticalJs?: string;
+  criticalCss?: string;
 }
 
 export interface PageTemplateData {
