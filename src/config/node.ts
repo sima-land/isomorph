@@ -1,6 +1,7 @@
 import type { ConfigSource } from './types';
 import { Env } from '@humanwhocodes/env';
 import { config } from 'dotenv';
+import path from 'path';
 
 declare const __ISOMORPH_ENV__: unknown;
 
@@ -10,12 +11,14 @@ declare const __ISOMORPH_ENV__: unknown;
  */
 export function createConfigSource(): ConfigSource {
   const envName = process.env.NODE_ENV;
-  const source: Record<string, string | undefined> = { ...process.env };
 
   // подключаем соответствующий среде файл со значениями по умолчанию
   if (envName) {
-    config({ path: `./.env.${envName}` });
+    config({ path: path.resolve(process.cwd(), `./.env.${envName}`) });
   }
+
+  // после подключения env-файла формируем источник данных окружения
+  const source: Record<string, string | undefined> = { ...process.env };
 
   // докидываем зашиваемые переменные окружения
   if (typeof __ISOMORPH_ENV__ !== 'undefined') {
