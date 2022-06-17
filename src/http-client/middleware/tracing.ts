@@ -10,13 +10,21 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
  * @return Middleware.
  */
 export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middleware<any> {
-  return async function (config, next, defaults) {
+  return async function middleware(config, next, defaults) {
     const { method, url, foundId } = getRequestInfo(config, defaults);
     const span = tracer.startSpan(`HTTP ${method} ${url}`, undefined, rootContext);
 
     span.setAttributes({
       [SemanticAttributes.HTTP_URL]: url,
       [SemanticAttributes.HTTP_METHOD]: method,
+      'request.headers': JSON.stringify({
+        ...defaults.params,
+        ...config.params,
+      }),
+      'request.params': JSON.stringify({
+        ...defaults.headers[method.toLowerCase() as 'get'],
+        ...config.headers,
+      }),
 
       // если нашли id - добавляем в теги
       ...(foundId && { 'request.id': foundId }),
