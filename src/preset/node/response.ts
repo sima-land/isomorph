@@ -8,6 +8,12 @@ import { RESPONSE_EVENT } from '../../http-server/constants';
 import { pageTemplate } from '../../http-server/template';
 import { PageResponse } from '../../http-server/utils';
 import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
+import { HttpClientFactory } from '../../http-client/types';
+import { create } from 'middleware-axios';
+import { tracingMiddleware } from '../../http-client/middleware/tracing';
+import { loggingMiddleware } from '../../http-client/middleware/logging';
+import { passHeadersMiddleware } from '../../http-client/middleware/headers';
+import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -19,7 +25,26 @@ export function PresetResponse(): Preset {
     [KnownToken.Response.render, provideRender],
     [KnownToken.Response.template, provideTemplate],
     [KnownToken.Response.main, provideMain],
+    [KnownToken.Http.Client.factory, provideHttpClientFactory],
   ]);
+}
+
+export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
+  const logger = resolve(KnownToken.logger);
+  const tracer = resolve(KnownToken.Tracing.tracer);
+  const context = resolve(KnownToken.Response.context);
+
+  return function createHttpClient(config) {
+    return create(config)
+      .use(tracingMiddleware(tracer, context.res.locals.tracing.rootContext))
+      .use(loggingMiddleware(logger))
+      .use(
+        passHeadersMiddleware(context.req, {
+          predicate: headerName => headerName.startsWith('simaland-'),
+        }),
+      )
+      .use(collectCookieMiddleware(context.req, context.res));
+  };
 }
 
 export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware {
