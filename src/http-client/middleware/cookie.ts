@@ -15,7 +15,7 @@ export interface CookieStore {
 export function collectCookieMiddleware(request: Request, response: Response): Middleware<any> {
   const store = createCookieStore(request.get('cookie'));
 
-  return async function (config, next) {
+  return async function collectCookie(config, next) {
     const result = await next({
       ...config,
       headers: {

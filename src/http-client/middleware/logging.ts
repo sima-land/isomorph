@@ -10,7 +10,7 @@ import { Severity } from '@sentry/types';
  * @return Middleware.
  */
 export function loggingMiddleware(logger: Logger): Middleware<any> {
-  return async function (config, next, defaults) {
+  return async function log(config, next, defaults) {
     const { baseURL, url, method = 'get', params, data } = { ...defaults, ...config };
     const readyMethod = method.toUpperCase();
     const readyURL = baseURL ? `${baseURL.replace(/\/$/, '')}/${url}` : url;

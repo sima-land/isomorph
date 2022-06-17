@@ -10,7 +10,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
  * @return Middleware.
  */
 export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middleware<any> {
-  return async function middleware(config, next, defaults) {
+  return async function trace(config, next, defaults) {
     const { method, url, foundId } = getRequestInfo(config, defaults);
     const span = tracer.startSpan(`HTTP ${method} ${url}`, undefined, rootContext);
 
