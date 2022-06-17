@@ -17,11 +17,11 @@ export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middlew
     span.setAttributes({
       [SemanticAttributes.HTTP_URL]: url,
       [SemanticAttributes.HTTP_METHOD]: method,
-      'request.headers': JSON.stringify({
+      'request.params': JSON.stringify({
         ...defaults.params,
         ...config.params,
       }),
-      'request.params': JSON.stringify({
+      'request.headers': JSON.stringify({
         ...defaults.headers[method.toLowerCase() as 'get'],
         ...config.headers,
       }),
