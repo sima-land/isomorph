@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import type { Container, Provider, Token } from './types';
-import { CircularDependencyError, NothingBoundError } from './errors';
+import { AlreadyBoundError, CircularDependencyError, NothingBoundError } from './errors';
 
 class ContainerImplementation implements Container {
   cache: Map<symbol, any>;
@@ -12,6 +12,10 @@ class ContainerImplementation implements Container {
   }
 
   set<T>(token: Token<T>, provider: Provider<T>): void {
+    if (this.registry.has(token._key)) {
+      throw new AlreadyBoundError(token._key);
+    }
+
     this.registry.set(token._key, provider);
   }
 

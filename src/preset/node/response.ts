@@ -25,6 +25,7 @@ export function PresetResponse(): Preset {
     [KnownToken.Response.render, provideRender],
     [KnownToken.Response.template, provideTemplate],
     [KnownToken.Response.main, provideMain],
+    [KnownToken.Response.params, provideParams],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
   ]);
 }
@@ -92,6 +93,24 @@ export function provideMain(resolve: Resolve): VoidFunction {
       .template(template)
       .send(context.res);
   };
+}
+
+export function provideParams(resolve: Resolve): Record<string, unknown> {
+  const context = resolve(KnownToken.Response.context);
+
+  try {
+    const headerValue = context.req.header('simaland-params');
+
+    /**
+     * Node.js переводит в ASCII.
+     * @see {https://github.com/nodejs/node/issues/17390}
+     */
+    const processedValue = headerValue ? Buffer.from(headerValue, 'binary').toString('utf8') : '';
+
+    return processedValue ? JSON.parse(processedValue) : {};
+  } catch {
+    return {};
+  }
 }
 
 /**

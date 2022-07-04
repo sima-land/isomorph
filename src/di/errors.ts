@@ -15,6 +15,20 @@ export class NothingBoundError extends Error {
 }
 
 /**
+ * Ошибка, сообщающая, что в контейнере уже зарегистрирован компонент под таким токеном.
+ */
+export class AlreadyBoundError extends Error {
+  /**
+   * Конструктор.
+   * @param key Ключ целевой зависимости.
+   */
+  constructor(key: symbol) {
+    super(`Cannot rebind token, already bound: ${String(key)}`);
+    this.name = 'AlreadyBoundError';
+  }
+}
+
+/**
  * Ошибка, сообщающая, что обнаружена циклическая зависимость.
  */
 export class CircularDependencyError extends Error {

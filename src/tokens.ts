@@ -59,6 +59,7 @@ export const KnownToken = {
 
   // scope: page response
   Response: {
+    params: createToken<Record<string, unknown>>('response/params'),
     template: createToken<PageTemplate>('response/template'),
     context: createToken<ResponseContext>('response/context'),
     assets: createToken<PageAssets>('response/assets'),

@@ -9,7 +9,7 @@ import type {
   ExtractType,
   Preset,
 } from './types';
-import { NothingBoundError } from './errors';
+import { AlreadyBoundError, NothingBoundError } from './errors';
 import { createToken } from './token';
 import { createContainer } from './container';
 
@@ -30,6 +30,10 @@ class ApplicationImplementation implements Application {
   }
 
   bind<T>(token: Token<T>): Binding<T> {
+    if (this.providers.has(token)) {
+      throw new AlreadyBoundError(token._key);
+    }
+
     // @todo вынести реализацию Binding в отдельный класс (в целях оптимизации)
     return {
       toValue: value => {
