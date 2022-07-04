@@ -46,6 +46,14 @@ describe('ModuleFederationPlugin', () => {
     } as any;
   }
 
+  it('constructor should have specific name', () => {
+    /**
+     * Для того чтобы не подпадать под условие из @sentry/webpack-plugin.
+     * @see {@link https://github.com/getsentry/sentry-webpack-plugin/blob/master/src/index.js#L110}
+     */
+    expect(ModuleFederationPlugin.name).not.toBe('ModuleFederationPlugin');
+  });
+
   describe('ModuleFederationPlugin instance', () => {
     it('should apply original plugin', () => {
       const compiler = createCompilerMock();

@@ -17,7 +17,7 @@ export const REMOTE_ERROR_TEXT = [
 /**
  * Создает плагин ModuleFederation с опциями, необходимыми для оркестрации удаленных модулей в браузере.
  */
-export class ModuleFederationPlugin {
+class CustomModuleFederationPlugin {
   /**
    * Проверенные, готовые опции.
    */
@@ -90,3 +90,5 @@ export class ModuleFederationPlugin {
     });
   }
 }
+
+export { CustomModuleFederationPlugin as ModuleFederationPlugin };

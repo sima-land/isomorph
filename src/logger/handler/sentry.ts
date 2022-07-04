@@ -4,7 +4,7 @@ import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 
 /**
  * Возвращает новый handler для logger'а для отправки событий в Sentry.
- * @param hub Набор данных для работы с Sentry.
+ * @param hub Sentry Hub.
  * @return Handler.
  */
 export function createSentryHandler(hub: Hub): LoggerEventHandler {
