@@ -1,14 +1,16 @@
-import type { AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import type { AxiosInstanceWrapper, MethodName } from 'middleware-axios';
 
 // @todo передавать заголовки ответа
 export type SauceResponse<T = any> =
   | {
       ok: true;
+      status: number;
       data: T;
     }
   | {
       ok: false;
+      status?: unknown;
       error: any;
     };
 
@@ -39,9 +41,20 @@ export function sauce(instance: AxiosInstance | AxiosInstanceWrapper): Sauce {
     ): Promise<SauceResponse<Data>> {
       try {
         const response = await instance[methodName](...(args as [any]));
-        return { ok: true, data: response.data };
+
+        return {
+          ok: true,
+          status: response.status,
+          data: response.data,
+        };
       } catch (error) {
-        return { ok: false, error };
+        const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+
+        return {
+          ok: false,
+          status,
+          error,
+        };
       }
     };
   }
