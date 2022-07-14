@@ -21,16 +21,11 @@ export function DesktopApp() {
 function provideApi(resolve: Resolve): Api {
   const ctx = resolve(KnownToken.Response.context);
   const config = resolve(KnownToken.Config.base);
-  const tracer = resolve(KnownToken.Tracing.tracer);
-  const logger = resolve(KnownToken.logger);
   const createClient = resolve(KnownToken.Http.Client.factory);
 
   return createApi({
     request: ctx.req,
-    response: ctx.res,
     config,
-    tracer,
-    logger,
     createClient,
   });
 }
