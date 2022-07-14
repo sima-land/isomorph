@@ -16,7 +16,7 @@ import { createContainer } from './container';
 /**
  * Токен, с помощью которого можно достать из приложения само приложение.
  */
-export const CURRENT_APP = createToken('application/self');
+export const CURRENT_APP = createToken<Application>('application/self');
 
 class ApplicationImplementation implements Application {
   private container?: Container;
@@ -31,7 +31,7 @@ class ApplicationImplementation implements Application {
 
   bind<T>(token: Token<T>): Binding<T> {
     if (this.providers.has(token)) {
-      throw new AlreadyBoundError(token._key);
+      throw new AlreadyBoundError(token);
     }
 
     // @todo вынести реализацию Binding в отдельный класс (в целях оптимизации)
@@ -49,7 +49,7 @@ class ApplicationImplementation implements Application {
     try {
       return this.getContainer().get(token);
     } catch (error) {
-      if (error instanceof NothingBoundError && this.parent) {
+      if (error instanceof NothingBoundError && error.token === token && this.parent) {
         return this.parent.get(token);
       } else {
         throw error;
@@ -84,6 +84,10 @@ class ApplicationImplementation implements Application {
   }
 
   attach(parent: Application): void {
+    if (this.parent) {
+      throw Error('Cannot reattach application');
+    }
+
     this.parent = parent;
   }
 

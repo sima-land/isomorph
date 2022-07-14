@@ -31,7 +31,7 @@ export function responseMetricsMiddleware(
     };
   }
 
-  return (req, res, next) => {
+  return function responseMetrics(req, res, next) {
     const start = process.hrtime.bigint();
 
     metrics.counter.inc(resolveLabels(req, res), 1);
@@ -58,7 +58,7 @@ export function renderMetricsMiddleware(
     histogram: PromClient.Histogram<typeof ConventionalLabels.SSR[number]>;
   },
 ): Handler {
-  return (req, res, next) => {
+  return function renderMetrics(req, res, next) {
     let start: bigint | undefined;
 
     res.once(RESPONSE_EVENT.renderStart, () => {

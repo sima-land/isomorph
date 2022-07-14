@@ -4,13 +4,16 @@ import type { Token } from './types';
  * Ошибка, сообщающая, что в контейнере нет сервиса по заданному ключу.
  */
 export class NothingBoundError extends Error {
+  public readonly token: Token<any>;
+
   /**
    * Конструктор.
-   * @param key Ключ целевой зависимости.
+   * @param token Токен.
    */
-  constructor(key: symbol) {
-    super(`Nothing bound to ${String(key)}`);
+  constructor(token: Token<any>) {
+    super(`Nothing bound to ${String(token)}`);
     this.name = 'NothingBoundError';
+    this.token = token;
   }
 }
 
@@ -20,10 +23,10 @@ export class NothingBoundError extends Error {
 export class AlreadyBoundError extends Error {
   /**
    * Конструктор.
-   * @param key Ключ целевой зависимости.
+   * @param token Токен.
    */
-  constructor(key: symbol) {
-    super(`Cannot rebind token, already bound: ${String(key)}`);
+  constructor(token: Token<any>) {
+    super(`Cannot rebind token, already bound: ${String(token)}`);
     this.name = 'AlreadyBoundError';
   }
 }

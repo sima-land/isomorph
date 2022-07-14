@@ -37,6 +37,10 @@ export interface Application {
 }
 
 export interface Preset {
+  /** @deprecated */
   override: <T>(token: Token<T>, provider: Provider<T>) => this;
+
+  set: <T>(token: Token<T>, provider: Provider<T>) => this;
+
   apply: (app: Application) => void;
 }

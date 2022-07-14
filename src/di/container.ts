@@ -13,7 +13,7 @@ class ContainerImplementation implements Container {
 
   set<T>(token: Token<T>, provider: Provider<T>): void {
     if (this.registry.has(token._key)) {
-      throw new AlreadyBoundError(token._key);
+      throw new AlreadyBoundError(token);
     }
 
     this.registry.set(token._key, provider);
@@ -46,7 +46,7 @@ class ContainerImplementation implements Container {
 
       return value;
     } else {
-      throw new NothingBoundError(token._key);
+      throw new NothingBoundError(token);
     }
   }
 }
