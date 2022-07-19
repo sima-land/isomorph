@@ -1,4 +1,6 @@
-import { createApplication } from '../application';
+import { createApplication, CURRENT_APP } from '../application';
+import { AlreadyBoundError } from '../errors';
+import { createPreset } from '../preset';
 import { createToken } from '../token';
 
 describe('Application', () => {
@@ -31,6 +33,152 @@ describe('Application', () => {
     expect(() => {
       app.get(TOKEN.server);
     }).toThrow('Nothing bound to Token(server)');
+  });
+
+  it('should bound itself to known token', () => {
+    const app = createApplication();
+
+    expect(app.get(CURRENT_APP)).toBe(app);
+  });
+
+  it('bind() should return binding with .toValue() method', () => {
+    const token = createToken<any>('foo');
+    const app = createApplication();
+    const component = { count: 10 };
+
+    app.bind(token).toValue(component);
+
+    expect(app.get(token)).toBe(component);
+  });
+
+  it('should prevent second binding to same token', () => {
+    const token = createToken<number>('age');
+    const app = createApplication();
+
+    expect(() => {
+      app.bind(token).toValue(23);
+    }).not.toThrow(new AlreadyBoundError(token));
+
+    expect(() => {
+      app.bind(token).toValue(34);
+    }).toThrow(new AlreadyBoundError(token));
+  });
+
+  it('should handle presets', () => {
+    const TOKEN = {
+      admin: createToken<{ role: 'admin'; rule: { for: string } }>('rules'),
+      rules: createToken<Array<{ for: string }>>('admin'),
+    };
+
+    const adminPreset = createPreset([
+      [
+        TOKEN.admin,
+        resolve => {
+          const rules = resolve(TOKEN.rules);
+
+          return {
+            role: 'admin',
+            rule: rules.find(r => r.for === 'admin'),
+          };
+        },
+      ],
+    ]);
+
+    const rulesPreset = createPreset([
+      [TOKEN.rules, () => [{ for: 'admin' }, { for: 'user' }, { for: 'guest' }]],
+    ]);
+
+    const app = createApplication();
+
+    app.preset(adminPreset);
+    app.preset(rulesPreset);
+
+    expect(app.get(TOKEN.admin)).toEqual({
+      role: 'admin',
+      rule: { for: 'admin' },
+    });
+  });
+
+  it('should handle parent app attach', () => {
+    const TOKEN = {
+      config: createToken<{ port: number }>('config'),
+      server: createToken<{ start: VoidFunction }>('server'),
+    };
+
+    const parentApp = createApplication();
+    const childApp = createApplication();
+    const spy = jest.fn();
+
+    childApp.attach(parentApp);
+
+    childApp.bind(TOKEN.server).toProvider(resolve => {
+      const config = resolve(TOKEN.config);
+
+      return {
+        start() {
+          spy(config.port);
+        },
+      };
+    });
+
+    parentApp.bind(TOKEN.config).toValue({ port: 1200 });
+
+    const server = childApp.get(TOKEN.server);
+
+    expect(spy).toBeCalledTimes(0);
+    server.start();
+    expect(spy).toBeCalledTimes(1);
+    expect(spy).toBeCalledWith(1200);
+  });
+
+  it('should prevent reattach', () => {
+    const parentApp = createApplication();
+    const childApp = createApplication();
+    const otherApp = createApplication();
+
+    childApp.attach(parentApp);
+
+    // other app reattach
+    expect(() => {
+      childApp.attach(otherApp);
+    }).toThrow(Error('Cannot reattach application'));
+
+    // same app reattach
+    expect(() => {
+      childApp.attach(parentApp);
+    }).toThrow(Error('Cannot reattach application'));
+  });
+
+  it('invoke() should works properly', () => {
+    const TOKEN = {
+      sword: createToken<{ sharpness: number }>('sword'),
+      knight: createToken<{ power: number; attack: () => number }>('knight'),
+    } as const;
+
+    const app = createApplication();
+
+    app.bind(TOKEN.knight).toProvider(resolve => {
+      const weapon = resolve(TOKEN.sword);
+
+      return {
+        power: 12,
+
+        attack() {
+          return weapon.sharpness + this.power;
+        },
+      };
+    });
+
+    app.bind(TOKEN.sword).toValue({ sharpness: 5 });
+
+    const spy = jest.fn();
+
+    app.invoke([TOKEN.knight], knight => {
+      spy(knight.attack());
+    });
+
+    expect(spy).toBeCalledTimes(1);
+    expect(spy).toBeCalledWith(17);
   });
 
   // @todo Проверка рекурсии не работает, надо починить и зафиксировать тестами
