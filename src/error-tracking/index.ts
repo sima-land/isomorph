@@ -2,6 +2,7 @@ import { SentryErrorData, SentryBreadcrumbData } from './types';
 
 /**
  * Ошибка с данными для Sentry.
+ * @todo Этот класс должен называться либо SentryReadyError либо в названии вообще не должен фигурировать Sentry.
  */
 export class SentryError extends Error {
   data: SentryErrorData;
@@ -18,6 +19,7 @@ export class SentryError extends Error {
 
 /**
  * Хлебная крошка для Sentry.
+ * @todo Этот класс должен называться либо SentryReadyBreadcrumb либо в названии вообще не должен фигурировать Sentry.
  */
 export class SentryBreadcrumb {
   data: SentryBreadcrumbData;

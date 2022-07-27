@@ -29,6 +29,7 @@ export function createMetricsHttpApp(): Application {
 
 /**
  * Возвращает набор готовых метрик по умолчанию для приложений.
+ * @todo Возможно стоит унести это в пресет.
  * @return Набор метрик.
  */
 export function createDefaultMetrics(): DefaultNodeMetrics {
