@@ -14,6 +14,7 @@ import { tracingMiddleware } from '../../http-client/middleware/tracing';
 import { loggingMiddleware } from '../../http-client/middleware/logging';
 import { passHeadersMiddleware } from '../../http-client/middleware/headers';
 import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
+import { SSRError } from '../../http-server/errors';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -84,14 +85,33 @@ export function provideMain(resolve: Resolve): VoidFunction {
   const prepare = resolve(KnownToken.Response.prepare);
   const render = resolve(KnownToken.Response.render);
   const template = resolve(KnownToken.Response.template);
+  const logger = resolve(KnownToken.logger);
 
   return async function main() {
-    new PageResponse()
-      .markup(await render(await prepare()))
-      .assets(assets)
-      .format(PageResponse.defineFormat(context.req))
-      .template(template)
-      .send(context.res);
+    try {
+      new PageResponse()
+        .markup(await render(await prepare()))
+        .assets(assets)
+        .format(PageResponse.defineFormat(context.req))
+        .template(template)
+        .send(context.res);
+    } catch (error) {
+      let message;
+      let statusCode = 500;
+
+      if (error instanceof Error) {
+        message = error.message;
+
+        if (error instanceof SSRError) {
+          statusCode = error.statusCode;
+        }
+      } else {
+        message = String(error);
+      }
+
+      context.res.status(statusCode).send(message);
+      logger.error(error);
+    }
   };
 }
 
