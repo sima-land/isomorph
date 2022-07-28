@@ -18,6 +18,9 @@ import { createContainer } from './container';
  */
 export const CURRENT_APP = createToken<Application>('application/self');
 
+/**
+ * Реализация Application.
+ */
 class ApplicationImplementation implements Application {
   private container?: Container;
   private parent?: Application;
@@ -103,6 +106,10 @@ class ApplicationImplementation implements Application {
   }
 }
 
+/**
+ * Возвращает новое DI-приложение.
+ * @return DI-приложение.
+ */
 export function createApplication(): Application {
   return new ApplicationImplementation();
 }

@@ -1,15 +1,18 @@
 import type { container } from 'webpack';
 
+/** @internal */
 export interface RemoteProperty {
   name: string;
   remoteEntryPath?: string;
   version?: string;
 }
 
+/** @internal */
 export type OriginalModuleFederationPluginOptions = ConstructorParameters<
   typeof container.ModuleFederationPlugin
 >[0];
 
+/** @internal */
 export interface ModuleFederationPluginOptions {
   /** Имя сервиса. */
   name: string;
@@ -33,6 +36,7 @@ export interface ModuleFederationPluginOptions {
   containersGlobalKey?: string;
 }
 
+/** @internal */
 export type ReadyOptions = Omit<
   ModuleFederationPluginOptions,
   'remoteEntriesGlobalKey' | 'containersGlobalKey'

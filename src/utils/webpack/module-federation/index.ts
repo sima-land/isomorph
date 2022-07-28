@@ -2,12 +2,14 @@ import type { ModuleFederationPluginOptions, ReadyOptions } from './types';
 import { container, Compiler, WebpackError } from 'webpack';
 import { createExternalConfig } from './utils';
 
+/** @internal */
 export const LIBRARY_ERROR_TEXT = [
   'Property "library" set internally as "global" and not overridden.',
   'For override global variable name use "containersGlobalKey" property.',
   'For override "library" type use ModuleFederationPlugin.',
 ].join(' ');
 
+/** @internal */
 export const REMOTE_ERROR_TEXT = [
   'The value of the remote element must be a string,',
   'or an object with field "name" for dynamic resolution of "remoteEntry".',

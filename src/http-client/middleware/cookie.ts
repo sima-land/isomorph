@@ -33,6 +33,7 @@ export function collectCookieMiddleware(request: Request, response: Response): M
 
 /**
  * Возвращает новое хранилище cookie.
+ * @internal
  * @param initialCookie Начальное значение cookie.
  * @return Хранилище cookie.
  */

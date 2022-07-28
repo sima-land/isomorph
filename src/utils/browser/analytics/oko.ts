@@ -4,7 +4,7 @@ import { isEqual, isFunction } from 'lodash';
 export type OkoEvent = Record<string, any>;
 
 /**
- * Отправка аналитики в око.
+ * Получив объект события, запустит его отправку в ОКО (если на странице есть ОКО).
  * @param eventData Данные события для отправки.
  */
 export const okoPush = (eventData: OkoEvent) => {
@@ -16,6 +16,7 @@ export const okoPush = (eventData: OkoEvent) => {
 
 /**
  * Хук, возвращающий функцию, которая отправит аналитику в ОКО.
+ * Не позволяет менять данные для отправки.
  * @param data Данные события для отправки в ОКО.
  * @return Функция.
  */

@@ -2,9 +2,17 @@ import express, { Application } from 'express';
 import * as PromClient from 'prom-client';
 import { ConventionalLabels } from './constants';
 
+/**
+ * Распространенные метрики для Node.js приложения.
+ */
 export interface DefaultNodeMetrics {
+  /** Счетчик входящих запросов. */
   requestCount: PromClient.Counter<typeof ConventionalLabels.HTTP_RESPONSE[number]>;
+
+  /** Гистограмма длительности ответа. */
   responseDuration: PromClient.Histogram<typeof ConventionalLabels.HTTP_RESPONSE[number]>;
+
+  /** Гистограмма длительности SSR. */
   renderDuration: PromClient.Histogram<typeof ConventionalLabels.SSR[number]>;
 }
 

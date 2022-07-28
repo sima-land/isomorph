@@ -1,5 +1,8 @@
 import type { Severity, Context, Extra, Breadcrumb } from '@sentry/types';
 
+/**
+ * Данные ошибки для Sentry.
+ */
 export interface SentryErrorData {
   level?: Severity;
 
@@ -14,4 +17,7 @@ export interface SentryErrorData {
   };
 }
 
+/**
+ * Данные хлебной крошки для Sentry.
+ */
 export type SentryBreadcrumbData = Breadcrumb;

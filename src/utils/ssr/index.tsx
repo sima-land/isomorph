@@ -1,6 +1,9 @@
 import React from 'react';
 import jsesc from 'jsesc';
 
+/**
+ * Набор методов для связывания серверного и клиентского приложений.
+ */
 export const SsrBridge = {
   /**
    * Вызывается на сервере.

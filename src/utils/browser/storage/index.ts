@@ -1,10 +1,18 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 
+/**
+ * Интерфейс объекта-обертки для безопасной работы с WebStorage.
+ */
 export interface StorageUtils
   extends Pick<Storage, 'clear' | 'getItem' | 'key' | 'removeItem' | 'setItem' | 'length'> {
   isAvailable: () => boolean;
 }
 
+/**
+ * Возвращает объект для безопасной работы с браузерным хранилищем (LocalStorage, SessionStorage).
+ * @param getStorage Функция, которая должна вернуть целевое хранилище.
+ * @return Объект-обертка для безопасной работы с браузерным хранилищем.
+ */
 export function createStorageUtils(getStorage: () => Storage): StorageUtils {
   function isAvailable(): boolean {
     try {

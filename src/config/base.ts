@@ -1,8 +1,8 @@
 import type { ConfigSource, BaseConfig } from './types';
 
 /**
- * Возвращает базовую конфигурацию.
- * @param source Источник.
+ * Возвращает новую базовую конфигурацию.
+ * @param source Источник конфигурации.
  * @return Базовая конфигурация.
  */
 export function createBaseConfig(source: ConfigSource): BaseConfig {

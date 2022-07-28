@@ -4,7 +4,7 @@ import { Env } from '@humanwhocodes/env';
 declare const __ISOMORPH_ENV__: unknown;
 
 /**
- * Возвращает "источник" для конфигурации.
+ * Возвращает новый источник конфигурации для браузера.
  * @return Источник.
  */
 export function createConfigSource(): ConfigSource {

@@ -1,18 +1,21 @@
 import React from 'react';
 
+/**
+ * Опции компонентов ErrorBoundary и SafeSuspense.
+ */
 export interface Props {
-  /** Дочерний компонент. */
+  /** Дочерний элемент. */
   children: NonNullable<React.ReactNode> | null;
 
-  /** Запасной элемент, если возникла ошибка. */
+  /** Содержимое, которое будет выведено если возникла ошибка. */
   fallback: NonNullable<React.ReactNode> | null;
 
-  /** Функция для логирования ошибки. */
+  /** Функция для логирования ошибок. */
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 /**
- * Обработчик ошибок в React-компонентах.
+ * Компонент-предохранитель. Обработчик ошибок в React-компонентах.
  */
 export class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
   /**
@@ -24,12 +27,12 @@ export class ErrorBoundary extends React.Component<Props, { hasError: boolean }>
     this.state = { hasError: false };
   }
 
-  /** @inheritdoc */
+  /** @inheritDoc */
   static getDerivedStateFromError() {
     return { hasError: true };
   }
 
-  /** @inheritdoc */
+  /** @inheritDoc */
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // @todo добавить возможность брать onError из специального контекста (это упростит передачу из di-контейнера)
     const { onError } = this.props;

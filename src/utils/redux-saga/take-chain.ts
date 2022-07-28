@@ -18,6 +18,7 @@ export function takeChain<
 
 /**
  * Генерирует эффект по таймауту.
+ * @internal
  * @param timeout Время задержки в мс.
  * @param types Массив с типами ожидаемых экшенов.
  * @param task Генератор.
@@ -56,6 +57,7 @@ export function* generateTakeChain<
 
 /**
  * Вызывает экшен с заданной задержкой.
+ * @internal
  * @param timeout Время задержки в мс.
  * @param action Тип экшена.
  */

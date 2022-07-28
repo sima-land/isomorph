@@ -6,7 +6,7 @@ import path from 'path';
 declare const __ISOMORPH_ENV__: unknown;
 
 /**
- * Возвращает "источник" для конфигурации.
+ * Возвращает новый источник конфигурации для Node.js.
  * @return Источник.
  */
 export function createConfigSource(): ConfigSource {

@@ -1,13 +1,22 @@
 import type { PayloadAction, Draft } from '@reduxjs/toolkit';
 
+/**
+ * Статус загрузки данных.
+ */
 export type Status = 'initial' | 'fetching' | 'success' | 'failure';
 
+/**
+ * Базовая структура хранилища удаленных данных.
+ */
 export interface RemoteDataState<TData, TError> {
   data: TData;
   error: TError;
   status: Status;
 }
 
+/**
+ * Возможные статусы загрузки данных.
+ */
 export const STATUS: Record<Status, Status> = {
   initial: 'initial',
   fetching: 'fetching',
