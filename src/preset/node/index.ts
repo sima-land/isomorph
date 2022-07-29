@@ -28,6 +28,7 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { getConventionalResource } from '../../tracing';
 import { hostname } from 'os';
+import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -46,6 +47,7 @@ export function PresetNode(): Preset {
     [Token.Http.Server.factory, () => Express],
     [Token.Http.Server.Defaults.middleware, provideDefaultMiddleware],
     [Token.Metrics.httpApp, createMetricsHttpApp],
+    [Token.SsrBridge.serverSide, provideBridgeServerSide],
   ]);
 }
 
@@ -142,4 +144,10 @@ export function provideDefaultMiddleware(resolve: Resolve): DefaultMiddleware {
     ],
     finish: [Handlers.errorHandler()],
   };
+}
+
+export function provideBridgeServerSide(resolve: Resolve): BridgeServerSide {
+  const config = resolve(Token.Config.base);
+
+  return SsrBridge.prepare(config.appName);
 }

@@ -9,6 +9,7 @@ import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-
 import { BrowserClient, defaultIntegrations, Hub } from '@sentry/browser';
 import { create } from 'middleware-axios';
 import type { BaseConfig } from '../../config/types';
+import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 
 export function PresetBrowser() {
   return createPreset([
@@ -17,6 +18,7 @@ export function PresetBrowser() {
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Http.Client.factory, () => create],
+    [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
   ]);
 }
 
@@ -49,4 +51,10 @@ export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware 
   const logger = resolve(KnownToken.logger);
 
   return createSagaMiddleware(logger);
+}
+
+export function provideBridgeClientSide(resolve: Resolve): BridgeClientSide<unknown> {
+  const config = resolve(KnownToken.Config.base);
+
+  return SsrBridge.resolve(config.appName);
 }

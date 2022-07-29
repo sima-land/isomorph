@@ -14,6 +14,7 @@ import type { Tracer } from '@opentelemetry/api';
 import type { Cache } from './cache/types';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/tracing';
 import type { Resource } from '@opentelemetry/resources';
+import { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 
 export const KnownToken = {
   // config
@@ -66,5 +67,10 @@ export const KnownToken = {
     prepare: createToken<() => JSX.Element | Promise<JSX.Element>>('response/prepare'),
     render: createToken<(element: JSX.Element) => string | Promise<string>>('response/render'),
     main: createToken<() => void>('response/main'),
+  },
+
+  SsrBridge: {
+    clientSide: createToken<BridgeClientSide<unknown>>('ssr-bridge/client-side'),
+    serverSide: createToken<BridgeServerSide>('ssr-bridge/server-side'),
   },
 } as const;
