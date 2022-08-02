@@ -53,6 +53,7 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
 
         logger.error(
           new SentryError(`HTTP request failed with status code ${statusCode}`, {
+            // @todo в будущем дать возможность конфигурировать
             level: severityFromStatus(error.response?.status),
             context: {
               key: 'Request details',
@@ -94,11 +95,27 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
 
 /**
  * Возвращает уровень на основе статуса ответа.
+ * @todo Возможно стоит вынести в preset.
  * @param status Статус.
  * @return Уровень.
  */
 export function severityFromStatus(status: number | undefined) {
-  return typeof status === 'number' && status >= 200 && status < 300
-    ? Severity.Info
-    : Severity.Error;
+  let result: Severity;
+
+  if (typeof status === 'number') {
+    switch (true) {
+      case status >= 200 && status <= 299:
+        result = Severity.Info;
+        break;
+      case status >= 300 && status <= 499:
+        result = Severity.Warning;
+        break;
+      default:
+        result = Severity.Error;
+    }
+  } else {
+    result = Severity.Error;
+  }
+
+  return result;
 }

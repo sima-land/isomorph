@@ -304,8 +304,19 @@ describe('severityFromStatus', () => {
   it('should works', () => {
     expect(severityFromStatus(200)).toBe(Severity.Info);
     expect(severityFromStatus(201)).toBe(Severity.Info);
+    expect(severityFromStatus(204)).toBe(Severity.Info);
 
+    expect(severityFromStatus(300)).toBe(Severity.Warning);
+    expect(severityFromStatus(302)).toBe(Severity.Warning);
+    expect(severityFromStatus(400)).toBe(Severity.Warning);
+    expect(severityFromStatus(404)).toBe(Severity.Warning);
+    expect(severityFromStatus(422)).toBe(Severity.Warning);
+    expect(severityFromStatus(499)).toBe(Severity.Warning);
+
+    expect(severityFromStatus(undefined)).toBe(Severity.Error);
+    expect(severityFromStatus(100)).toBe(Severity.Error);
     expect(severityFromStatus(199)).toBe(Severity.Error);
-    expect(severityFromStatus(302)).toBe(Severity.Error);
+    expect(severityFromStatus(500)).toBe(Severity.Error);
+    expect(severityFromStatus(503)).toBe(Severity.Error);
   });
 });
