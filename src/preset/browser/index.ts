@@ -10,6 +10,8 @@ import { BrowserClient, defaultIntegrations, Hub } from '@sentry/browser';
 import { create } from 'middleware-axios';
 import type { BaseConfig } from '../../config/types';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
+import { StrictMap, KnownHttpApiKey } from '../types';
+import { HttpApiHostPool } from '../utils';
 
 export function PresetBrowser() {
   return createPreset([
@@ -19,6 +21,7 @@ export function PresetBrowser() {
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Http.Client.factory, () => create],
     [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
+    [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
 }
 
@@ -57,4 +60,18 @@ export function provideBridgeClientSide(resolve: Resolve): BridgeClientSide<unkn
   const config = resolve(KnownToken.Config.base);
 
   return SsrBridge.resolve(config.appName);
+}
+
+export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpApiKey> {
+  const source = resolve(KnownToken.Config.source);
+
+  return new HttpApiHostPool<KnownHttpApiKey>(
+    {
+      ilium: 'PUBLIC_API_URL_ILIUM',
+      simaV3: 'PUBLIC_API_URL_SIMALAND_V3',
+      simaV4: 'PUBLIC_API_URL_SIMALAND_V4',
+      simaV6: 'PUBLIC_API_URL_SIMALAND_V6',
+    },
+    source,
+  );
 }

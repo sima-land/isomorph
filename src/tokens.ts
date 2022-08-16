@@ -15,6 +15,7 @@ import type { Cache } from './cache/types';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/tracing';
 import type { Resource } from '@opentelemetry/resources';
 import { BridgeClientSide, BridgeServerSide } from './utils/ssr';
+import { StrictMap, KnownHttpApiKey } from './preset/types';
 
 export const KnownToken = {
   // config
@@ -55,6 +56,9 @@ export const KnownToken = {
       Defaults: {
         middleware: createToken<DefaultMiddleware>('http.server.defaults.middleware'),
       },
+    },
+    Api: {
+      knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http.api.known-hosts'),
     },
   },
 

@@ -5,7 +5,7 @@ import type { Tracer } from '@opentelemetry/api';
 import type { DefaultMiddleware } from '../../http-server/types';
 import { Resolve, Preset, createPreset } from '../../di';
 import { BasicTracerProvider, BatchSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
-import { KnownToken as Token } from '../../tokens';
+import { KnownToken } from '../../tokens';
 import { createConfigSource } from '../../config/node';
 import { createBaseConfig } from '../../config/base';
 import { createLogger } from '../../logger';
@@ -29,6 +29,8 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { getConventionalResource } from '../../tracing';
 import { hostname } from 'os';
 import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
+import { StrictMap, KnownHttpApiKey } from '../types';
+import { HttpApiHostPool } from '../utils';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -36,30 +38,31 @@ import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
  */
 export function PresetNode(): Preset {
   return createPreset([
-    [Token.Config.source, createConfigSource],
-    [Token.Config.base, provideBaseConfig],
-    [Token.logger, provideLogger],
-    [Token.Tracing.tracer, provideTracer],
-    [Token.Tracing.spanExporter, provideSpanExporter],
-    [Token.Tracing.tracerProvider, provideTracerProvider],
-    [Token.Tracing.tracerProviderResource, provideTracerProviderResource],
-    [Token.Http.Client.factory, () => create],
-    [Token.Http.Server.factory, () => Express],
-    [Token.Http.Server.Defaults.middleware, provideDefaultMiddleware],
-    [Token.Metrics.httpApp, createMetricsHttpApp],
-    [Token.SsrBridge.serverSide, provideBridgeServerSide],
+    [KnownToken.Config.source, createConfigSource],
+    [KnownToken.Config.base, provideBaseConfig],
+    [KnownToken.logger, provideLogger],
+    [KnownToken.Tracing.tracer, provideTracer],
+    [KnownToken.Tracing.spanExporter, provideSpanExporter],
+    [KnownToken.Tracing.tracerProvider, provideTracerProvider],
+    [KnownToken.Tracing.tracerProviderResource, provideTracerProviderResource],
+    [KnownToken.Http.Client.factory, () => create],
+    [KnownToken.Http.Server.factory, () => Express],
+    [KnownToken.Http.Server.Defaults.middleware, provideDefaultMiddleware],
+    [KnownToken.Metrics.httpApp, createMetricsHttpApp],
+    [KnownToken.SsrBridge.serverSide, provideBridgeServerSide],
+    [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
 }
 
 export function provideBaseConfig(resolve: Resolve): BaseConfig {
-  const source = resolve(Token.Config.source);
+  const source = resolve(KnownToken.Config.source);
 
   return createBaseConfig(source);
 }
 
 export function provideLogger(resolve: Resolve): Logger {
-  const source = resolve(Token.Config.source);
-  const config = resolve(Token.Config.base);
+  const source = resolve(KnownToken.Config.source);
+  const config = resolve(KnownToken.Config.base);
 
   const client = new NodeClient({
     dsn: source.require('SENTRY_SERVER_DSN'),
@@ -78,14 +81,14 @@ export function provideLogger(resolve: Resolve): Logger {
 }
 
 export function provideTracer(resolve: Resolve): Tracer {
-  const config = resolve(Token.Config.base);
-  const provider = resolve(Token.Tracing.tracerProvider);
+  const config = resolve(KnownToken.Config.base);
+  const provider = resolve(KnownToken.Tracing.tracerProvider);
 
   return provider.getTracer(config.appName, config.appVersion);
 }
 
 export function provideSpanExporter(resolve: Resolve): SpanExporter {
-  const source = resolve(Token.Config.source);
+  const source = resolve(KnownToken.Config.source);
 
   const exporter = new JaegerExporter({
     host: source.require('JAEGER_AGENT_HOST'),
@@ -96,8 +99,8 @@ export function provideSpanExporter(resolve: Resolve): SpanExporter {
 }
 
 export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
-  const exporter = resolve(Token.Tracing.spanExporter);
-  const resource = resolve(Token.Tracing.tracerProviderResource);
+  const exporter = resolve(KnownToken.Tracing.spanExporter);
+  const resource = resolve(KnownToken.Tracing.tracerProviderResource);
 
   const provider = new NodeTracerProvider({
     resource,
@@ -113,7 +116,7 @@ export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
 }
 
 export function provideTracerProviderResource(resolve: Resolve): Resource {
-  const config = resolve(Token.Config.base);
+  const config = resolve(KnownToken.Config.base);
 
   return getConventionalResource(config).merge(
     new Resource({
@@ -123,9 +126,9 @@ export function provideTracerProviderResource(resolve: Resolve): Resource {
 }
 
 export function provideDefaultMiddleware(resolve: Resolve): DefaultMiddleware {
-  const config = resolve(Token.Config.base);
-  const logger = resolve(Token.logger);
-  const tracer = resolve(Token.Tracing.tracer);
+  const config = resolve(KnownToken.Config.base);
+  const logger = resolve(KnownToken.logger);
+  const tracer = resolve(KnownToken.Tracing.tracer);
 
   const metrics = createDefaultMetrics();
 
@@ -147,7 +150,21 @@ export function provideDefaultMiddleware(resolve: Resolve): DefaultMiddleware {
 }
 
 export function provideBridgeServerSide(resolve: Resolve): BridgeServerSide {
-  const config = resolve(Token.Config.base);
+  const config = resolve(KnownToken.Config.base);
 
   return SsrBridge.prepare(config.appName);
+}
+
+export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpApiKey> {
+  const source = resolve(KnownToken.Config.source);
+
+  return new HttpApiHostPool(
+    {
+      ilium: 'API_URL_ILIUM',
+      simaV3: 'API_URL_SIMALAND_V3',
+      simaV4: 'API_URL_SIMALAND_V4',
+      simaV6: 'API_URL_SIMALAND_V6',
+    },
+    source,
+  );
 }
