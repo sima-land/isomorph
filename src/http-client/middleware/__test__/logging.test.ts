@@ -3,7 +3,6 @@ import { Next } from 'middleware-axios';
 import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
 import { Logger } from '../../../logger';
 import { loggingMiddleware, severityFromStatus } from '../logging';
-import { Severity } from '@sentry/types';
 
 jest.useFakeTimers();
 
@@ -56,7 +55,7 @@ describe('loggingMiddleware', () => {
           method: 'GET',
           params: undefined,
         },
-        level: Severity.Info,
+        level: 'info',
       }),
     ]);
     expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
@@ -69,7 +68,7 @@ describe('loggingMiddleware', () => {
           params: undefined,
           status_code: 200,
         },
-        level: Severity.Info,
+        level: 'info',
       }),
     ]);
   });
@@ -106,7 +105,7 @@ describe('loggingMiddleware', () => {
           method: 'GET',
           params: undefined,
         },
-        level: Severity.Info,
+        level: 'info',
       }),
     ]);
     expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
@@ -119,7 +118,7 @@ describe('loggingMiddleware', () => {
           params: undefined,
           status_code: 200,
         },
-        level: Severity.Info,
+        level: 'info',
       }),
     ]);
   });
@@ -157,7 +156,7 @@ describe('loggingMiddleware', () => {
           method: 'GET',
           params: undefined,
         },
-        level: Severity.Info,
+        level: 'info',
       }),
     ]);
     expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
@@ -170,7 +169,7 @@ describe('loggingMiddleware', () => {
           params: undefined,
           status_code: 200,
         },
-        level: Severity.Info,
+        level: 'info',
       }),
     ]);
   });
@@ -302,21 +301,21 @@ describe('loggingMiddleware', () => {
 
 describe('severityFromStatus', () => {
   it('should works', () => {
-    expect(severityFromStatus(200)).toBe(Severity.Info);
-    expect(severityFromStatus(201)).toBe(Severity.Info);
-    expect(severityFromStatus(204)).toBe(Severity.Info);
+    expect(severityFromStatus(200)).toBe('info');
+    expect(severityFromStatus(201)).toBe('info');
+    expect(severityFromStatus(204)).toBe('info');
 
-    expect(severityFromStatus(300)).toBe(Severity.Warning);
-    expect(severityFromStatus(302)).toBe(Severity.Warning);
-    expect(severityFromStatus(400)).toBe(Severity.Warning);
-    expect(severityFromStatus(404)).toBe(Severity.Warning);
-    expect(severityFromStatus(422)).toBe(Severity.Warning);
-    expect(severityFromStatus(499)).toBe(Severity.Warning);
+    expect(severityFromStatus(300)).toBe('warning');
+    expect(severityFromStatus(302)).toBe('warning');
+    expect(severityFromStatus(400)).toBe('warning');
+    expect(severityFromStatus(404)).toBe('warning');
+    expect(severityFromStatus(422)).toBe('warning');
+    expect(severityFromStatus(499)).toBe('warning');
 
-    expect(severityFromStatus(undefined)).toBe(Severity.Error);
-    expect(severityFromStatus(100)).toBe(Severity.Error);
-    expect(severityFromStatus(199)).toBe(Severity.Error);
-    expect(severityFromStatus(500)).toBe(Severity.Error);
-    expect(severityFromStatus(503)).toBe(Severity.Error);
+    expect(severityFromStatus(undefined)).toBe('error');
+    expect(severityFromStatus(100)).toBe('error');
+    expect(severityFromStatus(199)).toBe('error');
+    expect(severityFromStatus(500)).toBe('error');
+    expect(severityFromStatus(503)).toBe('error');
   });
 });

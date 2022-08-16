@@ -2,7 +2,7 @@ import Axios from 'axios';
 import { Middleware } from 'middleware-axios';
 import { Logger } from '../../logger/types';
 import { SentryBreadcrumb, SentryError } from '../../error-tracking';
-import { Severity } from '@sentry/types';
+import { SeverityLevel } from '@sentry/types';
 
 /**
  * Возвращает новый middleware для логирования запросов.
@@ -28,7 +28,7 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
             method: readyMethod,
             params,
           },
-          level: Severity.Info,
+          level: 'info',
         }),
       );
 
@@ -44,7 +44,7 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
             method: readyMethod,
             params,
           },
-          level: Severity.Info,
+          level: 'info',
         }),
       );
     } catch (error) {
@@ -82,7 +82,7 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
               method: readyMethod,
               params,
             },
-            level: Severity.Error,
+            level: 'error',
           }),
         );
       }
@@ -99,22 +99,22 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
  * @param status Статус.
  * @return Уровень.
  */
-export function severityFromStatus(status: number | undefined) {
-  let result: Severity;
+export function severityFromStatus(status: number | undefined): SeverityLevel {
+  let result: SeverityLevel;
 
   if (typeof status === 'number') {
     switch (true) {
       case status >= 200 && status <= 299:
-        result = Severity.Info;
+        result = 'info';
         break;
       case status >= 300 && status <= 499:
-        result = Severity.Warning;
+        result = 'warning';
         break;
       default:
-        result = Severity.Error;
+        result = 'error';
     }
   } else {
-    result = Severity.Error;
+    result = 'error';
   }
 
   return result;

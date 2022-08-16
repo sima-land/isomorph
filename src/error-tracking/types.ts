@@ -1,10 +1,10 @@
-import type { Severity, Context, Extra, Breadcrumb } from '@sentry/types';
+import type { SeverityLevel, Context, Extra, Breadcrumb } from '@sentry/types';
 
 /**
  * Данные ошибки для Sentry.
  */
 export interface SentryErrorData {
-  level?: Severity;
+  level?: SeverityLevel;
 
   context?: {
     key: string;

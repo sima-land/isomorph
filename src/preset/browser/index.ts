@@ -6,7 +6,13 @@ import { createConfigSource } from '../../config/browser';
 import { Logger, createLogger } from '../../logger';
 import { createSentryHandler } from '../../logger/handler/sentry';
 import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
-import { BrowserClient, defaultIntegrations, Hub } from '@sentry/browser';
+import {
+  BrowserClient,
+  Hub,
+  defaultIntegrations,
+  defaultStackParser,
+  makeFetchTransport,
+} from '@sentry/browser';
 import { create } from 'middleware-axios';
 import type { BaseConfig } from '../../config/types';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
@@ -35,6 +41,8 @@ export function provideLogger(resolve: Resolve): Logger {
   const source = resolve(KnownToken.Config.source);
 
   const client = new BrowserClient({
+    transport: makeFetchTransport,
+    stackParser: defaultStackParser,
     dsn: source.require('SENTRY_CLIENT_DSN'),
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('SENTRY_ENVIRONMENT'),

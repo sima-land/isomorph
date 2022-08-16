@@ -21,7 +21,14 @@ import { createDefaultMetrics, createMetricsHttpApp } from '../../metrics/node';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { create } from 'middleware-axios';
 import Express from 'express';
-import { Handlers, NodeClient, Hub, defaultIntegrations } from '@sentry/node';
+import {
+  Handlers,
+  NodeClient,
+  Hub,
+  defaultIntegrations,
+  defaultStackParser,
+  makeNodeTransport,
+} from '@sentry/node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
@@ -65,6 +72,8 @@ export function provideLogger(resolve: Resolve): Logger {
   const config = resolve(KnownToken.Config.base);
 
   const client = new NodeClient({
+    transport: makeNodeTransport,
+    stackParser: defaultStackParser,
     dsn: source.require('SENTRY_SERVER_DSN'),
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('SENTRY_ENVIRONMENT'),
