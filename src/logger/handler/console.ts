@@ -19,7 +19,10 @@ export function createConsoleHandler(config: BaseConfig): LoggerEventHandler {
             level: label => ({ level: label }),
           },
         }
-      : pinoPretty({ colorize: true }),
+      : pinoPretty({
+          colorize: true,
+          translateTime: 'yyyy-mm-dd HH:MM:ss.l o',
+        }),
   );
 
   return function handler(event) {
