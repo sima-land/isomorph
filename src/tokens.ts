@@ -73,6 +73,7 @@ export const KnownToken = {
     main: createToken<() => void>('response/main'),
   },
 
+  // SSR
   SsrBridge: {
     clientSide: createToken<BridgeClientSide<unknown>>('ssr-bridge/client-side'),
     serverSide: createToken<BridgeServerSide>('ssr-bridge/server-side'),

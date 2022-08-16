@@ -29,7 +29,7 @@ function provideApi(resolve: Resolve): Api {
   return createApi({
     simaV3: sauce(
       createClient({
-        baseURL: knownHosts.getUrl('simaV3'),
+        baseURL: knownHosts.get('simaV3'),
         headers: getRequestHeaders(config, context.req),
       }),
     ),
