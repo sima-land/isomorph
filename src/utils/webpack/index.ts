@@ -65,6 +65,7 @@ export class EnvPlugin {
 
       if (this.options.define) {
         new webpack.DefinePlugin(
+          // @todo похоже для консистентности здесь должно быть не this.options.define а valuesNode
           Object.entries(this.options.define).reduce<Record<string, string>>(
             (acc, [key, value]) => {
               acc[`process.env.${key}`] = JSON.stringify(value);

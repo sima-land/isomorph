@@ -43,9 +43,9 @@ export function provideLogger(resolve: Resolve): Logger {
   const client = new BrowserClient({
     transport: makeFetchTransport,
     stackParser: defaultStackParser,
-    dsn: source.require('SENTRY_CLIENT_DSN'),
+    dsn: source.require('PUBLIC_SENTRY_DSN'),
     release: source.require('SENTRY_RELEASE'),
-    environment: source.require('SENTRY_ENVIRONMENT'),
+    environment: source.require('PUBLIC_SENTRY_ENVIRONMENT'),
     integrations: [...defaultIntegrations],
   });
 

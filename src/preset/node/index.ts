@@ -74,7 +74,7 @@ export function provideLogger(resolve: Resolve): Logger {
   const client = new NodeClient({
     transport: makeNodeTransport,
     stackParser: defaultStackParser,
-    dsn: source.require('SENTRY_SERVER_DSN'),
+    dsn: source.require('SENTRY_DSN'),
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('SENTRY_ENVIRONMENT'),
     integrations: [...defaultIntegrations],
