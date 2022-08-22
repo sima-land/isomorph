@@ -2,6 +2,7 @@ import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { displayUrl } from '../utils';
 
 /**
  * Возвращает новый middleware для трассировки исходящих запросов.
@@ -38,6 +39,8 @@ export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middlew
         message: 'HTTP Request failed',
       });
 
+      span.end();
+
       // не прячем ошибку
       throw error;
     }
@@ -53,23 +56,26 @@ export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middlew
  * @param defaults Базовый конфиг экземпляра Axios.
  * @return Базовые данные запроса.
  */
-export const getRequestInfo = (
+export function getRequestInfo(
   config: AxiosRequestConfig,
   defaults: AxiosDefaults,
 ): {
   method: string;
   url: string;
   foundId?: number;
-} => {
+} {
   const method = (config.method || 'GET').toUpperCase();
   const baseURL = config.baseURL || defaults.baseURL || '';
 
   // ВАЖНО: абстрагируем id только в url игнорируя baseURL
   const [url, foundId] = hideFirstId(config.url || defaults.url || '');
-  const readyUrl = `${baseURL}${url}`;
 
-  return { method, url: readyUrl, foundId };
-};
+  return {
+    method,
+    url: displayUrl(baseURL, url),
+    foundId,
+  };
+}
 
 /**
  * Преобразует строку вида:
@@ -80,8 +86,8 @@ export const getRequestInfo = (
  * @param url Url.
  * @return Кортеж со строкой и результатом поиска числа.
  */
-export const hideFirstId = (url: string): [string, number | undefined] => {
+export function hideFirstId(url: string): [string, number | undefined] {
   const found = /\d{2,}/.exec(url);
 
   return found ? [url.replace(found[0], '{id}'), Number(found[0])] : [url, undefined];
-};
+}

@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import type { ConventionalJson, PageAssets, PageTemplate, PageTemplateData } from './types';
+import type { BaseConfig } from '../config/types';
 import { isIP } from 'net';
 
 /**
@@ -29,6 +30,21 @@ export function getServiceHeaders(req: Request): Record<string, string | undefin
   }
 
   return result;
+}
+
+/**
+ * Формирует заголовки для исходящих запросов с сервера по соглашению.
+ * @param config Конфиг.
+ * @param request Входящий запрос.
+ * @return Заголовки для исходящих запросов.
+ */
+export function getRequestHeaders(config: BaseConfig, request: Request): Record<string, string> {
+  return {
+    'X-Client-Ip': getXClientIp(request),
+    'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
+    Cookie: request.get('cookie') || '',
+    ...getServiceHeaders(request),
+  };
 }
 
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */

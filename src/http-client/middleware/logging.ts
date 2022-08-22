@@ -3,6 +3,7 @@ import { Middleware } from 'middleware-axios';
 import { Logger } from '../../logger/types';
 import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 import { SeverityLevel } from '@sentry/types';
+import { displayUrl } from '../utils';
 
 /**
  * Возвращает новый middleware для логирования запросов.
@@ -14,9 +15,7 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
     const { baseURL, url, method = 'get', params, data } = { ...defaults, ...config };
     const readyMethod = method.toUpperCase();
 
-    const readyURL = baseURL
-      ? `${baseURL.replace(/\/$/, '')}/${(url || '').replace(/^\//, '')}`
-      : url;
+    const readyURL = displayUrl(baseURL, url);
 
     try {
       logger.info(

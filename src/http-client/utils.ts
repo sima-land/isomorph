@@ -1,18 +1,32 @@
-import { getServiceHeaders, getXClientIp } from '../http-server/utils';
-import type { Request } from 'express';
-import type { BaseConfig } from '../config/types';
+import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
 
 /**
- * Формирует заголовки для исходящих запросов с сервера по соглашению.
- * @param config Конфиг.
- * @param request Входящий запрос.
- * @return Заголовки для исходящих запросов.
+ * Объединяет значения опций baseURL и url (axios) в одну строку для логирования.
+ * @param baseURL Опция baseURL.
+ * @param url Опция url.
+ * @return Отображение. Не является валидным URL.
  */
-export function getRequestHeaders(config: BaseConfig, request: Request): Record<string, string> {
-  return {
-    'X-Client-Ip': getXClientIp(request),
-    'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
-    Cookie: request.get('cookie') || '',
-    ...getServiceHeaders(request),
-  };
+export function displayUrl(
+  baseURL: AxiosDefaults['baseURL'] = '',
+  url: AxiosRequestConfig['url'] = '',
+) {
+  let result: string;
+
+  switch (true) {
+    case Boolean(baseURL && url):
+      result = `${baseURL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+      break;
+    case Boolean(baseURL) && !url:
+      result = baseURL;
+      break;
+    case !baseURL && Boolean(url):
+      result = url;
+      break;
+    case !baseURL && !url:
+    default:
+      result = '[empty]';
+      break;
+  }
+
+  return result;
 }
