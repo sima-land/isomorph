@@ -32,9 +32,9 @@ import { PresetNode } from '@sima-land/isomorph/preset/node';
 const app = createApplication();
 
 const preset = PresetNode()
-  .override(TOKEN.foo, provideFoo)
-  .override(TOKEN.bar, provideBar)
-  .override(TOKEN.baz, provideBaz);
+  .set(TOKEN.foo, provideFoo)
+  .set(TOKEN.bar, provideBar)
+  .set(TOKEN.baz, provideBaz);
 
 app.preset(preset);
 ```
