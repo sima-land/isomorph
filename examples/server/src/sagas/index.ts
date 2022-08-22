@@ -16,19 +16,21 @@ export function* rootSaga(options: SagaOptions): Generator<any, void, any> {
 }
 
 function* fetchUser({ api }: SagaOptions) {
-  try {
-    const response: Awaited<ReturnType<typeof api.getUser>> = yield call(api.getUser);
+  const response: Awaited<ReturnType<typeof api.getUser>> = yield call(api.getUser);
+
+  if (response.ok) {
     yield put(actions.userFetchDone(response.data.items[0]));
-  } catch (error) {
+  } else {
     yield put(actions.userFetchDone({ name: 'Unknown' }));
   }
 }
 
 function* fetchCurrencies({ api }: SagaOptions) {
-  try {
-    const response: Awaited<ReturnType<typeof api.getCurrencies>> = yield call(api.getCurrencies);
+  const response: Awaited<ReturnType<typeof api.getCurrencies>> = yield call(api.getCurrencies);
+
+  if (response.ok) {
     yield put(actions.currenciesFetchDone(response.data.items));
-  } catch (error) {
+  } else {
     yield put(actions.currenciesFetchDone([]));
   }
 }
