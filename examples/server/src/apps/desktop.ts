@@ -6,7 +6,6 @@ import { Token } from '../tokens';
 import { Api, createApi } from '../services/api';
 import { prepareDesktopPage } from '../pages/desktop';
 import { sauce } from '@sima-land/isomorph/http-client/sauce';
-import { getRequestHeaders } from '@sima-land/isomorph/http-client/utils';
 
 export function DesktopApp() {
   const app = createApplication();
@@ -21,8 +20,6 @@ export function DesktopApp() {
 }
 
 function provideApi(resolve: Resolve): Api {
-  const config = resolve(KnownToken.Config.base);
-  const context = resolve(KnownToken.Response.context);
   const knownHosts = resolve(KnownToken.Http.Api.knownHosts);
   const createClient = resolve(KnownToken.Http.Client.factory);
 
@@ -30,7 +27,6 @@ function provideApi(resolve: Resolve): Api {
     simaV3: sauce(
       createClient({
         baseURL: knownHosts.get('simaV3'),
-        headers: getRequestHeaders(config, context.req),
       }),
     ),
   });

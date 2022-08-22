@@ -21,6 +21,7 @@ export function createConfigSource(): ConfigSource {
   const source: Record<string, string | undefined> = { ...process.env };
 
   // докидываем зашиваемые переменные окружения
+  // @todo возможно стоит делать так чтобы переменные из process.env имели приоритет
   if (typeof __ISOMORPH_ENV__ !== 'undefined') {
     Object.assign(source, __ISOMORPH_ENV__);
   }
