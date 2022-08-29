@@ -19,3 +19,28 @@ sidebar_position: 5
 ## tracingMiddleware (middleware-axios)
 
 **tracingMiddleware** возвращает готовый промежуточный слой для `AxiosInstanceWrapper`. Этот промежуточный слой будет создавать span на каждый запрос и завершать его при ответе.
+
+```ts
+import express from 'express';
+import { create } from 'middleware-axios';
+import { tracingMiddleware } from '@sima-land/isomorph/http-client/middleware/tracing';
+import { Tracer, Context } from '@opentelemetry/api';
+
+declare const tracer: Tracer;
+declare const context: Context;
+
+const client = create({
+  baseURL: 'https://www.test.com/',
+});
+
+client.use(tracingMiddleware(tracer, context));
+
+// все исходящие запросы будут отражены как стадии основного процесса
+client.get('https://www.sima-land.ru/api/v3/user');
+```
+
+:::info Важно
+
+При использовании DI-проложения с пресетами `PresetNode` и `PresetResponse` нет необходимости вручную конфигурировать промежуточные слои, а также трассировщик и контекст. Фабрика будет возвращать клиент, который уже связан с контекстом входящего запроса.
+
+:::
