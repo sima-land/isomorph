@@ -25,7 +25,7 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
           data: {
             url: readyURL,
             method: readyMethod,
-            params,
+            ...(params && { params }),
           },
           level: 'info',
         }),
@@ -41,7 +41,7 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
             url: readyURL,
             status_code: response.status,
             method: readyMethod,
-            params,
+            ...(params && { params }),
           },
           level: 'info',
         }),
@@ -51,24 +51,28 @@ export function loggingMiddleware(logger: Logger): Middleware<any> {
         const statusCode = error.response?.status || 'UNKNOWN';
 
         logger.error(
-          new SentryError(`HTTP request failed with status code ${statusCode}`, {
-            // @todo в будущем дать возможность конфигурировать
-            level: severityFromStatus(error.response?.status),
-            context: {
-              key: 'Request details',
-              data: {
-                url,
-                baseURL,
-                method: readyMethod,
-                headers: {
-                  ...config.headers,
-                  ...defaults.headers[readyMethod.toLowerCase() as keyof typeof defaults.headers],
+          new SentryError(
+            `HTTP request failed with status code ${statusCode}, error message: ${error.message}`,
+            {
+              // @todo в будущем дать возможность конфигурировать
+              level: severityFromStatus(error.response?.status),
+              context: {
+                key: 'Request details',
+                data: {
+                  error,
+                  url,
+                  baseURL,
+                  method: readyMethod,
+                  headers: {
+                    ...config.headers,
+                    ...defaults.headers[readyMethod.toLowerCase() as keyof typeof defaults.headers],
+                  },
+                  ...(params && { params }),
+                  data,
                 },
-                params,
-                data,
               },
             },
-          }),
+          ),
         );
 
         logger.info(
