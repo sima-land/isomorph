@@ -12,10 +12,10 @@ import type { HttpClientFactory } from './http-client/types';
 import type { ConfigSource, BaseConfig } from './config/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { Cache } from './cache/types';
-import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/tracing';
+import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { Resource } from '@opentelemetry/resources';
-import { BridgeClientSide, BridgeServerSide } from './utils/ssr';
-import { StrictMap, KnownHttpApiKey } from './preset/types';
+import type { StrictMap, KnownHttpApiKey } from './preset/types';
+import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 
 export const KnownToken = {
   // config

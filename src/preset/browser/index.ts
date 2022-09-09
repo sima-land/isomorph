@@ -18,6 +18,8 @@ import type { BaseConfig } from '../../config/types';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey } from '../types';
 import { HttpApiHostPool } from '../utils';
+import { loggingMiddleware } from '../../http-client/middleware/logging';
+import { HttpClientFactory } from '../../http-client/types';
 
 export function PresetBrowser() {
   return createPreset([
@@ -25,7 +27,7 @@ export function PresetBrowser() {
     [KnownToken.Config.base, provideBaseConfig],
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
-    [KnownToken.Http.Client.factory, () => create],
+    [KnownToken.Http.Client.factory, provideHttpClientFactory],
     [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
@@ -82,4 +84,16 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
     },
     source,
   );
+}
+
+export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
+  const logger = resolve(KnownToken.logger);
+
+  return function createHttpClient(config) {
+    const client = create(config);
+
+    client.use(loggingMiddleware(logger));
+
+    return client;
+  };
 }
