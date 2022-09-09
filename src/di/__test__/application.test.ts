@@ -182,28 +182,6 @@ describe('Application', () => {
   });
 
   // @todo Проверка рекурсии не работает, надо починить и зафиксировать тестами
-  // it('should throw exception properly when circular dependency found', () => {
-  //   const TOKEN = {
-  //     server: createToken<any>('server'),
-  //     client: createToken<any>('client'),
-  //   } as const;
-
-  //   const app = createApplication();
-
-  //   app.bind(TOKEN.server).toProvider(resolve => {
-  //     resolve(TOKEN.client);
-  //     return { type: 'server' };
-  //   });
-
-  //   app.bind(TOKEN.client).toProvider(resolve => {
-  //     resolve(TOKEN.server);
-  //     return { type: 'client' };
-  //   });
-
-  //   expect(() => {
-  //     app.get(TOKEN.server);
-  //   }).toThrow('sfgasfasf');
-  // });
 
   it('should throw exception properly when component not found in parent app too', () => {
     const TOKEN = {
