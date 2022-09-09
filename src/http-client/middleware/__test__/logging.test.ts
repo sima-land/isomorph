@@ -128,6 +128,7 @@ describe('loggingMiddleware', () => {
 
     const config: AxiosRequestConfig<any> = {
       url: 'https://ya.ru',
+      params: { foo: 'bar' },
     };
 
     const defaults: AxiosDefaults<any> = {
@@ -154,7 +155,7 @@ describe('loggingMiddleware', () => {
         data: {
           url: 'https://ya.ru',
           method: 'GET',
-          params: undefined,
+          params: { foo: 'bar' },
         },
         level: 'info',
       }),
@@ -166,7 +167,7 @@ describe('loggingMiddleware', () => {
         data: {
           url: 'https://ya.ru',
           method: 'GET',
-          params: undefined,
+          params: { foo: 'bar' },
           status_code: 200,
         },
         level: 'info',
@@ -185,6 +186,7 @@ describe('loggingMiddleware', () => {
 
     const config: AxiosRequestConfig<any> = {
       url: 'https://ya.ru',
+      params: { bar: 'baz' },
     };
 
     const defaults: AxiosDefaults<any> = {
@@ -243,12 +245,16 @@ describe('loggingMiddleware', () => {
     expect(logger.info).toBeCalledTimes(2);
     expect(resultError).toBe(error);
 
-    expect((logger.error as jest.Mock).mock.calls[0][0]).toEqual(
-      new SentryError(`HTTP request failed with status code UNKNOWN`, {
+    const loggerErrorArgument: any = (logger.error as jest.Mock).mock.calls[0][0];
+
+    expect(loggerErrorArgument instanceof SentryError).toBe(true);
+    expect(loggerErrorArgument).toEqual(
+      new SentryError(`HTTP request failed with status code UNKNOWN, error message: test`, {
         level: severityFromStatus(error.response?.status),
         context: {
           key: 'Request details',
           data: {
+            error,
             url: 'https://ya.ru',
             baseURL: undefined,
             method: 'GET',
@@ -256,12 +262,14 @@ describe('loggingMiddleware', () => {
               ...config.headers,
               ...defaults.headers.get,
             },
-            params: undefined,
+            params: { bar: 'baz' },
             data: undefined,
           },
         },
       }),
     );
+
+    expect(loggerErrorArgument.data.context.data.error).toBe(error);
   });
 
   it('should log NOT axios error', async () => {
