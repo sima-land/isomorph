@@ -8,15 +8,14 @@ export const pageTemplate = compile(`
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,600,700,700i,800&display=swap&subset=cyrillic">
   <style>
     * {
-      margin: 0;
-      padding: 0;
-      border: 0;
-      outline: 0;
       box-sizing: border-box;
-      font: inherit;
-      line-height: inherit;
+    }
+    body {
+      font-family: -apple-system,BlinkMacSystemFont,'Source Sans Pro',"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,Arial,sans-serif;
+      margin: 0;
     }
   </style>
   <% if (assets.criticalCss) { %>
