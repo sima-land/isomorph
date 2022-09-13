@@ -10,7 +10,8 @@ export type SauceResponse<T = any> =
     }
   | {
       ok: false;
-      status?: unknown;
+      status?: unknown; // unknown так как не факт что упали именно по статусу, например может быть exception
+      data?: unknown; // иногда хочется узнать, что прислал сервер вместе с ошибкой (например 422)
       error: any;
     };
 
@@ -49,11 +50,13 @@ export function sauce(instance: AxiosInstance | AxiosInstanceWrapper): Sauce {
         };
       } catch (error) {
         const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+        const data = axios.isAxiosError(error) ? error.response?.data : undefined;
 
         return {
           ok: false,
           status,
           error,
+          data,
         };
       }
     };
