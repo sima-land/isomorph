@@ -20,21 +20,23 @@ export function createExternalConfig({
   remoteEntryPath?: string;
 }) {
   return `promise new Promise((resolveProxy, rejectProxy) => {
+  let installed = false;
+  let shareScope;
+  
   if (window["${remoteEntriesGlobalKey}"]) {
     const proxy = {
       get(request) {
-        return this.__installed
+        return installed
           ? window["${containersGlobalKey}"]["${serviceName}"].get(request)
           : new Promise((resolveRequest, rejectRequest) => {
               const scriptElement = document.createElement("script");
 
               scriptElement.onload = () => {
                 scriptElement.remove();
-                const container =
-                  window["${containersGlobalKey}"]["${serviceName}"];
+                const container = window["${containersGlobalKey}"]["${serviceName}"];
                 try {
-                  container.init(this.__shareScope);
-                  this.__installed = true;
+                  container.init(shareScope);
+                  installed = true;
                 } catch (e) {}
                 resolveRequest(container.get(request));
               };
@@ -57,13 +59,9 @@ export function createExternalConfig({
             });
       },
       init(scope) {
-        this.__shareScope = scope;
+        shareScope = scope;
       },
     };
-
-    for (const method in proxy) {
-      proxy[method] = proxy[method].bind(proxy);
-    }
 
     resolveProxy(proxy);
   } else {
