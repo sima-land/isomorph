@@ -19,26 +19,55 @@ export function createExternalConfig({
   containersGlobalKey: string;
   remoteEntryPath?: string;
 }) {
-  return `promise new Promise((resolve, reject) => {
-  if (window['${remoteEntriesGlobalKey}']) {
-    const scriptElement = document.createElement('script');
-    scriptElement.onload = () => {
-      scriptElement.remove();
-      resolve(window['${containersGlobalKey}']['${serviceName}']);
+  return `promise new Promise((resolveProxy, rejectProxy) => {
+  let installed = false;
+  let shareScope;
+  
+  if (window["${remoteEntriesGlobalKey}"]) {
+    const proxy = {
+      get(request) {
+        return installed
+          ? window["${containersGlobalKey}"]["${serviceName}"].get(request)
+          : new Promise((resolveRequest, rejectRequest) => {
+              const scriptElement = document.createElement("script");
+
+              scriptElement.onload = () => {
+                scriptElement.remove();
+                const container = window["${containersGlobalKey}"]["${serviceName}"];
+                try {
+                  container.init(shareScope);
+                  installed = true;
+                } catch (e) {}
+                resolveRequest(container.get(request));
+              };
+              
+              scriptElement.onerror = () => {
+                scriptElement.remove();
+                rejectRequest(
+                  new Error('Failed loading remoteEntry for "${serviceName}".')
+                );
+              };
+              
+              scriptElement.src = ${
+                remoteEntryPath
+                  ? `'${remoteEntryPath}'`
+                  : `window['${remoteEntriesGlobalKey}']['${serviceName}']`
+              };
+              
+              scriptElement.async = true;
+              document.head.append(scriptElement);
+            });
+      },
+      init(scope) {
+        shareScope = scope;
+      },
     };
-    scriptElement.onerror = () => {
-      scriptElement.remove();
-      reject(new Error('Failed loading remoteEntry for "${serviceName}".'));
-    };
-    scriptElement.src = ${
-      remoteEntryPath
-        ? `'${remoteEntryPath}'`
-        : `window['${remoteEntriesGlobalKey}']['${serviceName}']`
-    };
-    scriptElement.async = true;
-    document.head.append(scriptElement);
+
+    resolveProxy(proxy);
   } else {
-    reject(new ReferenceError('Object "${remoteEntriesGlobalKey}" unavailable.'));
+    rejectProxy(
+      new ReferenceError('Object "${remoteEntriesGlobalKey}" unavailable.')
+    );
   }
-})`;
+});`;
 }
