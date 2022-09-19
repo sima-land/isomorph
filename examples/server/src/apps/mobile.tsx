@@ -1,8 +1,8 @@
+import React from 'react';
 import type { PageAssets } from '@sima-land/isomorph/http-server/types';
 import { Resolve, createApplication } from '@sima-land/isomorph/di';
 import { PresetResponse } from '@sima-land/isomorph/preset/node/response';
 import { KnownToken } from '@sima-land/isomorph/tokens';
-import { prepareMobilePage } from '../pages/mobile';
 
 export function MobileApp() {
   const app = createApplication();
@@ -10,9 +10,21 @@ export function MobileApp() {
   app.preset(PresetResponse());
 
   app.bind(KnownToken.Response.assets).toProvider(provideAssets);
-  app.bind(KnownToken.Response.prepare).toValue(prepareMobilePage);
+  app.bind(KnownToken.Response.prepare).toProvider(providePrepare);
 
   return app;
+}
+
+function providePrepare() {
+  return function prepareMobilePage() {
+    return (
+      <div>
+        <h1>Example app</h1>
+        <h2>Mobile version</h2>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione, minima.</p>
+      </div>
+    );
+  };
 }
 
 function provideAssets(resolve: Resolve): PageAssets {
