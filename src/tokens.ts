@@ -16,6 +16,7 @@ import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace
 import type { Resource } from '@opentelemetry/resources';
 import type { StrictMap, KnownHttpApiKey } from './preset/types';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
+import type { PageResponse } from './http-server/utils';
 
 export const KnownToken = {
   // config
@@ -64,6 +65,7 @@ export const KnownToken = {
 
   // scope: page response
   Response: {
+    builder: createToken<PageResponse>('response/builder'),
     params: createToken<Record<string, unknown>>('response/params'),
     template: createToken<PageTemplate>('response/template'),
     context: createToken<ResponseContext>('response/context'),

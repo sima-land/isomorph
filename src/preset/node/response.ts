@@ -23,6 +23,7 @@ import { SSRError } from '../../http-server/errors';
 export function PresetResponse(): Preset {
   return createPreset([
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
+    [KnownToken.Response.builder, () => new PageResponse()],
     [KnownToken.Response.render, provideRender],
     [KnownToken.Response.template, provideTemplate],
     [KnownToken.Response.main, provideMain],
@@ -96,10 +97,11 @@ export function provideMain(resolve: Resolve): VoidFunction {
   const render = resolve(KnownToken.Response.render);
   const template = resolve(KnownToken.Response.template);
   const logger = resolve(KnownToken.logger);
+  const builder = resolve(KnownToken.Response.builder);
 
   return async function main() {
     try {
-      new PageResponse()
+      builder
         .markup(await render(await prepare()))
         .assets(assets)
         .format(PageResponse.defineFormat(context.req))

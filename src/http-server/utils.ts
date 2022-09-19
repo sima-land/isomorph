@@ -51,6 +51,7 @@ export function getRequestHeaders(config: BaseConfig, request: Request): Record<
 export class PageResponse {
   private type: 'html' | 'json';
   private html: string;
+  private _meta: any;
   private _assets: PageAssets;
   private _template: PageTemplate;
 
@@ -95,6 +96,11 @@ export class PageResponse {
     return this;
   }
 
+  meta(meta: any): this {
+    this._meta = meta;
+    return this;
+  }
+
   send(res: Response) {
     const templateData: PageTemplateData = {
       type: this.type,
@@ -110,6 +116,7 @@ export class PageResponse {
           bundle_css: this._assets.css,
           critical_js: this._assets.criticalJs,
           critical_css: this._assets.criticalCss,
+          meta: this._meta,
         };
 
         res.json(result);
@@ -125,6 +132,10 @@ export class PageResponse {
 
         if (this._assets.criticalCss) {
           res.setHeader('simaland-critical-css', this._assets.criticalCss);
+        }
+
+        if (this._meta) {
+          res.setHeader('simaland-meta', JSON.stringify(this._meta));
         }
 
         res.send(this._template(templateData));
