@@ -1,7 +1,6 @@
 import type { ModuleFederationPluginOptions, ReadyOptions } from './types';
 import { container, Compiler, WebpackError } from 'webpack';
-import { createExternalConfig } from './utils';
-import { defineSharedConfig } from './sharing';
+import { createExternalConfig, DEFAULT_SHARED } from './utils';
 
 /** @internal */
 export const LIBRARY_ERROR_TEXT = [
@@ -28,6 +27,8 @@ class CustomModuleFederationPlugin {
 
   /**
    * @param options Опции.
+   * @param options.shared Общие модули. Если не переданы, используются дефолтные модули.
+   * Для отключения общих модулей задать false.
    */
   constructor(options: ModuleFederationPluginOptions) {
     const {
@@ -64,9 +65,10 @@ class CustomModuleFederationPlugin {
    * @param compiler Компилятор.
    */
   apply(compiler: Compiler) {
-    const { remotes, remoteEntriesGlobalKey, containersGlobalKey, ...restOptions } =
+    const { remotes, remoteEntriesGlobalKey, containersGlobalKey, shared, ...restOptions } =
       this.readyOptions;
 
+    const configuredShared = shared || DEFAULT_SHARED;
     const configuredRemotes: Record<string, any> = {};
 
     if (remotes) {
@@ -88,10 +90,11 @@ class CustomModuleFederationPlugin {
     compiler.hooks.environment.tap('[isomorph]ModuleFederationPlugin', () => {
       new container.ModuleFederationPlugin({
         ...(remotes && { remotes: configuredRemotes }),
+        ...(shared !== false && { shared: configuredShared }),
         ...restOptions,
       }).apply(compiler);
     });
   }
 }
 
-export { CustomModuleFederationPlugin as ModuleFederationPlugin, defineSharedConfig };
+export { CustomModuleFederationPlugin as ModuleFederationPlugin, DEFAULT_SHARED };

@@ -1,5 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`DEFAULT_SHARED should match reference 1`] = `
+Array [
+  Object {
+    "react": Object {
+      "singleton": true,
+    },
+    "react-dom": Object {
+      "singleton": true,
+    },
+  },
+  "react/jsx-runtime",
+  "react-redux",
+  "@reduxjs/toolkit",
+  "redux-saga",
+  "redux-saga/",
+  "classnames",
+  "classnames/",
+  "axios",
+  "@olime/cq-ch",
+  "@sentry/browser",
+]
+`;
+
 exports[`createExternalConfig should match reference 1`] = `
 "promise new Promise((resolveProxy, rejectProxy) => {
   let installed = false;

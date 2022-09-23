@@ -1,4 +1,4 @@
-import type { OriginalShared, Shared, SharedObject } from './types';
+import type { SharedArray } from './types';
 
 /**
  * Возвращает скрипт инициализации удаленного модуля.
@@ -75,42 +75,30 @@ export function createExternalConfig({
 }
 
 /**
- * Объединяет две коллекции модулей, переопределяя в base совпадающие.
- * @param base Базовая коллекция модулей.
- * @param expanding Дополнительная коллекция модулей.
- * @return Объект модулей.
+ * Перечень общих для всех сервисов зависимостей.
  */
-export function mergeModules(base: Shared, expanding: Shared): OriginalShared {
-  const merged = { ...toObject(base), ...toObject(expanding) };
+export const DEFAULT_SHARED: SharedArray = [
+  {
+    react: {
+      singleton: true,
+    },
+    'react-dom': {
+      singleton: true,
+    },
+  },
 
-  return Object.fromEntries(
-    Object.entries(merged).filter(
-      (pair): pair is [string, Exclude<typeof pair[1], false>] => pair[1] !== false,
-    ),
-  );
-}
+  /* Инжектится транспайлером в [jt]sx для преобразования JSX */
+  'react/jsx-runtime',
+  'react-redux',
+  '@reduxjs/toolkit',
+  'redux-saga',
 
-/**
- * Преобразует переданную коллекцию в объект.
- * @param shared Коллекция модулей.
- * @return Объект модулей.
- */
-function toObject(shared: Shared): SharedObject {
-  return wrapInArray(shared).reduce((result: SharedObject, item) => {
-    if (typeof item === 'string') {
-      result[item] = {}; // Валидное определение модуля (все значения из дефолтов).
-      return result;
-    } else {
-      return { ...result, ...item };
-    }
-  }, {});
-}
-
-/**
- * Оборачивает элемент в массив, если он не является массивом.
- * @param original Элемент.
- * @return Массив.
- */
-function wrapInArray<T>(original: T | T[]): T[] {
-  return Array.isArray(original) ? original : [original];
-}
+  /* Шарим модули, импортируемые из поддиректорий, например `/effects` */
+  'redux-saga/',
+  'classnames',
+  /* Шарим модули, импортируемые из поддиректорий, например `/bind` */
+  'classnames/',
+  'axios',
+  '@olime/cq-ch',
+  '@sentry/browser',
+];

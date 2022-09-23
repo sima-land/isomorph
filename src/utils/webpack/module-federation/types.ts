@@ -13,6 +13,9 @@ export type OriginalModuleFederationPluginOptions = ConstructorParameters<
 >[0];
 
 /** @internal */
+export type Shared = OriginalModuleFederationPluginOptions['shared'];
+
+/** @internal */
 export interface ModuleFederationPluginOptions {
   /** Имя сервиса. */
   name: string;
@@ -27,7 +30,7 @@ export interface ModuleFederationPluginOptions {
   exposes?: OriginalModuleFederationPluginOptions['exposes'];
 
   /** Общие зависимости.  */
-  shared?: OriginalModuleFederationPluginOptions['shared'];
+  shared?: Shared | false;
 
   /** Ключ свойства в глобальном объекте,в котором хранится карта точек входа в удаленные сервисы. */
   remoteEntriesGlobalKey?: string;
@@ -48,13 +51,4 @@ export type ReadyOptions = Omit<
   };
 
 /** @internal */
-export type OriginalShared = NonNullable<OriginalModuleFederationPluginOptions['shared']>;
-
-/** @internal */
-type OriginalSharedObject = Exclude<OriginalShared, Array<unknown>>;
-
-/** @internal */
-export type SharedObject = Record<string, OriginalSharedObject[keyof OriginalSharedObject] | false>;
-
-/** @internal */
-export type Shared = SharedObject | (string | SharedObject)[];
+export type SharedArray = Extract<Shared, Array<unknown>>;
