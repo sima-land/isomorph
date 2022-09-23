@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createExternalConfig should match reference 1`] = `
+"promise new Promise((resolveProxy, rejectProxy) => {
+  let installed = false;
+  let shareScope;
+  
+  if (window[\\"entries_key\\"]) {
+    const proxy = {
+      get(request) {
+        return installed
+          ? window[\\"container_key\\"][\\"example\\"].get(request)
+          : new Promise((resolveRequest, rejectRequest) => {
+              const scriptElement = document.createElement(\\"script\\");
+
+              scriptElement.onload = () => {
+                scriptElement.remove();
+                const container = window[\\"container_key\\"][\\"example\\"];
+                try {
+                  container.init(shareScope);
+                  installed = true;
+                } catch (e) {}
+                resolveRequest(container.get(request));
+              };
+              
+              scriptElement.onerror = () => {
+                scriptElement.remove();
+                rejectRequest(
+                  new Error('Failed loading remoteEntry for \\"example\\".')
+                );
+              };
+              
+              scriptElement.src = window['entries_key']['example'];
+              
+              scriptElement.async = true;
+              document.head.append(scriptElement);
+            });
+      },
+      init(scope) {
+        shareScope = scope;
+      },
+    };
+
+    resolveProxy(proxy);
+  } else {
+    rejectProxy(
+      new ReferenceError('Object \\"entries_key\\" unavailable.')
+    );
+  }
+});"
+`;
+
+exports[`createExternalConfig should match reference 2`] = `
+"promise new Promise((resolveProxy, rejectProxy) => {
+  let installed = false;
+  let shareScope;
+  
+  if (window[\\"entries_key\\"]) {
+    const proxy = {
+      get(request) {
+        return installed
+          ? window[\\"container_key\\"][\\"example\\"].get(request)
+          : new Promise((resolveRequest, rejectRequest) => {
+              const scriptElement = document.createElement(\\"script\\");
+
+              scriptElement.onload = () => {
+                scriptElement.remove();
+                const container = window[\\"container_key\\"][\\"example\\"];
+                try {
+                  container.init(shareScope);
+                  installed = true;
+                } catch (e) {}
+                resolveRequest(container.get(request));
+              };
+              
+              scriptElement.onerror = () => {
+                scriptElement.remove();
+                rejectRequest(
+                  new Error('Failed loading remoteEntry for \\"example\\".')
+                );
+              };
+              
+              scriptElement.src = 'path/to/cdn/example/1.0.0/remoteEntry.hash.js';
+              
+              scriptElement.async = true;
+              document.head.append(scriptElement);
+            });
+      },
+      init(scope) {
+        shareScope = scope;
+      },
+    };
+
+    resolveProxy(proxy);
+  } else {
+    rejectProxy(
+      new ReferenceError('Object \\"entries_key\\" unavailable.')
+    );
+  }
+});"
+`;

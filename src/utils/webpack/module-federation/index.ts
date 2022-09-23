@@ -1,6 +1,7 @@
 import type { ModuleFederationPluginOptions, ReadyOptions } from './types';
 import { container, Compiler, WebpackError } from 'webpack';
 import { createExternalConfig } from './utils';
+import { defineSharedConfig } from './sharing';
 
 /** @internal */
 export const LIBRARY_ERROR_TEXT = [
@@ -93,4 +94,4 @@ class CustomModuleFederationPlugin {
   }
 }
 
-export { CustomModuleFederationPlugin as ModuleFederationPlugin };
+export { CustomModuleFederationPlugin as ModuleFederationPlugin, defineSharedConfig };

@@ -1,3 +1,5 @@
+import type { OriginalShared, Shared, SharedObject } from './types';
+
 /**
  * Возвращает скрипт инициализации удаленного модуля.
  * @internal
@@ -70,4 +72,45 @@ export function createExternalConfig({
     );
   }
 });`;
+}
+
+/**
+ * Объединяет две коллекции модулей, переопределяя в base совпадающие.
+ * @param base Базовая коллекция модулей.
+ * @param expanding Дополнительная коллекция модулей.
+ * @return Объект модулей.
+ */
+export function mergeModules(base: Shared, expanding: Shared): OriginalShared {
+  const merged = { ...toObject(base), ...toObject(expanding) };
+
+  return Object.fromEntries(
+    Object.entries(merged).filter(
+      (pair): pair is [string, Exclude<typeof pair[1], false>] => pair[1] !== false,
+    ),
+  );
+}
+
+/**
+ * Преобразует переданную коллекцию в объект.
+ * @param shared Коллекция модулей.
+ * @return Объект модулей.
+ */
+function toObject(shared: Shared): SharedObject {
+  return wrapInArray(shared).reduce((result: SharedObject, item) => {
+    if (typeof item === 'string') {
+      result[item] = {}; // Валидное определение модуля (все значения из дефолтов).
+      return result;
+    } else {
+      return { ...result, ...item };
+    }
+  }, {});
+}
+
+/**
+ * Оборачивает элемент в массив, если он не является массивом.
+ * @param original Элемент.
+ * @return Массив.
+ */
+function wrapInArray<T>(original: T | T[]): T[] {
+  return Array.isArray(original) ? original : [original];
 }

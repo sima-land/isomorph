@@ -46,3 +46,15 @@ export type ReadyOptions = Omit<
   > & {
     library: Required<OriginalModuleFederationPluginOptions>['library'];
   };
+
+/** @internal */
+export type OriginalShared = NonNullable<OriginalModuleFederationPluginOptions['shared']>;
+
+/** @internal */
+type OriginalSharedObject = Exclude<OriginalShared, Array<unknown>>;
+
+/** @internal */
+export type SharedObject = Record<string, OriginalSharedObject[keyof OriginalSharedObject] | false>;
+
+/** @internal */
+export type Shared = SharedObject | (string | SharedObject)[];
