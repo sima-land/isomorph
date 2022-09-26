@@ -1,3 +1,5 @@
+import type { SharedArray } from './types';
+
 /**
  * Возвращает скрипт инициализации удаленного модуля.
  * @internal
@@ -71,3 +73,32 @@ export function createExternalConfig({
   }
 });`;
 }
+
+/**
+ * Перечень общих для всех сервисов зависимостей.
+ */
+export const DEFAULT_SHARED: SharedArray = [
+  {
+    react: {
+      singleton: true,
+    },
+    'react-dom': {
+      singleton: true,
+    },
+  },
+
+  /* Инжектится транспайлером в [jt]sx для преобразования JSX */
+  'react/jsx-runtime',
+  'react-redux',
+  '@reduxjs/toolkit',
+  'redux-saga',
+
+  /* Шарим модули, импортируемые из поддиректорий, например `/effects` */
+  'redux-saga/',
+  'classnames',
+  /* Шарим модули, импортируемые из поддиректорий, например `/bind` */
+  'classnames/',
+  'axios',
+  '@olime/cq-ch',
+  '@sentry/browser',
+];

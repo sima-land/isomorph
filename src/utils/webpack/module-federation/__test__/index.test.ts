@@ -1,5 +1,5 @@
 import { container, Compiler } from 'webpack';
-import { LIBRARY_ERROR_TEXT, ModuleFederationPlugin, REMOTE_ERROR_TEXT } from '..';
+import { DEFAULT_SHARED, LIBRARY_ERROR_TEXT, ModuleFederationPlugin, REMOTE_ERROR_TEXT } from '..';
 
 jest.mock('../utils', () => ({
   createExternalConfig: jest.fn(arg => arg),
@@ -249,6 +249,63 @@ describe('ModuleFederationPlugin', () => {
       for (const key of Object.keys(calls[0][0])) {
         expect(calls[1][0][key] === calls[0][0][key]).toBe(true);
       }
+    });
+
+    describe('for shared', () => {
+      it('should pass default shared modules', () => {
+        const compiler = createCompilerMock();
+
+        const instance = new ModuleFederationPlugin({
+          name: 'service-name',
+        });
+
+        instance.apply(compiler);
+        expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+          name: 'service-name',
+          library: {
+            type: 'global',
+            name: ['__FederationContainers__', 'service-name'],
+          },
+          shared: DEFAULT_SHARED,
+        });
+      });
+
+      it('should pass shared modules from options', () => {
+        const compiler = createCompilerMock();
+
+        const instance = new ModuleFederationPlugin({
+          name: 'service-name',
+          shared: { module: '^x.x.x' },
+        });
+
+        instance.apply(compiler);
+        expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+          name: 'service-name',
+          library: {
+            type: 'global',
+            name: ['__FederationContainers__', 'service-name'],
+          },
+          shared: { module: '^x.x.x' },
+        });
+      });
+
+      it('should disable default shared modules', () => {
+        const compiler = createCompilerMock();
+
+        const instance = new ModuleFederationPlugin({
+          name: 'service-name',
+          shared: false,
+        });
+
+        instance.apply(compiler);
+        expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+          name: 'service-name',
+          library: {
+            type: 'global',
+            name: ['__FederationContainers__', 'service-name'],
+          },
+        });
+      });
     });
   });
 });
