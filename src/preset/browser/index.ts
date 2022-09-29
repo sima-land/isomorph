@@ -17,7 +17,7 @@ import { create } from 'middleware-axios';
 import type { BaseConfig } from '../../config/types';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey } from '../types';
-import { eqHostname, HttpApiHostPool } from '../utils';
+import { HttpApiHostPool } from '../utils';
 import { loggingMiddleware } from '../../http-client/middleware/logging';
 import { HttpClientFactory } from '../../http-client/types';
 
@@ -52,7 +52,7 @@ export function provideLogger(resolve: Resolve): Logger {
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('PUBLIC_SENTRY_ENVIRONMENT'),
     integrations: [...defaultIntegrations],
-    enabled: eqHostname(SIMA_LAND_ORIGIN_HOSTS),
+    enabled: SIMA_LAND_ORIGIN_HOSTS.test(window.location.hostname),
   });
 
   const hub = new Hub(client);

@@ -28,12 +28,3 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
     return this.source.require(variableName);
   }
 }
-
-/**
- * Проверяет соответствие имени хоста паттерну.
- * @param pattern Паттерн.
- * @return Признак соответствия.
- */
-export function eqHostname(pattern: RegExp) {
-  return typeof window !== 'undefined' && pattern.test(window.location.hostname);
-}
