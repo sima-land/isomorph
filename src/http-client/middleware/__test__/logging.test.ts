@@ -1,13 +1,12 @@
-import { AxiosRequestConfig, AxiosDefaults } from 'axios';
+import { AxiosRequestConfig, AxiosDefaults, AxiosResponse } from 'axios';
 import { Next } from 'middleware-axios';
-import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
 import { Logger } from '../../../logger';
-import { loggingMiddleware, severityFromStatus } from '../logging';
+import { loggingMiddleware, LoggingMiddlewareHandler, severityFromStatus } from '../logging';
 
 jest.useFakeTimers();
 
-describe('loggingMiddleware', () => {
-  const logger: Logger = {
+function getFakeLogger(): Logger {
+  return {
     log: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
@@ -15,67 +14,55 @@ describe('loggingMiddleware', () => {
     debug: jest.fn(),
     subscribe: jest.fn(),
   };
+}
+
+function getFakeHandler(): LoggingMiddlewareHandler {
+  return {
+    beforeRequest: jest.fn(),
+    afterResponse: jest.fn(),
+    onCatch: jest.fn(),
+  };
+}
+
+function loggerNotUsed(logger: Logger): boolean {
+  const methods = [
+    logger.log,
+    logger.info,
+    logger.warn,
+    logger.error,
+    logger.debug,
+    logger.subscribe,
+  ];
+
+  const callCount = methods.reduce<number>(
+    (acc, item) => acc + (item as jest.Mock).mock.calls.length,
+    0,
+  );
+
+  return callCount === 0;
+}
+
+function handlerNotUsed(handler: LoggingMiddlewareHandler): boolean {
+  const methods = [handler.beforeRequest, handler.afterResponse, handler.onCatch];
+
+  const callCount = methods.reduce<number>(
+    (acc, item) => acc + (item as jest.Mock).mock.calls.length,
+    0,
+  );
+
+  return callCount === 0;
+}
+
+describe('loggingMiddleware', () => {
+  let logger = getFakeLogger();
+  let handler = getFakeHandler();
 
   beforeEach(() => {
-    (logger.info as jest.Mock).mockClear();
-    (logger.error as jest.Mock).mockClear();
+    logger = getFakeLogger();
+    handler = getFakeHandler();
   });
 
-  it('should log ready url properly when baseURL and url provided', async () => {
-    const middleware = loggingMiddleware(logger);
-
-    const config: AxiosRequestConfig<any> = {
-      url: '/foo/bar',
-    };
-
-    const defaults: AxiosDefaults<any> = {
-      headers: {} as any,
-      baseURL: 'https://sima.com/',
-    };
-
-    const next: Next<any> = jest.fn(() =>
-      Promise.resolve({
-        status: 200,
-        statusText: '200',
-        data: {},
-        headers: {},
-        config: {},
-      }),
-    );
-
-    await middleware(config, next, defaults);
-
-    expect(logger.info).toBeCalledTimes(2);
-    expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
-      new SentryBreadcrumb({
-        category: 'http.request',
-        type: 'http',
-        data: {
-          url: 'https://sima.com/foo/bar',
-          method: 'GET',
-          params: undefined,
-        },
-        level: 'info',
-      }),
-    ]);
-    expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
-      new SentryBreadcrumb({
-        category: 'http.response',
-        type: 'http',
-        data: {
-          url: 'https://sima.com/foo/bar',
-          method: 'GET',
-          params: undefined,
-          status_code: 200,
-        },
-        level: 'info',
-      }),
-    ]);
-  });
-
-  it('should log ready url properly when only baseURL provided', async () => {
-    const middleware = loggingMiddleware(logger);
-
+  it('should works properly without error', async () => {
     const config: AxiosRequestConfig<any> = {};
 
     const defaults: AxiosDefaults<any> = {
@@ -83,227 +70,90 @@ describe('loggingMiddleware', () => {
       baseURL: 'https://sima.com/',
     };
 
-    const next: Next<any> = jest.fn(() =>
-      Promise.resolve({
-        status: 200,
-        statusText: '200',
-        data: {},
-        headers: {},
-        config: {},
-      }),
-    );
+    const response: AxiosResponse = {
+      status: 200,
+      statusText: '200',
+      data: {},
+      headers: {},
+      config: {},
+    };
+
+    const next: Next<any> = jest.fn(() => Promise.resolve(response));
+
+    const middleware = loggingMiddleware(logger, handler);
+
+    expect(loggerNotUsed(logger)).toBe(true);
+    expect(handlerNotUsed(handler)).toBe(true);
 
     await middleware(config, next, defaults);
 
-    expect(logger.info).toBeCalledTimes(2);
-    expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
-      new SentryBreadcrumb({
-        category: 'http.request',
-        type: 'http',
-        data: {
-          url: 'https://sima.com/',
-          method: 'GET',
-          params: undefined,
-        },
-        level: 'info',
-      }),
-    ]);
-    expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
-      new SentryBreadcrumb({
-        category: 'http.response',
-        type: 'http',
-        data: {
-          url: 'https://sima.com/',
-          method: 'GET',
-          params: undefined,
-          status_code: 200,
-        },
-        level: 'info',
-      }),
-    ]);
+    expect(handler.beforeRequest).toBeCalledTimes(1);
+    expect(handler.beforeRequest).toBeCalledWith({ config, defaults, logger });
+    expect(handler.afterResponse).toBeCalledTimes(1);
+    expect(handler.afterResponse).toBeCalledWith({ config, defaults, logger, response });
+    expect(handler.onCatch).toBeCalledTimes(0);
   });
 
-  it('should log ready url properly when only url provided', async () => {
-    const middleware = loggingMiddleware(logger);
-
-    const config: AxiosRequestConfig<any> = {
-      url: 'https://ya.ru',
-      params: { foo: 'bar' },
-    };
+  it('should works properly with error', async () => {
+    const config: AxiosRequestConfig<any> = {};
 
     const defaults: AxiosDefaults<any> = {
       headers: {} as any,
+      baseURL: 'https://sima.com/',
     };
 
-    const next: Next<any> = jest.fn(() =>
-      Promise.resolve({
-        status: 200,
-        statusText: '200',
-        data: {},
-        headers: {},
-        config: {},
-      }),
-    );
+    const error = new Error('Some test error');
+
+    const next: Next<any> = jest.fn(() => Promise.reject(error));
+
+    const middleware = loggingMiddleware(logger, handler);
+
+    expect(loggerNotUsed(logger)).toBe(true);
+    expect(handlerNotUsed(handler)).toBe(true);
+
+    await middleware(config, next, defaults).catch(() => null);
+
+    expect(handler.beforeRequest).toBeCalledTimes(1);
+    expect(handler.beforeRequest).toBeCalledWith({ config, defaults, logger });
+    expect(handler.afterResponse).toBeCalledTimes(0);
+    expect(handler.onCatch).toBeCalledTimes(1);
+    expect(handler.onCatch).toBeCalledWith({ config, defaults, logger, error });
+  });
+
+  it('should handle handler factory', async () => {
+    const config: AxiosRequestConfig<any> = {};
+
+    const defaults: AxiosDefaults<any> = {
+      headers: {} as any,
+      baseURL: 'https://sima.com/',
+    };
+
+    const response: AxiosResponse = {
+      status: 200,
+      statusText: '200',
+      data: {},
+      headers: {},
+      config: {},
+    };
+
+    const next: Next<any> = jest.fn(() => Promise.resolve(response));
+
+    const handlerFactory = jest.fn(() => handler);
+
+    const middleware = loggingMiddleware(logger, handlerFactory);
+
+    expect(loggerNotUsed(logger)).toBe(true);
+    expect(handlerNotUsed(handler)).toBe(true);
 
     await middleware(config, next, defaults);
 
-    expect(logger.info).toBeCalledTimes(2);
-    expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
-      new SentryBreadcrumb({
-        category: 'http.request',
-        type: 'http',
-        data: {
-          url: 'https://ya.ru',
-          method: 'GET',
-          params: { foo: 'bar' },
-        },
-        level: 'info',
-      }),
-    ]);
-    expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
-      new SentryBreadcrumb({
-        category: 'http.response',
-        type: 'http',
-        data: {
-          url: 'https://ya.ru',
-          method: 'GET',
-          params: { foo: 'bar' },
-          status_code: 200,
-        },
-        level: 'info',
-      }),
-    ]);
-  });
-
-  it('should log axios error', async () => {
-    const error = {
-      message: 'test',
-      response: { status: 407 },
-      isAxiosError: true,
-    };
-
-    const middleware = loggingMiddleware(logger);
-
-    const config: AxiosRequestConfig<any> = {
-      url: 'https://ya.ru',
-      params: { bar: 'baz' },
-    };
-
-    const defaults: AxiosDefaults<any> = {
-      headers: {} as any,
-    };
-
-    const next: Next<any> = jest.fn(() => Promise.reject(error));
-
-    let resultError: any;
-
-    expect(logger.error).toBeCalledTimes(0);
-    expect(logger.info).toBeCalledTimes(0);
-
-    try {
-      await middleware(config, next, defaults);
-    } catch (err) {
-      resultError = err;
-    }
-
-    expect(logger.error).toBeCalledTimes(1);
-    expect(logger.info).toBeCalledTimes(2);
-    expect(resultError).toBe(error);
-  });
-
-  it('should log axios error without status', async () => {
-    const error = {
-      message: 'test',
-      response: { status: undefined },
-      isAxiosError: true,
-    };
-
-    const middleware = loggingMiddleware(logger);
-
-    const config: AxiosRequestConfig<any> = {
-      url: 'https://ya.ru',
-    };
-
-    const defaults: AxiosDefaults<any> = {
-      headers: {} as any,
-    };
-
-    const next: Next<any> = jest.fn(() => Promise.reject(error));
-
-    let resultError: any;
-
-    expect(logger.error).toBeCalledTimes(0);
-    expect(logger.info).toBeCalledTimes(0);
-
-    try {
-      await middleware(config, next, defaults);
-    } catch (err) {
-      resultError = err;
-    }
-
-    expect(logger.error).toBeCalledTimes(1);
-    expect(logger.info).toBeCalledTimes(2);
-    expect(resultError).toBe(error);
-
-    const loggerErrorArgument: any = (logger.error as jest.Mock).mock.calls[0][0];
-
-    expect(loggerErrorArgument instanceof SentryError).toBe(true);
-    expect(loggerErrorArgument).toEqual(
-      new SentryError(`HTTP request failed with status code UNKNOWN, error message: test`, {
-        level: severityFromStatus(error.response?.status),
-        context: {
-          key: 'Request details',
-          data: {
-            error,
-            url: 'https://ya.ru',
-            baseURL: undefined,
-            method: 'GET',
-            headers: {
-              ...config.headers,
-              ...defaults.headers.get,
-            },
-            params: { bar: 'baz' },
-            data: undefined,
-          },
-        },
-      }),
-    );
-
-    expect(loggerErrorArgument.data.context.data.error).toBe(error);
-  });
-
-  it('should log NOT axios error', async () => {
-    const error = {
-      message: 'test',
-      response: { status: 407 },
-    };
-
-    const middleware = loggingMiddleware(logger);
-
-    const config: AxiosRequestConfig<any> = {
-      url: 'https://ya.ru',
-    };
-
-    const defaults: AxiosDefaults<any> = {
-      headers: {} as any,
-    };
-
-    const next: Next<any> = jest.fn(() => Promise.reject(error));
-
-    let resultError: any;
-
-    expect(logger.error).toBeCalledTimes(0);
-    expect(logger.info).toBeCalledTimes(0);
-
-    try {
-      await middleware(config, next, defaults);
-    } catch (err) {
-      resultError = err;
-    }
-
-    expect(logger.error).toBeCalledTimes(0);
-    expect(logger.info).toBeCalledTimes(1);
-    expect(resultError).toBe(error);
+    expect(handlerFactory).toBeCalledTimes(1);
+    expect(handlerFactory).toBeCalledWith({ config, defaults, logger });
+    expect(handler.beforeRequest).toBeCalledTimes(1);
+    expect(handler.beforeRequest).toBeCalledWith({ config, defaults, logger });
+    expect(handler.afterResponse).toBeCalledTimes(1);
+    expect(handler.afterResponse).toBeCalledWith({ config, defaults, logger, response });
+    expect(handler.onCatch).toBeCalledTimes(0);
   });
 });
 

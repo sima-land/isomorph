@@ -48,11 +48,9 @@ export function applyAxiosDefaults(
     method,
     ...restDefaults,
     ...config,
-    ...((headersDefaults || config.headers) && {
-      headers: {
-        ...headersDefaults[method.toLowerCase() as keyof typeof defaults.headers],
-        ...config.headers,
-      },
-    }),
+    headers: {
+      ...headersDefaults[method.toLowerCase() as keyof typeof defaults.headers],
+      ...config.headers,
+    },
   };
 }
