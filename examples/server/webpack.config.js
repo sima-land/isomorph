@@ -1,10 +1,10 @@
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const NodemonPlugin = require('nodemon-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const { EnvPlugin } = require('@sima-land/isomorph/utils/webpack');
 
 module.exports = {
-  watch: true,
   mode: 'development',
   target: 'node',
   externalsPresets: { node: true },
@@ -26,7 +26,32 @@ module.exports = {
           loader: 'swc-loader',
         },
       },
+      {
+        test: /\.css$/,
+        exclude: /node_modules/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                auto: true,
+                localIdentName: '[name]__[local]--[hash:hex:3]',
+              },
+            },
+          },
+        ],
+      },
     ],
   },
-  plugins: [new NodemonPlugin(), new EnvPlugin()],
+  plugins: [
+    new EnvPlugin(),
+    new NodemonPlugin({
+      script: './dist/index.js',
+      watch: path.resolve('./dist'),
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'static/index.css',
+    }),
+  ],
 };

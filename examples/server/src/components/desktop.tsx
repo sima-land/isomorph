@@ -1,23 +1,43 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { selectors } from '../reducers/app';
+import styles from './desktop.module.css';
+
+function Card({ title, children }: { title?: string; children: ReactNode }) {
+  return (
+    <div className={styles.card}>
+      {title && <div className={styles.title}>{title}</div>}
+      {children}
+    </div>
+  );
+}
 
 export function DesktopApp() {
+  const user = useSelector(selectors.user);
   const currencies = useSelector(selectors.currencies);
 
   return (
-    <div>
-      <h1>Example app</h1>
+    <div className={styles.root}>
+      <Card title='User'>
+        {user.data && user.status === 'success' && (
+          <ul>
+            <li>id: {user.data.id}</li>
+            <li>name: {user.data.name}</li>
+          </ul>
+        )}
+        {user.status === 'failure' && user.error}
+      </Card>
 
-      <h2>Desktop version</h2>
-      <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Autem, nam.</p>
-
-      <h2>Currencies</h2>
-      <ul>
-        {currencies?.map((currency: any) => (
-          <li key={currency.id}>{currency.name}</li>
-        ))}
-      </ul>
+      <Card title='Currencies'>
+        {currencies.data && currencies.status === 'success' && (
+          <ul>
+            {currencies.data.map((currency: any) => (
+              <li key={currency.id}>{currency.name}</li>
+            ))}
+          </ul>
+        )}
+        {currencies.status === 'failure' && currencies.error}
+      </Card>
     </div>
   );
 }

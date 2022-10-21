@@ -1,6 +1,6 @@
 import { END } from 'redux-saga';
 import { call, put, all } from 'redux-saga/effects';
-import { Api } from '../services/api';
+import { Api } from '../types';
 import { actions } from '../reducers/app';
 
 export interface SagaOptions {
@@ -21,7 +21,7 @@ function* fetchUser({ api }: SagaOptions) {
   if (response.ok) {
     yield put(actions.userFetchDone(response.data.items[0]));
   } else {
-    yield put(actions.userFetchDone({ name: 'Unknown' }));
+    yield put(actions.userFetchFail(String(response.error)));
   }
 }
 
@@ -31,6 +31,6 @@ function* fetchCurrencies({ api }: SagaOptions) {
   if (response.ok) {
     yield put(actions.currenciesFetchDone(response.data.items));
   } else {
-    yield put(actions.currenciesFetchDone([]));
+    yield put(actions.currenciesFetchFail(String(response.error)));
   }
 }

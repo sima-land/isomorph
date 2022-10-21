@@ -1,9 +1,9 @@
 import { RootApp } from './apps/root';
-import { Token } from './tokens';
+import { TOKEN } from './tokens';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 
 RootApp().invoke(
-  [Token.Root.config, KnownToken.logger, Token.Root.mainServer, KnownToken.Metrics.httpApp],
+  [TOKEN.Root.config, KnownToken.logger, TOKEN.Root.mainServer, KnownToken.Metrics.httpApp],
   (config, logger, mainServer, metricsServer) => {
     // main app
     mainServer.listen(config.mainPort, () => {

@@ -3,8 +3,8 @@ import type { PageAssets } from '@sima-land/isomorph/http-server/types';
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { PresetResponse } from '@sima-land/isomorph/preset/node/response';
 import { KnownToken } from '@sima-land/isomorph/tokens';
-import { Token } from '../tokens';
-import { Api, createApi } from '../services/api';
+import { TOKEN } from '../tokens';
+import { Api } from '../types';
 import { sauce } from '@sima-land/isomorph/http-client/sauce';
 import { Provider } from 'react-redux';
 import { GlobalDataScript, SsrBridge } from '@sima-land/isomorph/utils/ssr';
@@ -18,7 +18,7 @@ export function DesktopApp() {
 
   app.preset(PresetResponse());
 
-  app.bind(Token.Response.api).toProvider(provideApi);
+  app.bind(TOKEN.Response.api).toProvider(provideApi);
   app.bind(KnownToken.Response.assets).toProvider(provideAssets);
   app.bind(KnownToken.Response.prepare).toProvider(providePrepare);
 
@@ -28,19 +28,28 @@ export function DesktopApp() {
 function provideApi(resolve: Resolve): Api {
   const knownHosts = resolve(KnownToken.Http.Api.knownHosts);
   const createClient = resolve(KnownToken.Http.Client.factory);
+  const client = sauce(createClient({ baseURL: knownHosts.get('simaV3') }));
 
-  return createApi({
-    simaV3: sauce(
-      createClient({
-        baseURL: knownHosts.get('simaV3'),
-      }),
-    ),
-  });
+  return {
+    getCurrencies() {
+      return client.get<any>('currency/');
+    },
+    getUser() {
+      return client.get<any>('user/');
+    },
+  };
+}
+
+function provideAssets(): PageAssets {
+  return {
+    js: '',
+    css: 'index.css',
+  };
 }
 
 function providePrepare(resolve: Resolve): () => Promise<JSX.Element> {
   const config = resolve(KnownToken.Config.base);
-  const api = resolve(Token.Response.api);
+  const api = resolve(TOKEN.Response.api);
   const sagaMiddleware = resolve(KnownToken.sagaMiddleware);
   const responseBuilder = resolve(KnownToken.Response.builder);
 
@@ -57,7 +66,7 @@ function providePrepare(resolve: Resolve): () => Promise<JSX.Element> {
     // устанавливаем meta в ответ
     responseBuilder.meta(
       JSON.stringify({
-        userId: store.getState().user?.id,
+        userId: store.getState().user?.data?.id,
       }),
     );
 
@@ -72,14 +81,5 @@ function providePrepare(resolve: Resolve): () => Promise<JSX.Element> {
         />
       </Provider>
     );
-  };
-}
-
-function provideAssets(resolve: Resolve): PageAssets {
-  const source = resolve(KnownToken.Config.source);
-
-  return {
-    js: source.get('DESKTOP_CLIENT_ASSET_JS') || '',
-    css: source.get('DESKTOP_CLIENT_ASSET_CSS') || '',
   };
 }

@@ -1,9 +1,8 @@
 import { createToken } from '@sima-land/isomorph/di';
 import type { Application, Handler } from 'express';
-import type { Api } from './services/api';
-import type { Config } from './services/config';
+import type { Config, Api } from './types';
 
-export const Token = {
+export const TOKEN = {
   // scope: root
   Root: {
     config: createToken<Config>('root/config'),
