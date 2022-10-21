@@ -17,6 +17,7 @@ import type { Resource } from '@opentelemetry/resources';
 import type { StrictMap, KnownHttpApiKey } from './preset/types';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { PageResponse } from './http-server/utils';
+import type { loggingMiddleware } from './http-client/middleware/logging';
 
 export const KnownToken = {
   // config
@@ -51,6 +52,11 @@ export const KnownToken = {
   Http: {
     Client: {
       factory: createToken<HttpClientFactory>('http.client.factory'),
+      LogMiddleware: {
+        handler: createToken<Parameters<typeof loggingMiddleware>[1]>(
+          'http.client.log-middleware.handler',
+        ),
+      },
     },
     Server: {
       factory: createToken<() => Application>('http.server.factory'),

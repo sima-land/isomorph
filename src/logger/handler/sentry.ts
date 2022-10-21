@@ -22,7 +22,11 @@ export function createSentryHandler(hub: Hub): LoggerEventHandler {
           }
 
           if (context) {
-            scope.setContext(context.key, context.data);
+            const list = Array.isArray(context) ? context : [context];
+
+            for (const item of list) {
+              scope.setContext(item.key, item.data);
+            }
           }
 
           if (extra) {

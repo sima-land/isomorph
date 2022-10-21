@@ -15,6 +15,7 @@ import { loggingMiddleware } from '../../http-client/middleware/logging';
 import { passHeadersMiddleware } from '../../http-client/middleware/headers';
 import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 import { SSRError } from '../../http-server/errors';
+import { HttpClientLogHandler } from '../utils';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -29,6 +30,7 @@ export function PresetResponse(): Preset {
     [KnownToken.Response.main, provideMain],
     [KnownToken.Response.params, provideParams],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
+    [KnownToken.Http.Client.LogMiddleware.handler, provideLogMiddlewareHandler],
   ]);
 }
 
@@ -37,6 +39,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   const logger = resolve(KnownToken.logger);
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.Response.context);
+  const loggingHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
 
   return function createHttpClient(config) {
     const client = create({
@@ -48,7 +51,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
     });
 
     client.use(tracingMiddleware(tracer, context.res.locals.tracing.rootContext));
-    client.use(loggingMiddleware(logger));
+    client.use(loggingMiddleware(logger, loggingHandler));
     client.use(
       passHeadersMiddleware(context.req, {
         predicate: headerName => headerName.startsWith('simaland-'),
@@ -57,6 +60,12 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
     client.use(collectCookieMiddleware(context.req, context.res));
 
     return client;
+  };
+}
+
+export function provideLogMiddlewareHandler(): Parameters<typeof loggingMiddleware>[1] {
+  return function (data) {
+    return new HttpClientLogHandler(data);
   };
 }
 

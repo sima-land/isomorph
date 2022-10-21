@@ -1,94 +1,50 @@
-import Axios from 'axios';
+import { AxiosResponse, AxiosRequestConfig, AxiosDefaults } from 'axios';
 import { Middleware } from 'middleware-axios';
 import { Logger } from '../../logger/types';
-import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 import { SeverityLevel } from '@sentry/types';
-import { displayUrl } from '../utils';
+
+export interface SharedData {
+  logger: Logger;
+  config: AxiosRequestConfig;
+  defaults: AxiosDefaults;
+}
+
+export interface DoneSharedData extends SharedData {
+  response: AxiosResponse<unknown, unknown>;
+}
+
+export interface FailSharedData extends SharedData {
+  error: unknown;
+}
+
+export interface LoggingMiddlewareHandler {
+  beforeRequest: (data: SharedData) => Promise<void> | void;
+  afterResponse: (data: DoneSharedData) => Promise<void> | void;
+  onCatch: (data: FailSharedData) => Promise<void> | void;
+}
 
 /**
  * Возвращает новый middleware для логирования запросов.
  * @param logger Логгер.
+ * @param handlerArg Обработчик.
  * @return Middleware.
  */
-export function loggingMiddleware(logger: Logger): Middleware<any> {
+export function loggingMiddleware(
+  logger: Logger,
+  handlerArg: LoggingMiddlewareHandler | ((data: SharedData) => LoggingMiddlewareHandler),
+): Middleware<any> {
   return async function log(config, next, defaults) {
-    const { baseURL, url, method = 'get', params, data } = { ...defaults, ...config };
-    const readyMethod = method.toUpperCase();
-
-    const readyURL = displayUrl(baseURL, url);
+    const shared: SharedData = { logger, config, defaults };
+    const handler = typeof handlerArg === 'function' ? handlerArg(shared) : handlerArg;
 
     try {
-      logger.info(
-        new SentryBreadcrumb({
-          category: 'http.request',
-          type: 'http',
-          data: {
-            url: readyURL,
-            method: readyMethod,
-            ...(params && { params }),
-          },
-          level: 'info',
-        }),
-      );
+      await handler.beforeRequest(shared);
 
       const response = await next(config);
 
-      logger.info(
-        new SentryBreadcrumb({
-          category: 'http.response',
-          type: 'http',
-          data: {
-            url: readyURL,
-            status_code: response.status,
-            method: readyMethod,
-            ...(params && { params }),
-          },
-          level: 'info',
-        }),
-      );
+      await handler.afterResponse({ ...shared, response });
     } catch (error) {
-      if (Axios.isAxiosError(error)) {
-        const statusCode = error.response?.status || 'UNKNOWN';
-
-        logger.error(
-          new SentryError(
-            `HTTP request failed with status code ${statusCode}, error message: ${error.message}`,
-            {
-              // @todo в будущем дать возможность конфигурировать
-              level: severityFromStatus(error.response?.status),
-              context: {
-                key: 'Request details',
-                data: {
-                  error,
-                  url,
-                  baseURL,
-                  method: readyMethod,
-                  headers: {
-                    ...config.headers,
-                    ...defaults.headers[readyMethod.toLowerCase() as keyof typeof defaults.headers],
-                  },
-                  ...(params && { params }),
-                  data,
-                },
-              },
-            },
-          ),
-        );
-
-        logger.info(
-          new SentryBreadcrumb({
-            category: 'http.response',
-            type: 'http',
-            data: {
-              url: readyURL,
-              status_code: statusCode,
-              method: readyMethod,
-              params,
-            },
-            level: 'error',
-          }),
-        );
-      }
+      await handler.onCatch({ ...shared, error });
 
       // ВАЖНО: не скрываем ошибку, сообщаем остальному миру про нее
       throw error;

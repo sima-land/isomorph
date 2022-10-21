@@ -17,7 +17,7 @@ import { create } from 'middleware-axios';
 import type { BaseConfig } from '../../config/types';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey } from '../types';
-import { HttpApiHostPool } from '../utils';
+import { HttpApiHostPool, HttpClientLogHandler } from '../utils';
 import { loggingMiddleware } from '../../http-client/middleware/logging';
 import { HttpClientFactory } from '../../http-client/types';
 
@@ -28,6 +28,7 @@ export function PresetBrowser() {
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
+    [KnownToken.Http.Client.LogMiddleware.handler, provideLogMiddlewareHandler],
     [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
@@ -88,12 +89,19 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
 
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   const logger = resolve(KnownToken.logger);
+  const loggingHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
 
   return function createHttpClient(config) {
     const client = create(config);
 
-    client.use(loggingMiddleware(logger));
+    client.use(loggingMiddleware(logger, loggingHandler));
 
     return client;
+  };
+}
+
+export function provideLogMiddlewareHandler(): Parameters<typeof loggingMiddleware>[1] {
+  return function (data) {
+    return new HttpClientLogHandler(data);
   };
 }

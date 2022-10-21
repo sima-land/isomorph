@@ -1,15 +1,17 @@
 import type { SeverityLevel, Context, Extra, Breadcrumb } from '@sentry/types';
 
+export interface ContextData {
+  key: string;
+  data: Context | null;
+}
+
 /**
  * Данные ошибки для Sentry.
  */
 export interface SentryErrorData {
   level?: SeverityLevel;
 
-  context?: {
-    key: string;
-    data: Context | null;
-  };
+  context?: ContextData | ContextData[];
 
   extra?: {
     key: string;
