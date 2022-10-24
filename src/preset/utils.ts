@@ -49,6 +49,15 @@ export class HttpClientLogHandler implements LoggingMiddlewareHandler {
   };
 
   /**
+   * Получив данные логирования вернет новый обработчик.
+   * @param data Начальные данны логирования.
+   * @return Обработчик.
+   */
+  static create(data: SharedData): HttpClientLogHandler {
+    return new HttpClientLogHandler(data);
+  }
+
+  /**
    * Конструктор.
    * @param data Данные запроса.
    */

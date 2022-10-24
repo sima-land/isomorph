@@ -28,7 +28,7 @@ export function PresetBrowser() {
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.LogMiddleware.handler, provideLogMiddlewareHandler],
+    [KnownToken.Http.Client.LogMiddleware.handler, () => HttpClientLogHandler.create],
     [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
@@ -97,11 +97,5 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
     client.use(loggingMiddleware(logger, loggingHandler));
 
     return client;
-  };
-}
-
-export function provideLogMiddlewareHandler(): Parameters<typeof loggingMiddleware>[1] {
-  return function createLoggingHandler(data) {
-    return new HttpClientLogHandler(data);
   };
 }

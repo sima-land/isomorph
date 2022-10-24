@@ -30,7 +30,7 @@ export function PresetResponse(): Preset {
     [KnownToken.Response.main, provideMain],
     [KnownToken.Response.params, provideParams],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.LogMiddleware.handler, provideLogMiddlewareHandler],
+    [KnownToken.Http.Client.LogMiddleware.handler, () => HttpClientLogHandler.create],
   ]);
 }
 
@@ -60,12 +60,6 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
     client.use(collectCookieMiddleware(context.req, context.res));
 
     return client;
-  };
-}
-
-export function provideLogMiddlewareHandler(): Parameters<typeof loggingMiddleware>[1] {
-  return function (data) {
-    return new HttpClientLogHandler(data);
   };
 }
 
