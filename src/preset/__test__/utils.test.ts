@@ -50,6 +50,21 @@ describe('HttpClientLogHandler', () => {
     (logger.error as jest.Mock).mockClear();
   });
 
+  it('static method create() should return new HttpClientLogHandler', () => {
+    const config: AxiosRequestConfig<any> = {
+      url: '/foo/bar',
+    };
+
+    const defaults: AxiosDefaults<any> = {
+      headers: {} as any,
+      baseURL: 'https://sima.com/',
+    };
+
+    const result = HttpClientLogHandler.create({ config, defaults, logger });
+
+    expect(result instanceof HttpClientLogHandler).toBe(true);
+  });
+
   it('should log ready url properly when baseURL and url provided', async () => {
     const config: AxiosRequestConfig<any> = {
       url: '/foo/bar',
