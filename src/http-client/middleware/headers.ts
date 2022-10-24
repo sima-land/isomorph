@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 import type { Middleware } from 'middleware-axios';
+import type { RawAxiosRequestHeaders } from 'axios';
 
 export interface PassHeadersOptions {
   predicate: (headerName: string, headerValue: string) => boolean;
@@ -17,7 +18,7 @@ export function passHeadersMiddleware(
   { predicate }: PassHeadersOptions = { predicate: () => true },
 ): Middleware<any> {
   return async function passHeaders(config, next) {
-    const headers: Record<string, string> = { ...config.headers };
+    const headers: RawAxiosRequestHeaders = { ...config.headers };
 
     for (const headerName in req.headers) {
       const headerValue = req.headers[headerName];

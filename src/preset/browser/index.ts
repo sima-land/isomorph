@@ -101,7 +101,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
 }
 
 export function provideLogMiddlewareHandler(): Parameters<typeof loggingMiddleware>[1] {
-  return function (data) {
+  return function createLoggingHandler(data) {
     return new HttpClientLogHandler(data);
   };
 }

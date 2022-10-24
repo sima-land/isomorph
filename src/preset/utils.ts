@@ -41,7 +41,7 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
 
 /**
  * Обработчик для промежуточного слоя логирования исходящих http-запросов.
- * Отправляет хлебные крошки и данные ошибки в Sentry.
+ * Отправляет хлебные крошки и данные ошибки, пригодные для Sentry.
  */
 export class HttpClientLogHandler implements LoggingMiddlewareHandler {
   private readonly requestInfo: ReturnType<typeof applyAxiosDefaults> & {

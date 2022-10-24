@@ -7,7 +7,7 @@ import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
  * @return Отображение. Не является валидным URL.
  */
 export function displayUrl(
-  baseURL: AxiosDefaults['baseURL'] = '',
+  baseURL: AxiosRequestConfig['baseURL'] = '',
   url: AxiosRequestConfig['url'] = '',
 ) {
   let result: string;
