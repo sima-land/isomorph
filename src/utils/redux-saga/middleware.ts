@@ -60,6 +60,9 @@ function createSagaExtendedMiddleware(logger: Logger): SagaExtendedMiddleware {
         .toPromise()
         .then(() => {
           ready = true;
+        })
+        .finally(() => {
+          // вне зависимости от результата отключаем таймер если он есть
           timerId !== undefined && clearTimeout(timerId);
         }),
     );
