@@ -10,6 +10,11 @@ import {
 } from '../../http-client/middleware/logging';
 import { applyAxiosDefaults, displayUrl } from '../../http-client/utils';
 import { Logger } from '../../logger';
+import {
+  SagaErrorInfo,
+  SagaInterruptInfo,
+  SagaMiddlewareHandler,
+} from '../../utils/redux-saga/types';
 import { StrictMap } from './types';
 
 /** Реализация пула хостов. */
@@ -44,7 +49,7 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
  * Обработчик для промежуточного слоя логирования исходящих http-запросов.
  * Отправляет хлебные крошки и данные ошибки, пригодные для Sentry.
  */
-export class HttpClientLogHandler implements LogMiddlewareHandler {
+export class HttpClientLogging implements LogMiddlewareHandler {
   private logger: Logger;
 
   private readonly requestInfo: ReturnType<typeof applyAxiosDefaults> & {
@@ -169,5 +174,51 @@ export class HttpClientLogHandler implements LogMiddlewareHandler {
     } else {
       this.logger.error(error);
     }
+  }
+}
+
+/**
+ * Лог событий запуска и выполнения redux-saga.
+ */
+export class SagaLogging implements SagaMiddlewareHandler {
+  private logger: Logger;
+
+  /**
+   * @param logger Logger.
+   */
+  constructor(logger: Logger) {
+    this.logger = logger;
+  }
+
+  /**
+   * При получении ошибки выполнения саги передаст ее логгеру ее с данными стека в extra.
+   * @param error Ошибка.
+   * @param info Инфо выполнения саги.
+   */
+  onSagaError(error: Error, info: SagaErrorInfo) {
+    this.logger.error(
+      new SentryError(error.message, {
+        extra: {
+          key: 'Saga stack',
+          data: info.sagaStack,
+        },
+      }),
+    );
+  }
+
+  /**
+   * При получении ошибки запуска саги передаст ее логгеру.
+   * @param error Ошибка.
+   */
+  onConfigError(error: Error) {
+    this.logger.error(error);
+  }
+
+  /**
+   * При прерывании саги передаст информацию логгеру как ошибку.
+   * @param info Инфо прерывания саги.
+   */
+  onTimeoutInterrupt({ timeout }: SagaInterruptInfo) {
+    this.logger.error(new Error(`Сага прервана по таймауту (${timeout} миллисекунд)`));
   }
 }

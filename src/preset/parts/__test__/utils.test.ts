@@ -3,7 +3,7 @@ import { AxiosRequestConfig, AxiosDefaults } from 'axios';
 import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
 import { severityFromStatus } from '../../../http-client/middleware/logging';
 import { Logger } from '../../../logger';
-import { HttpApiHostPool, HttpClientLogHandler } from '../utils';
+import { HttpApiHostPool, HttpClientLogging } from '../utils';
 
 describe('HttpApiHostPool', () => {
   it('.get() should return value from map', () => {
@@ -33,7 +33,7 @@ describe('HttpApiHostPool', () => {
   });
 });
 
-describe('HttpClientLogHandler', () => {
+describe('HttpClientLogging', () => {
   const logger: Logger = {
     log: jest.fn(),
     info: jest.fn(),
@@ -66,7 +66,7 @@ describe('HttpClientLogHandler', () => {
       config,
     };
 
-    const handler = new HttpClientLogHandler(logger, { config, defaults });
+    const handler = new HttpClientLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -115,7 +115,7 @@ describe('HttpClientLogHandler', () => {
       config: {},
     };
 
-    const handler = new HttpClientLogHandler(logger, { config, defaults });
+    const handler = new HttpClientLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -166,7 +166,7 @@ describe('HttpClientLogHandler', () => {
       config: {},
     };
 
-    const handler = new HttpClientLogHandler(logger, { config, defaults });
+    const handler = new HttpClientLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -217,7 +217,7 @@ describe('HttpClientLogHandler', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogHandler(logger, { config, defaults });
+    const handler = new HttpClientLogging(logger, { config, defaults });
 
     expect(logger.error).toBeCalledTimes(0);
     expect(logger.info).toBeCalledTimes(0);
@@ -246,7 +246,7 @@ describe('HttpClientLogHandler', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogHandler(logger, { config, defaults });
+    const handler = new HttpClientLogging(logger, { config, defaults });
 
     expect(logger.error).toBeCalledTimes(0);
     expect(logger.info).toBeCalledTimes(0);
@@ -299,7 +299,7 @@ describe('HttpClientLogHandler', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogHandler(logger, { config, defaults });
+    const handler = new HttpClientLogging(logger, { config, defaults });
 
     expect(logger.error).toBeCalledTimes(0);
     expect(logger.info).toBeCalledTimes(0);
