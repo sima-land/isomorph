@@ -1,22 +1,8 @@
 import { AxiosRequestConfig, AxiosDefaults, AxiosResponse } from 'axios';
 import { Next } from 'middleware-axios';
-import { Logger } from '../../../logger';
-import { loggingMiddleware, LoggingMiddlewareHandler, severityFromStatus } from '../logging';
+import { loggingMiddleware, LogMiddlewareHandler, severityFromStatus } from '../logging';
 
-jest.useFakeTimers();
-
-function getFakeLogger(): Logger {
-  return {
-    log: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    subscribe: jest.fn(),
-  };
-}
-
-function getFakeHandler(): LoggingMiddlewareHandler {
+function getFakeHandler(): LogMiddlewareHandler {
   return {
     beforeRequest: jest.fn(),
     afterResponse: jest.fn(),
@@ -24,25 +10,7 @@ function getFakeHandler(): LoggingMiddlewareHandler {
   };
 }
 
-function loggerNotUsed(logger: Logger): boolean {
-  const methods = [
-    logger.log,
-    logger.info,
-    logger.warn,
-    logger.error,
-    logger.debug,
-    logger.subscribe,
-  ];
-
-  const callCount = methods.reduce<number>(
-    (acc, item) => acc + (item as jest.Mock).mock.calls.length,
-    0,
-  );
-
-  return callCount === 0;
-}
-
-function handlerNotUsed(handler: LoggingMiddlewareHandler): boolean {
+function handlerNotUsed(handler: LogMiddlewareHandler): boolean {
   const methods = [handler.beforeRequest, handler.afterResponse, handler.onCatch];
 
   const callCount = methods.reduce<number>(
@@ -54,11 +22,9 @@ function handlerNotUsed(handler: LoggingMiddlewareHandler): boolean {
 }
 
 describe('loggingMiddleware', () => {
-  let logger = getFakeLogger();
   let handler = getFakeHandler();
 
   beforeEach(() => {
-    logger = getFakeLogger();
     handler = getFakeHandler();
   });
 
@@ -80,17 +46,16 @@ describe('loggingMiddleware', () => {
 
     const next: Next<any> = jest.fn(() => Promise.resolve(response));
 
-    const middleware = loggingMiddleware(logger, handler);
+    const middleware = loggingMiddleware(handler);
 
-    expect(loggerNotUsed(logger)).toBe(true);
     expect(handlerNotUsed(handler)).toBe(true);
 
     await middleware(config, next, defaults);
 
     expect(handler.beforeRequest).toBeCalledTimes(1);
-    expect(handler.beforeRequest).toBeCalledWith({ config, defaults, logger });
+    expect(handler.beforeRequest).toBeCalledWith({ config, defaults });
     expect(handler.afterResponse).toBeCalledTimes(1);
-    expect(handler.afterResponse).toBeCalledWith({ config, defaults, logger, response });
+    expect(handler.afterResponse).toBeCalledWith({ config, defaults, response });
     expect(handler.onCatch).toBeCalledTimes(0);
   });
 
@@ -106,18 +71,17 @@ describe('loggingMiddleware', () => {
 
     const next: Next<any> = jest.fn(() => Promise.reject(error));
 
-    const middleware = loggingMiddleware(logger, handler);
+    const middleware = loggingMiddleware(handler);
 
-    expect(loggerNotUsed(logger)).toBe(true);
     expect(handlerNotUsed(handler)).toBe(true);
 
     await middleware(config, next, defaults).catch(() => null);
 
     expect(handler.beforeRequest).toBeCalledTimes(1);
-    expect(handler.beforeRequest).toBeCalledWith({ config, defaults, logger });
+    expect(handler.beforeRequest).toBeCalledWith({ config, defaults });
     expect(handler.afterResponse).toBeCalledTimes(0);
     expect(handler.onCatch).toBeCalledTimes(1);
-    expect(handler.onCatch).toBeCalledWith({ config, defaults, logger, error });
+    expect(handler.onCatch).toBeCalledWith({ config, defaults, error });
   });
 
   it('should handle handler factory', async () => {
@@ -140,19 +104,18 @@ describe('loggingMiddleware', () => {
 
     const handlerFactory = jest.fn(() => handler);
 
-    const middleware = loggingMiddleware(logger, handlerFactory);
+    const middleware = loggingMiddleware(handlerFactory);
 
-    expect(loggerNotUsed(logger)).toBe(true);
     expect(handlerNotUsed(handler)).toBe(true);
 
     await middleware(config, next, defaults);
 
     expect(handlerFactory).toBeCalledTimes(1);
-    expect(handlerFactory).toBeCalledWith({ config, defaults, logger });
+    expect(handlerFactory).toBeCalledWith({ config, defaults });
     expect(handler.beforeRequest).toBeCalledTimes(1);
-    expect(handler.beforeRequest).toBeCalledWith({ config, defaults, logger });
+    expect(handler.beforeRequest).toBeCalledWith({ config, defaults });
     expect(handler.afterResponse).toBeCalledTimes(1);
-    expect(handler.afterResponse).toBeCalledWith({ config, defaults, logger, response });
+    expect(handler.afterResponse).toBeCalledWith({ config, defaults, response });
     expect(handler.onCatch).toBeCalledTimes(0);
   });
 });

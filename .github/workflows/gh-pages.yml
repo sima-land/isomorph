@@ -3,7 +3,7 @@ name: Deploy Docusaurus docs on Github Pages
 on:
   push:
     branches:
-      - 24-master-bridge
+      - 24-master-bridge # исправить на основную ветку после слияния
 
 jobs:
   build-and-deploy:

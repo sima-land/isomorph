@@ -14,10 +14,10 @@ import type { Tracer } from '@opentelemetry/api';
 import type { Cache } from './cache/types';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { Resource } from '@opentelemetry/resources';
-import type { StrictMap, KnownHttpApiKey } from './preset/types';
+import type { StrictMap, KnownHttpApiKey } from './preset/parts/types';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { PageResponse } from './http-server/utils';
-import type { loggingMiddleware } from './http-client/middleware/logging';
+import type { LogMiddlewareHandlerInit } from './http-client/middleware/logging';
 
 export const KnownToken = {
   // config
@@ -53,9 +53,7 @@ export const KnownToken = {
     Client: {
       factory: createToken<HttpClientFactory>('http.client.factory'),
       LogMiddleware: {
-        handler: createToken<Parameters<typeof loggingMiddleware>[1]>(
-          'http.client.log-middleware.handler',
-        ),
+        handler: createToken<LogMiddlewareHandlerInit>('http.client.log-middleware.handler'),
       },
     },
     Server: {

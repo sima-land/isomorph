@@ -7,7 +7,6 @@ import { renderToString } from 'react-dom/server';
 import { RESPONSE_EVENT } from '../../http-server/constants';
 import { pageTemplate } from '../../http-server/template';
 import { getRequestHeaders, PageResponse } from '../../http-server/utils';
-import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
 import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
 import { tracingMiddleware } from '../../http-client/middleware/tracing';
@@ -15,7 +14,7 @@ import { loggingMiddleware } from '../../http-client/middleware/logging';
 import { passHeadersMiddleware } from '../../http-client/middleware/headers';
 import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 import { SSRError } from '../../http-server/errors';
-import { HttpClientLogHandler } from '../utils';
+import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -30,13 +29,12 @@ export function PresetResponse(): Preset {
     [KnownToken.Response.main, provideMain],
     [KnownToken.Response.params, provideParams],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.LogMiddleware.handler, () => HttpClientLogHandler.create],
+    [KnownToken.Http.Client.LogMiddleware.handler, provideHttpClientLogHandler],
   ]);
 }
 
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   const appConfig = resolve(KnownToken.Config.base);
-  const logger = resolve(KnownToken.logger);
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.Response.context);
   const loggingHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
@@ -51,7 +49,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
     });
 
     client.use(tracingMiddleware(tracer, context.res.locals.tracing.rootContext));
-    client.use(loggingMiddleware(logger, loggingHandler));
+    client.use(loggingMiddleware(loggingHandler));
     client.use(
       passHeadersMiddleware(context.req, {
         predicate: headerName => headerName.startsWith('simaland-'),
@@ -61,12 +59,6 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
 
     return client;
   };
-}
-
-export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware {
-  const logger = resolve(KnownToken.logger);
-
-  return createSagaMiddleware(logger);
 }
 
 export function provideRender(resolve: Resolve): (element: JSX.Element) => string {

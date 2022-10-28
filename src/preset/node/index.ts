@@ -1,5 +1,4 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { BaseConfig } from '../../config/types';
 import type { Logger } from '../../logger/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { DefaultMiddleware } from '../../http-server/types';
@@ -7,7 +6,6 @@ import { Resolve, Preset, createPreset } from '../../di';
 import { BasicTracerProvider, BatchSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
 import { KnownToken } from '../../tokens';
 import { createConfigSource } from '../../config/node';
-import { createBaseConfig } from '../../config/base';
 import { createLogger } from '../../logger';
 import { createConsoleHandler } from '../../logger/handler/console';
 import { createSentryHandler } from '../../logger/handler/sentry';
@@ -36,8 +34,9 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { getConventionalResource } from '../../tracing';
 import { hostname } from 'os';
 import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
-import { StrictMap, KnownHttpApiKey } from '../types';
-import { HttpApiHostPool } from '../utils';
+import { StrictMap, KnownHttpApiKey } from '../parts/types';
+import { HttpApiHostPool } from '../parts/utils';
+import { provideBaseConfig } from '../parts/providers';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -59,12 +58,6 @@ export function PresetNode(): Preset {
     [KnownToken.SsrBridge.serverSide, provideBridgeServerSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
-}
-
-export function provideBaseConfig(resolve: Resolve): BaseConfig {
-  const source = resolve(KnownToken.Config.source);
-
-  return createBaseConfig(source);
 }
 
 export function provideLogger(resolve: Resolve): Logger {

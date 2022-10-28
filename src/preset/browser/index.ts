@@ -1,11 +1,9 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc  */
 import { createPreset, Resolve } from '../../di';
 import { KnownToken } from '../../tokens';
-import { createBaseConfig } from '../../config/base';
 import { createConfigSource } from '../../config/browser';
 import { Logger, createLogger } from '../../logger';
 import { createSentryHandler } from '../../logger/handler/sentry';
-import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
 import {
   BrowserClient,
   Hub,
@@ -14,12 +12,16 @@ import {
   makeFetchTransport,
 } from '@sentry/browser';
 import { create } from 'middleware-axios';
-import type { BaseConfig } from '../../config/types';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
-import { StrictMap, KnownHttpApiKey } from '../types';
-import { HttpApiHostPool, HttpClientLogHandler } from '../utils';
+import { StrictMap, KnownHttpApiKey } from '../parts/types';
+import { HttpApiHostPool } from '../parts/utils';
 import { loggingMiddleware } from '../../http-client/middleware/logging';
 import { HttpClientFactory } from '../../http-client/types';
+import {
+  provideBaseConfig,
+  provideSagaMiddleware,
+  provideHttpClientLogHandler,
+} from '../parts/providers';
 
 export function PresetBrowser() {
   return createPreset([
@@ -28,16 +30,10 @@ export function PresetBrowser() {
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.LogMiddleware.handler, () => HttpClientLogHandler.create],
+    [KnownToken.Http.Client.LogMiddleware.handler, provideHttpClientLogHandler],
     [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
-}
-
-export function provideBaseConfig(resolve: Resolve): BaseConfig {
-  const source = resolve(KnownToken.Config.source);
-
-  return createBaseConfig(source);
 }
 
 export function provideLogger(resolve: Resolve): Logger {
@@ -54,17 +50,13 @@ export function provideLogger(resolve: Resolve): Logger {
 
   const hub = new Hub(client);
 
+  hub.setTag('url', window.location.href);
+
   const logger = createLogger();
 
   logger.subscribe(createSentryHandler(hub));
 
   return logger;
-}
-
-export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware {
-  const logger = resolve(KnownToken.logger);
-
-  return createSagaMiddleware(logger);
 }
 
 export function provideBridgeClientSide(resolve: Resolve): BridgeClientSide<unknown> {
@@ -88,13 +80,12 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
 }
 
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
-  const logger = resolve(KnownToken.logger);
   const loggingHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
 
   return function createHttpClient(config) {
     const client = create(config);
 
-    client.use(loggingMiddleware(logger, loggingHandler));
+    client.use(loggingMiddleware(loggingHandler));
 
     return client;
   };

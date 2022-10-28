@@ -1,11 +1,9 @@
 import { Env } from '@humanwhocodes/env';
 import { AxiosRequestConfig, AxiosDefaults } from 'axios';
-import { SentryBreadcrumb, SentryError } from '../../error-tracking';
-import { severityFromStatus } from '../../http-client/middleware/logging';
-import { Logger } from '../../logger';
+import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
+import { severityFromStatus } from '../../../http-client/middleware/logging';
+import { Logger } from '../../../logger';
 import { HttpApiHostPool, HttpClientLogHandler } from '../utils';
-
-// jest.useFakeTimers();
 
 describe('HttpApiHostPool', () => {
   it('.get() should return value from map', () => {
@@ -50,21 +48,6 @@ describe('HttpClientLogHandler', () => {
     (logger.error as jest.Mock).mockClear();
   });
 
-  it('static method create() should return new HttpClientLogHandler', () => {
-    const config: AxiosRequestConfig<any> = {
-      url: '/foo/bar',
-    };
-
-    const defaults: AxiosDefaults<any> = {
-      headers: {} as any,
-      baseURL: 'https://sima.com/',
-    };
-
-    const result = HttpClientLogHandler.create({ config, defaults, logger });
-
-    expect(result instanceof HttpClientLogHandler).toBe(true);
-  });
-
   it('should log ready url properly when baseURL and url provided', async () => {
     const config: AxiosRequestConfig<any> = {
       url: '/foo/bar',
@@ -83,10 +66,10 @@ describe('HttpClientLogHandler', () => {
       config,
     };
 
-    const handler = new HttpClientLogHandler({ config, defaults, logger });
+    const handler = new HttpClientLogHandler(logger, { config, defaults });
 
-    handler.beforeRequest({ config, defaults, logger });
-    handler.afterResponse({ config, defaults, logger, response });
+    handler.beforeRequest();
+    handler.afterResponse({ config, defaults, response });
 
     expect(logger.info).toBeCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
@@ -132,10 +115,10 @@ describe('HttpClientLogHandler', () => {
       config: {},
     };
 
-    const handler = new HttpClientLogHandler({ config, defaults, logger });
+    const handler = new HttpClientLogHandler(logger, { config, defaults });
 
-    handler.beforeRequest({ config, defaults, logger });
-    handler.afterResponse({ config, defaults, logger, response });
+    handler.beforeRequest();
+    handler.afterResponse({ config, defaults, response });
 
     expect(logger.info).toBeCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
@@ -183,10 +166,10 @@ describe('HttpClientLogHandler', () => {
       config: {},
     };
 
-    const handler = new HttpClientLogHandler({ config, defaults, logger });
+    const handler = new HttpClientLogHandler(logger, { config, defaults });
 
-    handler.beforeRequest({ config, defaults, logger });
-    handler.afterResponse({ config, defaults, logger, response });
+    handler.beforeRequest();
+    handler.afterResponse({ config, defaults, response });
 
     expect(logger.info).toBeCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
@@ -234,13 +217,13 @@ describe('HttpClientLogHandler', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogHandler({ config, defaults, logger });
+    const handler = new HttpClientLogHandler(logger, { config, defaults });
 
     expect(logger.error).toBeCalledTimes(0);
     expect(logger.info).toBeCalledTimes(0);
 
-    handler.beforeRequest({ config, defaults, logger });
-    handler.onCatch({ config, defaults, logger, error });
+    handler.beforeRequest();
+    handler.onCatch({ config, defaults, error });
 
     expect(logger.error).toBeCalledTimes(1);
     expect(logger.info).toBeCalledTimes(2);
@@ -263,13 +246,13 @@ describe('HttpClientLogHandler', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogHandler({ config, defaults, logger });
+    const handler = new HttpClientLogHandler(logger, { config, defaults });
 
     expect(logger.error).toBeCalledTimes(0);
     expect(logger.info).toBeCalledTimes(0);
 
-    handler.beforeRequest({ config, defaults, logger });
-    handler.onCatch({ config, defaults, logger, error });
+    handler.beforeRequest();
+    handler.onCatch({ config, defaults, error });
 
     expect(logger.error).toBeCalledTimes(1);
     expect(logger.info).toBeCalledTimes(1);
@@ -316,13 +299,13 @@ describe('HttpClientLogHandler', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogHandler({ config, defaults, logger });
+    const handler = new HttpClientLogHandler(logger, { config, defaults });
 
     expect(logger.error).toBeCalledTimes(0);
     expect(logger.info).toBeCalledTimes(0);
 
-    handler.beforeRequest({ config, defaults, logger });
-    handler.onCatch({ config, defaults, logger, error });
+    handler.beforeRequest();
+    handler.onCatch({ config, defaults, error });
 
     expect(logger.error).toBeCalledTimes(1);
     expect(logger.info).toBeCalledTimes(1);

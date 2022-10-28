@@ -1,14 +1,15 @@
 import Axios from 'axios';
-import { ConfigSource } from '../config/types';
-import { SentryBreadcrumb, SentryError } from '../error-tracking';
+import { ConfigSource } from '../../config/types';
+import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 import {
   DoneSharedData,
   FailSharedData,
-  LoggingMiddlewareHandler,
+  LogMiddlewareHandler,
   severityFromStatus,
   SharedData,
-} from '../http-client/middleware/logging';
-import { applyAxiosDefaults, displayUrl } from '../http-client/utils';
+} from '../../http-client/middleware/logging';
+import { applyAxiosDefaults, displayUrl } from '../../http-client/utils';
+import { Logger } from '../../logger';
 import { StrictMap } from './types';
 
 /** Реализация пула хостов. */
@@ -18,7 +19,7 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
 
   /**
    * Конструктор.
-   * @param map Карта значений по их ключам.
+   * @param map Карта "Название api >> Название переменной среды с хостом api".
    * @param source Источник конфигурации.
    */
   constructor(map: Record<Key, string>, source: ConfigSource) {
@@ -43,26 +44,22 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
  * Обработчик для промежуточного слоя логирования исходящих http-запросов.
  * Отправляет хлебные крошки и данные ошибки, пригодные для Sentry.
  */
-export class HttpClientLogHandler implements LoggingMiddlewareHandler {
+export class HttpClientLogHandler implements LogMiddlewareHandler {
+  private logger: Logger;
+
   private readonly requestInfo: ReturnType<typeof applyAxiosDefaults> & {
     readyURL: string;
   };
 
   /**
-   * Получив данные логирования вернет новый обработчик.
-   * @param data Начальные данны логирования.
-   * @return Обработчик.
-   */
-  static create(data: SharedData): HttpClientLogHandler {
-    return new HttpClientLogHandler(data);
-  }
-
-  /**
    * Конструктор.
+   * @param logger Logger.
    * @param data Данные запроса.
    */
-  constructor(data: SharedData) {
+  constructor(logger: Logger, data: SharedData) {
     const config = applyAxiosDefaults(data.config, data.defaults);
+
+    this.logger = logger;
 
     this.requestInfo = {
       ...config,
@@ -72,12 +69,11 @@ export class HttpClientLogHandler implements LoggingMiddlewareHandler {
 
   /**
    * Отправит хлебные крошки перед запросом.
-   * @param data Данные запроса.
    */
-  beforeRequest({ logger }: SharedData) {
+  beforeRequest() {
     const { readyURL, method, params } = this.requestInfo;
 
-    logger.info(
+    this.logger.info(
       new SentryBreadcrumb({
         category: 'http.request',
         type: 'http',
@@ -95,10 +91,10 @@ export class HttpClientLogHandler implements LoggingMiddlewareHandler {
    * Отправит хлебные крошки после запроса.
    * @param data Данные ответа.
    */
-  afterResponse({ logger, response }: DoneSharedData) {
+  afterResponse({ response }: DoneSharedData) {
     const { readyURL, method, params } = this.requestInfo;
 
-    logger.info(
+    this.logger.info(
       new SentryBreadcrumb({
         category: 'http.response',
         type: 'http',
@@ -117,12 +113,12 @@ export class HttpClientLogHandler implements LoggingMiddlewareHandler {
    * Отправит данные ошибки при перехвате.
    * @param data Данные запроса.
    */
-  onCatch({ logger, error }: FailSharedData) {
+  onCatch({ error }: FailSharedData) {
     if (Axios.isAxiosError(error)) {
       const { requestInfo } = this;
       const statusCode = error.response?.status || 'UNKNOWN';
 
-      logger.error(
+      this.logger.error(
         new SentryError(
           `HTTP request failed, status code: ${statusCode}, error message: ${error.message}`,
           {
@@ -143,7 +139,10 @@ export class HttpClientLogHandler implements LoggingMiddlewareHandler {
                 key: 'Response details',
                 data: {
                   data: error.response?.data,
-                  headers: error.response?.headers,
+
+                  // копируем так как в Sentry падает ошибка: **non-serializable** (TypeError: Object.getPrototypeOf(...) is null)
+                  headers: { ...error.response?.headers },
+
                   error: error.toJSON(),
                 },
               },
@@ -153,7 +152,7 @@ export class HttpClientLogHandler implements LoggingMiddlewareHandler {
       );
 
       if (typeof statusCode === 'number') {
-        logger.info(
+        this.logger.info(
           new SentryBreadcrumb({
             category: 'http.response',
             type: 'http',
@@ -168,7 +167,7 @@ export class HttpClientLogHandler implements LoggingMiddlewareHandler {
         );
       }
     } else {
-      logger.error(error);
+      this.logger.error(error);
     }
   }
 }
