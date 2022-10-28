@@ -1,32 +1,22 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { MiddlewareAPI } from '@reduxjs/toolkit';
-import { SagaExtendedMiddleware } from './types';
-import { Logger } from '../../logger';
+import { SagaExtendedMiddleware, SagaMiddlewareHandler } from './types';
 import createSagaMiddleware, { END, Saga } from 'redux-saga';
-import { SentryError } from '../../error-tracking';
 
 /**
  * Возвращает расширенную версию SagaMiddleware.
- * @param logger Logger.
+ * @param handler Обработчик событий.
  * @return Middleware.
  */
-function createSagaExtendedMiddleware(logger: Logger): SagaExtendedMiddleware {
+function createSagaExtendedMiddleware(handler: SagaMiddlewareHandler): SagaExtendedMiddleware {
   const privates: {
     api?: MiddlewareAPI;
     timeout?: number;
   } = {};
 
   const sagaMiddleware = createSagaMiddleware({
-    onError: (error, { sagaStack }) => {
-      logger.error(
-        // @todo убрать отсюда упоминание sentry, вынести в провайдер, возможно заменить аргумент logger на onError
-        new SentryError(error.message, {
-          extra: {
-            key: 'Saga stack',
-            data: sagaStack,
-          },
-        }),
-      );
+    onError: (error, info) => {
+      handler.onSagaError(error, info);
     },
   });
 
@@ -48,10 +38,14 @@ function createSagaExtendedMiddleware(logger: Logger): SagaExtendedMiddleware {
     const promises: Promise<void>[] = [];
 
     let ready = false;
-    let timerId: NodeJS.Timeout;
+    let timerId: ReturnType<typeof setTimeout>;
 
     if (!api) {
-      throw Error('Middleware is not applied to the store');
+      const error = new Error('Middleware is not applied to the store');
+
+      handler.onConfigError(error);
+
+      throw error;
     }
 
     promises.push(
@@ -72,7 +66,7 @@ function createSagaExtendedMiddleware(logger: Logger): SagaExtendedMiddleware {
         new Promise<void>(resolve => {
           timerId = setTimeout(() => {
             if (!ready) {
-              logger.error(Error(`Сага прервана по таймауту (${timeout} миллисекунд)`));
+              handler.onTimeoutInterrupt({ timeout });
               api.dispatch(END);
             }
 
