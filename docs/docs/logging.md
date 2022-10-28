@@ -36,13 +36,23 @@ if (somethingWrong) {
 
 ```ts
 import { loggingMiddleware } from '@sima-land/isomorph/http-client/middleware';
-import { createLogger } from '@sima-land/isomorph/logger';
 import { create } from 'middleware-axios';
 
-const logger = createLogger();
 const client = create();
 
-client.use(loggingMiddleware(logger));
+const middleware = loggingMiddleware({
+  beforeRequest({ config, defaults }) {
+    console.log('beforeRequest');
+  },
+  afterResponse({ config, defaults, responser }) {
+    console.log('afterResponse');
+  },
+  onCatch({ config, defaults, error }) {
+    console.log('onCatch');
+  },
+});
+
+client.use(middleware);
 ```
 
 ### Middleware для express-приложения
