@@ -37,7 +37,6 @@ class ApplicationImplementation implements Application {
       throw new AlreadyBoundError(token);
     }
 
-    // @todo вынести реализацию Binding в отдельный класс (в целях оптимизации)
     return {
       toValue: value => {
         this.providers.set(token, () => value);

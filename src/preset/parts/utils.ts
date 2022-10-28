@@ -1,12 +1,12 @@
+import { SeverityLevel } from '@sentry/browser';
 import Axios from 'axios';
 import { ConfigSource } from '../../config/types';
 import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 import {
+  SharedData,
   DoneSharedData,
   FailSharedData,
   LogMiddlewareHandler,
-  severityFromStatus,
-  SharedData,
 } from '../../http-client/middleware/logging';
 import { applyAxiosDefaults, displayUrl } from '../../http-client/utils';
 import { Logger } from '../../logger';
@@ -43,6 +43,32 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
     // "лениво" берём переменную, именно в момент вызова (чтобы не заставлять указывать в сервисах все переменные разом)
     return this.source.require(variableName);
   }
+}
+
+/**
+ * Возвращает уровень на основе статуса ответа.
+ * @param status Статус HTTP-ответа.
+ * @return Уровень.
+ */
+export function severityFromStatus(status: number | undefined): SeverityLevel {
+  let result: SeverityLevel;
+
+  if (typeof status === 'number') {
+    switch (true) {
+      case status >= 200 && status <= 299:
+        result = 'info';
+        break;
+      case status >= 300 && status <= 499:
+        result = 'warning';
+        break;
+      default:
+        result = 'error';
+    }
+  } else {
+    result = 'error';
+  }
+
+  return result;
 }
 
 /**

@@ -1,6 +1,5 @@
 import { AxiosResponse, AxiosRequestConfig, AxiosDefaults } from 'axios';
 import { Middleware } from 'middleware-axios';
-import { SeverityLevel } from '@sentry/types';
 
 export interface SharedData {
   config: AxiosRequestConfig;
@@ -50,31 +49,4 @@ export function loggingMiddleware(handlerInit: LogMiddlewareHandlerInit): Middle
       throw error;
     }
   };
-}
-
-/**
- * Возвращает уровень на основе статуса ответа.
- * @todo Возможно стоит вынести в preset.
- * @param status Статус.
- * @return Уровень.
- */
-export function severityFromStatus(status: number | undefined): SeverityLevel {
-  let result: SeverityLevel;
-
-  if (typeof status === 'number') {
-    switch (true) {
-      case status >= 200 && status <= 299:
-        result = 'info';
-        break;
-      case status >= 300 && status <= 499:
-        result = 'warning';
-        break;
-      default:
-        result = 'error';
-    }
-  } else {
-    result = 'error';
-  }
-
-  return result;
 }

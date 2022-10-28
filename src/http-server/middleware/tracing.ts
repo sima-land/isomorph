@@ -8,7 +8,7 @@ import type { Request, Handler } from 'express';
  * @return Middleware.
  */
 export function tracingMiddleware(tracer: Tracer): Handler {
-  return (req, res, next) => {
+  return function tracing(req, res, next) {
     const externalContext = propagation.extract(ROOT_CONTEXT, req.headers);
     const rootSpan = tracer.startSpan('response', undefined, externalContext);
 
