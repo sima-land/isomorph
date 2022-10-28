@@ -4,14 +4,14 @@ import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { PresetResponse } from '@sima-land/isomorph/preset/node/response';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 import { TOKEN } from '../tokens';
-import { Api } from '../types';
+import { Api } from '../../types';
 import { sauce } from '@sima-land/isomorph/http-client/sauce';
 import { Provider } from 'react-redux';
 import { GlobalDataScript, SsrBridge } from '@sima-land/isomorph/utils/ssr';
-import { DesktopApp as Desktop } from '../components/desktop';
-import { reducer } from '../reducers/app';
+import { DesktopApp as Desktop } from '../../components/desktop';
+import { reducer } from '../../reducers/app';
 import { configureStore } from '@reduxjs/toolkit';
-import { rootSaga } from '../sagas';
+import { rootSaga } from '../../sagas';
 
 export function DesktopApp() {
   const app = createApplication();
@@ -32,10 +32,10 @@ function provideApi(resolve: Resolve): Api {
 
   return {
     getCurrencies() {
-      return client.get<any>('currency/');
+      return client.get('currency/');
     },
     getUser() {
-      return client.get<any>('user/');
+      return client.get('user/');
     },
   };
 }

@@ -1,4 +1,4 @@
-import type { Sauce } from '@sima-land/isomorph/http-client/sauce';
+import type { SauceResponse } from '@sima-land/isomorph/http-client/sauce';
 
 export interface Config {
   mainPort: number;
@@ -6,6 +6,16 @@ export interface Config {
 }
 
 export interface Api {
-  getUser(): ReturnType<Sauce['get']>;
-  getCurrencies(): ReturnType<Sauce['get']>;
+  getUser(): Promise<SauceResponse<{ items: User[] }>>;
+  getCurrencies(): Promise<SauceResponse<{ items: Currency[] }>>;
+}
+
+export interface User {
+  id: string;
+  name: string;
+}
+
+export interface Currency {
+  id: number;
+  name: string;
 }

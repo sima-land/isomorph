@@ -1,15 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Status } from '@sima-land/isomorph/utils/redux/remote-data';
-
-interface User {
-  id: string;
-  name: string;
-}
-
-interface Currency {
-  id: number;
-  name: string;
-}
+import { Currency, User } from '../types';
 
 interface AppState {
   user: {

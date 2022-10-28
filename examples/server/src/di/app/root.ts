@@ -1,6 +1,6 @@
 import express, { Application as ExpressApp } from 'express';
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
-import { Config } from '../types';
+import { Config } from '../../types';
 import { PresetNode } from '@sima-land/isomorph/preset/node';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 import { TOKEN } from '../tokens';

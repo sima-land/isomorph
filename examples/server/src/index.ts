@@ -1,5 +1,5 @@
-import { RootApp } from './apps/root';
-import { TOKEN } from './tokens';
+import { RootApp } from './di/app/root';
+import { TOKEN } from './di/tokens';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 
 RootApp().invoke(

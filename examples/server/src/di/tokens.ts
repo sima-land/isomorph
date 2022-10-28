@@ -1,6 +1,6 @@
 import { createToken } from '@sima-land/isomorph/di';
 import type { Application, Handler } from 'express';
-import type { Config, Api } from './types';
+import type { Config, Api } from '../types';
 
 export const TOKEN = {
   // scope: root
