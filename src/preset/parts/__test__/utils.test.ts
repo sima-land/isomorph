@@ -3,7 +3,16 @@ import { AxiosRequestConfig, AxiosDefaults } from 'axios';
 import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
 import { severityFromStatus } from '../../../http-client/middleware/logging';
 import { Logger } from '../../../logger';
-import { HttpApiHostPool, HttpClientLogging } from '../utils';
+import { HttpApiHostPool, HttpClientLogging, SagaLogging } from '../utils';
+
+const logger: Logger = {
+  log: jest.fn(),
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+  subscribe: jest.fn(),
+};
 
 describe('HttpApiHostPool', () => {
   it('.get() should return value from map', () => {
@@ -34,15 +43,6 @@ describe('HttpApiHostPool', () => {
 });
 
 describe('HttpClientLogging', () => {
-  const logger: Logger = {
-    log: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    subscribe: jest.fn(),
-  };
-
   beforeEach(() => {
     (logger.info as jest.Mock).mockClear();
     (logger.error as jest.Mock).mockClear();
@@ -309,5 +309,39 @@ describe('HttpClientLogging', () => {
 
     expect(logger.error).toBeCalledTimes(1);
     expect(logger.info).toBeCalledTimes(1);
+  });
+});
+
+describe('SagaLogging', () => {
+  beforeEach(() => {
+    (logger.info as jest.Mock).mockClear();
+    (logger.error as jest.Mock).mockClear();
+  });
+
+  it('should handle saga error properly', () => {
+    const handler = new SagaLogging(logger);
+
+    expect(logger.error).toBeCalledTimes(0);
+    handler.onSagaError(new Error('my test error'), { sagaStack: 'my test stack' });
+    expect(logger.error).toBeCalledTimes(1);
+  });
+
+  it('should handle config error properly', () => {
+    const handler = new SagaLogging(logger);
+    const error = new Error('my test error');
+
+    expect(logger.error).toBeCalledTimes(0);
+    handler.onConfigError(error);
+    expect(logger.error).toBeCalledTimes(1);
+    expect(logger.error).toBeCalledWith(error);
+  });
+
+  it('should handle timeout interrupt properly', () => {
+    const handler = new SagaLogging(logger);
+    const info = { timeout: 250 };
+
+    expect(logger.error).toBeCalledTimes(0);
+    handler.onTimeoutInterrupt(info);
+    expect(logger.error).toBeCalledTimes(1);
   });
 });
