@@ -104,7 +104,7 @@ export function provideMain(resolve: Resolve): VoidFunction {
         .send(context.res);
     } catch (error) {
       let message;
-      let statusCode = 500;
+      let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
 
       if (error instanceof Error) {
         message = error.message;

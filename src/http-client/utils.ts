@@ -36,6 +36,7 @@ export function displayUrl(
  * @param config Конфигурация запроса.
  * @param defaults Настройки по умолчанию для экземпляра axios.
  * @return Уточненная итоговая конфигурация.
+ * @todo Было бы круто заменить на axios/core/mergeConfig (https://github.com/axios/axios/blob/v1.x/lib/core/mergeConfig.js).
  */
 export function applyAxiosDefaults(
   config: AxiosRequestConfig,
