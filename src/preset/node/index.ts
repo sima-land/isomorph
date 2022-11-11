@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { Logger } from '../../logger/types';
+import type { Logger, LoggerEventHandler } from '../../logger/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { DefaultMiddleware } from '../../http-server/types';
 import { Resolve, Preset, createPreset } from '../../di';
@@ -7,7 +7,7 @@ import { BasicTracerProvider, BatchSpanProcessor, SpanExporter } from '@opentele
 import { KnownToken } from '../../tokens';
 import { createConfigSource } from '../../config/node';
 import { createLogger } from '../../logger';
-import { createConsoleHandler } from '../../logger/handler/console';
+import { createPinoHandler } from '../../logger/handler/pino';
 import { createSentryHandler } from '../../logger/handler/sentry';
 import { loggingMiddleware } from '../../http-server/middleware/logging';
 import { tracingMiddleware } from '../../http-server/middleware/tracing';
@@ -19,14 +19,7 @@ import { createDefaultMetrics, createMetricsHttpApp } from '../../metrics/node';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { create } from 'middleware-axios';
 import Express from 'express';
-import {
-  Handlers,
-  NodeClient,
-  Hub,
-  defaultIntegrations,
-  defaultStackParser,
-  makeNodeTransport,
-} from '@sentry/node';
+import { init, Handlers, getCurrentHub } from '@sentry/node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
@@ -37,6 +30,8 @@ import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey } from '../parts/types';
 import { HttpApiHostPool } from '../parts/utils';
 import { provideBaseConfig } from '../parts/providers';
+import pino from 'pino';
+import PinoPretty from 'pino-pretty';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -61,25 +56,47 @@ export function PresetNode(): Preset {
 }
 
 export function provideLogger(resolve: Resolve): Logger {
-  const source = resolve(KnownToken.Config.source);
-  const config = resolve(KnownToken.Config.base);
+  const logger = createLogger();
 
-  const client = new NodeClient({
-    transport: makeNodeTransport,
-    stackParser: defaultStackParser,
+  logger.subscribe(providePinoHandler(resolve));
+  logger.subscribe(provideSentryHandler(resolve));
+
+  return logger;
+}
+
+export function provideSentryHandler(resolve: Resolve): LoggerEventHandler {
+  const source = resolve(KnownToken.Config.source);
+
+  // экспериментально пробуем не использовать вручную созданный клиент
+  init({
     dsn: source.require('SENTRY_DSN'),
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('SENTRY_ENVIRONMENT'),
-    integrations: [...defaultIntegrations],
   });
-  const hub = new Hub(client);
 
-  const logger = createLogger();
+  // ВАЖНО: передаем функцию чтобы брать текущий hub в момент вызова метода logger'а
+  // это нужно чтобы хлебные крошки в ошибках Sentry группировались по запросам
+  return createSentryHandler(getCurrentHub);
+}
 
-  logger.subscribe(createConsoleHandler(config));
-  logger.subscribe(createSentryHandler(hub));
+export function providePinoHandler(resolve: Resolve): LoggerEventHandler {
+  const config = resolve(KnownToken.Config.base);
 
-  return logger;
+  const pinoLogger = pino(
+    config.env === 'production'
+      ? {
+          formatters: {
+            // ВАЖНО: для Fluent необходимо наличие поля level: string
+            level: label => ({ level: label }),
+          },
+        }
+      : PinoPretty({
+          colorize: true,
+          translateTime: 'yyyy-mm-dd HH:MM:ss.l o',
+        }),
+  );
+
+  return createPinoHandler(pinoLogger);
 }
 
 export function provideTracer(resolve: Resolve): Tracer {

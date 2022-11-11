@@ -4,11 +4,18 @@ import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 
 /**
  * Возвращает новый handler для logger'а для отправки событий в Sentry.
- * @param hub Sentry Hub.
+ * @param hubInit Sentry Hub или функция которая его вернёт.
  * @return Handler.
  */
-export function createSentryHandler(hub: Hub): LoggerEventHandler {
+export function createSentryHandler(hubInit: Hub | (() => Hub)): LoggerEventHandler {
+  const getHub = typeof hubInit === 'function' ? hubInit : () => hubInit;
+
   return event => {
+    // ВАЖНО: каждый входящий http-запрос должен иметь свой собственный hub
+    // подробности: https://github.com/getsentry/sentry-javascript/discussions/5648
+    // поэтому если передана функция - вызываем каждый раз (внутри обработчика)
+    const hub = getHub();
+
     // error
     if (event.type === 'error') {
       const error = event.data;

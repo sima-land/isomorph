@@ -11,12 +11,13 @@ import { toMilliseconds } from '../../utils/number';
  * @return Middleware.
  */
 export function loggingMiddleware(config: BaseConfig, logger: Logger): Handler {
-  return function (req, res, next) {
+  return function log(req, res, next) {
     const start = process.hrtime.bigint();
 
     res.once('finish', () => {
       const finish = process.hrtime.bigint();
 
+      // @todo перенести в пресеты?
       const message: ConventionalFluentInfo = {
         version: config.appVersion,
         route: req.originalUrl,
