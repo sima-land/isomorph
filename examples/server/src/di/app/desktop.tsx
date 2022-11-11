@@ -7,7 +7,7 @@ import { TOKEN } from '../tokens';
 import { Api } from '../../types';
 import { sauce } from '@sima-land/isomorph/http-client/sauce';
 import { Provider } from 'react-redux';
-import { GlobalDataScript, SsrBridge } from '@sima-land/isomorph/utils/ssr';
+import { GlobalDataScript } from '@sima-land/isomorph/utils/ssr';
 import { DesktopApp as Desktop } from '../../components/desktop';
 import { reducer } from '../../reducers/app';
 import { configureStore } from '@reduxjs/toolkit';
@@ -48,10 +48,10 @@ function provideAssets(): PageAssets {
 }
 
 function providePrepare(resolve: Resolve): () => Promise<JSX.Element> {
-  const config = resolve(KnownToken.Config.base);
   const api = resolve(TOKEN.Response.api);
   const sagaMiddleware = resolve(KnownToken.sagaMiddleware);
-  const responseBuilder = resolve(KnownToken.Response.builder);
+  const bridge = resolve(KnownToken.SsrBridge.serverSide);
+  const builder = resolve(KnownToken.Response.builder);
 
   return async function prepare() {
     const store = configureStore({
@@ -61,14 +61,8 @@ function providePrepare(resolve: Resolve): () => Promise<JSX.Element> {
 
     await sagaMiddleware.timeout(3000).run(rootSaga, { api });
 
-    const bridge = SsrBridge.prepare(config.appName);
-
-    // устанавливаем meta в ответ
-    responseBuilder.meta(
-      JSON.stringify({
-        userId: store.getState().user?.data?.id,
-      }),
-    );
+    // пример установки meta-данных в ответ
+    builder.meta(JSON.stringify({ userId: store.getState().user?.data?.id }));
 
     return (
       <Provider store={store}>

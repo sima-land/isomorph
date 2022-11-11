@@ -18,4 +18,5 @@ export interface User {
 export interface Currency {
   id: number;
   name: string;
+  grapheme: string;
 }
