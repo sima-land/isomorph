@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "Example of browser application",
   "scripts": {
-    "start": "NODE_ENV='development' webpack serve",
+    "dev": "NODE_ENV='development' webpack serve",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "type-check": "tsc -p . --noEmit"
   },

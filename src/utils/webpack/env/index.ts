@@ -28,7 +28,16 @@ export class EnvPlugin implements WebpackPluginInstance {
    */
   apply(compiler: Compiler) {
     const { webpack } = compiler;
-    const env = defineEnv({ dotenvUsage: this.options.dotenvUsage });
+
+    const env = defineEnv({
+      dotenvUsage: this.options.dotenvUsage,
+      onError: error => {
+        compiler.hooks.compilation.tap('EnvPlugin', compilation => {
+          compilation.warnings.push(new webpack.WebpackError(`[EnvPlugin] ${String(error)}`));
+        });
+      },
+    });
+
     let values: Record<string, string | undefined> | null = null;
     let target: string | undefined;
 

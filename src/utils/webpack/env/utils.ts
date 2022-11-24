@@ -1,5 +1,5 @@
 import { EnvPluginOptions } from './types';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 
@@ -9,20 +9,26 @@ import dotenv from 'dotenv';
  * @return Объект с переменными среды.
  */
 export function defineEnv(
-  options: Pick<EnvPluginOptions, 'dotenvUsage'>,
+  options: Pick<EnvPluginOptions, 'dotenvUsage'> & { onError?: (error: unknown) => void },
 ): Record<string, string | undefined> {
   const result = { ...process.env };
 
   if (options.dotenvUsage && process.env.NODE_ENV) {
-    // @todo обрабатывать проблемы с чтением/парсингом итд
-    const dotenvPath = path.join(process.cwd(), `.env.${process.env.NODE_ENV}`);
-    const parsed = dotenv.parse(readFileSync(dotenvPath, 'utf-8'));
+    try {
+      const dotenvPath = path.join(process.cwd(), `.env.${process.env.NODE_ENV}`);
 
-    // @todo дёрнуть бы эту логику из пакета dotenv, https://github.com/motdotla/dotenv/issues/690
-    for (const key of Object.keys(parsed)) {
-      if (!Object.prototype.hasOwnProperty.call(result, key)) {
-        result[key] = parsed[key];
+      if (existsSync(dotenvPath)) {
+        const parsed = dotenv.parse(readFileSync(dotenvPath, 'utf-8'));
+
+        // @todo дёрнуть бы эту логику из пакета dotenv, https://github.com/motdotla/dotenv/issues/690
+        for (const key of Object.keys(parsed)) {
+          if (!Object.prototype.hasOwnProperty.call(result, key)) {
+            result[key] = parsed[key];
+          }
+        }
       }
+    } catch (error) {
+      options.onError?.(error);
     }
   }
 

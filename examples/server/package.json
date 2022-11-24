@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "description": "Example of server application",
   "scripts": {
-    "start": "NODE_ENV='development' webpack watch",
+    "dev": "NODE_ENV='development' webpack watch",
+    "start": "NODE_ENV='development' node ./dist/index.js",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "type-check": "tsc -p . --noEmit"
   },

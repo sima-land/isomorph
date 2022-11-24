@@ -54,8 +54,8 @@
     "express": "^4.17.3",
     "jsesc": "^3.0.2",
     "middleware-axios": "^2.1.5",
-    "pino": "^8.4.2",
-    "pino-pretty": "^9.0.1",
+    "pino": "^8.7.0",
+    "pino-pretty": "^9.1.1",
     "prom-client": "^14.0.1",
     "webpack": "^5.74.0"
   },
