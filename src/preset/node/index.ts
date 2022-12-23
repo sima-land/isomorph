@@ -3,7 +3,11 @@ import type { Logger, LoggerEventHandler } from '../../logger/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { DefaultMiddleware } from '../../http-server/types';
 import { Resolve, Preset, createPreset } from '../../di';
-import { BasicTracerProvider, BatchSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
+import {
+  BasicTracerProvider,
+  BatchSpanProcessor,
+  SpanExporter,
+} from '@opentelemetry/sdk-trace-base';
 import { KnownToken } from '../../tokens';
 import { createConfigSource } from '../../config/node';
 import { createLogger } from '../../logger';
@@ -58,6 +62,7 @@ export function PresetNode(): Preset {
 export function provideLogger(resolve: Resolve): Logger {
   const logger = createLogger();
 
+  // @todo возможно надо придумать как не давать вызывать провайдеры внутри провайдеров
   logger.subscribe(providePinoHandler(resolve));
   logger.subscribe(provideSentryHandler(resolve));
 
@@ -125,13 +130,13 @@ export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
     resource,
   });
 
-  provider.addSpanProcessor(new BatchSpanProcessor(exporter) as any); // @todo разобраться с as any
+  provider.addSpanProcessor(new BatchSpanProcessor(exporter));
 
   provider.register({
     propagator: new JaegerPropagator(),
   });
 
-  return provider as any; // @todo разобраться с as any
+  return provider;
 }
 
 export function provideTracerProviderResource(resolve: Resolve): Resource {

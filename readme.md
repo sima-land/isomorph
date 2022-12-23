@@ -7,6 +7,7 @@
 - react
 - redux
 - redux-saga
+- axios
 - express
 - webpack
 - sentry (логирование ошибок)

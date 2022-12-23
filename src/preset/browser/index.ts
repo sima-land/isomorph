@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc  */
-import { createPreset, Resolve } from '../../di';
+import { createPreset, Resolve, Preset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { createConfigSource } from '../../config/browser';
 import { Logger, createLogger } from '../../logger';
@@ -14,7 +14,7 @@ import {
 import { create } from 'middleware-axios';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey } from '../parts/types';
-import { HttpApiHostPool } from '../parts/utils';
+import { HttpApiHostPool, HttpStatus } from '../parts/utils';
 import { loggingMiddleware } from '../../http-client/middleware/logging';
 import { HttpClientFactory } from '../../http-client/types';
 import {
@@ -23,7 +23,7 @@ import {
   provideHttpClientLogHandler,
 } from '../parts/providers';
 
-export function PresetBrowser() {
+export function PresetBrowser(): Preset {
   return createPreset([
     [KnownToken.Config.source, createConfigSource],
     [KnownToken.Config.base, provideBaseConfig],
@@ -85,6 +85,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   return function createHttpClient(config) {
     const client = create(config);
 
+    client.use(HttpStatus.createMiddleware());
     client.use(loggingMiddleware(loggingHandler));
 
     return client;

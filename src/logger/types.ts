@@ -33,6 +33,7 @@ export interface Logger {
 
 /**
  * Структура данных, которую необходимо выводить в терминал по соглашению внутри компании.
+ * @todo Убрать в preset'ы?
  */
 export interface ConventionalFluentInfo {
   version: string;

@@ -1,5 +1,6 @@
 import { SeverityLevel } from '@sentry/browser';
-import Axios from 'axios';
+import Axios, { AxiosRequestConfig } from 'axios';
+import type { Middleware } from 'middleware-axios';
 import { ConfigSource } from '../../config/types';
 import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 import {
@@ -50,7 +51,7 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
  * @param status Статус HTTP-ответа.
  * @return Уровень.
  */
-export function severityFromStatus(status: number | undefined): SeverityLevel {
+export function severityFromStatus(status: unknown): SeverityLevel {
   let result: SeverityLevel;
 
   if (typeof status === 'number') {
@@ -76,9 +77,9 @@ export function severityFromStatus(status: number | undefined): SeverityLevel {
  * Отправляет хлебные крошки и данные ошибки, пригодные для Sentry.
  */
 export class HttpClientLogging implements LogMiddlewareHandler {
-  private logger: Logger;
+  protected logger: Logger;
 
-  private readonly requestInfo: ReturnType<typeof applyAxiosDefaults> & {
+  protected readonly requestInfo: ReturnType<typeof applyAxiosDefaults> & {
     readyURL: string;
   };
 
@@ -149,6 +150,8 @@ export class HttpClientLogging implements LogMiddlewareHandler {
       const { requestInfo } = this;
       const statusCode = error.response?.status || 'UNKNOWN';
 
+      // @todo выяснить: нужно ли нам отправлять ответы с кодом <500 в Sentry на уровне всех команд
+      // если да то можно добавить метод в духе errorStatusFilter(s => s !== 422)
       this.logger.error(
         new SentryError(
           `HTTP request failed, status code: ${statusCode}, error message: ${error.message}`,
@@ -207,7 +210,7 @@ export class HttpClientLogging implements LogMiddlewareHandler {
  * Лог событий запуска и выполнения redux-saga.
  */
 export class SagaLogging implements SagaMiddlewareHandler {
-  private logger: Logger;
+  protected logger: Logger;
 
   /**
    * @param logger Logger.
@@ -246,5 +249,65 @@ export class SagaLogging implements SagaMiddlewareHandler {
    */
   onTimeoutInterrupt({ timeout }: SagaInterruptInfo) {
     this.logger.error(new Error(`Сага прервана по таймауту (${timeout} миллисекунд)`));
+  }
+}
+
+/** Работа с HTTP-статусами по соглашению. */
+export abstract class HttpStatus {
+  /**
+   * Определяет, является ли переданный статус успешным.
+   * @param status Статус.
+   * @return Признак.
+   */
+  static isGetOk(status: unknown): boolean {
+    return typeof status === 'number' && status === 200;
+  }
+
+  /**
+   * Определяет, является ли переданный статус успешным POST.
+   * @param status Статус.
+   * @return Признак.
+   */
+  static isPostOk(status: unknown): boolean {
+    return typeof status === 'number' && status === 201;
+  }
+
+  /**
+   * Определяет, является ли переданный статус успешным DELETE.
+   * @param status Статус.
+   * @return Признак.
+   */
+  static isDeleteOk(status: unknown): boolean {
+    return typeof status === 'number' && (status === 204 || status === 200);
+  }
+
+  /**
+   * Возвращает новый промежуточный слой для валидации статуса HTTP-ответа.
+   * Валидация применяется только если в конфиге запроса не указан validateStatus.
+   * @return Промежуточный слой.
+   */
+  static createMiddleware(): Middleware<unknown> {
+    return async (config, next) => {
+      if ('validateStatus' in config) {
+        // если validateStatus указан явно то не применяем валидацию по умолчанию
+        await next(config);
+      } else {
+        let validateStatus: AxiosRequestConfig['validateStatus'] = null;
+
+        switch (config.method) {
+          case 'get':
+            validateStatus = HttpStatus.isGetOk;
+            break;
+          case 'post':
+            validateStatus = HttpStatus.isPostOk;
+            break;
+          case 'delete':
+            validateStatus = HttpStatus.isDeleteOk;
+            break;
+        }
+
+        await next({ ...config, validateStatus });
+      }
+    };
   }
 }

@@ -34,6 +34,7 @@ export function getServiceHeaders(req: Request): Record<string, string | undefin
 
 /**
  * Формирует заголовки для исходящих запросов с сервера по соглашению.
+ * @todo Убрать в preset'ы?
  * @param config Конфиг.
  * @param request Входящий запрос.
  * @return Заголовки для исходящих запросов.

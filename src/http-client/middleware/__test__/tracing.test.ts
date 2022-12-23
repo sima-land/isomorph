@@ -1,6 +1,6 @@
 import { Context } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { Span, Tracer } from '@opentelemetry/tracing';
+import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
 import { tracingMiddleware, getRequestInfo, hideFirstId } from '../tracing';
 
 describe('tracingMiddleware', () => {

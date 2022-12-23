@@ -17,6 +17,7 @@ sidebar_position: 0
 - react
 - redux
 - redux-saga
+- axios
 - express
 - webpack
 - sentry (отслеживание ошибок)

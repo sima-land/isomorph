@@ -15,6 +15,7 @@ import { passHeadersMiddleware } from '../../http-client/middleware/headers';
 import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 import { SSRError } from '../../http-server/errors';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
+import { HttpStatus } from '../parts/utils';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -34,6 +35,8 @@ export function PresetResponse(): Preset {
 }
 
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
+  // @todo а что если привести все зависимости к виду:
+  // const getAppConfig = resolve.lazy(KnownToken.Config.base);
   const appConfig = resolve(KnownToken.Config.base);
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.Response.context);
@@ -48,6 +51,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
       },
     });
 
+    client.use(HttpStatus.createMiddleware());
     client.use(tracingMiddleware(tracer, context.res.locals.tracing.rootContext));
     client.use(loggingMiddleware(loggingHandler));
     client.use(
