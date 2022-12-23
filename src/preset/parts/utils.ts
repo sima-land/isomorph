@@ -259,7 +259,7 @@ export abstract class HttpStatus {
    * @param status Статус.
    * @return Признак.
    */
-  static isGetOk(status: unknown): boolean {
+  static isOk(status: unknown): boolean {
     return typeof status === 'number' && status === 200;
   }
 
@@ -287,16 +287,20 @@ export abstract class HttpStatus {
    * @return Промежуточный слой.
    */
   static createMiddleware(): Middleware<unknown> {
-    return async (config, next) => {
-      if ('validateStatus' in config) {
+    return async (config, next, defaults) => {
+      if (
+        ('validateStatus' in config && config.validateStatus !== undefined) ||
+        ('validateStatus' in defaults && defaults.validateStatus !== undefined)
+      ) {
         // если validateStatus указан явно то не применяем валидацию по умолчанию
         await next(config);
       } else {
         let validateStatus: AxiosRequestConfig['validateStatus'] = null;
 
-        switch (config.method) {
+        switch (config.method?.toLowerCase()) {
+          case undefined:
           case 'get':
-            validateStatus = HttpStatus.isGetOk;
+            validateStatus = HttpStatus.isOk;
             break;
           case 'post':
             validateStatus = HttpStatus.isPostOk;
