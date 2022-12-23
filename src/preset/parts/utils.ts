@@ -288,10 +288,7 @@ export abstract class HttpStatus {
    */
   static createMiddleware(): Middleware<unknown> {
     return async (config, next, defaults) => {
-      if (
-        ('validateStatus' in config && config.validateStatus !== undefined) ||
-        ('validateStatus' in defaults && defaults.validateStatus !== undefined)
-      ) {
+      if (config.validateStatus !== undefined || defaults.validateStatus !== undefined) {
         // если validateStatus указан явно то не применяем валидацию по умолчанию
         await next(config);
       } else {
