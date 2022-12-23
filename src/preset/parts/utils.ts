@@ -295,8 +295,9 @@ export abstract class HttpStatus {
         let validateStatus: AxiosRequestConfig['validateStatus'] = null;
 
         switch (config.method?.toLowerCase()) {
-          case undefined:
           case 'get':
+          case 'put':
+          case undefined:
             validateStatus = HttpStatus.isOk;
             break;
           case 'post':

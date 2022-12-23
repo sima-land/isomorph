@@ -16,7 +16,7 @@ export interface StorageUtils
 export function createStorageUtils(getStorage: () => Storage): StorageUtils {
   function isAvailable(): boolean {
     try {
-      const testKey = `local_storage_test_key::${Date.now()}`;
+      const testKey = `storage_test_key::${Date.now()}`;
 
       getStorage().setItem(testKey, testKey);
       getStorage().removeItem(testKey);

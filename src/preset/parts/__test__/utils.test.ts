@@ -442,6 +442,8 @@ describe('HttpStatus', () => {
         [undefined, HttpStatus.isOk],
         ['get', HttpStatus.isOk],
         ['GET', HttpStatus.isOk],
+        ['put', HttpStatus.isOk],
+        ['PUT', HttpStatus.isOk],
         ['post', HttpStatus.isPostOk],
         ['POST', HttpStatus.isPostOk],
         ['delete', HttpStatus.isDeleteOk],
