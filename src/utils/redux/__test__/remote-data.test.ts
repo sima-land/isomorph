@@ -170,7 +170,7 @@ describe('RemoteData.createSelectors', () => {
       type: 'test-selectors-state',
     };
 
-    const selectors = RemoteData.createSelectors<TestSelectorsState>(
+    const selectors = RemoteData.createSelectors<TestSelectorsState, TestSelectorsState>(
       (state: TestSelectorsState) => state,
     );
 

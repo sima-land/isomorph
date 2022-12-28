@@ -127,8 +127,8 @@ export abstract class RemoteData {
    * @param selectRoot Функция получения состояния.
    * @return Набор селекторов.
    */
-  static createSelectors<S extends RemoteDataState<unknown, unknown>>(
-    selectRoot: (...args: any[]) => S,
+  static createSelectors<S extends RemoteDataState<unknown, unknown>, R = unknown>(
+    selectRoot: (root: R) => S,
   ) {
     return {
       isInitial: createSelector(selectRoot, state => state.status === 'initial'),
