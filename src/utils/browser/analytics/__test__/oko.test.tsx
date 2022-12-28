@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import { createElement } from 'react';
 import { render } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
 import { okoPush, useOkoPush } from '../oko';

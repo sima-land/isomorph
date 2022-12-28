@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { Logger, LoggerEventHandler } from '../../logger/types';
+import type { Logger, LoggerEventHandler } from '../../log/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { DefaultMiddleware } from '../../http-server/types';
 import { Resolve, Preset, createPreset } from '../../di';
@@ -10,10 +10,10 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import { KnownToken } from '../../tokens';
 import { createConfigSource } from '../../config/node';
-import { createLogger } from '../../logger';
-import { createPinoHandler } from '../../logger/handler/pino';
-import { createSentryHandler } from '../../logger/handler/sentry';
-import { loggingMiddleware } from '../../http-server/middleware/logging';
+import { createLogger } from '../../log';
+import { createPinoHandler } from '../../log/handler/pino';
+import { createSentryHandler } from '../../log/handler/sentry';
+import { logMiddleware } from '../../http-server/middleware/log';
 import { tracingMiddleware } from '../../http-server/middleware/tracing';
 import {
   renderMetricsMiddleware,
@@ -158,7 +158,7 @@ export function provideDefaultMiddleware(resolve: Resolve): DefaultMiddleware {
 
   return {
     start: [Handlers.requestHandler()],
-    logging: [loggingMiddleware(config, logger)],
+    logging: [logMiddleware(config, logger)],
     tracing: [tracingMiddleware(tracer)],
     metrics: [
       responseMetricsMiddleware(config, {

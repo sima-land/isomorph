@@ -10,7 +10,7 @@ import { getRequestHeaders, PageResponse } from '../../http-server/utils';
 import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
 import { tracingMiddleware } from '../../http-client/middleware/tracing';
-import { loggingMiddleware } from '../../http-client/middleware/logging';
+import { logMiddleware } from '../../http-client/middleware/log';
 import { passHeadersMiddleware } from '../../http-client/middleware/headers';
 import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 import { SSRError } from '../../http-server/errors';
@@ -40,7 +40,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   const appConfig = resolve(KnownToken.Config.base);
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.Response.context);
-  const loggingHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
+  const logHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
 
   return function createHttpClient(config) {
     const client = create({
@@ -53,7 +53,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
 
     client.use(HttpStatus.createMiddleware());
     client.use(tracingMiddleware(tracer, context.res.locals.tracing.rootContext));
-    client.use(loggingMiddleware(loggingHandler));
+    client.use(logMiddleware(logHandler));
     client.use(
       passHeadersMiddleware(context.req, {
         predicate: headerName => headerName.startsWith('simaland-'),

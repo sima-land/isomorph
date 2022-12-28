@@ -2,8 +2,8 @@
 import { createPreset, Resolve, Preset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { createConfigSource } from '../../config/browser';
-import { Logger, createLogger } from '../../logger';
-import { createSentryHandler } from '../../logger/handler/sentry';
+import { Logger, createLogger } from '../../log';
+import { createSentryHandler } from '../../log/handler/sentry';
 import {
   BrowserClient,
   Hub,
@@ -15,7 +15,7 @@ import { create } from 'middleware-axios';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey } from '../parts/types';
 import { HttpApiHostPool, HttpStatus } from '../parts/utils';
-import { loggingMiddleware } from '../../http-client/middleware/logging';
+import { logMiddleware } from '../../http-client/middleware/log';
 import { HttpClientFactory } from '../../http-client/types';
 import {
   provideBaseConfig,
@@ -80,13 +80,13 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
 }
 
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
-  const loggingHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
+  const logHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
 
   return function createHttpClient(config) {
     const client = create(config);
 
     client.use(HttpStatus.createMiddleware());
-    client.use(loggingMiddleware(loggingHandler));
+    client.use(logMiddleware(logHandler));
 
     return client;
   };

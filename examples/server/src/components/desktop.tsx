@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { selectors } from '../reducers/app';
 import styles from './desktop.module.css';

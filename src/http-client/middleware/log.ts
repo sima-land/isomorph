@@ -31,7 +31,7 @@ export type LogMiddlewareHandlerInit = LogMiddlewareHandler | LogMiddlewareHandl
  * @param handlerInit Обработчик.
  * @return Middleware.
  */
-export function loggingMiddleware(handlerInit: LogMiddlewareHandlerInit): Middleware<any> {
+export function logMiddleware(handlerInit: LogMiddlewareHandlerInit): Middleware<any> {
   return async function log(config, next, defaults) {
     const shared: SharedData = { config, defaults };
     const handler = typeof handlerInit === 'function' ? handlerInit(shared) : handlerInit;

@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosDefaults, AxiosResponse } from 'axios';
 import { Next } from 'middleware-axios';
-import { loggingMiddleware, LogMiddlewareHandler } from '../logging';
+import { logMiddleware, LogMiddlewareHandler } from '../log';
 
 function getFakeHandler(): LogMiddlewareHandler {
   return {
@@ -21,7 +21,7 @@ function handlerNotUsed(handler: LogMiddlewareHandler): boolean {
   return callCount === 0;
 }
 
-describe('loggingMiddleware', () => {
+describe('logMiddleware', () => {
   let handler = getFakeHandler();
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('loggingMiddleware', () => {
 
     const next: Next<any> = jest.fn(() => Promise.resolve(response));
 
-    const middleware = loggingMiddleware(handler);
+    const middleware = logMiddleware(handler);
 
     expect(handlerNotUsed(handler)).toBe(true);
 
@@ -71,7 +71,7 @@ describe('loggingMiddleware', () => {
 
     const next: Next<any> = jest.fn(() => Promise.reject(error));
 
-    const middleware = loggingMiddleware(handler);
+    const middleware = logMiddleware(handler);
 
     expect(handlerNotUsed(handler)).toBe(true);
 
@@ -104,7 +104,7 @@ describe('loggingMiddleware', () => {
 
     const handlerFactory = jest.fn(() => handler);
 
-    const middleware = loggingMiddleware(handlerFactory);
+    const middleware = logMiddleware(handlerFactory);
 
     expect(handlerNotUsed(handler)).toBe(true);
 

@@ -8,9 +8,9 @@ import {
   DoneSharedData,
   FailSharedData,
   LogMiddlewareHandler,
-} from '../../http-client/middleware/logging';
+} from '../../http-client/middleware/log';
 import { applyAxiosDefaults, displayUrl } from '../../http-client/utils';
-import { Logger } from '../../logger';
+import { Logger } from '../../log';
 import {
   SagaErrorInfo,
   SagaInterruptInfo,

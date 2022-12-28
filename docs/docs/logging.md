@@ -35,12 +35,12 @@ if (somethingWrong) {
 Также пакет предоставляет функцию создания middleware для логирования исходящих http-запросов.
 
 ```ts
-import { loggingMiddleware } from '@sima-land/isomorph/http-client/middleware';
+import { logMiddleware } from '@sima-land/isomorph/http-server/middleware/log';
 import { create } from 'middleware-axios';
 
 const client = create();
 
-const middleware = loggingMiddleware({
+const middleware = logMiddleware({
   beforeRequest({ config, defaults }) {
     console.log('beforeRequest');
   },
@@ -60,12 +60,12 @@ client.use(middleware);
 Аналогичная утилита предоставляется для express-приложений. Созданный промежуточный слой будет сообщать логгеру базовую информацию о входящем запросе и ответе.
 
 ```ts
-import { loggingMiddleware } from '@sima-land/isomorph/http-server/middleware';
+import { logMiddleware } from '@sima-land/isomorph/http-server/middleware/log';
 import { createLogger } from '@sima-land/isomorph/logger';
 import express from 'express';
 
 const logger = createLogger();
 const app = express();
 
-app.use(config, loggingMiddleware(logger));
+app.use(config, logMiddleware(logger));
 ```

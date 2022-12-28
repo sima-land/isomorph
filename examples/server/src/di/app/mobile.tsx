@@ -1,4 +1,3 @@
-import React from 'react';
 import type { PageAssets } from '@sima-land/isomorph/http-server/types';
 import { Resolve, createApplication } from '@sima-land/isomorph/di';
 import { PresetResponse } from '@sima-land/isomorph/preset/node/response';

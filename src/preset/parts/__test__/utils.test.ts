@@ -1,7 +1,7 @@
 import { Env } from '@humanwhocodes/env';
 import { AxiosRequestConfig, AxiosDefaults } from 'axios';
 import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
-import { Logger } from '../../../logger';
+import { Logger } from '../../../log';
 import {
   HttpApiHostPool,
   HttpClientLogging,

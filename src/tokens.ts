@@ -7,7 +7,7 @@ import type {
   ResponseContext,
 } from './http-server/types';
 import type { SagaExtendedMiddleware } from './utils/redux-saga';
-import type { Logger } from './logger/types';
+import type { Logger } from './log/types';
 import type { HttpClientFactory } from './http-client/types';
 import type { ConfigSource, BaseConfig } from './config/types';
 import type { Tracer } from '@opentelemetry/api';
@@ -17,7 +17,7 @@ import type { Resource } from '@opentelemetry/resources';
 import type { StrictMap, KnownHttpApiKey } from './preset/parts/types';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { PageResponse } from './http-server/utils';
-import type { LogMiddlewareHandlerInit } from './http-client/middleware/logging';
+import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
 
 export const KnownToken = {
   // config
@@ -29,7 +29,7 @@ export const KnownToken = {
   // cache
   cache: createToken<Cache>('cache'),
 
-  // logging
+  // log
   logger: createToken<Logger>('logger'),
 
   // saga runner

@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component, Suspense } from 'react';
 
 /**
  * Опции компонентов ErrorBoundary и SafeSuspense.
@@ -17,7 +17,7 @@ export interface Props {
 /**
  * Компонент-предохранитель. Обработчик ошибок в React-компонентах.
  */
-export class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
+export class ErrorBoundary extends Component<Props, { hasError: boolean }> {
   /**
    * @param props Свойства.
    */
@@ -58,9 +58,9 @@ export class ErrorBoundary extends React.Component<Props, { hasError: boolean }>
  * @return Элемент.
  */
 export const SafeSuspense = ({ children, fallback, onError }: Props) => (
-  <React.Suspense fallback={fallback}>
+  <Suspense fallback={fallback}>
     <ErrorBoundary fallback={fallback} onError={onError}>
       {children}
     </ErrorBoundary>
-  </React.Suspense>
+  </Suspense>
 );
