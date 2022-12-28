@@ -1,5 +1,5 @@
 import { createReducer, createSlice } from '@reduxjs/toolkit';
-import { STATUS, RemoteData, RemoteDataState, createRemoteDataReducers } from '../remote-data';
+import { STATUS, RemoteData, RemoteDataState, createRemoteDataReducers } from '..';
 
 interface TestState extends RemoteDataState<number, string> {
   foo: 'bar';
@@ -50,6 +50,12 @@ describe('createGenericSlice', () => {
 });
 
 type TestSliceState = RemoteDataState<number, string | null>;
+
+describe('RemoteData.STATUS', () => {
+  it('should be constant of status', () => {
+    expect(RemoteData.STATUS).toBe(STATUS);
+  });
+});
 
 describe('RemoteData.createActions', () => {
   it('should create action creators', () => {

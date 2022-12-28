@@ -44,13 +44,14 @@ export const STATUS: Record<Status, Status> = {
   fetching: 'fetching',
   success: 'success',
   failure: 'failure',
-};
+} as const;
 
 /** Работа с удаленными данными. */
 export abstract class RemoteData {
   static get STATUS() {
     return STATUS;
   }
+
   /**
    * Возвращает action'ы для работы с удаленными данными.
    * @param name Префикс имён.
