@@ -21,7 +21,7 @@ export interface SauceMethod<K extends MethodName | 'request'> {
 }
 
 /**
- * Обёртка над экземпляр axios.
+ * Обёртка над экземпляром axios.
  * Все методы возвращают promise, который никогда переходят в состояние rejected.
  */
 export interface Sauce {
