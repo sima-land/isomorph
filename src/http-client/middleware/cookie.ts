@@ -58,6 +58,7 @@ export function createCookieStore(initialCookie?: string): CookieStore {
   // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
   function set(setCookieHeaderValues: string[]): void {
     for (const item of setCookieHeaderValues) {
+      // отделяем значение от директив
       const [cookie] = item.split(';');
       setItem(cookie);
     }
@@ -67,7 +68,7 @@ export function createCookieStore(initialCookie?: string): CookieStore {
   function asHeader(): string {
     return Object.values(data)
       .map(cookie => `${cookie.name}=${cookie.value}`)
-      .join(';');
+      .join('; ');
   }
 
   return { set, asHeader };
