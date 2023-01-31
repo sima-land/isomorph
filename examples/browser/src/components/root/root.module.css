@@ -1,0 +1,28 @@
+.root {
+  padding: 32px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.content {
+  display: flex;
+  gap: 24px;
+}
+
+.content > * {
+  flex-basis: 50%;
+}
+
+.content li {
+  list-style: none;
+  line-height: 1.5;
+}
+
+.grapheme {
+  display: inline-block;
+  min-width: 40px;
+}

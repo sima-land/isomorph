@@ -19,10 +19,15 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: npm ci
+
+        run: |
+          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm ci
 
       - name: Lint
-        run: npm run lint
+        run: |
+          npm run lint
+          npm run type-check
 
       - name: Test
-        run: npm run coverage -- --forceExit
+        run: npm run test:coverage -- --forceExit

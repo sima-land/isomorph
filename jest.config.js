@@ -1,10 +1,22 @@
 module.exports = {
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jest-environment-jsdom',
   setupFiles: ['./.jest/setup.js'],
   globalSetup: './.jest/global-setup.js',
-  transformIgnorePatterns: [
-    '/node_modules/',
-  ],
+  transform: {
+    '^.+\\.(t|j)sx?$': [
+      '@swc/jest',
+      {
+        jsc: {
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
+          },
+        },
+      },
+    ],
+  },
+  transformIgnorePatterns: ['/node_modules/'],
   clearMocks: true,
   coverageThreshold: {
     global: {
