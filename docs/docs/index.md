@@ -6,12 +6,6 @@ sidebar_position: 0
 
 `@sima-land/isomorph` - минималистичный JS-фреймворк для быстрого старта frontend-микросервисов.
 
-:::info Важно
-
-Это документация для версии 11+, которая на данный момент не является основной.
-
-:::
-
 Содержит утилиты для стека:
 
 - react
@@ -28,10 +22,10 @@ sidebar_position: 0
 
 ```bash
 # используя npm...
-npm install --save @sima-land/isomorph@11
+npm install --save @sima-land/isomorph
 
 # ...или yarn
-yarn add @sima-land/isomorph@11
+yarn add @sima-land/isomorph
 ```
 
 ## Название

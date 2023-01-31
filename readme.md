@@ -18,8 +18,8 @@
 
 ```bash
 # npm
-npm i -S @sima-land/isomorph@11
+npm i -S @sima-land/isomorph
 
 # или yarn
-yarn add @sima-land/isomorph@11
+yarn add @sima-land/isomorph
 ```
