@@ -28,6 +28,7 @@ export function passHeadersMiddleware(
       }
     }
 
-    await next({ ...config, headers });
+    // ВАЖНО: не ждем ответа тк он может упасть + нам не важен результат
+    next({ ...config, headers });
   };
 }

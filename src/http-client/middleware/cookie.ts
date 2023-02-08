@@ -24,7 +24,7 @@ export function collectCookieMiddleware(request: Request, response: Response): M
       },
     });
 
-    if (result.headers['set-cookie']) {
+    if (result.headers['set-cookie'] && !response.writableEnded) {
       store.set(result.headers['set-cookie']);
       response.setHeader('cookie', store.asHeader());
     }
