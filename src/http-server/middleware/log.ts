@@ -13,21 +13,34 @@ import { toMilliseconds } from '../../utils/number';
 export function logMiddleware(config: BaseConfig, logger: Logger): Handler {
   return function log(req, res, next) {
     const start = process.hrtime.bigint();
+    const remoteIp = getXClientIp(req);
+
+    // @todo перенести в пресеты?
+    const startMsg: Omit<ConventionalFluentInfo, 'latency' | 'status'> & { type: string } = {
+      type: 'http.request[incoming]',
+      version: config.appVersion,
+      route: req.originalUrl,
+      method: req.method,
+      remote_ip: remoteIp,
+    };
+
+    logger.info(startMsg);
 
     res.once('finish', () => {
       const finish = process.hrtime.bigint();
 
       // @todo перенести в пресеты?
-      const message: ConventionalFluentInfo = {
+      const finishMsg: ConventionalFluentInfo & { type: string } = {
+        type: 'http.response[outgoing]',
         version: config.appVersion,
         route: req.originalUrl,
         method: req.method,
         status: res.statusCode,
-        remote_ip: getXClientIp(req),
+        remote_ip: remoteIp,
         latency: toMilliseconds(finish - start),
       };
 
-      logger.info(message);
+      logger.info(finishMsg);
     });
 
     next();

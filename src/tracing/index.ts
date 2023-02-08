@@ -7,6 +7,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
  * Может быть дополнен с помощью метода merge.
  * @param config Конфиг.
  * @return Ресурс для провайдера.
+ * @todo Перенести в пресеты?
  */
 export function getConventionalResource(config: BaseConfig): Resource {
   return new Resource({
