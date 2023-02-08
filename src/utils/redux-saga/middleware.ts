@@ -46,7 +46,7 @@ class MiddlewareControl {
       return middleware;
     };
 
-    middleware.run = async <S extends Saga>(saga: S, ...args: Parameters<S>) => {
+    middleware.run = async (saga, ...args) => {
       await this.run(saga, ...args);
     };
 
@@ -55,7 +55,7 @@ class MiddlewareControl {
 
   private configInterrupt(milliseconds: number, config?: SagaInterruptConfig) {
     this.interruptTimeout = milliseconds;
-    this.interruptStrategy = config?.strategy ?? 'dispatch-end';
+    this.interruptStrategy = config?.strategy ?? 'cancel-task';
   }
 
   private async run<S extends Saga>(saga: S, ...args: Parameters<S>): Promise<void> {
