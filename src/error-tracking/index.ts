@@ -22,12 +22,16 @@ export class SentryError extends Error {
  * @todo Этот класс должен называться либо SentryReadyBreadcrumb либо в названии вообще не должен фигурировать Sentry.
  */
 export class SentryBreadcrumb {
+  type: string;
   data: SentryBreadcrumbData;
 
   /**
    * @param data Данные.
    */
   constructor(data: SentryBreadcrumbData) {
+    this.type = 'breadcrumb';
     this.data = data;
   }
 }
+
+// @todo переименовать error-tracking в events и добавить сюда остальные классы ошибок и событий?
