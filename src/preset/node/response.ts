@@ -37,10 +37,17 @@ export function PresetResponse(): Preset {
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   // @todo а что если привести все зависимости к виду:
   // const getAppConfig = resolve.lazy(KnownToken.Config.base);
+
   const appConfig = resolve(KnownToken.Config.base);
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.Response.context);
   const logHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
+
+  // @todo добавить при необходимости (но тогда в логе будет значительно больше ошибок)
+  // const controller = new AbortController();
+  // context.res.on('finish', () => {
+  //   controller.abort();
+  // });
 
   return function createHttpClient(config) {
     const client = create({

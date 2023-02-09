@@ -70,7 +70,10 @@ export const KnownToken = {
   // scope: page response
   Response: {
     builder: createToken<PageResponse>('response/builder'),
+
+    // @todo переименовать в requestSimaParams или убрать
     params: createToken<Record<string, unknown>>('response/params'),
+
     template: createToken<PageTemplate>('response/template'),
     context: createToken<ResponseContext>('response/context'),
     assets: createToken<PageAssets>('response/assets'),
