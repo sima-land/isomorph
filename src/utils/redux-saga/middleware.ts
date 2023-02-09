@@ -76,14 +76,12 @@ class MiddlewareControl {
   }
 
   private async runWithBreakTask<S extends Saga>(data: SagaTimeoutRunData<S>): Promise<void> {
-    try {
-      await this.sagaMiddleware.run(runWithTimeLimit, data).toPromise();
-    } catch (error) {
-      if (error instanceof TimeoutInterruptError) {
-        this.handler.onTimeoutInterrupt({ timeout: data.timeout });
-      } else {
-        throw error;
-      }
+    const result: Either<unknown, unknown> = await this.sagaMiddleware
+      .run(runWithTimeLimit, data)
+      .toPromise();
+
+    if (!result.done) {
+      this.handler.onTimeoutInterrupt({ timeout: data.timeout });
     }
   }
 
@@ -136,26 +134,34 @@ class MiddlewareControl {
 
 function* runWithTimeLimit<S extends Saga>(
   data: SagaTimeoutRunData<S>,
-): Generator<any, ReturnType<S>, any> {
+): Generator<any, Either<SagaCancelSignal, ReturnType<S>>, any> {
   const { saga, args, timeout } = data;
   const task: Task = yield fork(saga, ...args);
 
-  const [isTimeout, taskResult]: [boolean, ReturnType<S>] = yield race([
+  const [needCancel, taskResult]: [boolean, ReturnType<S>] = yield race([
     delay(timeout, true),
     call(() => task.toPromise()),
   ]);
 
-  if (isTimeout) {
+  if (needCancel) {
     yield cancel(task);
-    throw new TimeoutInterruptError();
-  }
 
-  return taskResult;
+    // ВАЖНО: если делать throw ... - ошибка попадет в onError (createSagaMiddleware)
+    // чтобы не логировать лишний раз возвращаем значение
+    return { done: false, error: new SagaCancelSignal() };
+  } else {
+    return { done: true, value: taskResult };
+  }
 }
 
-class TimeoutInterruptError extends Error {
+// @todo в будущем можно заменить все ожидаемые исключения (только внутри фреймворка) на этот тип
+type Either<E, V> = { done: false; error: E } | { done: true; value: V };
+
+class SagaCancelSignal {
+  name: string;
+
   constructor() {
-    super('Saga was cancelled by timeout');
+    this.name = 'SagaCancelSignal';
   }
 }
 
