@@ -15,7 +15,7 @@ sidebar_position: 3
 ### Пример использования
 
 ```ts
-import { createLogger } from '@sima-land/isomorph/logger';
+import { createLogger } from '@sima-land/isomorph/log';
 
 const logger = createLogger();
 
@@ -61,7 +61,7 @@ client.use(middleware);
 
 ```ts
 import { logMiddleware } from '@sima-land/isomorph/http-server/middleware/log';
-import { createLogger } from '@sima-land/isomorph/logger';
+import { createLogger } from '@sima-land/isomorph/log';
 import express from 'express';
 
 const logger = createLogger();

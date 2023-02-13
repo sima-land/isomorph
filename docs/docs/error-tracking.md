@@ -13,8 +13,8 @@ sidebar_position: 4
 Подготовим логгер и обработчик для него. Для работы обработчику нужен Sentry Hub.
 
 ```ts
-import { createLogger } from '@sima-land/isomorph/logger';
-import { createSentryHandler } from '@sima-land/isomorph/logger/handler/sentry';
+import { createLogger } from '@sima-land/isomorph/log';
+import { createSentryHandler } from '@sima-land/isomorph/log/handler/sentry';
 import { BrowserClient, Hub } from '@sentry/browser';
 
 const sentryClient = new BrowserClient({ dsn: process.env.SENTRY_DSN });
