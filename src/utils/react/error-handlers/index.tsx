@@ -1,17 +1,17 @@
-import { Component, Suspense } from 'react';
+import { Component, ErrorInfo, ReactNode, Suspense } from 'react';
 
 /**
  * Опции компонентов ErrorBoundary и SafeSuspense.
  */
 export interface Props {
   /** Дочерний элемент. */
-  children: NonNullable<React.ReactNode> | null;
+  children: NonNullable<ReactNode> | null;
 
   /** Содержимое, которое будет выведено если возникла ошибка. */
-  fallback: NonNullable<React.ReactNode> | null;
+  fallback: NonNullable<ReactNode> | null;
 
   /** Функция для логирования ошибок. */
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 /**
@@ -57,10 +57,12 @@ export class ErrorBoundary extends Component<Props, { hasError: boolean }> {
  * @param props Свойства.
  * @return Элемент.
  */
-export const SafeSuspense = ({ children, fallback, onError }: Props) => (
-  <Suspense fallback={fallback}>
-    <ErrorBoundary fallback={fallback} onError={onError}>
-      {children}
-    </ErrorBoundary>
-  </Suspense>
-);
+export function SafeSuspense({ children, fallback, onError }: Props) {
+  return (
+    <Suspense fallback={fallback}>
+      <ErrorBoundary fallback={fallback} onError={onError}>
+        {children}
+      </ErrorBoundary>
+    </Suspense>
+  );
+}
