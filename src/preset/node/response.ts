@@ -49,7 +49,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   //   controller.abort();
   // });
 
-  return function createHttpClient(config) {
+  return function createHttpClient(config = {}) {
     const client = create({
       ...config,
       headers: {

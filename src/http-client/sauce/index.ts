@@ -58,7 +58,7 @@ export function sauce(instance: AxiosInstance | AxiosInstanceWrapper): Sauce {
  * @param info Результат вызова метода экземпляра axios.
  * @return Отформатированный ответ.
  */
-export function formatResultInfo(info: SafetyInfo<AxiosResponse>): SauceResponse {
+export function formatResultInfo<T>(info: SafetyInfo<AxiosResponse<T>>): SauceResponse<T> {
   if (info.ok) {
     return {
       ok: true,

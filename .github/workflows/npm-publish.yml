@@ -9,9 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
           registry-url: https://registry.npmjs.org/
 
       - uses: ./.github/actions/publish-notify
@@ -21,9 +22,7 @@ jobs:
           tg-chat-id: ${{ secrets.TG_CHAT_ID }}
 
       - name: Install dependencies
-        run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
-          npm ci
+        run: npm ci
 
       - name: Lint
         run: |
@@ -36,13 +35,13 @@ jobs:
       - name: Build package
         run: |
           npm --no-git-tag-version version ${GITHUB_REF#refs/*/}
-          npm set-script prepare ""
+          npm pkg delete scripts.prepare
           npm run build
 
       - name: Publish build
         run: npm publish ./dist --access public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
 
       - uses: ./.github/actions/publish-notify
         if: success()
