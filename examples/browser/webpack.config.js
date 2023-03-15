@@ -8,6 +8,7 @@ const env = createConfigSource();
 
 module.exports = {
   mode: 'development',
+  devtool: 'source-map',
   target: 'web',
   entry: './src/index.tsx',
   output: {

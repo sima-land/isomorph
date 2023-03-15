@@ -2,7 +2,7 @@ import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { sauce } from '@sima-land/isomorph/http-client/sauce';
 import { PresetBrowser } from '@sima-land/isomorph/preset/browser';
 import { KnownToken } from '@sima-land/isomorph/tokens';
-import { Api, Config } from '../types';
+import { HttpApi, Config } from '../types';
 import { TOKEN } from './tokens';
 
 export function ExampleApp() {
@@ -25,7 +25,7 @@ export function provideConfig(resolve: Resolve): Config {
   };
 }
 
-export function provideApi(resolve: Resolve): Api {
+export function provideApi(resolve: Resolve): HttpApi {
   const knownHosts = resolve(KnownToken.Http.Api.knownHosts);
   const createClient = resolve(KnownToken.Http.Client.factory);
   const client = sauce(createClient({ baseURL: knownHosts.get('simaV3') }));
