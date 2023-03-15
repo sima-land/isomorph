@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc  */
 import { createPreset, Resolve, Preset } from '../../di';
 import { KnownToken } from '../../tokens';
-import { createConfigSource } from '../../config/browser';
+import { ConfigSource, createConfigSource } from '../../config';
 import { Logger, createLogger } from '../../log';
 import { createSentryHandler } from '../../log/handler/sentry';
 import {
@@ -25,7 +25,7 @@ import {
 
 export function PresetBrowser(): Preset {
   return createPreset([
-    [KnownToken.Config.source, createConfigSource],
+    [KnownToken.Config.source, provideConfigSource],
     [KnownToken.Config.base, provideBaseConfig],
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
@@ -34,6 +34,12 @@ export function PresetBrowser(): Preset {
     [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
+}
+
+export function provideConfigSource(): ConfigSource {
+  return createConfigSource({
+    environment: process.env,
+  });
 }
 
 export function provideLogger(resolve: Resolve): Logger {
