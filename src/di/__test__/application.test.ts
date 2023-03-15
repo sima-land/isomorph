@@ -1,5 +1,5 @@
 import { createApplication, CURRENT_APP } from '../application';
-import { AlreadyBoundError } from '../errors';
+import { AlreadyBoundError, CircularDependencyError } from '../errors';
 import { createPreset } from '../preset';
 import { createToken } from '../token';
 
@@ -57,11 +57,11 @@ describe('Application', () => {
 
     expect(() => {
       app.bind(token).toValue(23);
-    }).not.toThrow(new AlreadyBoundError(token));
+    }).not.toThrow();
 
     expect(() => {
       app.bind(token).toValue(34);
-    }).toThrow(new AlreadyBoundError(token));
+    }).toThrow(new AlreadyBoundError(token, 'Application'));
   });
 
   it('should handle presets', () => {
@@ -181,7 +181,39 @@ describe('Application', () => {
     expect(spy).toBeCalledWith(17);
   });
 
-  // @todo Проверка рекурсии не работает, надо починить и зафиксировать тестами
+  it('should properly handle circular dependencies', () => {
+    const TOKEN = {
+      config: createToken<any>('config'),
+      logger: createToken<any>('logger'),
+    } as const;
+
+    const app = createApplication();
+
+    app.bind(TOKEN.config).toProvider(resolve => {
+      const logger = resolve(TOKEN.logger);
+
+      logger.info('Config created');
+
+      return {
+        appName: 'test app',
+      };
+    });
+
+    app.bind(TOKEN.logger).toProvider(resolve => {
+      const config = resolve(TOKEN.config);
+
+      return {
+        info(message: any) {
+          // eslint-disable-next-line no-console
+          console.log(config.appName, message);
+        },
+      };
+    });
+
+    expect(() => app.get(TOKEN.config)).toThrow(
+      new CircularDependencyError([TOKEN.config, TOKEN.logger, TOKEN.config], 'Application'),
+    );
+  });
 
   it('should throw exception properly when component not found in parent app too', () => {
     const TOKEN = {
