@@ -30,7 +30,7 @@ export function PresetBrowser(): Preset {
     [KnownToken.logger, provideLogger],
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.LogMiddleware.handler, provideHttpClientLogHandler],
+    [KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler],
     [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
@@ -86,7 +86,7 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
 }
 
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
-  const logHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
+  const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
 
   return function createHttpClient(config = {}) {
     const client = create(config);

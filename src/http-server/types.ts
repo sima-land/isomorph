@@ -1,5 +1,6 @@
-import type { Request, Response, NextFunction, Handler, ErrorRequestHandler } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
+// @todo переименовать в HandlerContext
 export interface ResponseContext {
   req: Request;
   res: Response;
@@ -30,12 +31,4 @@ export interface ConventionalJson {
   critical_js?: string;
   critical_css?: string;
   meta?: any;
-}
-
-export interface DefaultMiddleware {
-  start: Handler[];
-  logging: Handler[];
-  tracing: Handler[];
-  metrics: Handler[];
-  finish: Array<Handler | ErrorRequestHandler>;
 }

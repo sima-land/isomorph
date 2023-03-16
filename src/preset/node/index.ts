@@ -2,7 +2,6 @@
 import path from 'path';
 import type { Logger, LoggerEventHandler } from '../../log/types';
 import type { Tracer } from '@opentelemetry/api';
-import type { DefaultMiddleware } from '../../http-server/types';
 import { Resolve, Preset, createPreset } from '../../di';
 import {
   BasicTracerProvider,
@@ -23,7 +22,7 @@ import {
 import { createDefaultMetrics, createMetricsHttpApp } from '../../metrics/node';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { create } from 'middleware-axios';
-import Express from 'express';
+import Express, { Handler } from 'express';
 import { init, Handlers, getCurrentHub } from '@sentry/node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
@@ -38,6 +37,7 @@ import { provideBaseConfig } from '../parts/providers';
 import pino from 'pino';
 import PinoPretty from 'pino-pretty';
 import { config as applyDotenv } from 'dotenv';
+import { composeMiddleware } from '../../http-server/utils';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -45,19 +45,38 @@ import { config as applyDotenv } from 'dotenv';
  */
 export function PresetNode(): Preset {
   return createPreset([
+    // config
     [KnownToken.Config.source, provideConfigSource],
     [KnownToken.Config.base, provideBaseConfig],
+
+    // log
     [KnownToken.logger, provideLogger],
+
+    // tracing
     [KnownToken.Tracing.tracer, provideTracer],
     [KnownToken.Tracing.spanExporter, provideSpanExporter],
     [KnownToken.Tracing.tracerProvider, provideTracerProvider],
     [KnownToken.Tracing.tracerProviderResource, provideTracerProviderResource],
-    [KnownToken.Http.Client.factory, () => create],
-    [KnownToken.Http.Server.factory, () => Express],
-    [KnownToken.Http.Server.Defaults.middleware, provideDefaultMiddleware],
+
+    // metrics
     [KnownToken.Metrics.httpApp, createMetricsHttpApp],
-    [KnownToken.SsrBridge.serverSide, provideBridgeServerSide],
+
+    // http client
+    [KnownToken.Http.Client.factory, () => create],
+
+    // http server
+    [KnownToken.Http.Server.factory, () => Express],
+    [KnownToken.Http.Server.Middleware.request, () => Handlers.requestHandler()],
+    [KnownToken.Http.Server.Middleware.log, provideHttpServerLogMiddleware],
+    [KnownToken.Http.Server.Middleware.metrics, provideHttpServerMetricsMiddleware],
+    [KnownToken.Http.Server.Middleware.tracing, provideHttpServerTracingMiddleware],
+    [KnownToken.Http.Server.Middleware.error, () => Handlers.errorHandler()],
+
+    // http api
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
+
+    // ssr bridge
+    [KnownToken.SsrBridge.serverSide, provideBridgeServerSide],
   ]);
 }
 
@@ -164,28 +183,32 @@ export function provideTracerProviderResource(resolve: Resolve): Resource {
   );
 }
 
-export function provideDefaultMiddleware(resolve: Resolve): DefaultMiddleware {
+export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
   const logger = resolve(KnownToken.logger);
-  const tracer = resolve(KnownToken.Tracing.tracer);
 
+  return logMiddleware(config, logger);
+}
+
+export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
+  const config = resolve(KnownToken.Config.base);
   const metrics = createDefaultMetrics();
 
-  return {
-    start: [Handlers.requestHandler()],
-    logging: [logMiddleware(config, logger)],
-    tracing: [tracingMiddleware(tracer)],
-    metrics: [
-      responseMetricsMiddleware(config, {
-        counter: metrics.requestCount,
-        histogram: metrics.responseDuration,
-      }),
-      renderMetricsMiddleware(config, {
-        histogram: metrics.renderDuration,
-      }),
-    ],
-    finish: [Handlers.errorHandler()],
-  };
+  return composeMiddleware([
+    responseMetricsMiddleware(config, {
+      counter: metrics.requestCount,
+      histogram: metrics.responseDuration,
+    }),
+    renderMetricsMiddleware(config, {
+      histogram: metrics.renderDuration,
+    }),
+  ]);
+}
+
+export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
+  const tracer = resolve(KnownToken.Tracing.tracer);
+
+  return tracingMiddleware(tracer);
 }
 
 export function provideBridgeServerSide(resolve: Resolve): BridgeServerSide {
