@@ -240,4 +240,19 @@ describe('Application', () => {
       child.get(TOKEN.client);
     }).toThrow('Nothing bound to Token(config)');
   });
+
+  it('should get component from cache', () => {
+    const app = createApplication();
+    const token = createToken<{ id: number }>('foo');
+
+    const value = { id: 123 };
+    app.bind(token).toValue(value);
+
+    const first = app.get(token);
+    const second = app.get(token);
+
+    expect(Object.is(value, first)).toBe(true);
+    expect(Object.is(value, second)).toBe(true);
+    expect(Object.is(first, second)).toBe(true);
+  });
 });

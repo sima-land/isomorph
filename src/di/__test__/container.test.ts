@@ -1,5 +1,5 @@
 import { createContainer } from '../container';
-import { AlreadyBoundError, CircularDependencyError } from '../errors';
+import { AlreadyBoundError, CircularDependencyError, NothingBoundError } from '../errors';
 import { createToken } from '../token';
 
 describe('Container', () => {
@@ -90,5 +90,14 @@ describe('Container', () => {
     expect(() => {
       container.get(TOKEN.bar);
     }).toThrow(new CircularDependencyError([TOKEN.bar, TOKEN.foo, TOKEN.baz, TOKEN.bar]));
+  });
+
+  it('should throw error when nothing boud to token', () => {
+    const container = createContainer();
+    const token = createToken('test');
+
+    expect(() => {
+      container.get(token);
+    }).toThrow(new NothingBoundError(token));
   });
 });

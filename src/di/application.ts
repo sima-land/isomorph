@@ -79,11 +79,7 @@ class ApplicationImplementation implements Application {
     }
 
     if (this.providers.has(token._key)) {
-      const provider = this.providers.get(token._key);
-
-      if (typeof provider !== 'function') {
-        throw new Error('Provider is not a function');
-      }
+      const provider = this.providers.get(token._key) as Provider<T>;
 
       const component = provider(otherToken => this.resolve(otherToken, nextChain()));
 
