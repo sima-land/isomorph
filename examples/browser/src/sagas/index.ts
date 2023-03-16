@@ -1,10 +1,10 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { Api } from '../types';
+import { HttpApi } from '../types';
 import { User } from '../reducers/user';
 import { Currency } from '../reducers/currency';
 
 export interface SagaOptions {
-  api: Api;
+  api: HttpApi;
 }
 
 export function* rootSaga(options: SagaOptions): Generator<any, void, any> {

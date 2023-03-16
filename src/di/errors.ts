@@ -4,14 +4,15 @@ import type { Token } from './types';
  * Ошибка, сообщающая, что в контейнере нет сервиса по заданному ключу.
  */
 export class NothingBoundError extends Error {
-  public readonly token: Token<any>;
+  public readonly token: Token<unknown>;
 
   /**
    * Конструктор.
    * @param token Токен.
+   * @param containerName Имя контейнера.
    */
-  constructor(token: Token<any>) {
-    super(`Nothing bound to ${String(token)}`);
+  constructor(token: Token<unknown>, containerName?: string) {
+    super(`Nothing bound to ${String(token)} in ${display(containerName)}`);
     this.name = 'NothingBoundError';
     this.token = token;
   }
@@ -24,9 +25,10 @@ export class AlreadyBoundError extends Error {
   /**
    * Конструктор.
    * @param token Токен.
+   * @param containerName Имя контейнера.
    */
-  constructor(token: Token<any>) {
-    super(`Cannot rebind token, already bound: ${String(token)}`);
+  constructor(token: Token<unknown>, containerName?: string) {
+    super(`Cannot rebind token in ${display(containerName)}, already bound: ${String(token)}`);
     this.name = 'AlreadyBoundError';
   }
 }
@@ -38,10 +40,20 @@ export class CircularDependencyError extends Error {
   /**
    * Конструктор.
    * @param trace Список токенов, в котором обнаружен цикл.
+   * @param containerName Имя контейнера.
    */
-  constructor(trace: Token<any>[]) {
-    const names = trace.map(token => String(token._key)).join(' >> ');
-    super(`Circular dependency found, trace: ${names}`);
+  constructor(trace: Token<unknown>[], containerName?: string) {
+    const names = trace.map(String).join(' >> ');
+    super(`Circular dependency found in ${display(containerName)}, trace: ${names}`);
     this.name = 'CircularDependencyError';
   }
+}
+
+/**
+ * Вернёт переданное имя контейнера или заглушку.
+ * @param containerName Имя.
+ * @return Имя или заглушка.
+ */
+function display(containerName?: string) {
+  return containerName ?? '[unknown container]';
 }

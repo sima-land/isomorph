@@ -1,17 +1,7 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type {
-  Application,
-  Container,
-  Provider,
-  Resolve,
-  Token,
-  Binding,
-  ExtractType,
-  Preset,
-} from './types';
-import { AlreadyBoundError, NothingBoundError } from './errors';
+import type { Application, Provider, Token, Binding, ExtractType, Preset } from './types';
+import { AlreadyBoundError, CircularDependencyError, NothingBoundError } from './errors';
 import { createToken } from './token';
-import { createContainer } from './container';
 
 /**
  * Токен, с помощью которого можно достать из приложения само приложение.
@@ -22,72 +12,94 @@ export const CURRENT_APP = createToken<Application>('application/self');
  * Реализация Application.
  */
 class ApplicationImplementation implements Application {
-  private container?: Container;
-  private parent?: Application;
+  /** Родительское приложение. */
+  private parent?: ApplicationImplementation;
+
+  /** Зарегистрированные пресеты. */
   private presets: Preset[];
-  private providers: Map<Token<any>, Provider<any>>;
+
+  /** Зарегистрированные провайдеры. */
+  private providers: Map<symbol, Provider<unknown>>;
+
+  /** Инициализированные компоненты (синглтоны). */
+  private components: Map<symbol, unknown>;
+
+  /** Инициализировано ли приложение.  */
+  private initialized: boolean;
 
   constructor() {
     this.providers = new Map();
+    this.components = new Map();
     this.presets = [];
+    this.initialized = false;
+  }
+
+  toString() {
+    return 'Application';
   }
 
   bind<T>(token: Token<T>): Binding<T> {
-    if (this.providers.has(token)) {
-      throw new AlreadyBoundError(token);
+    if (this.providers.has(token._key)) {
+      throw new AlreadyBoundError(token, this.toString());
     }
 
     return {
       toValue: value => {
-        this.providers.set(token, () => value);
+        this.providers.set(token._key, () => value);
       },
       toProvider: provider => {
-        this.providers.set(token, provider);
+        this.providers.set(token._key, provider);
       },
     };
   }
 
   get<T>(token: Token<T>): T {
-    try {
-      return this.getContainer().get(token);
-    } catch (error) {
-      if (error instanceof NothingBoundError && error.token === token && this.parent) {
-        return this.parent.get(token);
-      } else {
-        throw error;
+    if (!this.initialized) {
+      this.bind(CURRENT_APP).toValue(this);
+
+      for (const preset of this.presets) {
+        preset.apply(this);
       }
+
+      this.initialized = true;
     }
+
+    return this.resolve(token, []);
   }
 
-  private getContainer(): Container {
-    if (!this.container) {
-      this.container = this.configureContainer();
+  protected resolve<T>(token: Token<T>, chain: Token<any>[]): T {
+    const nextChain = () => [...chain, token];
+
+    if (chain.includes(token)) {
+      throw new CircularDependencyError(nextChain(), this.toString());
     }
 
-    return this.container;
-  }
-
-  private configureContainer(): Container {
-    const container = createContainer();
-
-    container.set(CURRENT_APP, () => this);
-
-    for (const preset of this.presets) {
-      preset.apply(this);
+    if (this.components.has(token._key)) {
+      return this.components.get(token._key) as T;
     }
 
-    const resolve: Resolve = token => this.get(token);
+    if (this.providers.has(token._key)) {
+      const provider = this.providers.get(token._key) as Provider<T>;
 
-    for (const [token, provider] of this.providers) {
-      container.set(token, () => provider(resolve));
+      const component = provider(otherToken => this.resolve(otherToken, nextChain()));
+
+      // ВАЖНО: всегда как singleton
+      this.components.set(token._key, component);
+
+      return component as T;
     }
 
-    return container;
-  }
-
-  attach(parent: Application): void {
     if (this.parent) {
-      throw Error('Cannot reattach application');
+      // ВАЖНО: передаём именно chain а не nextChain()
+      return this.parent.resolve(token, chain);
+    }
+
+    throw new NothingBoundError(token, this.toString());
+  }
+
+  attach(parent: ApplicationImplementation): void {
+    if (this.parent) {
+      throw new Error('Cannot reattach application');
     }
 
     this.parent = parent;

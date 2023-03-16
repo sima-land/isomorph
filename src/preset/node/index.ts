@@ -1,4 +1,5 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+import path from 'path';
 import type { Logger, LoggerEventHandler } from '../../log/types';
 import type { Tracer } from '@opentelemetry/api';
 import type { DefaultMiddleware } from '../../http-server/types';
@@ -9,7 +10,7 @@ import {
   SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
 import { KnownToken } from '../../tokens';
-import { createConfigSource } from '../../config/node';
+import { ConfigSource, createConfigSource } from '../../config';
 import { createLogger } from '../../log';
 import { createPinoHandler } from '../../log/handler/pino';
 import { createSentryHandler } from '../../log/handler/sentry';
@@ -36,6 +37,7 @@ import { HttpApiHostPool } from '../parts/utils';
 import { provideBaseConfig } from '../parts/providers';
 import pino from 'pino';
 import PinoPretty from 'pino-pretty';
+import { config as applyDotenv } from 'dotenv';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -43,7 +45,7 @@ import PinoPretty from 'pino-pretty';
  */
 export function PresetNode(): Preset {
   return createPreset([
-    [KnownToken.Config.source, createConfigSource],
+    [KnownToken.Config.source, provideConfigSource],
     [KnownToken.Config.base, provideBaseConfig],
     [KnownToken.logger, provideLogger],
     [KnownToken.Tracing.tracer, provideTracer],
@@ -57,6 +59,19 @@ export function PresetNode(): Preset {
     [KnownToken.SsrBridge.serverSide, provideBridgeServerSide],
     [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
   ]);
+}
+
+export function provideConfigSource(): ConfigSource {
+  const envName = process.env.NODE_ENV;
+
+  // подключаем соответствующий среде файл со значениями по умолчанию
+  if (envName) {
+    applyDotenv({ path: path.resolve(process.cwd(), `./.env.${envName}`) });
+  }
+
+  return createConfigSource({
+    environment: process.env,
+  });
 }
 
 export function provideLogger(resolve: Resolve): Logger {
