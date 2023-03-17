@@ -13,7 +13,7 @@ interface SafetyFailInfo {
 export type SafetyInfo<T> = SafetyDoneInfo<T> | SafetyFailInfo;
 
 interface SafetyFormatter<T, F> {
-  (info: SafetyInfo<T>): F;
+  (info: SafetyInfo<T>): F | Promise<F>;
 }
 
 /**
