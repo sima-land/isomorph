@@ -1,11 +1,6 @@
 import { createToken } from './di';
-import type { Application } from 'express';
-import type {
-  DefaultMiddleware,
-  PageAssets,
-  PageTemplate,
-  ResponseContext,
-} from './http-server/types';
+import type { Application, ErrorRequestHandler, Handler } from 'express';
+import type { PageAssets, PageTemplate, ResponseContext } from './http-server/types';
 import type { SagaExtendedMiddleware } from './utils/redux-saga';
 import type { Logger } from './log/types';
 import type { HttpClientFactory } from './http-client/types';
@@ -22,8 +17,8 @@ import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
 export const KnownToken = {
   // config
   Config: {
-    source: createToken<ConfigSource>('config.source'),
-    base: createToken<BaseConfig>('config.base'),
+    source: createToken<ConfigSource>('config/source'),
+    base: createToken<BaseConfig>('config/base'),
   },
 
   // cache
@@ -37,49 +32,56 @@ export const KnownToken = {
 
   // tracing
   Tracing: {
-    tracer: createToken<Tracer>('tracing.tracer'),
-    spanExporter: createToken<SpanExporter>('tracing.span-exporter'),
-    tracerProvider: createToken<BasicTracerProvider>('tracing.tracer-provider'),
-    tracerProviderResource: createToken<Resource>('tracing.tracer-provider-resource'),
+    tracer: createToken<Tracer>('tracing/tracer'),
+    spanExporter: createToken<SpanExporter>('tracing/span-exporter'),
+    tracerProvider: createToken<BasicTracerProvider>('tracing/tracer-provider'),
+    tracerProviderResource: createToken<Resource>('tracing/resource'),
   },
 
   // metrics
   Metrics: {
-    httpApp: createToken<Application>('metrics.http-app'),
+    httpApp: createToken<Application>('metrics/http-app'),
   },
 
   // http
   Http: {
+    Api: {
+      knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http/api/known-hosts'),
+    },
     Client: {
-      factory: createToken<HttpClientFactory>('http.client.factory'),
-      LogMiddleware: {
-        handler: createToken<LogMiddlewareHandlerInit>('http.client.log-middleware.handler'),
+      factory: createToken<HttpClientFactory>('client/factory'),
+      Middleware: {
+        Log: {
+          handler: createToken<LogMiddlewareHandlerInit>('log/handler'),
+        },
       },
     },
     Server: {
-      factory: createToken<() => Application>('http.server.factory'),
-      Defaults: {
-        middleware: createToken<DefaultMiddleware>('http.server.defaults.middleware'),
+      factory: createToken<() => Application>('server/factory'),
+      Middleware: {
+        request: createToken<Handler>('middleware/request'),
+        log: createToken<Handler>('middleware/log'),
+        tracing: createToken<Handler>('middleware/tracing'),
+        metrics: createToken<Handler>('middleware/metrics'),
+        error: createToken<ErrorRequestHandler>('middleware/error'),
       },
     },
-    Api: {
-      knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http.api.known-hosts'),
+    Handler: {
+      main: createToken<() => void>('handler/main'),
+      context: createToken<ResponseContext>('handler/context'),
+      Request: {
+        specificParams: createToken<Record<string, unknown>>('request/specific-params'),
+      },
+      Response: {
+        builder: createToken<PageResponse>('response/builder'),
+        Page: {
+          assets: createToken<PageAssets>('page/assets'),
+          template: createToken<PageTemplate>('page/template'),
+          prepare: createToken<() => JSX.Element | Promise<JSX.Element>>('page/prepare'),
+          render: createToken<(element: JSX.Element) => string | Promise<string>>('page/render'),
+        },
+      },
     },
-  },
-
-  // scope: page response
-  Response: {
-    builder: createToken<PageResponse>('response/builder'),
-
-    // @todo переименовать в requestSimaParams или убрать
-    params: createToken<Record<string, unknown>>('response/params'),
-
-    template: createToken<PageTemplate>('response/template'),
-    context: createToken<ResponseContext>('response/context'),
-    assets: createToken<PageAssets>('response/assets'),
-    prepare: createToken<() => JSX.Element | Promise<JSX.Element>>('response/prepare'),
-    render: createToken<(element: JSX.Element) => string | Promise<string>>('response/render'),
-    main: createToken<() => void>('response/main'),
   },
 
   // SSR

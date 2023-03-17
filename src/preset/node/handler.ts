@@ -21,16 +21,22 @@ import { HttpStatus } from '../parts/utils';
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
  * @return Preset.
  */
-export function PresetResponse(): Preset {
+export function PresetHandler(): Preset {
   return createPreset([
+    // saga
     [KnownToken.sagaMiddleware, provideSagaMiddleware],
-    [KnownToken.Response.builder, () => new PageResponse()],
-    [KnownToken.Response.render, provideRender],
-    [KnownToken.Response.template, provideTemplate],
-    [KnownToken.Response.main, provideMain],
-    [KnownToken.Response.params, provideParams],
+
+    // http client
     [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.LogMiddleware.handler, provideHttpClientLogHandler],
+    [KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler],
+
+    // http handler
+    [KnownToken.Http.Handler.main, provideMain],
+    [KnownToken.Http.Handler.Request.specificParams, provideSpecificParams],
+    [KnownToken.Http.Handler.Response.builder, () => new PageResponse()],
+    [KnownToken.Http.Handler.Response.Page.assets, () => ({ js: '', css: '' })],
+    [KnownToken.Http.Handler.Response.Page.template, provideTemplate],
+    [KnownToken.Http.Handler.Response.Page.render, provideRender],
   ]);
 }
 
@@ -40,8 +46,8 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
 
   const appConfig = resolve(KnownToken.Config.base);
   const tracer = resolve(KnownToken.Tracing.tracer);
-  const context = resolve(KnownToken.Response.context);
-  const logHandler = resolve(KnownToken.Http.Client.LogMiddleware.handler);
+  const context = resolve(KnownToken.Http.Handler.context);
+  const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
 
   // @todo добавить при необходимости (но тогда в логе будет значительно больше ошибок)
   // const controller = new AbortController();
@@ -73,7 +79,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
 }
 
 export function provideRender(resolve: Resolve): (element: JSX.Element) => string {
-  const { res } = resolve(KnownToken.Response.context);
+  const { res } = resolve(KnownToken.Http.Handler.context);
 
   return function render(element: JSX.Element): string {
     res.emit(RESPONSE_EVENT.renderStart);
@@ -97,16 +103,17 @@ export function provideTemplate(resolve: Resolve): PageTemplate {
 }
 
 export function provideMain(resolve: Resolve): VoidFunction {
-  const context = resolve(KnownToken.Response.context);
-  const assets = resolve(KnownToken.Response.assets);
-  const prepare = resolve(KnownToken.Response.prepare);
-  const render = resolve(KnownToken.Response.render);
-  const template = resolve(KnownToken.Response.template);
   const logger = resolve(KnownToken.logger);
-  const builder = resolve(KnownToken.Response.builder);
+  const context = resolve(KnownToken.Http.Handler.context);
+  const assets = resolve(KnownToken.Http.Handler.Response.Page.assets);
+  const prepare = resolve(KnownToken.Http.Handler.Response.Page.prepare);
+  const render = resolve(KnownToken.Http.Handler.Response.Page.render);
+  const template = resolve(KnownToken.Http.Handler.Response.Page.template);
+  const builder = resolve(KnownToken.Http.Handler.Response.builder);
 
   return async function main() {
     try {
+      // @todo это билдер ответа но в ответе может не быть markup, assets и тд, подумать и переделать
       builder
         .markup(await render(await prepare()))
         .assets(assets)
@@ -133,8 +140,8 @@ export function provideMain(resolve: Resolve): VoidFunction {
   };
 }
 
-export function provideParams(resolve: Resolve): Record<string, unknown> {
-  const context = resolve(KnownToken.Response.context);
+export function provideSpecificParams(resolve: Resolve): Record<string, unknown> {
+  const context = resolve(KnownToken.Http.Handler.context);
 
   try {
     const headerValue = context.req.header('simaland-params');
@@ -164,8 +171,8 @@ export function HandlerProvider(appFactory: () => Application) {
       const app = appFactory();
 
       app.attach(parent);
-      app.bind(KnownToken.Response.context).toValue({ req, res, next });
-      app.get(KnownToken.Response.main)();
+      app.bind(KnownToken.Http.Handler.context).toValue({ req, res, next });
+      app.get(KnownToken.Http.Handler.main)();
     };
   };
 }
