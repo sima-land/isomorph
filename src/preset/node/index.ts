@@ -19,10 +19,10 @@ import {
   renderMetricsMiddleware,
   responseMetricsMiddleware,
 } from '../../http-server/middleware/metrics';
-import { createDefaultMetrics, createMetricsHttpApp } from '../../metrics/node';
+import { createDefaultMetrics } from '../../metrics/node';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { create } from 'middleware-axios';
-import Express, { Handler } from 'express';
+import Express, { Application, Handler } from 'express';
 import { init, Handlers, getCurrentHub } from '@sentry/node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
@@ -38,6 +38,7 @@ import pino from 'pino';
 import PinoPretty from 'pino-pretty';
 import { config as applyDotenv } from 'dotenv';
 import { composeMiddleware } from '../../http-server/utils';
+import * as PromClient from 'prom-client';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -59,7 +60,7 @@ export function PresetNode(): Preset {
     [KnownToken.Tracing.tracerProviderResource, provideTracerProviderResource],
 
     // metrics
-    [KnownToken.Metrics.httpApp, createMetricsHttpApp],
+    [KnownToken.Metrics.httpApp, provideMetricsHttpApp],
 
     // http client
     [KnownToken.Http.Client.factory, () => create],
@@ -148,27 +149,20 @@ export function provideTracer(resolve: Resolve): Tracer {
 export function provideSpanExporter(resolve: Resolve): SpanExporter {
   const source = resolve(KnownToken.Config.source);
 
-  const exporter = new JaegerExporter({
+  return new JaegerExporter({
     host: source.require('JAEGER_AGENT_HOST'),
     port: parseInt(source.require('JAEGER_AGENT_PORT')) || undefined,
   });
-
-  return exporter;
 }
 
 export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
   const exporter = resolve(KnownToken.Tracing.spanExporter);
   const resource = resolve(KnownToken.Tracing.tracerProviderResource);
 
-  const provider = new NodeTracerProvider({
-    resource,
-  });
+  const provider = new NodeTracerProvider({ resource });
 
   provider.addSpanProcessor(new BatchSpanProcessor(exporter));
-
-  provider.register({
-    propagator: new JaegerPropagator(),
-  });
+  provider.register({ propagator: new JaegerPropagator() });
 
   return provider;
 }
@@ -229,4 +223,19 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
     },
     source,
   );
+}
+
+export function provideMetricsHttpApp(): Application {
+  PromClient.collectDefaultMetrics();
+
+  const app = Express();
+
+  app.get('/', async function (req, res) {
+    const metrics = await PromClient.register.metrics();
+
+    res.setHeader('Content-Type', PromClient.register.contentType);
+    res.send(metrics);
+  });
+
+  return app;
 }

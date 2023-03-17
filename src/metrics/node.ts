@@ -1,4 +1,3 @@
-import express, { Application } from 'express';
 import * as PromClient from 'prom-client';
 import { ConventionalLabels } from './constants';
 
@@ -14,25 +13,6 @@ export interface DefaultNodeMetrics {
 
   /** Гистограмма длительности SSR. */
   renderDuration: PromClient.Histogram<typeof ConventionalLabels.SSR[number]>;
-}
-
-/**
- * Возвращает новое express-приложение, настроенное для выдачи информации о метриках.
- * @return Приложение.
- */
-export function createMetricsHttpApp(): Application {
-  const app = express();
-
-  PromClient.collectDefaultMetrics();
-
-  app.get('/', async function (req, res) {
-    const metrics = await PromClient.register.metrics();
-
-    res.setHeader('Content-Type', PromClient.register.contentType);
-    res.send(metrics);
-  });
-
-  return app;
 }
 
 /**
