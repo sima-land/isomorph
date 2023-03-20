@@ -1,18 +1,15 @@
-import { RootApp } from './di/app/root';
+import { MainApp } from './di/apps/main';
 import { TOKEN } from './di/tokens';
-import { KnownToken } from '@sima-land/isomorph/tokens';
 
-RootApp().invoke(
-  [TOKEN.Root.config, KnownToken.logger, TOKEN.Root.mainServer, KnownToken.Metrics.httpApp],
+MainApp().invoke(
+  [TOKEN.appConfig, TOKEN.Known.logger, TOKEN.httpServer, TOKEN.Known.Metrics.httpApp],
   (config, logger, mainServer, metricsServer) => {
-    // main app
-    mainServer.listen(config.mainPort, () => {
-      logger.info(`Server started on port ${config.mainPort}`);
+    mainServer.listen(config.httpPort.main, () => {
+      logger.info(`Server started on port ${config.httpPort.main}`);
     });
 
-    // metrics app
-    metricsServer.listen(config.metricsPort, () => {
-      logger.info(`Metrics app started on port ${config.metricsPort}`);
+    metricsServer.listen(config.httpPort.metrics, () => {
+      logger.info(`Metrics app started on port ${config.httpPort.metrics}`);
     });
   },
 );
