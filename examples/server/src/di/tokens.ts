@@ -4,10 +4,10 @@ import type { AppConfig, HttpApi } from '../app';
 import type { Application, Handler } from 'express';
 
 export const TOKEN = {
-  // reexport for convenient use
+  // реэкспорт "известных токенов" для удобного использования
   Known: KnownToken,
 
-  // tokens for our application components
+  // токены компонентов нашего приложения
   appConfig: createToken<AppConfig>('app-config'),
   httpServer: createToken<Application>('http-server'),
   usersHandler: createToken<Handler>('users-handler'),

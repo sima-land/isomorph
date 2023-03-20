@@ -39,7 +39,7 @@ function provideHttpServer(resolve: Resolve): ExpressApp {
   const usersHandler = resolve(TOKEN.usersHandler);
   const postsHandler = resolve(TOKEN.postsHandler);
 
-  // builtin middleware
+  // промежуточные слои (express) доступные из пресета PresetNode
   const requestHandle = resolve(TOKEN.Known.Http.Server.Middleware.request);
   const logging = resolve(TOKEN.Known.Http.Server.Middleware.log);
   const metrics = resolve(TOKEN.Known.Http.Server.Middleware.metrics);
@@ -48,11 +48,11 @@ function provideHttpServer(resolve: Resolve): ExpressApp {
 
   const app = createServer();
 
-  // register middleware
+  // регистрируем промежуточные слои
   app.use(express.static('dist/static'));
   app.use(['/', '/users', '/posts'], [requestHandle, logging, metrics, tracing, errorHandle]);
 
-  // register routes
+  // регистрируем роуты
   app.get('/', usersHandler);
   app.get('/users', usersHandler);
   app.get('/posts', postsHandler);
