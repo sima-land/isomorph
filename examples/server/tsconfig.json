@@ -6,10 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@sima-land/isomorph/*": ["../../dist/*"]
-    }
+    "jsx": "react-jsx"
   },
   "include": ["./src/"]
 }

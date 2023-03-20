@@ -22,9 +22,7 @@ module.exports = {
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'swc-loader',
-        },
+        use: 'babel-loader',
       },
       {
         test: /\.css$/,
