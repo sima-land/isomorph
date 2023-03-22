@@ -12,6 +12,7 @@ describe('Preset', () => {
     } as const;
 
     preset.set(TOKEN.hello, () => 'hello');
+    preset.set(TOKEN.world, () => 'world');
 
     const app = createApplication();
     app.preset(preset);
