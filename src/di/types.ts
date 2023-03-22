@@ -95,9 +95,6 @@ export interface Application {
  * Пресет - набор провайдеров (с возможностью их добавлять/переопределять) который можно применить к DI-приложению.
  */
 export interface Preset {
-  /** @deprecated */
-  override: <T>(token: Token<T>, provider: Provider<T>) => this;
-
   /** Добавляет провайдер в пресет. */
   set: <T>(token: Token<T>, provider: Provider<T>) => this;
 

@@ -139,22 +139,3 @@ export abstract class RemoteData {
     } as const;
   }
 }
-
-/**
- * Возвращает набор обработчиков для работы с удаленными данными.
- * @deprecated Теперь нужно использовать RemoteData.createHandlers.
- * @return Набор.
- */
-export const createRemoteDataReducers = <S extends RemoteDataState<any, any>>() => ({
-  request: (state: Draft<S>) => {
-    state.status = STATUS.fetching;
-  },
-  success: (state: Draft<S>, action: PayloadAction<S['data']>) => {
-    state.data = action.payload;
-    state.status = STATUS.success;
-  },
-  failure: (state: Draft<S>, action: PayloadAction<S['error']>) => {
-    state.error = action.payload;
-    state.status = STATUS.failure;
-  },
-});
