@@ -1,10 +1,4 @@
-import {
-  Status,
-  RemoteDataState,
-  STATUS,
-  RemoteData,
-  createRemoteDataReducers,
-} from './remote-data';
+import { Status, RemoteDataState, STATUS, RemoteData } from './remote-data';
 
 export type { Status, RemoteDataState };
-export { STATUS, RemoteData, createRemoteDataReducers };
+export { STATUS, RemoteData };

@@ -10,11 +10,6 @@ class PresetImplementation implements Preset {
     this.registry = new Map<Token<any>, Provider<any>>(defaults);
   }
 
-  override<T>(token: Token<T>, provider: Provider<T>): this {
-    this.registry.set(token, provider);
-    return this;
-  }
-
   set<T>(token: Token<T>, provider: Provider<T>): this {
     this.registry.set(token, provider);
     return this;

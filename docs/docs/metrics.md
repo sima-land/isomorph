@@ -8,16 +8,20 @@ sidebar_position: 6
 
 Пакет **isomorph** предоставляет реализации базового http-сервера для вывода собранных данных о работе сервиса, а также express-middleware для сбора базовых метрик express-приложения.
 
-## createMetricsHttpApp
+## Токен `KnownToken.Metrics.httpApp`
 
-**createMetricsHttpApp** вернет готовое express-приложение для сбора метрик.
+Компонент по токену `KnownToken.Metrics.httpApp` вернет готовое express-приложение для сбора метрик.
 
 ```ts
-import { createMetricsHttpApp } from '@sima-land/isomorph/metrics/node';
+import { Resolve } from '@sima-land/isomorph/di';
 
-const metricsApp = createMetricsHttpApp();
+declare const resolve: Resolve;
 
-metricsApp.listen(8080);
+const metricsHttpApp = resolve(KnownToken.Metrics.httpApp);
+
+metricsHttpApp.listen(8080, () => {
+  console.log('Server started');
+});
 ```
 
 ## Middleware для express-приложений
@@ -28,7 +32,7 @@ metricsApp.listen(8080);
 import {
   responseMetricsMiddleware,
   renderMetricsMiddleware,
-} from '@sima-land/isomorph/http-server/middleware/metrics';
+} from '@sima-land/isomorph/http-server/middleware/metrics/node';
 import express from 'express';
 import * as PromClient from 'prom-client';
 
