@@ -75,7 +75,7 @@ export const KnownToken = {
       Response: {
         builder: createToken<PageResponse>('response/builder'),
         Page: {
-          assets: createToken<PageAssets>('page/assets'),
+          assets: createToken<PageAssets | (() => PageAssets | Promise<PageAssets>)>('page/assets'),
           template: createToken<PageTemplate>('page/template'),
           prepare: createToken<() => JSX.Element | Promise<JSX.Element>>('page/prepare'),
           render: createToken<(element: JSX.Element) => string | Promise<string>>('page/render'),
