@@ -35,7 +35,7 @@ class MiddlewareControl {
     });
   }
 
-  public toMiddleware(): SagaExtendedMiddleware {
+  toMiddleware(): SagaExtendedMiddleware {
     const middleware: SagaExtendedMiddleware = api => {
       this.api = api;
       return this.sagaMiddleware(api);
