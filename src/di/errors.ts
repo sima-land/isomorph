@@ -4,7 +4,7 @@ import type { Token } from './types';
  * Ошибка, сообщающая, что в контейнере нет сервиса по заданному ключу.
  */
 export class NothingBoundError extends Error {
-  public readonly token: Token<unknown>;
+  readonly token: Token<unknown>;
 
   /**
    * Конструктор.

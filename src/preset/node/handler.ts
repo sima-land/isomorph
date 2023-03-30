@@ -111,12 +111,14 @@ export function provideMain(resolve: Resolve): VoidFunction {
   const template = resolve(KnownToken.Http.Handler.Response.Page.template);
   const builder = resolve(KnownToken.Http.Handler.Response.builder);
 
+  const getAssets = typeof assets === 'function' ? assets : () => assets;
+
   return async function main() {
     try {
       // @todo это билдер ответа но в ответе может не быть markup, assets и тд, подумать и переделать
       builder
         .markup(await render(await prepare()))
-        .assets(assets)
+        .assets(await getAssets())
         .format(PageResponse.defineFormat(context.req))
         .template(template)
         .send(context.res);

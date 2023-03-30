@@ -26,7 +26,7 @@ class TokenImplementation<T = never> implements Token<T> {
   /**
    * @inheritdoc
    */
-  public toString(): string {
+  toString(): string {
     return `Token(${this._key.description})`;
   }
 }
