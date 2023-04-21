@@ -1,25 +1,25 @@
 /**
  * Тип события.
  */
-export type LoggerEventType = 'error' | 'log' | 'info' | 'warn' | 'debug';
+export type LogEventType = 'error' | 'log' | 'info' | 'warn' | 'debug';
 
 /**
  * Интерфейс события.
  */
-export interface LoggerEvent {
-  type: LoggerEventType;
+export interface LogEvent {
+  type: LogEventType;
   data: unknown;
 }
 
 /**
  * Интерфейс функции-обработчика события.
  */
-export interface LoggerEventHandler {
-  (event: LoggerEvent): void;
+export interface LogHandler {
+  (event: LogEvent): void;
 }
 
 /**
- * Интерфейс логгера.
+ * Logger.
  * Поддерживает наиболее распространенные события жизненного цикла программы.
  */
 export interface Logger {
@@ -28,12 +28,14 @@ export interface Logger {
   info(data: any): void;
   warn(data: any): void;
   debug(data: any): void;
-  subscribe(handler: LoggerEventHandler): void;
+
+  // @todo вынести в интерфейс SubscribableLogger?
+  subscribe(handler: LogHandler): void;
 }
 
 /**
  * Структура данных, которую необходимо выводить в терминал по соглашению внутри компании.
- * @todo Убрать в preset'ы?
+ * @todo Убрать в preset'ы.
  */
 export interface ConventionalFluentInfo {
   version: string;

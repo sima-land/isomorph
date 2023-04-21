@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import path from 'path';
-import type { Logger, LoggerEventHandler } from '../../log/types';
+import type { Logger, LogHandler } from '../../log/types';
 import type { Tracer } from '@opentelemetry/api';
 import { Resolve, Preset, createPreset } from '../../di';
 import {
@@ -89,9 +89,7 @@ export function provideConfigSource(): ConfigSource {
     applyDotenv({ path: path.resolve(process.cwd(), `./.env.${envName}`) });
   }
 
-  return createConfigSource({
-    environment: process.env,
-  });
+  return createConfigSource(process.env);
 }
 
 export function provideLogger(resolve: Resolve): Logger {
@@ -104,7 +102,7 @@ export function provideLogger(resolve: Resolve): Logger {
   return logger;
 }
 
-export function provideSentryHandler(resolve: Resolve): LoggerEventHandler {
+export function provideSentryHandler(resolve: Resolve): LogHandler {
   const source = resolve(KnownToken.Config.source);
 
   // экспериментально пробуем не использовать вручную созданный клиент
@@ -119,7 +117,7 @@ export function provideSentryHandler(resolve: Resolve): LoggerEventHandler {
   return createSentryHandler(getCurrentHub);
 }
 
-export function providePinoHandler(resolve: Resolve): LoggerEventHandler {
+export function providePinoHandler(resolve: Resolve): LogHandler {
   const config = resolve(KnownToken.Config.base);
 
   const pinoLogger = pino(

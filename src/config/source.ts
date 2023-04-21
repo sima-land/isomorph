@@ -9,16 +9,14 @@ interface Dictionary {
 
 /**
  * Возвращает новый источник конфигурации.
- * @param options Опции.
+ * @param dictionary Опции.
  * @return Источник.
  */
-export function createConfigSource({ environment }: { environment: Dictionary }): ConfigSource {
+export function createConfigSource(dictionary: Dictionary): ConfigSource {
   const source: Dictionary = {};
 
   // берем все переменные из предоставленной среды
-  if (typeof process !== 'undefined') {
-    Object.assign(source, environment);
-  }
+  Object.assign(source, dictionary);
 
   // докидываем зашиваемые переменные окружения
   if (typeof __ISOMORPH_ENV__ !== 'undefined') {

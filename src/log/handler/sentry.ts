@@ -1,4 +1,4 @@
-import type { LoggerEventHandler } from '../types';
+import type { LogHandler } from '../types';
 import type { Hub } from '@sentry/types';
 import { SentryBreadcrumb, SentryError } from '../../error-tracking';
 
@@ -7,7 +7,7 @@ import { SentryBreadcrumb, SentryError } from '../../error-tracking';
  * @param hubInit Sentry Hub или функция которая его вернёт.
  * @return Handler.
  */
-export function createSentryHandler(hubInit: Hub | (() => Hub)): LoggerEventHandler {
+export function createSentryHandler(hubInit: Hub | (() => Hub)): LogHandler {
   const getHub = typeof hubInit === 'function' ? hubInit : () => hubInit;
 
   return event => {

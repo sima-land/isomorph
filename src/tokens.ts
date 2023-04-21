@@ -14,6 +14,7 @@ import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { PageResponse } from './http-server/utils';
 import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
 
+// @todo переименовать в Lib/LibToken/SharedToken/...?
 export const KnownToken = {
   // config
   Config: {
@@ -35,6 +36,8 @@ export const KnownToken = {
     tracer: createToken<Tracer>('tracing/tracer'),
     spanExporter: createToken<SpanExporter>('tracing/span-exporter'),
     tracerProvider: createToken<BasicTracerProvider>('tracing/tracer-provider'),
+
+    // @todo перенести в KnownToken.Telemetry.Resource?
     tracerProviderResource: createToken<Resource>('tracing/resource'),
   },
 
@@ -45,6 +48,9 @@ export const KnownToken = {
 
   // http
   Http: {
+    // Fetch: {
+    //   factory: createToken<() => typeof fetch>('fetch/factory'),
+    // },
     Api: {
       knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http/api/known-hosts'),
     },

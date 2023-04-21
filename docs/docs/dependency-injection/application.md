@@ -22,10 +22,10 @@ import { createApplication } from '@sima-land/isomorph/di';
 export const app = createApplication();
 
 // регистрируем константное значение
-app.bind(Token.config).toValue({ appName: 'ExampleApp' });
+app.bind(TOKEN.config).toValue({ appName: 'ExampleApp' });
 
 // регистрируем компонент с помощью провайдера
-app.bind(Token.logger).toProvider(provideLogger);
+app.bind(TOKEN.logger).toProvider(provideLogger);
 ```
 
 Аналогично DI-контейнеру, компоненты, зарегистрированные через провайдер будут инициализироваться "лениво".
@@ -35,7 +35,7 @@ app.bind(Token.logger).toProvider(provideLogger);
 ```ts title="index.ts"
 import { app } from './app';
 
-app.invoke([Token.config, Token.logger], (config, logger) => {
+app.invoke([TOKEN.config, TOKEN.logger], (config, logger) => {
   logger.info(config.appName);
 });
 ```

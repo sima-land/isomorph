@@ -2,9 +2,11 @@ import type { BaseConfig } from '@sima-land/isomorph/config';
 import type { SauceResponse } from '@sima-land/isomorph/http-client/sauce';
 
 export interface AppConfig extends BaseConfig {
-  httpPort: {
-    main: number;
-    metrics: number;
+  http: {
+    ports: {
+      main: number;
+      metrics: number;
+    };
   };
 }
 

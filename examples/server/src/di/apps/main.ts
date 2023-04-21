@@ -27,9 +27,11 @@ function provideAppConfig(resolve: Resolve): AppConfig {
 
   return {
     ...base,
-    httpPort: {
-      main: Number(source.require('MAIN_HTTP_PORT')) || -1,
-      metrics: Number(source.require('METRICS_HTTP_PORT')) || -1,
+    http: {
+      ports: {
+        main: Number(source.require('MAIN_HTTP_PORT')) || -1,
+        metrics: Number(source.require('METRICS_HTTP_PORT')) || -1,
+      },
     },
   };
 }
@@ -53,9 +55,9 @@ function provideHttpServer(resolve: Resolve): ExpressApp {
   app.use(['/', '/users', '/posts'], [requestHandle, logging, metrics, tracing, errorHandle]);
 
   // регистрируем роуты
-  app.get('/', usersHandler);
-  app.get('/users', usersHandler);
+  app.get('/', postsHandler);
   app.get('/posts', postsHandler);
+  app.get('/users', usersHandler);
   app.get('/healthcheck', healthCheck());
 
   return app;
