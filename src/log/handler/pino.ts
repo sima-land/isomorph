@@ -1,4 +1,4 @@
-import type { LoggerEventHandler } from '../types';
+import type { LogHandler } from '../types';
 import type pino from 'pino';
 
 /**
@@ -6,7 +6,7 @@ import type pino from 'pino';
  * @param pinoInstance Конфиг.
  * @return Handler.
  */
-export function createPinoHandler(pinoInstance: pino.Logger): LoggerEventHandler {
+export function createPinoHandler(pinoInstance: pino.Logger): LogHandler {
   return function pinoHandler(event) {
     switch (event.type) {
       case 'log':

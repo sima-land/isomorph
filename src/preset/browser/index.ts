@@ -37,9 +37,7 @@ export function PresetBrowser(): Preset {
 }
 
 export function provideConfigSource(): ConfigSource {
-  return createConfigSource({
-    environment: process.env,
-  });
+  return createConfigSource(process.env);
 }
 
 export function provideLogger(resolve: Resolve): Logger {
