@@ -41,7 +41,7 @@ describe('logMiddleware', () => {
       statusText: '200',
       data: {},
       headers: {},
-      config: {},
+      config: {} as any,
     };
 
     const next: Next<any> = jest.fn(() => Promise.resolve(response));
@@ -97,7 +97,7 @@ describe('logMiddleware', () => {
       statusText: '200',
       data: {},
       headers: {},
-      config: {},
+      config: {} as any,
     };
 
     const next: Next<any> = jest.fn(() => Promise.resolve(response));

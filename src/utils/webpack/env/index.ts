@@ -1,7 +1,7 @@
 import { pick, pickBy } from 'lodash';
-import { Compiler, WebpackPluginInstance } from 'webpack';
-import { EnvPluginOptions } from './types';
 import { defineEnv, asEnvVariables } from './utils';
+import type { Compiler, WebpackPluginInstance } from 'webpack';
+import type { EnvPluginOptions } from './types';
 
 /**
  * Плагин для зашивания переменных среды в сборки.

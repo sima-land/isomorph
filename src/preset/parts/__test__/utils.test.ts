@@ -1,5 +1,10 @@
 import { Env } from '@humanwhocodes/env';
-import { AxiosRequestConfig, AxiosDefaults } from 'axios';
+import {
+  AxiosRequestConfig,
+  AxiosDefaults,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
 import { Logger } from '../../../log';
 import {
@@ -75,16 +80,16 @@ describe('HttpClientLogging', () => {
   });
 
   it('should log ready url properly when baseURL and url provided', async () => {
-    const config: AxiosRequestConfig<any> = {
+    const config: InternalAxiosRequestConfig<any> = {
       url: '/foo/bar',
-    };
+    } as any;
 
     const defaults: AxiosDefaults<any> = {
       headers: {} as any,
       baseURL: 'https://sima.com/',
     };
 
-    const response = {
+    const response: AxiosResponse = {
       status: 200,
       statusText: '200',
       data: {},
@@ -126,19 +131,19 @@ describe('HttpClientLogging', () => {
   });
 
   it('should log ready url properly when only baseURL provided', async () => {
-    const config: AxiosRequestConfig<any> = {};
+    const config: InternalAxiosRequestConfig<any> = {} as any;
 
     const defaults: AxiosDefaults<any> = {
       headers: {} as any,
       baseURL: 'https://sima.com/',
     };
 
-    const response = {
+    const response: AxiosResponse = {
       status: 200,
       statusText: '200',
       data: {},
       headers: {},
-      config: {},
+      config: {} as any,
     };
 
     const handler = new HttpClientLogging(logger, { config, defaults });
@@ -184,12 +189,12 @@ describe('HttpClientLogging', () => {
       headers: {} as any,
     };
 
-    const response = {
+    const response: AxiosResponse = {
       status: 200,
       statusText: '200',
       data: {},
       headers: {},
-      config: {},
+      config: {} as any,
     };
 
     const handler = new HttpClientLogging(logger, { config, defaults });
