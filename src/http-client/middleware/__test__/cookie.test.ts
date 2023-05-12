@@ -1,4 +1,4 @@
-import { AxiosDefaults, AxiosRequestConfig } from 'axios';
+import { AxiosDefaults, InternalAxiosRequestConfig } from 'axios';
 import { Request, Response } from 'express';
 import { Next } from 'middleware-axios';
 import { createCookieStore, collectCookieMiddleware } from '../cookie';
@@ -42,10 +42,10 @@ describe('collectCookieMiddleware', () => {
 
     const middleware = collectCookieMiddleware(request, response);
 
-    const config: AxiosRequestConfig = {
+    const config: InternalAxiosRequestConfig = {
       method: 'get',
       url: '/test-cookie-middleware',
-      headers: { 'test-header': 'test-value' },
+      headers: { 'test-header': 'test-value' } as any,
     };
     const next: Next<unknown> = jest.fn(() =>
       Promise.resolve({
@@ -93,10 +93,10 @@ describe('collectCookieMiddleware', () => {
 
     const middleware = collectCookieMiddleware(request, response);
 
-    const config: AxiosRequestConfig = {
+    const config: InternalAxiosRequestConfig = {
       method: 'get',
       url: '/test-cookie-middleware',
-      headers: { 'test-header': 'test-value' },
+      headers: { 'test-header': 'test-value' } as any,
     };
     const next: Next<unknown> = jest.fn(() =>
       Promise.resolve({
