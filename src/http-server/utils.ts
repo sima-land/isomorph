@@ -1,7 +1,7 @@
 import type { Handler, Request, Response } from 'express';
 import type { ConventionalJson, PageAssets, PageTemplate, PageTemplateData } from './types';
 import type { BaseConfig } from '../config/types';
-import { isIP } from 'net';
+import net from 'node:net';
 
 /**
  * Объединяет промежуточные слои в один.
@@ -29,7 +29,7 @@ export function getXClientIp(req: Request): string {
   const headerValue =
     req.get('x-client-ip') || req.get('x-forwarded-for') || req.socket.remoteAddress || '';
 
-  return isIP(headerValue) ? headerValue : '';
+  return net.isIP(headerValue) ? headerValue : '';
 }
 
 /**

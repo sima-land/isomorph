@@ -1,6 +1,6 @@
 import { EnvPluginOptions } from './types';
-import { readFileSync, existsSync } from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import dotenv from 'dotenv';
 
 /**
@@ -17,8 +17,8 @@ export function defineEnv(
     try {
       const dotenvPath = path.join(process.cwd(), `.env.${process.env.NODE_ENV}`);
 
-      if (existsSync(dotenvPath)) {
-        const parsed = dotenv.parse(readFileSync(dotenvPath, 'utf-8'));
+      if (fs.existsSync(dotenvPath)) {
+        const parsed = dotenv.parse(fs.readFileSync(dotenvPath, 'utf-8'));
 
         // @todo дёрнуть бы эту логику из пакета dotenv, https://github.com/motdotla/dotenv/issues/690
         for (const key of Object.keys(parsed)) {
