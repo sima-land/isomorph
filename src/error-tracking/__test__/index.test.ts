@@ -1,13 +1,13 @@
-import { SentryError, SentryBreadcrumb } from '..';
+import { DetailedError, Breadcrumb } from '..';
 
-describe('SentryError', () => {
+describe('DetailedError', () => {
   it('name should be just "Error"', () => {
-    expect(new SentryError('hello, world!').name).toBe('Error');
+    expect(new DetailedError('hello, world!').name).toBe('Error');
   });
 });
 
-describe('SentryBreadcrumb', () => {
+describe('Breadcrumb', () => {
   it('name should be just "Error"', () => {
-    expect(new SentryBreadcrumb({ message: 'some text' }).data).toEqual({ message: 'some text' });
+    expect(new Breadcrumb({ message: 'some text' }).data).toEqual({ message: 'some text' });
   });
 });

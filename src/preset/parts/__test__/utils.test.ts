@@ -5,7 +5,7 @@ import {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { SentryBreadcrumb, SentryError } from '../../../error-tracking';
+import { Breadcrumb, DetailedError } from '../../../error-tracking';
 import { Logger } from '../../../log';
 import {
   HttpApiHostPool,
@@ -104,7 +104,7 @@ describe('HttpClientLogging', () => {
 
     expect(logger.info).toBeCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.request',
         type: 'http',
         data: {
@@ -116,7 +116,7 @@ describe('HttpClientLogging', () => {
       }),
     ]);
     expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.response',
         type: 'http',
         data: {
@@ -153,7 +153,7 @@ describe('HttpClientLogging', () => {
 
     expect(logger.info).toBeCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.request',
         type: 'http',
         data: {
@@ -165,7 +165,7 @@ describe('HttpClientLogging', () => {
       }),
     ]);
     expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.response',
         type: 'http',
         data: {
@@ -204,7 +204,7 @@ describe('HttpClientLogging', () => {
 
     expect(logger.info).toBeCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.request',
         type: 'http',
         data: {
@@ -216,7 +216,7 @@ describe('HttpClientLogging', () => {
       }),
     ]);
     expect((logger.info as jest.Mock).mock.calls[1]).toEqual([
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.response',
         type: 'http',
         data: {
@@ -290,9 +290,9 @@ describe('HttpClientLogging', () => {
 
     const loggerErrorArgument: any = (logger.error as jest.Mock).mock.calls[0][0];
 
-    expect(loggerErrorArgument instanceof SentryError).toBe(true);
+    expect(loggerErrorArgument instanceof DetailedError).toBe(true);
     expect(loggerErrorArgument).toEqual(
-      new SentryError(`HTTP request failed, status code: UNKNOWN, error message: test`, {
+      new DetailedError(`HTTP request failed, status code: UNKNOWN, error message: test`, {
         level: severityFromStatus(error.response?.status),
         context: {
           key: 'Request details',

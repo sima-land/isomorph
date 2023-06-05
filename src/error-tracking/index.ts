@@ -1,37 +1,33 @@
-import { SentryErrorData, SentryBreadcrumbData } from './types';
+import { ErrorDetails, BreadcrumbDetails } from './types';
 
 /**
- * Ошибка с данными для Sentry.
- * @todo Этот класс должен называться либо SentryReadyError либо в названии вообще не должен фигурировать Sentry.
+ * Ошибка с данными.
  */
-export class SentryError extends Error {
-  data: SentryErrorData;
+export class DetailedError extends Error {
+  data: ErrorDetails;
 
   /**
    * @param message Сообщение.
    * @param data Данные.
    */
-  constructor(message: string, data: SentryErrorData = {}) {
+  constructor(message?: string, data: ErrorDetails = {}) {
     super(message);
     this.data = data;
   }
 }
 
 /**
- * Хлебная крошка для Sentry.
- * @todo Этот класс должен называться либо SentryReadyBreadcrumb либо в названии вообще не должен фигурировать Sentry.
+ * Хлебная крошка.
  */
-export class SentryBreadcrumb {
+export class Breadcrumb {
   type: string;
-  data: SentryBreadcrumbData;
+  data: BreadcrumbDetails;
 
   /**
    * @param data Данные.
    */
-  constructor(data: SentryBreadcrumbData) {
+  constructor(data: BreadcrumbDetails) {
     this.type = 'breadcrumb';
     this.data = data;
   }
 }
-
-// @todo переименовать error-tracking в events и добавить сюда остальные классы ошибок и событий?

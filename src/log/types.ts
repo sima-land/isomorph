@@ -1,13 +1,13 @@
 /**
  * Тип события.
  */
-export type LogEventType = 'error' | 'log' | 'info' | 'warn' | 'debug';
+export type LogLevel = 'error' | 'log' | 'info' | 'warn' | 'debug';
 
 /**
  * Интерфейс события.
  */
 export interface LogEvent {
-  type: LogEventType;
+  type: LogLevel;
   data: unknown;
 }
 

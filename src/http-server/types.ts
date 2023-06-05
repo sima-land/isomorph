@@ -1,12 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 
-// @todo переименовать в HandlerContext
-export interface ResponseContext {
+export interface HandlerContext {
   req: Request;
   res: Response;
   next: NextFunction;
 }
 
+// @todo перенести в пресеты?
 export interface PageAssets {
   js: string;
   css: string;
@@ -24,6 +24,7 @@ export interface PageTemplate {
   (data: PageTemplateData): string;
 }
 
+// @todo перенести в пресеты
 export interface ConventionalJson {
   markup: string;
   bundle_js: string;

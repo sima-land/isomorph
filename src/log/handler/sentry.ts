@@ -1,6 +1,6 @@
 import type { LogHandler } from '../types';
 import type { Hub } from '@sentry/types';
-import { SentryBreadcrumb, SentryError } from '../../error-tracking';
+import { Breadcrumb, DetailedError } from '../../error-tracking';
 
 /**
  * Возвращает новый handler для logger'а для отправки событий в Sentry.
@@ -20,7 +20,7 @@ export function createSentryHandler(hubInit: Hub | (() => Hub)): LogHandler {
     if (event.type === 'error') {
       const error = event.data;
 
-      if (error instanceof SentryError) {
+      if (error instanceof DetailedError) {
         const { level, context, extra } = error.data;
 
         hub.withScope(scope => {
@@ -48,7 +48,7 @@ export function createSentryHandler(hubInit: Hub | (() => Hub)): LogHandler {
     }
 
     // breadcrumb
-    if (event.data instanceof SentryBreadcrumb) {
+    if (event.data instanceof Breadcrumb) {
       const breadcrumb = event.data.data;
 
       hub.addBreadcrumb(breadcrumb);

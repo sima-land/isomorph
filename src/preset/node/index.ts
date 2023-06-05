@@ -1,44 +1,50 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import path from 'path';
 import type { Logger, LogHandler } from '../../log/types';
-import type { Tracer } from '@opentelemetry/api';
+import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
+import { ConfigSource, createConfigSource } from '../../config';
+import { createLogger } from '../../log';
+import { createPinoHandler } from '../../log/handler/pino';
+import { createSentryHandler } from '../../log/handler/sentry';
+import {
+  responseMetricsMiddleware,
+  renderMetricsMiddleware,
+} from '../../http-server/middleware/metrics';
+import { HttpApiHostPool } from '../parts/utils';
+import { KnownToken } from '../../tokens';
+import { logMiddleware } from '../../http-server/middleware/log';
+import { provideBaseConfig } from '../parts/providers';
 import { Resolve, Preset, createPreset } from '../../di';
+import { StrictMap, KnownHttpApiKey } from '../parts/types';
+import { tracingMiddleware } from '../../http-server/middleware/tracing';
+
+// nodejs specific packages
+import os from 'node:os';
+import path from 'node:path';
+
+// nodejs libraries (not isomorphic)
+import { config as applyDotenv } from 'dotenv';
+import { create } from 'middleware-axios';
+import { init, Handlers, getCurrentHub } from '@sentry/node';
+import * as PromClient from 'prom-client';
+import Express, { Application, Handler } from 'express';
+import pino from 'pino';
+import PinoPretty from 'pino-pretty';
+
+// opentelemetry
+import type { Tracer } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   BatchSpanProcessor,
   SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
-import { KnownToken } from '../../tokens';
-import { ConfigSource, createConfigSource } from '../../config';
-import { createLogger } from '../../log';
-import { createPinoHandler } from '../../log/handler/pino';
-import { createSentryHandler } from '../../log/handler/sentry';
-import { logMiddleware } from '../../http-server/middleware/log';
-import { tracingMiddleware } from '../../http-server/middleware/tracing';
-import {
-  renderMetricsMiddleware,
-  responseMetricsMiddleware,
-} from '../../http-server/middleware/metrics';
-import { createDefaultMetrics } from '../../metrics/node';
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
-import { create } from 'middleware-axios';
-import Express, { Application, Handler } from 'express';
-import { init, Handlers, getCurrentHub } from '@sentry/node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { getConventionalResource } from '../../tracing';
-import { hostname } from 'os';
-import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
-import { StrictMap, KnownHttpApiKey } from '../parts/types';
-import { HttpApiHostPool } from '../parts/utils';
-import { provideBaseConfig } from '../parts/providers';
-import pino from 'pino';
-import PinoPretty from 'pino-pretty';
-import { config as applyDotenv } from 'dotenv';
+import { healthCheck } from '../../http-server/handler/health-check';
 import { composeMiddleware } from '../../http-server/utils';
-import * as PromClient from 'prom-client';
+import { createDefaultMetrics } from '../../metrics/node';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -67,6 +73,7 @@ export function PresetNode(): Preset {
 
     // http server
     [KnownToken.Http.Server.factory, () => Express],
+    [KnownToken.Http.Server.Handler.healthCheck, () => healthCheck()],
     [KnownToken.Http.Server.Middleware.request, () => Handlers.requestHandler()],
     [KnownToken.Http.Server.Middleware.log, provideHttpServerLogMiddleware],
     [KnownToken.Http.Server.Middleware.metrics, provideHttpServerMetricsMiddleware],
@@ -147,9 +154,11 @@ export function provideTracer(resolve: Resolve): Tracer {
 export function provideSpanExporter(resolve: Resolve): SpanExporter {
   const source = resolve(KnownToken.Config.source);
 
-  return new JaegerExporter({
-    host: source.require('JAEGER_AGENT_HOST'),
-    port: parseInt(source.require('JAEGER_AGENT_PORT')) || undefined,
+  const host = source.require('JAEGER_AGENT_HOST');
+  const port = source.require('JAEGER_AGENT_PORT');
+
+  return new OTLPTraceExporter({
+    url: port ? `${host}:${port}` : host,
   });
 }
 
@@ -168,11 +177,12 @@ export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
 export function provideTracerProviderResource(resolve: Resolve): Resource {
   const config = resolve(KnownToken.Config.base);
 
-  return getConventionalResource(config).merge(
-    new Resource({
-      [SemanticResourceAttributes.HOST_NAME]: hostname(),
-    }),
-  );
+  return new Resource({
+    [SemanticResourceAttributes.HOST_NAME]: os.hostname(),
+    [SemanticResourceAttributes.SERVICE_NAME]: config.appName,
+    [SemanticResourceAttributes.SERVICE_VERSION]: config.appVersion,
+    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: config.env,
+  });
 }
 
 export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
