@@ -193,7 +193,6 @@ export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
     const start = process.hrtime.bigint();
     const remoteIp = getXClientIp(req);
 
-    // @todo перенести в пресеты?
     const startMsg: Omit<ConventionalFluentInfo, 'latency' | 'status'> & { type: string } = {
       type: 'http.request[incoming]',
       version: config.appVersion,
