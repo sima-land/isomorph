@@ -207,7 +207,6 @@ export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
     res.once('finish', () => {
       const finish = process.hrtime.bigint();
 
-      // @todo перенести в пресеты?
       const finishMsg: ConventionalFluentInfo & { type: string } = {
         type: 'http.response[outgoing]',
         version: config.appVersion,
