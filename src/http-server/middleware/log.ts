@@ -6,6 +6,7 @@ import { toMilliseconds } from '../../utils/number';
 
 /**
  * Возвращает новый middleware для логирования запросов.
+ * @todo Переделать на получение абстрактного LogHandler'а, бизнес-логику перенести в пресеты.
  * @param config Конфиг.
  * @param logger Logger.
  * @return Middleware.

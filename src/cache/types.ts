@@ -1,5 +1,6 @@
 /**
  * Простейший интерфейс кэша.
+ * @todo Рассмотреть web-стандарт CacheStorage.
  */
 export interface Cache {
   /**

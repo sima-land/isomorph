@@ -65,7 +65,7 @@ export const KnownToken = {
     Server: {
       factory: createToken<() => Application>('server/factory'),
       Handler: {
-        healthCheck: createToken<Handler>('middleware/health-check'),
+        healthCheck: createToken<Handler>('handler/health-check'),
       },
       Middleware: {
         request: createToken<Handler>('middleware/request'),
