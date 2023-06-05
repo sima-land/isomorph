@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { Logger, LogHandler } from '../../log/types';
+import type { ConventionalFluentInfo, Logger, LogHandler } from '../../log/types';
 import { BridgeServerSide, SsrBridge } from '../../utils/ssr';
 import { ConfigSource, createConfigSource } from '../../config';
 import { createLogger } from '../../log';
@@ -11,7 +11,6 @@ import {
 } from '../../http-server/middleware/metrics';
 import { HttpApiHostPool } from '../parts/utils';
 import { KnownToken } from '../../tokens';
-import { logMiddleware } from '../../http-server/middleware/log';
 import { provideBaseConfig } from '../parts/providers';
 import { Resolve, Preset, createPreset } from '../../di';
 import { StrictMap, KnownHttpApiKey } from '../parts/types';
@@ -43,8 +42,9 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { healthCheck } from '../../http-server/handler/health-check';
-import { composeMiddleware } from '../../http-server/utils';
+import { composeMiddleware, getXClientIp } from '../../http-server/utils';
 import { createDefaultMetrics } from '../../metrics/node';
+import { toMilliseconds } from '../../utils/number';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -189,7 +189,38 @@ export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
   const logger = resolve(KnownToken.logger);
 
-  return logMiddleware(config, logger);
+  return (req, res, next) => {
+    const start = process.hrtime.bigint();
+    const remoteIp = getXClientIp(req);
+
+    const startMsg: Omit<ConventionalFluentInfo, 'latency' | 'status'> & { type: string } = {
+      type: 'http.request[incoming]',
+      version: config.appVersion,
+      route: req.originalUrl,
+      method: req.method,
+      remote_ip: remoteIp,
+    };
+
+    logger.info(startMsg);
+
+    res.once('finish', () => {
+      const finish = process.hrtime.bigint();
+
+      const finishMsg: ConventionalFluentInfo & { type: string } = {
+        type: 'http.response[outgoing]',
+        version: config.appVersion,
+        route: req.originalUrl,
+        method: req.method,
+        status: res.statusCode,
+        remote_ip: remoteIp,
+        latency: toMilliseconds(finish - start),
+      };
+
+      logger.info(finishMsg);
+    });
+
+    next();
+  };
 }
 
 export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
