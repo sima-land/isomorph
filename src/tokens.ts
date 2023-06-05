@@ -1,6 +1,6 @@
 import { createToken } from './di';
 import type { Application, ErrorRequestHandler, Handler } from 'express';
-import type { PageAssets, PageTemplate, ResponseContext } from './http-server/types';
+import type { PageAssets, PageTemplate, HandlerContext } from './http-server/types';
 import type { SagaExtendedMiddleware } from './utils/redux-saga';
 import type { Logger } from './log/types';
 import type { HttpClientFactory } from './http-client/types';
@@ -64,6 +64,9 @@ export const KnownToken = {
     },
     Server: {
       factory: createToken<() => Application>('server/factory'),
+      Handler: {
+        healthCheck: createToken<Handler>('middleware/health-check'),
+      },
       Middleware: {
         request: createToken<Handler>('middleware/request'),
         log: createToken<Handler>('middleware/log'),
@@ -74,7 +77,7 @@ export const KnownToken = {
     },
     Handler: {
       main: createToken<() => void>('handler/main'),
-      context: createToken<ResponseContext>('handler/context'),
+      context: createToken<HandlerContext>('handler/context'),
       Request: {
         specificParams: createToken<Record<string, unknown>>('request/specific-params'),
       },

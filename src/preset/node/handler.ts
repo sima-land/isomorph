@@ -19,6 +19,7 @@ import { HttpStatus } from '../parts/utils';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
+ * @todo Возможно стоит переименовать в PresetPageHandler.
  * @return Preset.
  */
 export function PresetHandler(): Preset {
@@ -162,15 +163,15 @@ export function provideSpecificParams(resolve: Resolve): Record<string, unknown>
 
 /**
  * Возвращает express-handler, создающий дочернее di-приложение при запросе.
- * @param appFactory Фабрика di-приложения запроса.
+ * @param getApp Должна вернуть di-приложения запроса.
  * @return Обработчик.
  */
-export function HandlerProvider(appFactory: () => Application) {
+export function HandlerProvider(getApp: () => Application) {
   return function provider(resolve: Resolve): Handler {
     const parent = resolve(CURRENT_APP);
 
     return function handler(req, res, next) {
-      const app = appFactory();
+      const app = getApp();
 
       app.attach(parent);
       app.bind(KnownToken.Http.Handler.context).toValue({ req, res, next });

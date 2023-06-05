@@ -1,4 +1,4 @@
-import type { Logger, LogEvent, LogEventType, LogHandler } from './types';
+import type { Logger, LogEvent, LogLevel, LogHandler } from './types';
 
 /**
  * Возвращает новый logger - объект для журналирования событий подобно console.
@@ -8,7 +8,7 @@ export function createLogger(): Logger {
   const handlers: LogHandler[] = [];
 
   // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
-  const createMethod = (type: LogEventType) => (data: any) => {
+  const createMethod = (type: LogLevel) => (data: any) => {
     const event: LogEvent = { type, data };
 
     for (const handler of handlers) {

@@ -2,7 +2,7 @@ import { SeverityLevel } from '@sentry/browser';
 import Axios, { AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
 import { ConfigSource } from '../../config/types';
-import { SentryBreadcrumb, SentryError } from '../../error-tracking';
+import { Breadcrumb, DetailedError } from '../../error-tracking';
 import {
   SharedData,
   DoneSharedData,
@@ -106,7 +106,7 @@ export class HttpClientLogging implements LogMiddlewareHandler {
     const { readyURL, method, params } = this.requestInfo;
 
     this.logger.info(
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.request',
         type: 'http',
         data: {
@@ -127,7 +127,7 @@ export class HttpClientLogging implements LogMiddlewareHandler {
     const { readyURL, method, params } = this.requestInfo;
 
     this.logger.info(
-      new SentryBreadcrumb({
+      new Breadcrumb({
         category: 'http.response',
         type: 'http',
         data: {
@@ -153,7 +153,7 @@ export class HttpClientLogging implements LogMiddlewareHandler {
       // @todo выяснить: нужно ли нам отправлять ответы с кодом <500 в Sentry на уровне всех команд
       // если да то можно добавить метод в духе errorStatusFilter(s => s !== 422)
       this.logger.error(
-        new SentryError(
+        new DetailedError(
           `HTTP request failed, status code: ${statusCode}, error message: ${error.message}`,
           {
             level: severityFromStatus(error.response?.status),
@@ -187,7 +187,7 @@ export class HttpClientLogging implements LogMiddlewareHandler {
 
       if (typeof statusCode === 'number') {
         this.logger.info(
-          new SentryBreadcrumb({
+          new Breadcrumb({
             category: 'http.response',
             type: 'http',
             data: {
@@ -226,7 +226,7 @@ export class SagaLogging implements SagaMiddlewareHandler {
    */
   onSagaError(error: Error, info: SagaErrorInfo) {
     this.logger.error(
-      new SentryError(error.message, {
+      new DetailedError(error.message, {
         extra: {
           key: 'Saga stack',
           data: info.sagaStack,

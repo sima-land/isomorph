@@ -6,9 +6,9 @@ export interface ContextData {
 }
 
 /**
- * Данные ошибки для Sentry.
+ * Детали ошибки.
  */
-export interface SentryErrorData {
+export interface ErrorDetails {
   level?: SeverityLevel;
 
   context?: ContextData | ContextData[];
@@ -20,6 +20,6 @@ export interface SentryErrorData {
 }
 
 /**
- * Данные хлебной крошки для Sentry.
+ * Детали хлебной крошки.
  */
-export type SentryBreadcrumbData = Breadcrumb;
+export type BreadcrumbDetails = Breadcrumb;
