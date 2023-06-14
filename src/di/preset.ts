@@ -27,6 +27,6 @@ class PresetImplementation implements Preset {
  * @param defaults Предустановленные зависимости.
  * @return Preset.
  */
-export function createPreset(defaults: PresetEntry[]): Preset {
+export function createPreset(defaults: PresetEntry[] = []): Preset {
   return new PresetImplementation(defaults);
 }
