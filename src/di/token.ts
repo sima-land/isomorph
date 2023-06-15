@@ -4,7 +4,7 @@ import { Token } from './types';
  * Реализация токена.
  */
 class TokenImplementation<T = never> implements Token<T> {
-  _key: symbol;
+  readonly _key: symbol;
 
   /**
    * Конструктор.
@@ -27,7 +27,7 @@ class TokenImplementation<T = never> implements Token<T> {
    * @inheritdoc
    */
   toString(): string {
-    return `Token(${this._key.description})`;
+    return `Token(${this._key.description ?? 'unknown'})`;
   }
 }
 

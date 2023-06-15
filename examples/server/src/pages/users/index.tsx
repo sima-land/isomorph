@@ -1,53 +1,54 @@
-import { createReducer } from '@reduxjs/toolkit';
-import { RemoteData, RemoteDataState } from '@sima-land/isomorph/utils/redux/remote-data';
-import { useSelector } from 'react-redux';
-import { END } from 'redux-saga';
-import { call, put } from 'typed-redux-saga/macro';
-import { SagaDeps, User } from '../../app';
+import { configureStore } from '@reduxjs/toolkit';
+import { createApplication, Resolve } from '@sima-land/isomorph/di';
+import { sauce } from '@sima-land/isomorph/http-client/sauce';
+import { PresetHandler } from '@sima-land/isomorph/preset/node/handler';
+import { Provider } from 'react-redux';
+import { HttpApi } from '../../app/types';
+import { UsersPage, UsersSlice } from './parts';
+import { TOKEN } from '../../tokens';
 
-type PostsState = RemoteDataState<User[], unknown>;
+export function UsersHandler() {
+  const app = createApplication();
 
-const initialState: PostsState = {
-  data: [],
-  error: null,
-  status: 'initial',
-};
+  app.preset(PresetHandler());
 
-export const actions = {
-  ...RemoteData.createActions<User[], unknown>('posts'),
-} as const;
+  app.bind(TOKEN.Project.Http.api).toProvider(provideHttpApi);
+  app.bind(TOKEN.Lib.Http.Handler.Response.Page.prepare).toProvider(provideRender);
 
-export const reducer = createReducer(initialState, builder => {
-  RemoteData.applyHandlers<User[], unknown>(actions, builder);
-});
-
-export function* saga({ api }: SagaDeps) {
-  const response = yield* call(api.getUsers);
-
-  if (response.ok) {
-    yield* put(actions.success(response.data));
-  } else {
-    yield* put(actions.failure(response.data || response.error));
-  }
-
-  yield* put(END);
+  return app;
 }
 
-export function UsersPage() {
-  const items = useSelector((state: PostsState) => state.data);
+function provideHttpApi(resolve: Resolve): HttpApi {
+  const createClient = resolve(TOKEN.Lib.Http.Client.factory);
 
-  return (
-    <div style={{ margin: '0 32px' }}>
-      <h1>Users</h1>
+  const client = sauce(createClient({ baseURL: 'https://jsonplaceholder.typicode.com/' }));
 
-      {items.map(item => (
-        <article key={item.id}>
-          <h3>{item.username}</h3>
-          {item.name}
-        </article>
-      ))}
+  return {
+    getPosts() {
+      return client.get('posts/');
+    },
+    getUsers() {
+      return client.get('users/');
+    },
+  };
+}
 
-      <a href='/posts'>Go to posts</a>
-    </div>
-  );
+function provideRender(resolve: Resolve) {
+  const httpApi = resolve(TOKEN.Project.Http.api);
+  const sagaMiddleware = resolve(TOKEN.Lib.sagaMiddleware);
+
+  return async () => {
+    const store = configureStore({
+      reducer: UsersSlice.reducer,
+      middleware: [sagaMiddleware],
+    });
+
+    await sagaMiddleware.run(UsersSlice.saga, { api: httpApi });
+
+    return (
+      <Provider store={store}>
+        <UsersPage />
+      </Provider>
+    );
+  };
 }
