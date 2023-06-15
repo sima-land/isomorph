@@ -1,7 +1,7 @@
 import { createToken } from '../token';
 
 describe('Token implementation', () => {
-  it('method _resolve() should works properly', () => {
+  it('_resolve() should works properly', () => {
     const token = createToken();
     const registry = new Map<symbol, any>();
     const component = { type: 'some component' };
@@ -11,9 +11,15 @@ describe('Token implementation', () => {
     expect(token._resolve(registry)).toBe(component);
   });
 
-  it('method toString() should works properly', () => {
+  it('toString() should works properly', () => {
     const token = createToken('hello');
 
     expect(String(token)).toBe('Token(hello)');
+  });
+
+  it('toString() should works properly for unnamed token', () => {
+    const token = createToken();
+
+    expect(String(token)).toBe('Token(unknown)');
   });
 });
