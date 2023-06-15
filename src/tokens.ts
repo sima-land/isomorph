@@ -14,7 +14,6 @@ import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { PageResponse } from './http-server/utils';
 import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
 
-// @todo переименовать в Lib/LibToken/SharedToken/...?
 export const KnownToken = {
   // config
   Config: {
@@ -48,9 +47,6 @@ export const KnownToken = {
 
   // http
   Http: {
-    // Fetch: {
-    //   factory: createToken<() => typeof fetch>('fetch/factory'),
-    // },
     Api: {
       knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http/api/known-hosts'),
     },

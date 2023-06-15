@@ -6,7 +6,7 @@ type PresetEntry<T = any> = [Token<T>, Provider<T>];
 class PresetImplementation implements Preset {
   private registry: Map<Token<any>, Provider<any>>;
 
-  constructor(defaults: Iterable<PresetEntry>) {
+  constructor(defaults?: Iterable<PresetEntry>) {
     this.registry = new Map<Token<any>, Provider<any>>(defaults);
   }
 
@@ -27,6 +27,6 @@ class PresetImplementation implements Preset {
  * @param defaults Предустановленные зависимости.
  * @return Preset.
  */
-export function createPreset(defaults: PresetEntry[]): Preset {
+export function createPreset(defaults?: PresetEntry[]): Preset {
   return new PresetImplementation(defaults);
 }

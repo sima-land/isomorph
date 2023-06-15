@@ -23,7 +23,7 @@ export const SsrBridge = {
   /**
    * Вызывается на сервере.
    * @param serviceKey Идентификатор корневого элемента.
-   * @return Идентификатор корневого элемента и ключ для глобально.
+   * @return Идентификатор корневого элемента и ключ для глобальной переменной.
    */
   prepare(serviceKey: string): BridgeServerSide {
     return {
