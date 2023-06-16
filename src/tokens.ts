@@ -1,5 +1,5 @@
 import { createToken } from './di';
-import type { Application, ErrorRequestHandler, Handler } from 'express';
+import type * as express from 'express';
 import type { PageAssets, PageTemplate, HandlerContext } from './http-server/types';
 import type { SagaExtendedMiddleware } from './utils/redux-saga';
 import type { Logger } from './log/types';
@@ -42,7 +42,7 @@ export const KnownToken = {
 
   // metrics
   Metrics: {
-    httpApp: createToken<Application>('metrics/http-app'),
+    httpApp: createToken<express.Application>('metrics/http-app'),
   },
 
   // http
@@ -59,16 +59,16 @@ export const KnownToken = {
       },
     },
     Server: {
-      factory: createToken<() => Application>('server/factory'),
+      factory: createToken<() => express.Application>('server/factory'),
       Handler: {
-        healthCheck: createToken<Handler>('handler/health-check'),
+        healthCheck: createToken<express.Handler>('handler/health-check'),
       },
       Middleware: {
-        request: createToken<Handler>('middleware/request'),
-        log: createToken<Handler>('middleware/log'),
-        tracing: createToken<Handler>('middleware/tracing'),
-        metrics: createToken<Handler>('middleware/metrics'),
-        error: createToken<ErrorRequestHandler>('middleware/error'),
+        request: createToken<express.Handler>('middleware/request'),
+        log: createToken<express.Handler>('middleware/log'),
+        tracing: createToken<express.Handler>('middleware/tracing'),
+        metrics: createToken<express.Handler>('middleware/metrics'),
+        error: createToken<express.ErrorRequestHandler>('middleware/error'),
       },
     },
     Handler: {
