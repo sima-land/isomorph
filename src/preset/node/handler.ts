@@ -65,7 +65,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
       },
     });
 
-    client.use(HttpStatus.createMiddleware());
+    client.use(HttpStatus.axiosMiddleware());
     client.use(tracingMiddleware(tracer, context.res.locals.tracing.rootContext));
     client.use(logMiddleware(logHandler));
     client.use(

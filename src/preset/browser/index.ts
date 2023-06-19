@@ -89,7 +89,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   return function createHttpClient(config = {}) {
     const client = create(config);
 
-    client.use(HttpStatus.createMiddleware());
+    client.use(HttpStatus.axiosMiddleware());
     client.use(logMiddleware(logHandler));
 
     return client;

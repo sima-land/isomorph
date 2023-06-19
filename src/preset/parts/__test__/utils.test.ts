@@ -400,7 +400,7 @@ describe('HttpStatus', () => {
   });
 
   describe('createMiddleware', () => {
-    const middleware = HttpStatus.createMiddleware();
+    const middleware = HttpStatus.axiosMiddleware();
 
     it('should NOT change validateStatus when is already defined as null', async () => {
       const config = { validateStatus: null };

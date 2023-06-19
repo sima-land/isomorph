@@ -248,7 +248,11 @@ export class SagaLogging implements SagaMiddlewareHandler {
    * @param info Инфо прерывания саги.
    */
   onTimeoutInterrupt({ timeout }: SagaInterruptInfo) {
-    this.logger.error(new Error(`Сага прервана по таймауту (${timeout} миллисекунд)`));
+    this.logger.error(
+      new DetailedError(`Сага прервана по таймауту (${timeout}мс)`, {
+        level: 'warning',
+      }),
+    );
   }
 }
 
@@ -286,7 +290,7 @@ export abstract class HttpStatus {
    * Валидация применяется только если в конфиге запроса не указан validateStatus.
    * @return Промежуточный слой.
    */
-  static createMiddleware(): Middleware<unknown> {
+  static axiosMiddleware(): Middleware<unknown> {
     return async (config, next, defaults) => {
       if (config.validateStatus !== undefined || defaults.validateStatus !== undefined) {
         // если validateStatus указан явно то не применяем валидацию по умолчанию
