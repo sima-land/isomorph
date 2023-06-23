@@ -7,7 +7,7 @@ import { HttpApi } from '../../app/types';
 import { UsersPage, UsersSlice } from './parts';
 import { TOKEN } from '../../tokens';
 
-export function UsersHandler() {
+export function UsersPageApp() {
   const app = createApplication();
 
   app.preset(PresetHandler());

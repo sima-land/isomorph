@@ -2,7 +2,7 @@ import { SeverityLevel } from '@sentry/browser';
 import Axios, { AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
 import { ConfigSource } from '../../config/types';
-import { Breadcrumb, DetailedError } from '../../error-tracking';
+import { Logger, Breadcrumb, DetailedError } from '../../log';
 import {
   SharedData,
   DoneSharedData,
@@ -10,7 +10,6 @@ import {
   LogMiddlewareHandler,
 } from '../../http-client/middleware/log';
 import { applyAxiosDefaults, displayUrl } from '../../http-client/utils';
-import { Logger } from '../../log';
 import {
   SagaErrorInfo,
   SagaInterruptInfo,

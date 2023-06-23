@@ -1,3 +1,5 @@
+import type { SeverityLevel, Context, Extra, Breadcrumb } from '@sentry/types';
+
 /**
  * Тип события.
  */
@@ -32,6 +34,33 @@ export interface Logger {
   // @todo вынести в интерфейс SubscribableLogger?
   subscribe(handler: LogHandler): void;
 }
+
+/**
+ * Контекст ошибки.
+ */
+export interface ContextData {
+  key: string;
+  data: Context | null;
+}
+
+/**
+ * Детали ошибки.
+ */
+export interface ErrorDetails {
+  level?: SeverityLevel;
+
+  context?: ContextData | ContextData[];
+
+  extra?: {
+    key: string;
+    data: Extra | null;
+  };
+}
+
+/**
+ * Детали хлебной крошки.
+ */
+export type BreadcrumbDetails = Breadcrumb;
 
 /**
  * Структура данных, которую необходимо выводить в терминал по соглашению внутри компании.
