@@ -1,4 +1,4 @@
-import { DetailedError, Breadcrumb } from '../errors';
+import { DetailedError, Breadcrumb } from '..';
 
 describe('DetailedError', () => {
   it('name should be just "Error"', () => {
