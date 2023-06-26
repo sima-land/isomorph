@@ -13,7 +13,7 @@ import { HttpApiHostPool } from '../parts/utils';
 import { KnownToken } from '../../tokens';
 import { provideBaseConfig } from '../parts/providers';
 import { Resolve, Preset, createPreset } from '../../di';
-import { StrictMap, KnownHttpApiKey } from '../parts/types';
+import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
 import { tracingMiddleware } from '../../http-server/middleware/tracing';
 
 // nodejs specific packages
@@ -48,44 +48,52 @@ import { toMilliseconds } from '../../utils/number';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
+ * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
  * @return Preset.
  */
-export function PresetNode(): Preset {
-  return createPreset([
-    // config
-    [KnownToken.Config.source, provideConfigSource],
-    [KnownToken.Config.base, provideBaseConfig],
+export function PresetNode(customize?: PresetTuner): Preset {
+  // ВАЖНО: используем .set() вместо аргумента defaults функции createPreset из-за скорости
+  const preset = createPreset();
 
-    // log
-    [KnownToken.logger, provideLogger],
+  // config
+  preset.set(KnownToken.Config.source, provideConfigSource);
+  preset.set(KnownToken.Config.base, provideBaseConfig);
 
-    // tracing
-    [KnownToken.Tracing.tracer, provideTracer],
-    [KnownToken.Tracing.spanExporter, provideSpanExporter],
-    [KnownToken.Tracing.tracerProvider, provideTracerProvider],
-    [KnownToken.Tracing.tracerProviderResource, provideTracerProviderResource],
+  // log
+  preset.set(KnownToken.logger, provideLogger);
 
-    // metrics
-    [KnownToken.Metrics.httpApp, provideMetricsHttpApp],
+  // tracing
+  preset.set(KnownToken.Tracing.tracer, provideTracer);
+  preset.set(KnownToken.Tracing.spanExporter, provideSpanExporter);
+  preset.set(KnownToken.Tracing.tracerProvider, provideTracerProvider);
+  preset.set(KnownToken.Tracing.tracerProviderResource, provideTracerProviderResource);
 
-    // http client
-    [KnownToken.Http.Client.factory, () => create],
+  // metrics
+  preset.set(KnownToken.Metrics.httpApp, provideMetricsHttpApp);
 
-    // http server
-    [KnownToken.Http.Server.factory, () => Express],
-    [KnownToken.Http.Server.Handler.healthCheck, () => healthCheck()],
-    [KnownToken.Http.Server.Middleware.request, () => Handlers.requestHandler()],
-    [KnownToken.Http.Server.Middleware.log, provideHttpServerLogMiddleware],
-    [KnownToken.Http.Server.Middleware.metrics, provideHttpServerMetricsMiddleware],
-    [KnownToken.Http.Server.Middleware.tracing, provideHttpServerTracingMiddleware],
-    [KnownToken.Http.Server.Middleware.error, () => Handlers.errorHandler()],
+  // http client
+  preset.set(KnownToken.Http.Client.factory, () => create);
 
-    // http api
-    [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
+  // http server
+  preset.set(KnownToken.Http.Server.factory, () => Express);
+  preset.set(KnownToken.Http.Server.Handler.healthCheck, () => healthCheck());
+  preset.set(KnownToken.Http.Server.Middleware.request, () => Handlers.requestHandler());
+  preset.set(KnownToken.Http.Server.Middleware.log, provideHttpServerLogMiddleware);
+  preset.set(KnownToken.Http.Server.Middleware.metrics, provideHttpServerMetricsMiddleware);
+  preset.set(KnownToken.Http.Server.Middleware.tracing, provideHttpServerTracingMiddleware);
+  preset.set(KnownToken.Http.Server.Middleware.error, () => Handlers.errorHandler());
 
-    // ssr bridge
-    [KnownToken.SsrBridge.serverSide, provideBridgeServerSide],
-  ]);
+  // http api
+  preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
+
+  // ssr bridge
+  preset.set(KnownToken.SsrBridge.serverSide, provideBridgeServerSide);
+
+  if (customize) {
+    customize({ override: preset.set.bind(preset) });
+  }
+
+  return preset;
 }
 
 export function provideConfigSource(): ConfigSource {
