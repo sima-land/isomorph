@@ -100,4 +100,6 @@ export interface Preset {
 
   /** Применяет пресет к переданному приложению. */
   apply: (app: Application) => void;
+
+  // @todo preventExtensions()
 }
