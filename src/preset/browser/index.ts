@@ -13,7 +13,7 @@ import {
 } from '@sentry/browser';
 import { create } from 'middleware-axios';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
-import { StrictMap, KnownHttpApiKey } from '../parts/types';
+import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
 import { HttpApiHostPool, HttpStatus } from '../parts/utils';
 import { logMiddleware } from '../../http-client/middleware/log';
 import { HttpClientFactory } from '../../http-client/types';
@@ -23,17 +23,29 @@ import {
   provideHttpClientLogHandler,
 } from '../parts/providers';
 
-export function PresetBrowser(): Preset {
-  return createPreset([
-    [KnownToken.Config.source, provideConfigSource],
-    [KnownToken.Config.base, provideBaseConfig],
-    [KnownToken.logger, provideLogger],
-    [KnownToken.sagaMiddleware, provideSagaMiddleware],
-    [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler],
-    [KnownToken.SsrBridge.clientSide, provideBridgeClientSide],
-    [KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts],
-  ]);
+/**
+ * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов в браузере.
+ * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
+ * @return Preset.
+ */
+export function PresetBrowser(customize?: PresetTuner): Preset {
+  // ВАЖНО: используем .set() вместо аргумента defaults функции createPreset из-за скорости
+  const preset = createPreset();
+
+  preset.set(KnownToken.Config.source, provideConfigSource);
+  preset.set(KnownToken.Config.base, provideBaseConfig);
+  preset.set(KnownToken.logger, provideLogger);
+  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
+  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
+  preset.set(KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler);
+  preset.set(KnownToken.SsrBridge.clientSide, provideBridgeClientSide);
+  preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
+
+  if (customize) {
+    customize({ override: preset.set.bind(preset) });
+  }
+
+  return preset;
 }
 
 export function provideConfigSource(): ConfigSource {

@@ -16,29 +16,38 @@ import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 import { SSRError } from '../../http-server/errors';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
 import { HttpStatus } from '../parts/utils';
+import { PresetTuner } from '../parts/types';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
+ * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
  * @todo Возможно стоит переименовать в PresetPageHandler.
  * @return Preset.
  */
-export function PresetHandler(): Preset {
-  return createPreset([
-    // saga
-    [KnownToken.sagaMiddleware, provideSagaMiddleware],
+export function PresetHandler(customize?: PresetTuner): Preset {
+  // ВАЖНО: используем .set() вместо аргумента defaults функции createPreset из-за скорости
+  const preset = createPreset();
 
-    // http client
-    [KnownToken.Http.Client.factory, provideHttpClientFactory],
-    [KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler],
+  // saga
+  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
 
-    // http handler
-    [KnownToken.Http.Handler.main, provideMain],
-    [KnownToken.Http.Handler.Request.specificParams, provideSpecificParams],
-    [KnownToken.Http.Handler.Response.builder, () => new PageResponse()],
-    [KnownToken.Http.Handler.Response.Page.assets, () => ({ js: '', css: '' })],
-    [KnownToken.Http.Handler.Response.Page.template, provideTemplate],
-    [KnownToken.Http.Handler.Response.Page.render, provideRender],
-  ]);
+  // http client
+  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
+  preset.set(KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler);
+
+  // http handler
+  preset.set(KnownToken.Http.Handler.main, provideMain);
+  preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
+  preset.set(KnownToken.Http.Handler.Response.builder, () => new PageResponse());
+  preset.set(KnownToken.Http.Handler.Response.Page.assets, () => ({ js: '', css: '' }));
+  preset.set(KnownToken.Http.Handler.Response.Page.template, provideTemplate);
+  preset.set(KnownToken.Http.Handler.Response.Page.render, provideRender);
+
+  if (customize) {
+    customize({ override: preset.set.bind(preset) });
+  }
+
+  return preset;
 }
 
 export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {

@@ -24,13 +24,13 @@ sidebar_position: 1
 import { createConfigSource } from '@sima-land/isomorph/config';
 
 // формируем источник конфигурации
-const source = createConfigSource({ environment: process.env });
+const source = createConfigSource(process.env);
 
 // определяем порт на основе переменной из конфигурации
 const port = source.require('MAIN_HTTP_PORT');
 ```
 
-Метод `require` выбросит исключение если переменная не задана в среде или .env-файле. Для необязательных переменных можно использовать метод `get`.
+Метод `require` выбросит исключение если переменная не задана. Для необязательных переменных можно использовать метод `get`.
 
 Подробнее в документации библиотеки [@humanwhocodes/env](https://github.com/humanwhocodes/env).
 
