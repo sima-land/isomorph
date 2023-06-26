@@ -5,8 +5,7 @@ import {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { Breadcrumb, DetailedError } from '../../../error-tracking';
-import { Logger } from '../../../log';
+import { Logger, Breadcrumb, DetailedError } from '../../../log';
 import {
   HttpApiHostPool,
   HttpClientLogging,

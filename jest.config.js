@@ -3,18 +3,7 @@ module.exports = {
   setupFiles: ['./.jest/setup.js'],
   globalSetup: './.jest/global-setup.js',
   transform: {
-    '^.+\\.(t|j)sx?$': [
-      '@swc/jest',
-      {
-        jsc: {
-          transform: {
-            react: {
-              runtime: 'automatic',
-            },
-          },
-        },
-      },
-    ],
+    '^.+\\.(t|j)sx?$': 'babel-jest',
   },
   transformIgnorePatterns: ['/node_modules/'],
   clearMocks: true,

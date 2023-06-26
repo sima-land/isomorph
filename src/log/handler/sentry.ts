@@ -1,6 +1,6 @@
 import type { LogHandler } from '../types';
 import type { Hub } from '@sentry/types';
-import { Breadcrumb, DetailedError } from '../../error-tracking';
+import { Breadcrumb, DetailedError } from '../../log';
 
 /**
  * Возвращает новый handler для logger'а для отправки событий в Sentry.

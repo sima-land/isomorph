@@ -5,18 +5,20 @@ import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { PresetNode } from '@sima-land/isomorph/preset/node';
 import { HandlerProvider } from '@sima-land/isomorph/preset/node/handler';
 import { healthCheck } from '@sima-land/isomorph/http-server/handler/health-check';
-import { UsersHandler } from '../pages/users';
-import { PostsHandler } from '../pages/posts';
+import { UsersPageApp } from '../pages/users';
+import { PostsPageApp } from '../pages/posts';
 
 export function MainApp() {
   const app = createApplication();
 
+  // используем пресет "node" с базовыми компонентами, такими как logger и тд
   app.preset(PresetNode());
 
+  // добавляем в приложение компоненты
   app.bind(TOKEN.Project.config).toProvider(provideAppConfig);
   app.bind(TOKEN.Project.Http.server).toProvider(provideHttpServer);
-  app.bind(TOKEN.Project.Http.Pages.users).toProvider(HandlerProvider(UsersHandler));
-  app.bind(TOKEN.Project.Http.Pages.posts).toProvider(HandlerProvider(PostsHandler));
+  app.bind(TOKEN.Project.Http.Pages.users).toProvider(HandlerProvider(UsersPageApp));
+  app.bind(TOKEN.Project.Http.Pages.posts).toProvider(HandlerProvider(PostsPageApp));
 
   return app;
 }

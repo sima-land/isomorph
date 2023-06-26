@@ -7,7 +7,7 @@ import { HttpApi } from '../../app/types';
 import { PostsPage, PostsSlice } from './parts';
 import { TOKEN } from '../../tokens';
 
-export function PostsHandler() {
+export function PostsPageApp() {
   const app = createApplication();
 
   app.preset(PresetHandler());
