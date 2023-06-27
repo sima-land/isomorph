@@ -3,21 +3,22 @@ import { ConventionalLabels } from './constants';
 
 /**
  * Распространенные метрики для Node.js приложения.
+ * @todo Унести это в пресет.
  */
 export interface DefaultNodeMetrics {
   /** Счетчик входящих запросов. */
-  requestCount: PromClient.Counter<typeof ConventionalLabels.HTTP_RESPONSE[number]>;
+  requestCount: PromClient.Counter<(typeof ConventionalLabels.HTTP_RESPONSE)[number]>;
 
   /** Гистограмма длительности ответа. */
-  responseDuration: PromClient.Histogram<typeof ConventionalLabels.HTTP_RESPONSE[number]>;
+  responseDuration: PromClient.Histogram<(typeof ConventionalLabels.HTTP_RESPONSE)[number]>;
 
   /** Гистограмма длительности SSR. */
-  renderDuration: PromClient.Histogram<typeof ConventionalLabels.SSR[number]>;
+  renderDuration: PromClient.Histogram<(typeof ConventionalLabels.SSR)[number]>;
 }
 
 /**
  * Возвращает набор готовых метрик по умолчанию для приложений.
- * @todo Возможно стоит унести это в пресет.
+ * @todo Унести это в пресет.
  * @return Набор метрик.
  */
 export function createDefaultMetrics(): DefaultNodeMetrics {
