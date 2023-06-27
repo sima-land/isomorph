@@ -49,7 +49,12 @@ export function PresetBrowser(customize?: PresetTuner): Preset {
 }
 
 export function provideConfigSource(): ConfigSource {
-  return createConfigSource(process.env);
+  // ВАЖНО: по умолчанию рассчитываем на process.env который предоставляется сборщиком (например webpack)
+  if (typeof process !== 'undefined' && process.env) {
+    return createConfigSource(process.env);
+  }
+
+  return createConfigSource({});
 }
 
 export function provideLogger(resolve: Resolve): Logger {

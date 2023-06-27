@@ -5,7 +5,7 @@ export interface Config extends BaseConfig {
   devtoolsEnabled: boolean;
 }
 
-export interface HttpApi {
+export interface Api {
   getUser(): Promise<SauceResponse<{ items: UserData[] }>>;
   getCurrencies(): Promise<SauceResponse<{ items: CurrencyData[] }>>;
 }

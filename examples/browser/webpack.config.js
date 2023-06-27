@@ -1,10 +1,10 @@
 const path = require('path');
+const dotenv = require('dotenv');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvPlugin } = require('@sima-land/isomorph/utils/webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { createConfigSource } = require('@sima-land/isomorph/config/node');
 
-const env = createConfigSource();
+dotenv.config({ path: './.env.development' });
 
 module.exports = {
   mode: 'development',
@@ -55,7 +55,7 @@ module.exports = {
       template: path.resolve(__dirname, 'src/index.ejs'),
       templateParameters: {
         options: {
-          rootElementId: env.require('APP_NAME'),
+          rootElementId: process.env.APP_NAME,
         },
       },
     }),

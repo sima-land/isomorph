@@ -2,15 +2,18 @@ import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { sauce } from '@sima-land/isomorph/http-client/sauce';
 import { PresetBrowser } from '@sima-land/isomorph/preset/browser';
 import { KnownToken } from '@sima-land/isomorph/tokens';
-import { HttpApi, Config } from '../types';
-import { TOKEN } from './tokens';
+import { Api, Config } from '../types';
+import { TOKEN } from '../tokens';
 
 export function ExampleApp() {
   const app = createApplication();
 
+  // используем пресет "browser" с базовыми компонентами, такими как logger и тд
   app.preset(PresetBrowser());
-  app.bind(TOKEN.config).toProvider(provideConfig);
-  app.bind(TOKEN.api).toProvider(provideApi);
+
+  // добавляем в приложение собственные компоненты
+  app.bind(TOKEN.Project.config).toProvider(provideConfig);
+  app.bind(TOKEN.Project.api).toProvider(provideApi);
 
   return app;
 }
@@ -25,7 +28,7 @@ export function provideConfig(resolve: Resolve): Config {
   };
 }
 
-export function provideApi(resolve: Resolve): HttpApi {
+export function provideApi(resolve: Resolve): Api {
   const knownHosts = resolve(KnownToken.Http.Api.knownHosts);
   const createClient = resolve(KnownToken.Http.Client.factory);
   const client = sauce(createClient({ baseURL: knownHosts.get('simaV3') }));
