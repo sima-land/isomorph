@@ -1,24 +1,23 @@
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { ErrorBoundary } from '@sima-land/isomorph/utils/react/error-handlers';
-import { ExampleApp } from './di/app';
-import { TOKEN } from './di/tokens';
-import { KnownToken } from '@sima-land/isomorph/tokens';
+import { ExampleApp } from './app';
+import { TOKEN } from './tokens';
 import { configureStore } from '@reduxjs/toolkit';
 import { Root } from './components/root';
 import { rootReducer } from './reducers';
 import { rootSaga } from './sagas';
 
 ExampleApp().invoke(
-  [TOKEN.config, KnownToken.logger, KnownToken.sagaMiddleware, TOKEN.api],
-  (config, logger, sagaMiddleware, api) => {
+  [TOKEN.Project.config, TOKEN.Lib.logger, TOKEN.Lib.sagaMiddleware, TOKEN.Project.api],
+  (config, logger, sagas, api) => {
     const container = document.getElementById(config.appName);
 
     if (container) {
       const store = configureStore({
         reducer: rootReducer,
         devTools: config.devtoolsEnabled && { name: `${config.appName} [${document.title}]` },
-        middleware: [sagaMiddleware],
+        middleware: [sagas],
       });
 
       render(
@@ -30,7 +29,7 @@ ExampleApp().invoke(
         container,
       );
 
-      sagaMiddleware.run(rootSaga, { api });
+      sagas.run(rootSaga, { api });
     }
   },
 );
