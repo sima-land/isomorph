@@ -1,6 +1,6 @@
 import { createToken } from './di';
 import type * as express from 'express';
-import type { PageAssets, PageTemplate, HandlerContext } from './http-server/types';
+import type { PageAssets, HandlerContext } from './http-server/types';
 import type { SagaExtendedMiddleware } from './utils/redux-saga';
 import type { Logger } from './log/types';
 import type { HttpClientFactory } from './http-client/types';
@@ -13,6 +13,7 @@ import type { StrictMap, KnownHttpApiKey } from './preset/parts/types';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { PageResponse } from './http-server/utils';
 import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
+import type { ElementType, ReactNode } from 'react';
 
 export const KnownToken = {
   // config
@@ -28,6 +29,7 @@ export const KnownToken = {
   logger: createToken<Logger>('logger'),
 
   // saga runner
+  // @todo переименовать в Redux.Middleware.saga?
   sagaMiddleware: createToken<SagaExtendedMiddleware>('saga-middleware'),
 
   // tracing
@@ -50,6 +52,8 @@ export const KnownToken = {
     Api: {
       knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http/api/known-hosts'),
     },
+
+    // @todo переименовать в Axios?
     Client: {
       factory: createToken<HttpClientFactory>('client/factory'),
       Middleware: {
@@ -58,9 +62,11 @@ export const KnownToken = {
         },
       },
     },
+
+    // @todo переименовать в Express?
     Server: {
       factory: createToken<() => express.Application>('server/factory'),
-      Handler: {
+      Handlers: {
         healthCheck: createToken<express.Handler>('handler/health-check'),
       },
       Middleware: {
@@ -71,6 +77,8 @@ export const KnownToken = {
         error: createToken<express.ErrorRequestHandler>('middleware/error'),
       },
     },
+
+    // @todo переименовать в ExpressHandler?
     Handler: {
       main: createToken<() => void>('handler/main'),
       context: createToken<HandlerContext>('handler/context'),
@@ -78,13 +86,13 @@ export const KnownToken = {
         specificParams: createToken<Record<string, unknown>>('request/specific-params'),
       },
       Response: {
+        // @todo заменить на specificExtra с единственным методом setMeta?
         builder: createToken<PageResponse>('response/builder'),
-        Page: {
-          assets: createToken<PageAssets | (() => PageAssets | Promise<PageAssets>)>('page/assets'),
-          template: createToken<PageTemplate>('page/template'),
-          prepare: createToken<() => JSX.Element | Promise<JSX.Element>>('page/prepare'),
-          render: createToken<(element: JSX.Element) => string | Promise<string>>('page/render'),
-        },
+      },
+      Page: {
+        assets: createToken<PageAssets | (() => PageAssets | Promise<PageAssets>)>('page/assets'),
+        helmet: createToken<ElementType<{ children: ReactNode }>>('page/helmet'),
+        render: createToken<() => JSX.Element | Promise<JSX.Element>>('page/render'),
       },
     },
   },

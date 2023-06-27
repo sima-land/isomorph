@@ -16,11 +16,11 @@ import { Resolve, Preset, createPreset } from '../../di';
 import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
 import { tracingMiddleware } from '../../http-server/middleware/tracing';
 
-// nodejs specific packages
+// Node.js specific packages
 import os from 'node:os';
 import path from 'node:path';
 
-// nodejs libraries (not isomorphic)
+// Node.js libraries (not isomorphic)
 import { config as applyDotenv } from 'dotenv';
 import { create } from 'middleware-axios';
 import { init, Handlers, getCurrentHub } from '@sentry/node';
@@ -76,7 +76,7 @@ export function PresetNode(customize?: PresetTuner): Preset {
 
   // http server
   preset.set(KnownToken.Http.Server.factory, () => Express);
-  preset.set(KnownToken.Http.Server.Handler.healthCheck, () => healthCheck());
+  preset.set(KnownToken.Http.Server.Handlers.healthCheck, () => healthCheck());
   preset.set(KnownToken.Http.Server.Middleware.request, () => Handlers.requestHandler());
   preset.set(KnownToken.Http.Server.Middleware.log, provideHttpServerLogMiddleware);
   preset.set(KnownToken.Http.Server.Middleware.metrics, provideHttpServerMetricsMiddleware);

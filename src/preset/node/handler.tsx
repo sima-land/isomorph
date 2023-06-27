@@ -1,11 +1,9 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { PageTemplate } from '../../http-server/types';
 import type { Handler } from 'express';
 import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { renderToString } from 'react-dom/server';
 import { RESPONSE_EVENT } from '../../http-server/constants';
-import { pageTemplate } from '../../http-server/template';
 import { getRequestHeaders, PageResponse } from '../../http-server/utils';
 import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
@@ -17,6 +15,8 @@ import { SSRError } from '../../http-server/errors';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
 import { HttpStatus } from '../parts/utils';
 import { PresetTuner } from '../parts/types';
+import { ConventionalJson, PageAssets } from '../../http-server/types';
+import { createContext, Fragment, ReactNode, useContext } from 'react';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -39,9 +39,9 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Http.Handler.main, provideMain);
   preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
   preset.set(KnownToken.Http.Handler.Response.builder, () => new PageResponse());
-  preset.set(KnownToken.Http.Handler.Response.Page.assets, () => ({ js: '', css: '' }));
-  preset.set(KnownToken.Http.Handler.Response.Page.template, provideTemplate);
-  preset.set(KnownToken.Http.Handler.Response.Page.render, provideRender);
+  preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));
+  preset.set(KnownToken.Http.Handler.Page.helmet, providePageHelmet);
+  preset.set(KnownToken.Http.Handler.Page.render, providePageRender);
 
   if (customize) {
     customize({ override: preset.set.bind(preset) });
@@ -88,50 +88,77 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   };
 }
 
-export function provideRender(resolve: Resolve): (element: JSX.Element) => string {
-  const { res } = resolve(KnownToken.Http.Handler.context);
+export function provideMain(resolve: Resolve): VoidFunction {
+  const config = resolve(KnownToken.Config.base);
+  const logger = resolve(KnownToken.logger);
+  const assetsInit = resolve(KnownToken.Http.Handler.Page.assets);
+  const render = resolve(KnownToken.Http.Handler.Page.render);
+  const builder = resolve(KnownToken.Http.Handler.Response.builder);
+  const Helmet = resolve(KnownToken.Http.Handler.Page.helmet);
+  const { req, res } = resolve(KnownToken.Http.Handler.context);
 
-  return function render(element: JSX.Element): string {
+  const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
+
+  const elementToString = (element: JSX.Element) => {
     res.emit(RESPONSE_EVENT.renderStart);
-
     const result = renderToString(element);
-
     res.emit(RESPONSE_EVENT.renderFinish);
 
     return result;
   };
-}
-
-export function provideTemplate(resolve: Resolve): PageTemplate {
-  const config = resolve(KnownToken.Config.base);
-
-  return function template(data) {
-    return data.type === 'html'
-      ? pageTemplate({ ...data, title: `[dev] ${config.appName}` })
-      : data.markup;
-  };
-}
-
-export function provideMain(resolve: Resolve): VoidFunction {
-  const logger = resolve(KnownToken.logger);
-  const context = resolve(KnownToken.Http.Handler.context);
-  const assets = resolve(KnownToken.Http.Handler.Response.Page.assets);
-  const prepare = resolve(KnownToken.Http.Handler.Response.Page.prepare);
-  const render = resolve(KnownToken.Http.Handler.Response.Page.render);
-  const template = resolve(KnownToken.Http.Handler.Response.Page.template);
-  const builder = resolve(KnownToken.Http.Handler.Response.builder);
-
-  const getAssets = typeof assets === 'function' ? assets : () => assets;
 
   return async function main() {
     try {
-      // @todo это билдер ответа но в ответе может не быть markup, assets и тд, подумать и переделать
-      builder
-        .markup(await render(await prepare()))
-        .assets(await getAssets())
-        .format(PageResponse.defineFormat(context.req))
-        .template(template)
-        .send(context.res);
+      const assets = await getAssets();
+      const meta = builder.getMeta();
+
+      const jsx = (
+        <HelmetContext.Provider value={{ title: config.appName, assets }}>
+          <Helmet>{await render()}</Helmet>
+        </HelmetContext.Provider>
+      );
+
+      switch (PageResponse.defineFormat(req)) {
+        case 'html': {
+          res.setHeader('simaland-bundle-js', assets.js);
+          res.setHeader('simaland-bundle-css', assets.css);
+
+          if (assets.criticalJs) {
+            res.setHeader('simaland-critical-js', assets.criticalJs);
+          }
+
+          if (assets.criticalCss) {
+            res.setHeader('simaland-critical-css', assets.criticalCss);
+          }
+
+          if (meta) {
+            res.setHeader('simaland-meta', JSON.stringify(meta));
+          }
+
+          // ВАЖНО: DOCTYPE обязательно нужен так как влияет на то как браузер будет парсить html/css
+          // ВАЖНО: DOCTYPE нужен только когда отдаем полноценную страницу
+          if (config.env === 'development') {
+            res.send(`<!DOCTYPE html>${elementToString(jsx)}`);
+          } else {
+            res.send(elementToString(jsx));
+          }
+          break;
+        }
+
+        case 'json': {
+          res.json(
+            JSON.stringify({
+              markup: elementToString(jsx),
+              bundle_js: assets.js,
+              bundle_css: assets.css,
+              critical_js: assets.criticalJs,
+              critical_css: assets.criticalCss,
+              meta,
+            } satisfies ConventionalJson),
+          );
+          break;
+        }
+      }
     } catch (error) {
       let message;
       let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
@@ -146,10 +173,28 @@ export function provideMain(resolve: Resolve): VoidFunction {
         message = String(error);
       }
 
-      context.res.status(statusCode).send(message);
+      res.status(statusCode).send(message);
       logger.error(error);
     }
   };
+}
+
+function providePageRender() {
+  return () => (
+    <>
+      <h1>Hello, world!</h1>
+      <p>This is a stub page. Define the render component in your handler</p>
+    </>
+  );
+}
+
+function providePageHelmet(resolve: Resolve) {
+  const config = resolve(KnownToken.Config.base);
+  const { req } = resolve(KnownToken.Http.Handler.context);
+
+  return config.env === 'development' && PageResponse.defineFormat(req) === 'html'
+    ? RegularHelmet
+    : Fragment;
 }
 
 export function provideSpecificParams(resolve: Resolve): Record<string, unknown> {
@@ -187,4 +232,44 @@ export function HandlerProvider(getApp: () => Application) {
       app.get(KnownToken.Http.Handler.main)();
     };
   };
+}
+
+const HelmetContext = createContext<{ title?: string; assets?: PageAssets }>({});
+
+const resetCSS = `
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system,BlinkMacSystemFont,'Source Sans Pro',"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,Arial,sans-serif;
+  margin: 0;
+}
+`;
+
+function RegularHelmet({ children }: { children?: ReactNode }) {
+  const { title, assets } = useContext(HelmetContext);
+
+  return (
+    <html>
+      <head>
+        <meta charSet='UTF-8' />
+        <meta httpEquiv='X-UA-Compatible' content='IE=edge' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <title>{title ?? 'Document'}</title>
+        <link
+          href='https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&amp;display=swap'
+          rel='stylesheet'
+        />
+        <style dangerouslySetInnerHTML={{ __html: resetCSS }} />
+
+        {assets?.criticalCss && <link rel='stylesheet' href={assets.criticalCss} />}
+        {assets?.css && <link rel='stylesheet' href={assets.css} />}
+        {assets?.criticalJs && <script src={assets.criticalJs} />}
+      </head>
+      <body>
+        {children}
+        {assets?.js && <script src={assets.js} />}
+      </body>
+    </html>
+  );
 }

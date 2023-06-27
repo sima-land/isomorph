@@ -1,5 +1,5 @@
 import type { Handler, Request, Response } from 'express';
-import type { ConventionalJson, PageAssets, PageTemplate, PageTemplateData } from './types';
+import type { ConventionalJson, PageAssets } from './types';
 import type { BaseConfig } from '../config/types';
 import net from 'node:net';
 
@@ -71,7 +71,6 @@ export class PageResponse {
   private html: string;
   private _meta: any;
   private _assets: PageAssets;
-  private _template: PageTemplate;
 
   static defineFormat(req: Request): PageResponse['type'] {
     let result: PageResponse['type'] = 'html';
@@ -83,15 +82,10 @@ export class PageResponse {
     return result;
   }
 
-  static defaultTemplate({ markup }: PageTemplateData) {
-    return markup;
-  }
-
   constructor() {
     this.type = 'html';
     this.html = '';
     this._assets = { js: '', css: '' };
-    this._template = PageResponse.defaultTemplate;
   }
 
   markup(html: string) {
@@ -109,27 +103,20 @@ export class PageResponse {
     return this;
   }
 
-  template(template: PageTemplate) {
-    this._template = template;
-    return this;
-  }
-
   meta(meta: any): this {
     this._meta = meta;
     return this;
   }
 
-  send(res: Response) {
-    const templateData: PageTemplateData = {
-      type: this.type,
-      markup: this.html,
-      assets: this._assets,
-    };
+  getMeta(): unknown {
+    return this._meta;
+  }
 
+  send(res: Response) {
     switch (this.type) {
       case 'json': {
         const result: ConventionalJson = {
-          markup: this._template(templateData),
+          markup: this.html,
           bundle_js: this._assets.js,
           bundle_css: this._assets.css,
           critical_js: this._assets.criticalJs,
@@ -156,7 +143,7 @@ export class PageResponse {
           res.setHeader('simaland-meta', JSON.stringify(this._meta));
         }
 
-        res.send(this._template(templateData));
+        res.send(this.markup);
         break;
       }
       default:
