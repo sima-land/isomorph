@@ -14,16 +14,6 @@ export interface PageAssets {
   criticalCss?: string;
 }
 
-export interface PageTemplateData {
-  markup: string;
-  assets: PageAssets;
-  type: 'json' | 'html';
-}
-
-export interface PageTemplate {
-  (data: PageTemplateData): string;
-}
-
 // @todo перенести в пресеты
 export interface ConventionalJson {
   markup: string;
