@@ -16,7 +16,7 @@
 
 ## Установка
 
-```bash
+```sh
 # npm
 npm i -S @sima-land/isomorph
 

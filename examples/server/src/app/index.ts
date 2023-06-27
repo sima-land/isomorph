@@ -14,7 +14,7 @@ export function MainApp() {
   // используем пресет "node" с базовыми компонентами, такими как logger и тд
   app.preset(PresetNode());
 
-  // добавляем в приложение компоненты
+  // добавляем в приложение собственные компоненты
   app.bind(TOKEN.Project.config).toProvider(provideAppConfig);
   app.bind(TOKEN.Project.Http.server).toProvider(provideHttpServer);
   app.bind(TOKEN.Project.Http.Pages.users).toProvider(HandlerProvider(UsersPageApp));

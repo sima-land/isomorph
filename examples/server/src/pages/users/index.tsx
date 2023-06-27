@@ -10,10 +10,16 @@ import { TOKEN } from '../../tokens';
 export function UsersPageApp() {
   const app = createApplication();
 
-  app.preset(PresetHandler());
+  // используем пресет "page handler"
+  app.preset(
+    // переопределяем провайдеры пресета
+    PresetHandler(({ override }) => {
+      override(TOKEN.Lib.Http.Handler.Page.render, provideRender);
+    }),
+  );
 
+  // добавляем в приложение собственные компоненты
   app.bind(TOKEN.Project.Http.api).toProvider(provideHttpApi);
-  app.bind(TOKEN.Lib.Http.Handler.Response.Page.prepare).toProvider(provideRender);
 
   return app;
 }
