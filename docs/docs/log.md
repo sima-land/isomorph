@@ -55,21 +55,6 @@ const middleware = logMiddleware({
 client.use(middleware);
 ```
 
-### Middleware для express-приложения
-
-Аналогичная утилита предоставляется для express-приложений. Созданный промежуточный слой будет сообщать логгеру базовую информацию о входящем запросе и ответе.
-
-```ts
-import { logMiddleware } from '@sima-land/isomorph/http-server/middleware/log';
-import { createLogger } from '@sima-land/isomorph/log';
-import express from 'express';
-
-const logger = createLogger();
-const app = express();
-
-app.use(config, logMiddleware(logger));
-```
-
 ### Сбор ошибок
 
 Для отслеживания ошибок мы используем преимущественно **Sentry**. Отправку ошибок и других событий в Sentry можно реализовать используя Logger со специальным обработчиком для Sentry.
@@ -97,11 +82,11 @@ logger.subscribe(createSentryHandler(sentryHub));
 Любые данные, переданные логгеру через метод `error` также будут отправлены в Sentry.
 
 ```ts
-import { SentryError, SentryBreadcrumb } from '@sima-land/isomorph/log';
+import { DetailedError, Breadcrumb } from '@sima-land/isomorph/log';
 
 // отправка ошибки
 logger.error(
-  new SentryError('something wrong', {
+  new DetailedError('something wrong', {
     extra: {
       key: 'something',
       data: 'wrong',
@@ -111,7 +96,7 @@ logger.error(
 
 // отправка "хлебной крошки"
 logger.info(
-  new SentryBreadcrumb({
+  new Breadcrumb({
     category: 'something happens',
     data: {
       foo: 1,

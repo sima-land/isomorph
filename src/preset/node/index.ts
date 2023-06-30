@@ -5,10 +5,6 @@ import { ConfigSource, createConfigSource } from '../../config';
 import { createLogger } from '../../log';
 import { createPinoHandler } from '../../log/handler/pino';
 import { createSentryHandler } from '../../log/handler/sentry';
-import {
-  responseMetricsMiddleware,
-  renderMetricsMiddleware,
-} from '../../http-server/middleware/metrics';
 import { HttpApiHostPool } from '../parts/utils';
 import { KnownToken } from '../../tokens';
 import { provideBaseConfig } from '../parts/providers';
@@ -25,7 +21,7 @@ import { config as applyDotenv } from 'dotenv';
 import { create } from 'middleware-axios';
 import { init, Handlers, getCurrentHub } from '@sentry/node';
 import * as PromClient from 'prom-client';
-import Express, { Application, Handler } from 'express';
+import Express, { Application, Handler, Request, Response } from 'express';
 import pino from 'pino';
 import PinoPretty from 'pino-pretty';
 
@@ -42,9 +38,9 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { healthCheck } from '../../http-server/handler/health-check';
-import { composeMiddleware, getXClientIp } from '../../http-server/utils';
-import { createDefaultMetrics } from '../../metrics/node';
+import { getXClientIp } from '../../http-server/utils';
 import { toMilliseconds } from '../../utils/number';
+import { RESPONSE_EVENT } from '../../http-server/constants';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -233,17 +229,72 @@ export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
 
 export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
-  const metrics = createDefaultMetrics();
 
-  return composeMiddleware([
-    responseMetricsMiddleware(config, {
-      counter: metrics.requestCount,
-      histogram: metrics.responseDuration,
-    }),
-    renderMetricsMiddleware(config, {
-      histogram: metrics.renderDuration,
-    }),
-  ]);
+  const ConventionalLabels = {
+    HTTP_RESPONSE: ['version', 'route', 'code', 'method'],
+    SSR: ['version', 'route', 'method'],
+  } as const;
+
+  const requestCount = new PromClient.Counter({
+    name: 'http_request_count',
+    help: 'Incoming HTTP request count',
+    labelNames: ConventionalLabels.HTTP_RESPONSE,
+  });
+
+  const responseDuration = new PromClient.Histogram({
+    name: 'http_response_duration_ms',
+    help: 'Duration of incoming HTTP requests in ms',
+    labelNames: ConventionalLabels.HTTP_RESPONSE,
+    buckets: [30, 100, 200, 500, 1000, 2500, 5000, 10000],
+  });
+
+  const renderDuration = new PromClient.Histogram({
+    name: 'render_duration_ms',
+    help: 'Duration of SSR ms',
+    labelNames: ConventionalLabels.SSR,
+    buckets: [0.1, 15, 50, 100, 250, 500, 800, 1500],
+  });
+
+  const getLabels = (
+    req: Request,
+    res: Response,
+  ): Record<(typeof ConventionalLabels.HTTP_RESPONSE)[number], string | number> => ({
+    version: config.appVersion,
+    route: req.baseUrl + req.path,
+    code: res.statusCode,
+    method: req.method,
+  });
+
+  return (req, res, next) => {
+    const responseStart = process.hrtime.bigint();
+
+    requestCount.inc(getLabels(req, res), 1);
+
+    res.once(RESPONSE_EVENT.renderStart, () => {
+      const renderStart = process.hrtime.bigint();
+
+      res.once(RESPONSE_EVENT.renderFinish, () => {
+        const renderFinish = process.hrtime.bigint();
+
+        renderDuration.observe(
+          {
+            version: config.appVersion,
+            method: req.method,
+            route: req.baseUrl + req.path,
+          },
+          toMilliseconds(renderStart - renderFinish),
+        );
+      });
+    });
+
+    res.once('finish', () => {
+      const responseFinish = process.hrtime.bigint();
+
+      responseDuration.observe(getLabels(req, res), toMilliseconds(responseFinish - responseStart));
+    });
+
+    next();
+  };
 }
 
 export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
