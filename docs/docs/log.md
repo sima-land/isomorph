@@ -82,11 +82,11 @@ logger.subscribe(createSentryHandler(sentryHub));
 Любые данные, переданные логгеру через метод `error` также будут отправлены в Sentry.
 
 ```ts
-import { SentryError, SentryBreadcrumb } from '@sima-land/isomorph/log';
+import { DetailedError, Breadcrumb } from '@sima-land/isomorph/log';
 
 // отправка ошибки
 logger.error(
-  new SentryError('something wrong', {
+  new DetailedError('something wrong', {
     extra: {
       key: 'something',
       data: 'wrong',
@@ -96,7 +96,7 @@ logger.error(
 
 // отправка "хлебной крошки"
 logger.info(
-  new SentryBreadcrumb({
+  new Breadcrumb({
     category: 'something happens',
     data: {
       foo: 1,
