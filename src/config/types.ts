@@ -16,3 +16,10 @@ export interface BaseConfig {
   /** Версия приложения. */
   appVersion: string;
 }
+
+/**
+ * Словарь.
+ */
+export interface Dictionary {
+  readonly [key: string]: string | undefined;
+}

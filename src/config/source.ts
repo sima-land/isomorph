@@ -1,11 +1,7 @@
-import type { ConfigSource } from './types';
+import type { ConfigSource, Dictionary } from './types';
 import { Env } from '@humanwhocodes/env';
 
 declare const __ISOMORPH_ENV__: unknown;
-
-interface Dictionary {
-  readonly [key: string]: string | undefined;
-}
 
 /**
  * Возвращает новый источник конфигурации.
