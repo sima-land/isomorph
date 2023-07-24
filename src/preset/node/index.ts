@@ -11,6 +11,10 @@ import { provideBaseConfig } from '../parts/providers';
 import { Resolve, Preset, createPreset } from '../../di';
 import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
 import { tracingMiddleware } from '../../http-server/middleware/tracing';
+import { healthCheck } from '../../http-server/handler/health-check';
+import { getXClientIp } from '../../http-server/utils';
+import { toMilliseconds } from '../../utils/number';
+import { RESPONSE_EVENT } from '../../http-server/constants';
 
 // Node.js specific packages
 import os from 'node:os';
@@ -37,10 +41,6 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { healthCheck } from '../../http-server/handler/health-check';
-import { getXClientIp } from '../../http-server/utils';
-import { toMilliseconds } from '../../utils/number';
-import { RESPONSE_EVENT } from '../../http-server/constants';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -158,11 +158,8 @@ export function provideTracer(resolve: Resolve): Tracer {
 export function provideSpanExporter(resolve: Resolve): SpanExporter {
   const source = resolve(KnownToken.Config.source);
 
-  const host = source.require('JAEGER_AGENT_HOST');
-  const port = source.require('JAEGER_AGENT_PORT');
-
   return new OTLPTraceExporter({
-    url: port ? `${host}:${port}` : host,
+    url: source.require('JAEGER_AGENT_URL'),
   });
 }
 
