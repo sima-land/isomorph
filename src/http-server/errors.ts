@@ -1,15 +1,6 @@
-/**
- * Ошибка в процессе серверного рендеринга.
- */
-export class SSRError extends Error {
-  statusCode: number;
+import { ResponseError } from '../http/errors';
 
-  /**
-   * @param message Сообщение.
-   * @param statusCode Код ответа.
-   */
-  constructor(message: string, statusCode = 500) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
+/**
+ * @deprecated Следует использовать ResponseError.
+ */
+export const SSRError = ResponseError;

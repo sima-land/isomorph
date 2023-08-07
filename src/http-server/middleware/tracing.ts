@@ -19,14 +19,15 @@ export function tracingMiddleware(tracer: Tracer): Handler {
     res.locals.tracing = {
       rootSpan,
       rootContext,
+      renderSpan: null,
     };
 
     res.once(RESPONSE_EVENT.renderStart, () => {
       res.locals.tracing.renderSpan = tracer.startSpan('render', undefined, rootContext);
-    });
 
-    res.once(RESPONSE_EVENT.renderFinish, () => {
-      res.locals.tracing.renderSpan.end();
+      res.once(RESPONSE_EVENT.renderFinish, () => {
+        res.locals.tracing.renderSpan.end();
+      });
     });
 
     res.once('finish', () => {

@@ -11,7 +11,7 @@ import { tracingMiddleware } from '../../http-client/middleware/tracing';
 import { logMiddleware } from '../../http-client/middleware/log';
 import { passHeadersMiddleware } from '../../http-client/middleware/headers';
 import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
-import { SSRError } from '../../http-server/errors';
+import { ResponseError } from '../../http';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
 import { HttpStatus } from '../parts/utils';
 import { PresetTuner } from '../parts/types';
@@ -166,7 +166,7 @@ export function provideMain(resolve: Resolve): VoidFunction {
       if (error instanceof Error) {
         message = error.message;
 
-        if (error instanceof SSRError) {
+        if (error instanceof ResponseError) {
           statusCode = error.statusCode;
         }
       } else {
