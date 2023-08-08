@@ -1,10 +1,10 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { Handler } from 'express';
+import type { Handler, Request } from 'express';
 import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { renderToString } from 'react-dom/server';
 import { RESPONSE_EVENT } from '../../http-server/constants';
-import { getRequestHeaders, PageResponse } from '../../http-server/utils';
+import { getRequestHeaders } from '../../http-server/utils';
 import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
 import { tracingMiddleware } from '../../http-client/middleware/tracing';
@@ -38,7 +38,7 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   // http handler
   preset.set(KnownToken.Http.Handler.main, provideMain);
   preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
-  preset.set(KnownToken.Http.Handler.Response.builder, () => new PageResponse());
+  preset.set(KnownToken.Http.Handler.Response.specificExtras, () => new SpecificExtras());
   preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));
   preset.set(KnownToken.Http.Handler.Page.helmet, providePageHelmet);
   preset.set(KnownToken.Http.Handler.Page.render, providePageRender);
@@ -93,7 +93,7 @@ export function provideMain(resolve: Resolve): VoidFunction {
   const logger = resolve(KnownToken.logger);
   const assetsInit = resolve(KnownToken.Http.Handler.Page.assets);
   const render = resolve(KnownToken.Http.Handler.Page.render);
-  const builder = resolve(KnownToken.Http.Handler.Response.builder);
+  const extras = resolve(KnownToken.Http.Handler.Response.specificExtras);
   const Helmet = resolve(KnownToken.Http.Handler.Page.helmet);
   const { req, res } = resolve(KnownToken.Http.Handler.context);
 
@@ -110,7 +110,7 @@ export function provideMain(resolve: Resolve): VoidFunction {
   return async function main() {
     try {
       const assets = await getAssets();
-      const meta = builder.getMeta();
+      const meta = extras.getMeta();
 
       const jsx = (
         <HelmetContext.Provider value={{ title: config.appName, assets }}>
@@ -118,7 +118,7 @@ export function provideMain(resolve: Resolve): VoidFunction {
         </HelmetContext.Provider>
       );
 
-      switch (PageResponse.defineFormat(req)) {
+      switch (getResponseFormat(req)) {
         case 'html': {
           res.setHeader('simaland-bundle-js', assets.js);
           res.setHeader('simaland-bundle-css', assets.css);
@@ -192,7 +192,7 @@ function providePageHelmet(resolve: Resolve) {
   const config = resolve(KnownToken.Config.base);
   const { req } = resolve(KnownToken.Http.Handler.context);
 
-  return config.env === 'development' && PageResponse.defineFormat(req) === 'html'
+  return config.env === 'development' && getResponseFormat(req) === 'html'
     ? RegularHelmet
     : Fragment;
 }
@@ -272,4 +272,35 @@ function RegularHelmet({ children }: { children?: ReactNode }) {
       </body>
     </html>
   );
+}
+
+/**
+ * Специфичные для наших микросервисов meta-данные.
+ */
+export class SpecificExtras {
+  private _meta: any;
+
+  meta(meta: any): this {
+    this._meta = meta;
+    return this;
+  }
+
+  getMeta(): unknown {
+    return this._meta;
+  }
+}
+
+/**
+ * Определит формат ответа.
+ * @param req Запрос.
+ * @return Формат.
+ */
+function getResponseFormat(req: Request): 'html' | 'json' {
+  let result: 'html' | 'json' = 'html';
+
+  if ((req.header('accept') || '').toLowerCase().includes('application/json')) {
+    result = 'json';
+  }
+
+  return result;
 }
