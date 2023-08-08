@@ -334,8 +334,9 @@ export function getRequestHeaders(config: BaseConfig, request: Request): Record<
 
   // добавляем специфичные заголовки
   for (const key of Object.keys(request.headers)) {
-    if (key.toLowerCase().indexOf('simaland-') === 0) {
-      result[key] = request.header(key) ?? '';
+    const value = request.header(key);
+    if (key.toLowerCase().indexOf('simaland-') === 0 && value) {
+      result[key] = value;
     }
   }
 
@@ -354,5 +355,5 @@ export function getClientIp(request: Request): string | undefined {
     request.socket.remoteAddress ||
     '';
 
-  return net.isIP(headerValue) ? headerValue : '';
+  return net.isIP(headerValue) ? headerValue : undefined;
 }

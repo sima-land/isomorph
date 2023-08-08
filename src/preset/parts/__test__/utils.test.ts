@@ -12,7 +12,10 @@ import {
   SagaLogging,
   severityFromStatus,
   HttpStatus,
+  getRequestHeaders,
 } from '../utils';
+import { Request } from 'express';
+import { BaseConfig } from '../../../config';
 
 const logger: Logger = {
   log: jest.fn(),
@@ -466,3 +469,74 @@ describe('HttpStatus', () => {
     });
   });
 });
+
+describe('getRequestHeaders', () => {
+  it('should return headers', () => {
+    const config: BaseConfig = {
+      appName: 'foo',
+      appVersion: '0.0.1',
+      env: 'test',
+    };
+
+    const request: Request = {
+      socket: {
+        remoteAddress: '127.0.0.1',
+      },
+      headers: {
+        cookie: 'userid=12345',
+        'simaland-a': 'aaa',
+        'simaland-b': 'bbb',
+      },
+      get(key: string) {
+        return this.headers[key];
+      },
+      header(key: string) {
+        return this.headers[key];
+      },
+    } as any;
+
+    const result = getRequestHeaders(config, request);
+
+    expect(result).toEqual({
+      'X-Client-Ip': '127.0.0.1',
+      'User-Agent': `simaland-foo/0.0.1`,
+      Cookie: 'userid=12345',
+      'simaland-a': 'aaa',
+      'simaland-b': 'bbb',
+    });
+  });
+
+  it('should return headers when ip,cookie is empty', () => {
+    const config: BaseConfig = {
+      appName: 'foo',
+      appVersion: '0.0.1',
+      env: 'test',
+    };
+
+    const request: Request = {
+      socket: {
+        remoteAddress: undefined,
+      },
+      headers: {},
+      get(key: string) {
+        return this.headers[key];
+      },
+      header(key: string) {
+        return this.headers[key];
+      },
+    } as any;
+
+    const result = getRequestHeaders(config, request);
+
+    expect(result).toEqual({
+      'X-Client-Ip': '',
+      'User-Agent': `simaland-foo/0.0.1`,
+    });
+  });
+});
+
+// describe('getClientIp', () => {
+//   it('',() => {
+
+//   });
+// });
