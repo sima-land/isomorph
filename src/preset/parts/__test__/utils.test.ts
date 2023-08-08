@@ -506,7 +506,7 @@ describe('getRequestHeaders', () => {
     });
   });
 
-  it('should return headers when ip,cookie is empty', () => {
+  it('should return headers when lot of data is undefined', () => {
     const config: BaseConfig = {
       appName: 'foo',
       appVersion: '0.0.1',
@@ -529,14 +529,7 @@ describe('getRequestHeaders', () => {
     const result = getRequestHeaders(config, request);
 
     expect(result).toEqual({
-      'X-Client-Ip': '',
       'User-Agent': `simaland-foo/0.0.1`,
     });
   });
 });
-
-// describe('getClientIp', () => {
-//   it('',() => {
-
-//   });
-// });

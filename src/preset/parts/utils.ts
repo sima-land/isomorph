@@ -327,10 +327,18 @@ export abstract class HttpStatus {
  */
 export function getRequestHeaders(config: BaseConfig, request: Request): Record<string, string> {
   const result: Record<string, string> = {
-    'X-Client-Ip': getClientIp(request) ?? '',
     'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
-    Cookie: request.get('cookie') || '',
   };
+
+  const clientIp = getClientIp(request);
+  if (clientIp) {
+    result['X-Client-Ip'] = clientIp;
+  }
+
+  const cookie = request.get('cookie');
+  if (cookie) {
+    result.Cookie = cookie;
+  }
 
   // добавляем специфичные заголовки
   for (const key of Object.keys(request.headers)) {
