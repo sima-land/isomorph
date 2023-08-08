@@ -10,9 +10,9 @@ import { KnownToken } from '../../tokens';
 import { provideBaseConfig } from '../parts/providers';
 import { Resolve, Preset, createPreset } from '../../di';
 import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
-import { healthCheck } from '../../http-server/handler/health-check';
+import { healthCheck } from '../../utils/express/handler/health-check';
 import { toMilliseconds } from '../../utils/number';
-import { RESPONSE_EVENT } from '../../http-server/constants';
+import { RESPONSE_EVENT_TYPE } from '../parts/constants';
 
 // Node.js specific packages
 import os from 'node:os';
@@ -265,10 +265,10 @@ export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
 
     requestCount.inc(getLabels(req, res), 1);
 
-    res.once(RESPONSE_EVENT.renderStart, () => {
+    res.once(RESPONSE_EVENT_TYPE.renderStart, () => {
       const renderStart = process.hrtime.bigint();
 
-      res.once(RESPONSE_EVENT.renderFinish, () => {
+      res.once(RESPONSE_EVENT_TYPE.renderFinish, () => {
         const renderFinish = process.hrtime.bigint();
 
         renderDuration.observe(
@@ -328,10 +328,10 @@ export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
       renderSpan: null,
     };
 
-    res.once(RESPONSE_EVENT.renderStart, () => {
+    res.once(RESPONSE_EVENT_TYPE.renderStart, () => {
       res.locals.tracing.renderSpan = tracer.startSpan('render', undefined, rootContext);
 
-      res.once(RESPONSE_EVENT.renderFinish, () => {
+      res.once(RESPONSE_EVENT_TYPE.renderFinish, () => {
         res.locals.tracing.renderSpan.end();
       });
     });
