@@ -3,7 +3,7 @@ import type { Handler, Request } from 'express';
 import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { renderToString } from 'react-dom/server';
-import { RESPONSE_EVENT } from '../../http-server/constants';
+import { RESPONSE_EVENT_TYPE } from '../parts/constants';
 import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
 import { tracingMiddleware } from '../../http-client/middleware/tracing';
@@ -13,8 +13,7 @@ import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 import { ResponseError } from '../../http';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
 import { HttpStatus, getRequestHeaders } from '../parts/utils';
-import { PresetTuner } from '../parts/types';
-import { ConventionalJson, PageAssets } from '../../http-server/types';
+import { ConventionalJson, PageAssets, PresetTuner } from '../parts/types';
 import { createContext, Fragment, ReactNode, useContext } from 'react';
 
 /**
@@ -99,9 +98,9 @@ export function provideMain(resolve: Resolve): VoidFunction {
   const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
   const elementToString = (element: JSX.Element) => {
-    res.emit(RESPONSE_EVENT.renderStart);
+    res.emit(RESPONSE_EVENT_TYPE.renderStart);
     const result = renderToString(element);
-    res.emit(RESPONSE_EVENT.renderFinish);
+    res.emit(RESPONSE_EVENT_TYPE.renderFinish);
 
     return result;
   };
