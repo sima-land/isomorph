@@ -10,7 +10,6 @@ import { KnownToken } from '../../tokens';
 import { provideBaseConfig } from '../parts/providers';
 import { Resolve, Preset, createPreset } from '../../di';
 import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
-import { tracingMiddleware } from '../../http-server/middleware/tracing';
 import { healthCheck } from '../../http-server/handler/health-check';
 import { getXClientIp } from '../../http-server/utils';
 import { toMilliseconds } from '../../utils/number';
@@ -30,7 +29,7 @@ import pino from 'pino';
 import PinoPretty from 'pino-pretty';
 
 // opentelemetry
-import type { Tracer } from '@opentelemetry/api';
+import { propagation, ROOT_CONTEXT, trace, type Tracer } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   BatchSpanProcessor,
@@ -297,7 +296,53 @@ export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
 export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
   const tracer = resolve(KnownToken.Tracing.tracer);
 
-  return tracingMiddleware(tracer);
+  /**
+   * Возвращает набор стандартных атрибутов для спана.
+   * @param req Входящий http-запрос.
+   * @return Атрибуты.
+   */
+  const getConventionalRequestAttrs = (req: Request): Record<string, string | undefined> => {
+    const result: Record<string, string | undefined> = {
+      'request.path': req.originalUrl,
+    };
+
+    for (const headerName in req.headers) {
+      if (headerName.toLowerCase().startsWith('simaland-')) {
+        result[headerName] = req.header(headerName);
+      }
+    }
+
+    return result;
+  };
+
+  return (req, res, next) => {
+    const externalContext = propagation.extract(ROOT_CONTEXT, req.headers);
+    const rootSpan = tracer.startSpan('response', undefined, externalContext);
+
+    rootSpan.setAttributes(getConventionalRequestAttrs(req));
+
+    const rootContext = trace.setSpan(externalContext, rootSpan);
+
+    res.locals.tracing = {
+      rootSpan,
+      rootContext,
+      renderSpan: null,
+    };
+
+    res.once(RESPONSE_EVENT.renderStart, () => {
+      res.locals.tracing.renderSpan = tracer.startSpan('render', undefined, rootContext);
+
+      res.once(RESPONSE_EVENT.renderFinish, () => {
+        res.locals.tracing.renderSpan.end();
+      });
+    });
+
+    res.once('finish', () => {
+      rootSpan.end();
+    });
+
+    next();
+  };
 }
 
 export function provideBridgeServerSide(resolve: Resolve): BridgeServerSide {
