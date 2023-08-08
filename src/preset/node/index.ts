@@ -5,13 +5,12 @@ import { ConfigSource, createConfigSource } from '../../config';
 import { createLogger } from '../../log';
 import { createPinoHandler } from '../../log/handler/pino';
 import { createSentryHandler } from '../../log/handler/sentry';
-import { HttpApiHostPool } from '../parts/utils';
+import { getClientIp, HttpApiHostPool } from '../parts/utils';
 import { KnownToken } from '../../tokens';
 import { provideBaseConfig } from '../parts/providers';
 import { Resolve, Preset, createPreset } from '../../di';
 import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
 import { healthCheck } from '../../http-server/handler/health-check';
-import { getXClientIp } from '../../http-server/utils';
 import { toMilliseconds } from '../../utils/number';
 import { RESPONSE_EVENT } from '../../http-server/constants';
 
@@ -191,7 +190,7 @@ export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
 
   return (req, res, next) => {
     const start = process.hrtime.bigint();
-    const remoteIp = getXClientIp(req);
+    const remoteIp = getClientIp(req) ?? '';
 
     const startMsg: Omit<ConventionalFluentInfo, 'latency' | 'status'> & { type: string } = {
       type: 'http.request[incoming]',

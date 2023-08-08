@@ -1,7 +1,9 @@
 import { SeverityLevel } from '@sentry/browser';
 import Axios, { AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
-import { ConfigSource } from '../../config/types';
+import type { Request } from 'express';
+import type { StrictMap } from './types';
+import type { ConfigSource, BaseConfig } from '../../config/types';
 import { Logger, Breadcrumb, DetailedError } from '../../log';
 import {
   SharedData,
@@ -15,7 +17,7 @@ import {
   SagaInterruptInfo,
   SagaMiddlewareHandler,
 } from '../../utils/redux-saga/types';
-import { StrictMap } from './types';
+import net from 'node:net';
 
 /** Реализация пула хостов. */
 export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
@@ -315,4 +317,42 @@ export abstract class HttpStatus {
       }
     };
   }
+}
+
+/**
+ * Формирует заголовки для исходящих запросов с сервера по соглашению.
+ * @param config Конфиг.
+ * @param request Входящий запрос.
+ * @return Заголовки для исходящих запросов.
+ */
+export function getRequestHeaders(config: BaseConfig, request: Request): Record<string, string> {
+  const result: Record<string, string> = {
+    'X-Client-Ip': getClientIp(request) ?? '',
+    'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
+    Cookie: request.get('cookie') || '',
+  };
+
+  // добавляем специфичные заголовки
+  for (const key of Object.keys(request.headers)) {
+    if (key.toLowerCase().indexOf('simaland-') === 0) {
+      result[key] = request.header(key) ?? '';
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Определяет IP входящего запроса.
+ * @param request Входящий запрос.
+ * @return IP.
+ */
+export function getClientIp(request: Request): string | undefined {
+  const headerValue =
+    request.get('x-client-ip') ||
+    request.get('x-forwarded-for') ||
+    request.socket.remoteAddress ||
+    '';
+
+  return net.isIP(headerValue) ? headerValue : '';
 }
