@@ -4,7 +4,6 @@ import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../d
 import { KnownToken } from '../../tokens';
 import { renderToString } from 'react-dom/server';
 import { RESPONSE_EVENT } from '../../http-server/constants';
-import { getRequestHeaders } from '../../http-server/utils';
 import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
 import { tracingMiddleware } from '../../http-client/middleware/tracing';
@@ -13,7 +12,7 @@ import { passHeadersMiddleware } from '../../http-client/middleware/headers';
 import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
 import { ResponseError } from '../../http';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
-import { HttpStatus } from '../parts/utils';
+import { HttpStatus, getRequestHeaders } from '../parts/utils';
 import { PresetTuner } from '../parts/types';
 import { ConventionalJson, PageAssets } from '../../http-server/types';
 import { createContext, Fragment, ReactNode, useContext } from 'react';
@@ -275,7 +274,7 @@ function RegularHelmet({ children }: { children?: ReactNode }) {
 }
 
 /**
- * Специфичные для наших микросервисов meta-данные.
+ * Специфичные для наших микросервисов дополнительные данные ответа.
  */
 export class SpecificExtras {
   private _meta: any;

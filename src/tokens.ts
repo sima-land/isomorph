@@ -1,19 +1,21 @@
 import { createToken } from './di';
 import type * as express from 'express';
+import type { ConfigSource, BaseConfig } from './config/types';
+import type { Logger } from './log/types';
+import type { Cache } from './cache/types';
+import type { HttpClientFactory } from './http-client/types';
+import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
 import type { PageAssets, HandlerContext } from './http-server/types';
 import type { SagaExtendedMiddleware } from './utils/redux-saga';
-import type { Logger } from './log/types';
-import type { HttpClientFactory } from './http-client/types';
-import type { ConfigSource, BaseConfig } from './config/types';
+import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { Tracer } from '@opentelemetry/api';
-import type { Cache } from './cache/types';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { Resource } from '@opentelemetry/resources';
-import type { StrictMap, KnownHttpApiKey } from './preset/parts/types';
-import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
-import type { SpecificExtras } from './preset/node/handler';
-import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
 import type { ElementType, ReactNode } from 'react';
+
+// @todo придумать как брать не из пресетов:
+import type { StrictMap, KnownHttpApiKey } from './preset/parts/types';
+import type { SpecificExtras } from './preset/node/handler';
 
 export const KnownToken = {
   // config
