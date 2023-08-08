@@ -11,7 +11,7 @@ import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace
 import type { Resource } from '@opentelemetry/resources';
 import type { StrictMap, KnownHttpApiKey } from './preset/parts/types';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
-import type { PageResponse } from './http-server/utils';
+import type { SpecificExtras } from './preset/node/handler';
 import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
 import type { ElementType, ReactNode } from 'react';
 
@@ -86,8 +86,7 @@ export const KnownToken = {
         specificParams: createToken<Record<string, unknown>>('request/specific-params'),
       },
       Response: {
-        // @todo заменить на specificExtra с единственным методом setMeta?
-        builder: createToken<PageResponse>('response/builder'),
+        specificExtras: createToken<SpecificExtras>('response/specific-extras'),
       },
       Page: {
         assets: createToken<PageAssets | (() => PageAssets | Promise<PageAssets>)>('page/assets'),
