@@ -343,6 +343,7 @@ export function getRequestHeaders(config: BaseConfig, request: Request): Record<
   // добавляем специфичные заголовки
   for (const key of Object.keys(request.headers)) {
     const value = request.header(key);
+
     if (key.toLowerCase().indexOf('simaland-') === 0 && value) {
       result[key] = value;
     }

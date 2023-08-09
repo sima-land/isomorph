@@ -4,6 +4,9 @@
   "description": "Tiny framework for fast start frontend microservices",
   "author": "www.sima-land.ru team",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=16.15.1"
+  },
   "scripts": {
     "prepare": "husky install",
     "type-check": "tsc -p . --noEmit",
@@ -14,9 +17,6 @@
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
     "test:coverage": "jest --clearCache && jest --coverage"
-  },
-  "engines": {
-    "node": ">=16.15.1"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
@@ -37,11 +37,12 @@
     "jest": "^28.1.3",
     "jest-environment-jsdom": "^28.1.3",
     "prettier": "^2.8.8",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "whatwg-fetch": "^3.6.17"
   },
   "dependencies": {
     "@humanwhocodes/env": "^2.2.2",
-    "@krutoo/fetch-tools": "^0.0.7",
+    "@krutoo/fetch-tools": "^0.0.9",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/exporter-prometheus": "^0.38.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.39.1",

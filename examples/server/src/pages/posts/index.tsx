@@ -10,7 +10,7 @@ import { TOKEN } from '../../tokens';
 export function PostsPageApp() {
   const app = createApplication();
 
-  // используем пресет "page handler"
+  // используем пресет "PresetHandler"
   app.preset(
     // переопределяем провайдеры пресета
     PresetHandler(({ override }) => {
@@ -22,21 +22,6 @@ export function PostsPageApp() {
   app.bind(TOKEN.Project.Http.api).toProvider(provideHttpApi);
 
   return app;
-}
-
-function provideHttpApi(resolve: Resolve): HttpApi {
-  const createClient = resolve(TOKEN.Lib.Http.Client.factory);
-
-  const client = sauce(createClient({ baseURL: 'https://jsonplaceholder.typicode.com/' }));
-
-  return {
-    getPosts() {
-      return client.get('posts/');
-    },
-    getUsers() {
-      return client.get('users/');
-    },
-  };
 }
 
 function provideRender(resolve: Resolve) {
@@ -56,5 +41,20 @@ function provideRender(resolve: Resolve) {
         <PostsPage />
       </Provider>
     );
+  };
+}
+
+function provideHttpApi(resolve: Resolve): HttpApi {
+  const createClient = resolve(TOKEN.Lib.Http.Client.factory);
+
+  const client = sauce(createClient({ baseURL: 'https://jsonplaceholder.typicode.com/' }));
+
+  return {
+    getPosts() {
+      return client.get('posts/');
+    },
+    getUsers() {
+      return client.get('users/');
+    },
   };
 }

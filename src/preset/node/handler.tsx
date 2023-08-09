@@ -8,9 +8,8 @@ import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
 import { tracingMiddleware } from '../../http-client/middleware/tracing';
 import { logMiddleware } from '../../http-client/middleware/log';
-import { passHeadersMiddleware } from '../../http-client/middleware/headers';
-import { collectCookieMiddleware } from '../../http-client/middleware/cookie';
-import { ResponseError } from '../../http';
+import { cookieMiddleware } from '../../http-client/middleware/cookie';
+import { ResponseError, createCookieStore } from '../../http';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
 import { HttpStatus, getRequestHeaders } from '../parts/utils';
 import { ConventionalJson, PageAssets, PresetTuner } from '../parts/types';
@@ -58,16 +57,28 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
   const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
 
   // @todo добавить при необходимости (но тогда в логе будет значительно больше ошибок)
+  // можно не отсылать ошибки из клиента если ответ от сервера уже ушел (writableEnded)
   // const controller = new AbortController();
   // context.res.on('finish', () => {
   //   controller.abort();
   // });
 
-  return function createHttpClient(config = {}) {
+  // ВАЖНО: для всех клиентов в рамках обработчика должно быть одно хранилище cookie
+  const cookieStore = createCookieStore(context.req.header('cookie'));
+
+  cookieStore.subscribe(() => {
+    if (!context.res.writableEnded) {
+      context.res.setHeader('cookie', cookieStore.getCookies());
+    }
+  });
+
+  const defaultHeaders = getRequestHeaders(appConfig, context.req);
+
+  return (config = {}) => {
     const client = create({
       ...config,
       headers: {
-        ...getRequestHeaders(appConfig, context.req),
+        ...defaultHeaders,
         ...config.headers,
       },
     });
@@ -75,12 +86,7 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
     client.use(HttpStatus.axiosMiddleware());
     client.use(tracingMiddleware(tracer, context.res.locals.tracing.rootContext));
     client.use(logMiddleware(logHandler));
-    client.use(
-      passHeadersMiddleware(context.req, {
-        predicate: headerName => headerName.startsWith('simaland-'),
-      }),
-    );
-    client.use(collectCookieMiddleware(context.req, context.res));
+    client.use(cookieMiddleware(cookieStore));
 
     return client;
   };

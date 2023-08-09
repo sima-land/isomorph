@@ -1,75 +1,26 @@
-import type { Request, Response } from 'express';
 import type { Middleware } from 'middleware-axios';
-
-export interface CookieStore {
-  set: (seCookie: string[]) => void;
-  asHeader: () => string;
-}
+import type { CookieStore } from '../../http';
 
 /**
  * Возвращает новый middleware для работы с cookie на сервере.
- * @param request Входящий запрос.
- * @param response Исходящий ответ.
+ * @param store Хранилище.
  * @return Middleware.
  */
-export function collectCookieMiddleware(request: Request, response: Response): Middleware<any> {
-  const store = createCookieStore(request.get('cookie'));
-
-  return async function collectCookie(config, next) {
+export function cookieMiddleware(store: CookieStore): Middleware<any> {
+  return async (config, next) => {
     const result = await next({
       ...config,
       headers: {
         ...config.headers,
-        Cookie: store.asHeader(),
+
+        // @todo учитывать Domain, Path, Expires и тд
+        // @todo учитывать редиректы с куками
+        Cookie: store.getCookies(),
       },
     });
 
-    if (result.headers['set-cookie'] && !response.writableEnded) {
-      store.set(result.headers['set-cookie']);
-      response.setHeader('cookie', store.asHeader());
+    if (result.headers['set-cookie']) {
+      result.headers['set-cookie'].forEach(item => store.setCookie(item));
     }
   };
-}
-
-/**
- * Возвращает новое хранилище cookie.
- * @internal
- * @param initialCookie Начальное значение cookie.
- * @return Хранилище cookie.
- */
-export function createCookieStore(initialCookie?: string): CookieStore {
-  const data: Record<string, { name: string; value: string }> = {};
-
-  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
-  function setItem(cookieItem: string) {
-    const [cookieName, cookieValue] = cookieItem.split('=').map(item => item.trim());
-
-    if (cookieName && cookieValue) {
-      data[cookieName] = { name: cookieName, value: cookieValue };
-    }
-  }
-
-  if (initialCookie && initialCookie.length) {
-    for (const item of initialCookie.split(';')) {
-      setItem(item);
-    }
-  }
-
-  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
-  function set(setCookieHeaderValues: string[]): void {
-    for (const item of setCookieHeaderValues) {
-      // отделяем значение от директив
-      const [cookie] = item.split(';');
-      setItem(cookie);
-    }
-  }
-
-  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
-  function asHeader(): string {
-    return Object.values(data)
-      .map(cookie => `${cookie.name}=${cookie.value}`)
-      .join('; ');
-  }
-
-  return { set, asHeader };
 }
