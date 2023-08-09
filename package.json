@@ -37,11 +37,12 @@
     "jest": "^28.1.3",
     "jest-environment-jsdom": "^28.1.3",
     "prettier": "^2.8.8",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "whatwg-fetch": "^3.6.17"
   },
   "dependencies": {
     "@humanwhocodes/env": "^2.2.2",
-    "@krutoo/fetch-tools": "^0.0.8",
+    "@krutoo/fetch-tools": "^0.0.9",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/exporter-prometheus": "^0.38.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.39.1",

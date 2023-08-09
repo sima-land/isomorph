@@ -1,46 +1,13 @@
 import { AxiosDefaults, InternalAxiosRequestConfig } from 'axios';
-import { Request, Response } from 'express';
 import { Next } from 'middleware-axios';
-import { createCookieStore, collectCookieMiddleware } from '../cookie';
+import { cookieMiddleware } from '../cookie';
+import { createCookieStore } from '../../../http';
 
-describe('createCookieStore', () => {
-  it('should save/take cookies correctly', () => {
-    const initialCookie = 'foo=1; bar=2; baz=3';
-    const store = createCookieStore(initialCookie);
-
-    expect(store.asHeader()).toBe(initialCookie);
-
-    store.set(['hello=world; Secure', 'foo=345; HttpOnly']);
-    expect(store.asHeader()).toBe('foo=345; bar=2; baz=3; hello=world');
-
-    store.set(['baz=777']);
-    expect(store.asHeader()).toBe('foo=345; bar=2; baz=777; hello=world');
-  });
-
-  it('should handle undefined initial cookies', () => {
-    const store = createCookieStore();
-
-    expect(store.asHeader()).toBe('');
-
-    store.set(['hello=world; Secure', 'foo=345; HttpOnly']);
-    expect(store.asHeader()).toBe('hello=world; foo=345');
-
-    store.set(['baz=432']);
-    expect(store.asHeader()).toBe('hello=world; foo=345; baz=432');
-  });
-});
-
-describe('collectCookieMiddleware', () => {
+describe('cookieMiddleware', () => {
   it('should set cookie to config', async () => {
-    const request: Request = {
-      get: (headerName: string) => (headerName === 'cookie' ? 'hello=world' : ''),
-    } as unknown as Request;
+    const store = createCookieStore('hello=world');
 
-    const response: Response = {
-      setHeader: jest.fn(),
-    } as unknown as Response;
-
-    const middleware = collectCookieMiddleware(request, response);
+    const middleware = cookieMiddleware(store);
 
     const config: InternalAxiosRequestConfig = {
       method: 'get',
@@ -83,15 +50,12 @@ describe('collectCookieMiddleware', () => {
   });
 
   it('should handle set-cookie header', async () => {
-    const request: Request = {
-      get: (headerName: string) => (headerName === 'cookie' ? 'hello=world' : ''),
-    } as unknown as Request;
+    const store = createCookieStore('hello=world');
 
-    const response: Response = {
-      setHeader: jest.fn(),
-    } as unknown as Response;
+    const spy = jest.fn();
+    store.subscribe(spy);
 
-    const middleware = collectCookieMiddleware(request, response);
+    const middleware = cookieMiddleware(store);
 
     const config: InternalAxiosRequestConfig = {
       method: 'get',
@@ -105,7 +69,7 @@ describe('collectCookieMiddleware', () => {
         statusText: 'OK',
         config,
         headers: {
-          'set-cookie': 'foo=bar',
+          'set-cookie': ['foo=bar', 'baz=123'],
         } as any,
       }),
     );
@@ -122,9 +86,9 @@ describe('collectCookieMiddleware', () => {
     };
 
     expect(next).toHaveBeenCalledTimes(0);
-    expect(response.setHeader).toHaveBeenCalledTimes(0);
+    expect(spy).toHaveBeenCalledTimes(0);
     await middleware(config, next, defaults);
     expect(next).toHaveBeenCalledTimes(1);
-    expect(response.setHeader).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(2);
   });
 });
