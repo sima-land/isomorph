@@ -1,5 +1,5 @@
 import type { Middleware } from 'middleware-axios';
-import type { CookieStore } from '../../http';
+import type { CookieStore } from '../../../http';
 
 /**
  * Возвращает новый middleware для работы с cookie на сервере.

@@ -15,7 +15,7 @@ import { create } from 'middleware-axios';
 import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
 import { HttpApiHostPool, HttpStatus } from '../parts/utils';
-import { logMiddleware } from '../../http-client/middleware/log';
+import { logMiddleware } from '../../utils/axios/middleware/log';
 import {
   provideBaseConfig,
   provideSagaMiddleware,

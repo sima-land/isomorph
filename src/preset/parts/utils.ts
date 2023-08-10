@@ -10,8 +10,8 @@ import {
   DoneSharedData,
   FailSharedData,
   LogMiddlewareHandler,
-} from '../../http-client/middleware/log';
-import { applyAxiosDefaults } from '../../http-client/utils';
+} from '../../utils/axios/middleware/log';
+import { applyAxiosDefaults } from '../../utils/axios/utils';
 import { displayUrl } from '../node/node/http-client';
 import {
   SagaErrorInfo,
