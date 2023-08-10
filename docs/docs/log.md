@@ -2,9 +2,9 @@
 sidebar_position: 3
 ---
 
-# Журналирование событий
+# Логирование
 
-Для журналирования событий пакет предоставляет простейшую реализацию логгера - объекта, содержащего методы для фиксации событий жизненного цикла приложения.
+Для логирования событий пакет предоставляет простейшую реализацию логгера - объекта, содержащего методы для фиксации событий жизненного цикла приложения.
 
 ## Logger
 
@@ -30,38 +30,13 @@ if (somethingWrong) {
 }
 ```
 
-### Middleware для HTTP-клиента
-
-Также пакет предоставляет функцию создания middleware для логирования исходящих http-запросов.
-
-```ts
-import { logMiddleware } from '@sima-land/isomorph/http-server/middleware/log';
-import { create } from 'middleware-axios';
-
-const client = create();
-
-const middleware = logMiddleware({
-  beforeRequest({ config, defaults }) {
-    console.log('beforeRequest');
-  },
-  afterResponse({ config, defaults, responser }) {
-    console.log('afterResponse');
-  },
-  onCatch({ config, defaults, error }) {
-    console.log('onCatch');
-  },
-});
-
-client.use(middleware);
-```
-
-### Сбор ошибок
+## Сбор ошибок
 
 Для отслеживания ошибок мы используем преимущественно **Sentry**. Отправку ошибок и других событий в Sentry можно реализовать используя Logger со специальным обработчиком для Sentry.
 
 Пакет предоставляет классы для формирования готовых к отправке объектов, представляющих ошибки и "хлебные крошки".
 
-## Примеры использования
+### Примеры использования
 
 Подготовим логгер и обработчик для него. Для работы обработчику нужен Sentry Hub.
 
