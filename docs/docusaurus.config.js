@@ -51,7 +51,7 @@ const config = {
       },
       navbar: {
         style: 'dark',
-        title: '@sima-land/isomorph',
+        title: 'Isomorph',
         logo: {
           alt: 'Логотип "Сима-ленд"',
           src: 'img/logo.svg',
