@@ -2,7 +2,7 @@
 import { createBaseConfig } from '../../config/base';
 import { BaseConfig } from '../../config/types';
 import { Resolve } from '../../di';
-import { LogMiddlewareHandlerInit } from '../../http-client/middleware/log';
+import { LogMiddlewareHandlerInit } from '../../utils/axios/middleware/log';
 import { KnownToken } from '../../tokens';
 import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
 import { HttpClientLogging, SagaLogging } from './utils';

@@ -5,7 +5,7 @@ import type * as express from 'express';
 import type { ConfigSource, BaseConfig } from './config/types';
 import type { Logger } from './log/types';
 import type { Cache } from './cache/types';
-import type { LogMiddlewareHandlerInit } from './http-client/middleware/log';
+import type { LogMiddlewareHandlerInit } from './utils/axios/middleware/log';
 import type { SagaExtendedMiddleware } from './utils/redux-saga';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { Tracer } from '@opentelemetry/api';

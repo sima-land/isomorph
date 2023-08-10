@@ -1,7 +1,7 @@
 import { AxiosDefaults, InternalAxiosRequestConfig } from 'axios';
 import { Next } from 'middleware-axios';
 import { cookieMiddleware } from '../cookie';
-import { createCookieStore } from '../../../http';
+import { createCookieStore } from '../../../../http';
 
 describe('cookieMiddleware', () => {
   it('should set cookie to config', async () => {

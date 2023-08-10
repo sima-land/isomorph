@@ -1,4 +1,4 @@
-import { applyAxiosDefaults } from '../utils';
+import { applyAxiosDefaults } from '..';
 
 describe('applyAxiosDefaults', () => {
   it('should merge config and defaults properly', () => {
