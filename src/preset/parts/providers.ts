@@ -22,7 +22,5 @@ export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware 
 export function provideHttpClientLogHandler(resolve: Resolve): LogMiddlewareHandlerInit {
   const logger = resolve(KnownToken.logger);
 
-  return function getLogHandler(data) {
-    return new HttpClientLogging(logger, data);
-  };
+  return data => new HttpClientLogging(logger, data);
 }

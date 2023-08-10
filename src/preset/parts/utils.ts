@@ -11,7 +11,8 @@ import {
   FailSharedData,
   LogMiddlewareHandler,
 } from '../../http-client/middleware/log';
-import { applyAxiosDefaults, displayUrl } from '../../http-client/utils';
+import { applyAxiosDefaults } from '../../http-client/utils';
+import { displayUrl } from '../node/node/http-client';
 import {
   SagaErrorInfo,
   SagaInterruptInfo,

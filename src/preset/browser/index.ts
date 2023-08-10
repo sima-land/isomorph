@@ -16,12 +16,12 @@ import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
 import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
 import { HttpApiHostPool, HttpStatus } from '../parts/utils';
 import { logMiddleware } from '../../http-client/middleware/log';
-import { HttpClientFactory } from '../../http-client/types';
 import {
   provideBaseConfig,
   provideSagaMiddleware,
   provideHttpClientLogHandler,
 } from '../parts/providers';
+import { CreateAxiosDefaults } from 'axios';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов в браузере.
@@ -100,11 +100,12 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
   );
 }
 
-export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
+export function provideHttpClientFactory(resolve: Resolve) {
   const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
 
-  return function createHttpClient(config = {}) {
-    const client = create(config);
+  return function createHttpClient(config: CreateAxiosDefaults = {}) {
+    // @todo убрать as any
+    const client = create(config as any);
 
     client.use(HttpStatus.axiosMiddleware());
     client.use(logMiddleware(logHandler));
