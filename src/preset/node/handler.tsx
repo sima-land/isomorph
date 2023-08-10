@@ -4,9 +4,7 @@ import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../d
 import { KnownToken } from '../../tokens';
 import { renderToString } from 'react-dom/server';
 import { RESPONSE_EVENT_TYPE } from '../parts/constants';
-import { HttpClientFactory } from '../../http-client/types';
 import { create } from 'middleware-axios';
-import { tracingMiddleware } from '../../http-client/middleware/tracing';
 import { logMiddleware } from '../../http-client/middleware/log';
 import { cookieMiddleware } from '../../http-client/middleware/cookie';
 import { ResponseError, createCookieStore } from '../../http';
@@ -14,6 +12,8 @@ import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/pro
 import { HttpStatus, getRequestHeaders } from '../parts/utils';
 import { ConventionalJson, PageAssets, PresetTuner } from '../parts/types';
 import { createContext, Fragment, ReactNode, useContext } from 'react';
+import { tracingMiddleware } from './node/http-client';
+import { CreateAxiosDefaults } from 'axios';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -47,7 +47,7 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   return preset;
 }
 
-export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
+export function provideHttpClientFactory(resolve: Resolve) {
   // @todo а что если привести все зависимости к виду:
   // const getAppConfig = resolve.lazy(KnownToken.Config.base);
 
@@ -74,12 +74,14 @@ export function provideHttpClientFactory(resolve: Resolve): HttpClientFactory {
 
   const defaultHeaders = getRequestHeaders(appConfig, context.req);
 
-  return (config = {}) => {
+  return (config: CreateAxiosDefaults = {}) => {
     const client = create({
       ...config,
       headers: {
         ...defaultHeaders,
-        ...config.headers,
+
+        // @todo убрать as any
+        ...(config.headers as any),
       },
     });
 

@@ -2,7 +2,6 @@ import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { displayUrl } from '../utils';
 
 /**
  * Возвращает новый middleware для трассировки исходящих запросов.
@@ -90,4 +89,35 @@ export function hideFirstId(url: string): [string, number | undefined] {
   const found = /\d{2,}/.exec(url);
 
   return found ? [url.replace(found[0], '{id}'), Number(found[0])] : [url, undefined];
+}
+
+/**
+ * Объединяет значения опций baseURL и url (axios) в одну строку для логирования.
+ * @param baseURL Опция baseURL.
+ * @param url Опция url.
+ * @return Отображение. Не является валидным URL.
+ */
+export function displayUrl(
+  baseURL: AxiosRequestConfig['baseURL'] = '',
+  url: AxiosRequestConfig['url'] = '',
+) {
+  let result: string;
+
+  switch (true) {
+    case Boolean(baseURL && url):
+      result = `${baseURL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+      break;
+    case Boolean(baseURL) && !url:
+      result = baseURL;
+      break;
+    case !baseURL && Boolean(url):
+      result = url;
+      break;
+    case !baseURL && !url:
+    default:
+      result = '[empty]';
+      break;
+  }
+
+  return result;
 }

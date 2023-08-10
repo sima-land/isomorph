@@ -33,7 +33,7 @@ export class ErrorBoundary extends Component<Props, { hasError: boolean }> {
   }
 
   /** @inheritDoc */
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // @todo добавить возможность брать onError из специального контекста (это упростит передачу из di-контейнера)
     const { onError } = this.props;
 
