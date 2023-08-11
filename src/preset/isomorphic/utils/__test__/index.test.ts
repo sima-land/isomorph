@@ -5,17 +5,78 @@ import {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { Logger, Breadcrumb, DetailedError } from '../../../log';
+import { Logger, Breadcrumb, DetailedError } from '../../../../log';
 import {
   HttpApiHostPool,
   HttpClientLogging,
   SagaLogging,
   severityFromStatus,
   HttpStatus,
-  getRequestHeaders,
-} from '../utils';
-import { Request } from 'express';
-import { BaseConfig } from '../../../config';
+  displayUrl,
+} from '..';
+
+describe('displayUrl', () => {
+  it('should properly merge baseURL with url', () => {
+    const cases: Array<{ url: string; baseURL: string; expectedUrl: string }> = [
+      // baseURL и url
+      {
+        baseURL: 'https://www.base.com/',
+        url: '/user/current',
+        expectedUrl: 'https://www.base.com/user/current',
+      },
+      {
+        baseURL: 'https://www.base.com',
+        url: 'user/current',
+        expectedUrl: 'https://www.base.com/user/current',
+      },
+      {
+        baseURL: 'https://www.base.com',
+        url: '/user/current',
+        expectedUrl: 'https://www.base.com/user/current',
+      },
+      {
+        baseURL: 'https://www.base.com/',
+        url: 'admin/all',
+        expectedUrl: 'https://www.base.com/admin/all',
+      },
+
+      // только baseURL
+      {
+        baseURL: 'www.test.com',
+        url: '',
+        expectedUrl: 'www.test.com',
+      },
+      {
+        baseURL: 'www.test.com/',
+        url: '',
+        expectedUrl: 'www.test.com/',
+      },
+
+      // только url
+      {
+        baseURL: '',
+        url: '/hello/world',
+        expectedUrl: '/hello/world',
+      },
+      {
+        baseURL: '',
+        url: 'some/path',
+        expectedUrl: 'some/path',
+      },
+
+      // ничего
+      {
+        baseURL: '',
+        url: '',
+        expectedUrl: '[empty]',
+      },
+    ];
+
+    for (const { baseURL, url, expectedUrl } of cases) {
+      expect(displayUrl(baseURL, url)).toBe(expectedUrl);
+    }
+  });
+});
 
 const logger: Logger = {
   log: jest.fn(),
@@ -466,70 +527,6 @@ describe('HttpStatus', () => {
         expect(next).toHaveBeenCalledTimes(1);
         expect(next).toHaveBeenCalledWith({ ...config, validateStatus: validator });
       }
-    });
-  });
-});
-
-describe('getRequestHeaders', () => {
-  it('should return headers', () => {
-    const config: BaseConfig = {
-      appName: 'foo',
-      appVersion: '0.0.1',
-      env: 'test',
-    };
-
-    const request: Request = {
-      socket: {
-        remoteAddress: '127.0.0.1',
-      },
-      headers: {
-        cookie: 'userid=12345',
-        'simaland-a': 'aaa',
-        'simaland-b': 'bbb',
-      },
-      get(key: string) {
-        return this.headers[key];
-      },
-      header(key: string) {
-        return this.headers[key];
-      },
-    } as any;
-
-    const result = getRequestHeaders(config, request);
-
-    expect(result).toEqual({
-      'X-Client-Ip': '127.0.0.1',
-      'User-Agent': `simaland-foo/0.0.1`,
-      Cookie: 'userid=12345',
-      'simaland-a': 'aaa',
-      'simaland-b': 'bbb',
-    });
-  });
-
-  it('should return headers when lot of data is undefined', () => {
-    const config: BaseConfig = {
-      appName: 'foo',
-      appVersion: '0.0.1',
-      env: 'test',
-    };
-
-    const request: Request = {
-      socket: {
-        remoteAddress: undefined,
-      },
-      headers: {},
-      get(key: string) {
-        return this.headers[key];
-      },
-      header(key: string) {
-        return this.headers[key];
-      },
-    } as any;
-
-    const result = getRequestHeaders(config, request);
-
-    expect(result).toEqual({
-      'User-Agent': `simaland-foo/0.0.1`,
     });
   });
 });

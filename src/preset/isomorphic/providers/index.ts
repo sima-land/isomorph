@@ -1,11 +1,11 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc  */
-import { createBaseConfig } from '../../config/base';
-import { BaseConfig } from '../../config/types';
-import { Resolve } from '../../di';
-import { LogMiddlewareHandlerInit } from '../../utils/axios/middleware/log';
-import { KnownToken } from '../../tokens';
-import { createSagaMiddleware, SagaExtendedMiddleware } from '../../utils/redux-saga';
-import { HttpClientLogging, SagaLogging } from './utils';
+import { createBaseConfig } from '../../../config/base';
+import { BaseConfig } from '../../../config/types';
+import { Resolve } from '../../../di';
+import { LogMiddlewareHandlerInit } from '../../../utils/axios/middleware/log';
+import { KnownToken } from '../../../tokens';
+import { createSagaMiddleware, SagaExtendedMiddleware } from '../../../utils/redux-saga';
+import { HttpClientLogging, SagaLogging } from '../utils';
 
 export function provideBaseConfig(resolve: Resolve): BaseConfig {
   const source = resolve(KnownToken.Config.source);

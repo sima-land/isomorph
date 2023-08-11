@@ -1,51 +1,17 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import type { Handler, Request } from 'express';
-import { Application, Preset, Resolve, CURRENT_APP, createPreset } from '../../di';
-import { KnownToken } from '../../tokens';
-import { renderToString } from 'react-dom/server';
-import { RESPONSE_EVENT_TYPE } from '../parts/constants';
-import { create } from 'middleware-axios';
-import { logMiddleware } from '../../utils/axios/middleware/log';
-import { cookieMiddleware } from '../../utils/axios/middleware/cookie';
-import { ResponseError, createCookieStore } from '../../http';
-import { provideSagaMiddleware, provideHttpClientLogHandler } from '../parts/providers';
-import { HttpStatus, getRequestHeaders } from '../parts/utils';
-import { ConventionalJson, PageAssets, PresetTuner } from '../parts/types';
-import { createContext, Fragment, ReactNode, useContext } from 'react';
-import { tracingMiddleware } from './node/http-client';
+import { ResponseError, createCookieStore } from '../../../../http';
+import { Resolve } from '../../../../di';
+import { KnownToken } from '../../../../tokens';
+import { getRequestHeaders, tracingMiddleware } from '../../node/utils/http-client';
 import { CreateAxiosDefaults } from 'axios';
-
-/**
- * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
- * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
- * @todo Возможно стоит переименовать в PresetPageHandler.
- * @return Preset.
- */
-export function PresetHandler(customize?: PresetTuner): Preset {
-  // ВАЖНО: используем .set() вместо аргумента defaults функции createPreset из-за скорости
-  const preset = createPreset();
-
-  // saga
-  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
-
-  // http client
-  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
-  preset.set(KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler);
-
-  // http handler
-  preset.set(KnownToken.Http.Handler.main, provideMain);
-  preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
-  preset.set(KnownToken.Http.Handler.Response.specificExtras, () => new SpecificExtras());
-  preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));
-  preset.set(KnownToken.Http.Handler.Page.helmet, providePageHelmet);
-  preset.set(KnownToken.Http.Handler.Page.render, providePageRender);
-
-  if (customize) {
-    customize({ override: preset.set.bind(preset) });
-  }
-
-  return preset;
-}
+import { create } from 'middleware-axios';
+import { HttpStatus } from '../../../isomorphic/utils';
+import { cookieMiddleware, logMiddleware } from '../../../../utils/axios';
+import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
+import { ConventionalJson } from '../../../isomorphic/types';
+import { Fragment } from 'react';
+import { HelmetContext, RegularHelmet, getResponseFormat } from '../utils';
+import { renderToString } from 'react-dom/server';
 
 export function provideHttpClientFactory(resolve: Resolve) {
   // @todo а что если привести все зависимости к виду:
@@ -94,7 +60,7 @@ export function provideHttpClientFactory(resolve: Resolve) {
   };
 }
 
-export function provideMain(resolve: Resolve): VoidFunction {
+export function provideHandlerMain(resolve: Resolve): VoidFunction {
   const config = resolve(KnownToken.Config.base);
   const logger = resolve(KnownToken.logger);
   const assetsInit = resolve(KnownToken.Http.Handler.Page.assets);
@@ -185,7 +151,7 @@ export function provideMain(resolve: Resolve): VoidFunction {
   };
 }
 
-function providePageRender() {
+export function providePageRender() {
   return () => (
     <>
       <h1>Hello, world!</h1>
@@ -194,7 +160,7 @@ function providePageRender() {
   );
 }
 
-function providePageHelmet(resolve: Resolve) {
+export function providePageHelmet(resolve: Resolve) {
   const config = resolve(KnownToken.Config.base);
   const { req } = resolve(KnownToken.Http.Handler.context);
 
@@ -219,94 +185,4 @@ export function provideSpecificParams(resolve: Resolve): Record<string, unknown>
   } catch {
     return {};
   }
-}
-
-/**
- * Возвращает express-handler, создающий дочернее di-приложение при запросе.
- * @param getApp Должна вернуть di-приложения запроса.
- * @return Обработчик.
- */
-export function HandlerProvider(getApp: () => Application) {
-  return function provider(resolve: Resolve): Handler {
-    const parent = resolve(CURRENT_APP);
-
-    return function handler(req, res, next) {
-      const app = getApp();
-
-      app.attach(parent);
-      app.bind(KnownToken.Http.Handler.context).toValue({ req, res, next });
-      app.get(KnownToken.Http.Handler.main)();
-    };
-  };
-}
-
-const HelmetContext = createContext<{ title?: string; assets?: PageAssets }>({});
-
-const resetCSS = `
-* {
-  box-sizing: border-box;
-}
-body {
-  font-family: -apple-system,BlinkMacSystemFont,'Source Sans Pro',"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,Arial,sans-serif;
-  margin: 0;
-}
-`;
-
-function RegularHelmet({ children }: { children?: ReactNode }) {
-  const { title, assets } = useContext(HelmetContext);
-
-  return (
-    <html>
-      <head>
-        <meta charSet='UTF-8' />
-        <meta httpEquiv='X-UA-Compatible' content='IE=edge' />
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <title>{title ?? 'Document'}</title>
-        <link
-          href='https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&amp;display=swap'
-          rel='stylesheet'
-        />
-        <style dangerouslySetInnerHTML={{ __html: resetCSS }} />
-
-        {assets?.criticalCss && <link rel='stylesheet' href={assets.criticalCss} />}
-        {assets?.css && <link rel='stylesheet' href={assets.css} />}
-        {assets?.criticalJs && <script src={assets.criticalJs} />}
-      </head>
-      <body>
-        {children}
-        {assets?.js && <script src={assets.js} />}
-      </body>
-    </html>
-  );
-}
-
-/**
- * Специфичные для наших микросервисов дополнительные данные ответа.
- */
-export class SpecificExtras {
-  private _meta: any;
-
-  meta(meta: any): this {
-    this._meta = meta;
-    return this;
-  }
-
-  getMeta(): unknown {
-    return this._meta;
-  }
-}
-
-/**
- * Определит формат ответа.
- * @param req Запрос.
- * @return Формат.
- */
-function getResponseFormat(req: Request): 'html' | 'json' {
-  let result: 'html' | 'json' = 'html';
-
-  if ((req.header('accept') || '').toLowerCase().includes('application/json')) {
-    result = 'json';
-  }
-
-  return result;
 }
