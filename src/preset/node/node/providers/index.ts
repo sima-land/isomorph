@@ -21,7 +21,7 @@ import path from 'node:path';
 import { config as applyDotenv } from 'dotenv';
 import { init, getCurrentHub, Handlers } from '@sentry/node';
 import * as PromClient from 'prom-client';
-import Express, { Application, Handler, Request, Response } from 'express';
+import Express, { Application, ErrorRequestHandler, Handler, Request, Response } from 'express';
 import pino from 'pino';
 import PinoPretty from 'pino-pretty';
 
@@ -141,7 +141,7 @@ export function provideHttpServerFactory() {
   return Express;
 }
 
-export function provideHttpServerRequestMiddleware() {
+export function provideHttpServerRequestMiddleware(): Handler {
   return Handlers.requestHandler();
 }
 
@@ -305,7 +305,7 @@ export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
   };
 }
 
-export function provideHttpServerErrorMiddleware() {
+export function provideHttpServerErrorMiddleware(): ErrorRequestHandler {
   return Handlers.errorHandler();
 }
 
