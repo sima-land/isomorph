@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { RemoteData, RemoteDataState } from '@sima-land/isomorph/utils/redux/remote-data';
+import { RemoteData, RemoteDataState } from '@sima-land/isomorph/utils/redux';
 import { useSelector } from 'react-redux';
 import { END } from 'redux-saga';
 import { call, put } from 'typed-redux-saga/macro';
