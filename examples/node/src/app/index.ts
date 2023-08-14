@@ -2,9 +2,7 @@ import { TOKEN } from '../tokens';
 import { AppConfig } from './types';
 import express, { Application as ExpressApp } from 'express';
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
-import { PresetNode } from '@sima-land/isomorph/preset/node';
-import { HandlerProvider } from '@sima-land/isomorph/preset/node/handler';
-import { healthCheck } from '@sima-land/isomorph/http-server/handler/health-check';
+import { PresetNode, HandlerProvider } from '@sima-land/isomorph/preset/node';
 import { UsersPageApp } from '../pages/users';
 import { PostsPageApp } from '../pages/posts';
 
@@ -39,9 +37,9 @@ function provideAppConfig(resolve: Resolve): AppConfig {
 }
 
 function provideHttpServer(resolve: Resolve): ExpressApp {
-  const createServer = resolve(TOKEN.Lib.Http.Server.factory);
   const usersHandler = resolve(TOKEN.Project.Http.Pages.users);
   const postsHandler = resolve(TOKEN.Project.Http.Pages.posts);
+  const healthCheckHandler = resolve(TOKEN.Lib.Http.Server.Handlers.healthCheck);
 
   // промежуточные слои (express) доступные из пресета PresetNode
   const requestHandle = resolve(TOKEN.Lib.Http.Server.Middleware.request);
@@ -50,7 +48,7 @@ function provideHttpServer(resolve: Resolve): ExpressApp {
   const tracing = resolve(TOKEN.Lib.Http.Server.Middleware.tracing);
   const errorHandle = resolve(TOKEN.Lib.Http.Server.Middleware.error);
 
-  const app = createServer();
+  const app = express();
 
   // регистрируем промежуточные слои
   app.use(express.static('dist/static'));
@@ -60,7 +58,7 @@ function provideHttpServer(resolve: Resolve): ExpressApp {
   app.get('/', postsHandler);
   app.get('/posts', postsHandler);
   app.get('/users', usersHandler);
-  app.get('/healthcheck', healthCheck());
+  app.get('/healthcheck', healthCheckHandler);
 
   return app;
 }
