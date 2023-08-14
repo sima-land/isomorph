@@ -12,8 +12,13 @@ import type { Tracer } from '@opentelemetry/api';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { Resource } from '@opentelemetry/resources';
 import type { ElementType, ReactNode } from 'react';
-import type { PageAssets, HandlerContext, StrictMap, KnownHttpApiKey } from './preset/parts/types';
-import type { SpecificExtras } from './preset/node/handler';
+import type {
+  HandlerContext,
+  KnownHttpApiKey,
+  PageAssets,
+  StrictMap,
+} from './preset/isomorphic/types';
+import type { SpecificExtras } from './preset/node/handler/utils';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper } from 'middleware-axios';
 

@@ -1,9 +1,4 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc  */
-import { createPreset, Resolve, Preset } from '../../di';
-import { KnownToken } from '../../tokens';
-import { ConfigSource, createConfigSource } from '../../config';
-import { Logger, createLogger } from '../../log';
-import { createSentryHandler } from '../../log/handler/sentry';
 import {
   BrowserClient,
   Hub,
@@ -11,42 +6,17 @@ import {
   defaultStackParser,
   makeFetchTransport,
 } from '@sentry/browser';
-import { create } from 'middleware-axios';
-import { BridgeClientSide, SsrBridge } from '../../utils/ssr';
-import { StrictMap, KnownHttpApiKey, PresetTuner } from '../parts/types';
-import { HttpApiHostPool, HttpStatus } from '../parts/utils';
-import { logMiddleware } from '../../utils/axios/middleware/log';
-import {
-  provideBaseConfig,
-  provideSagaMiddleware,
-  provideHttpClientLogHandler,
-} from '../parts/providers';
+import { ConfigSource, createConfigSource } from '../../../config';
+import { Resolve } from '../../../di';
+import { Logger, createLogger } from '../../../log';
+import { KnownToken } from '../../../tokens';
+import { createSentryHandler } from '../../../log/handler/sentry';
+import { BridgeClientSide, SsrBridge } from '../../../utils/ssr';
+import { KnownHttpApiKey, StrictMap } from '../../isomorphic/types';
+import { HttpApiHostPool, HttpStatus } from '../../isomorphic/utils';
 import { CreateAxiosDefaults } from 'axios';
-
-/**
- * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов в браузере.
- * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
- * @return Preset.
- */
-export function PresetBrowser(customize?: PresetTuner): Preset {
-  // ВАЖНО: используем .set() вместо аргумента defaults функции createPreset из-за скорости
-  const preset = createPreset();
-
-  preset.set(KnownToken.Config.source, provideConfigSource);
-  preset.set(KnownToken.Config.base, provideBaseConfig);
-  preset.set(KnownToken.logger, provideLogger);
-  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
-  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
-  preset.set(KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler);
-  preset.set(KnownToken.SsrBridge.clientSide, provideBridgeClientSide);
-  preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
-
-  if (customize) {
-    customize({ override: preset.set.bind(preset) });
-  }
-
-  return preset;
-}
+import { create } from 'middleware-axios';
+import { logMiddleware } from '../../../utils/axios';
 
 export function provideConfigSource(): ConfigSource {
   // ВАЖНО: по умолчанию рассчитываем на process.env который предоставляется сборщиком (например webpack)

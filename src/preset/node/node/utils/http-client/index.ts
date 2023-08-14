@@ -2,6 +2,10 @@ import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { BaseConfig } from '../../../../../config';
+import { Request } from 'express';
+import { getClientIp } from '../http-server';
+import { displayUrl } from '../../../../isomorphic/utils';
 
 /**
  * Возвращает новый middleware для трассировки исходящих запросов.
@@ -92,31 +96,33 @@ export function hideFirstId(url: string): [string, number | undefined] {
 }
 
 /**
- * Объединяет значения опций baseURL и url (axios) в одну строку для логирования.
- * @param baseURL Опция baseURL.
- * @param url Опция url.
- * @return Отображение. Не является валидным URL.
+ * Формирует заголовки для исходящих запросов с сервера по соглашению.
+ * @param config Конфиг.
+ * @param request Входящий запрос.
+ * @return Заголовки для исходящих запросов.
  */
-export function displayUrl(
-  baseURL: AxiosRequestConfig['baseURL'] = '',
-  url: AxiosRequestConfig['url'] = '',
-) {
-  let result: string;
+export function getRequestHeaders(config: BaseConfig, request: Request): Record<string, string> {
+  const result: Record<string, string> = {
+    'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
+  };
 
-  switch (true) {
-    case Boolean(baseURL && url):
-      result = `${baseURL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
-      break;
-    case Boolean(baseURL) && !url:
-      result = baseURL;
-      break;
-    case !baseURL && Boolean(url):
-      result = url;
-      break;
-    case !baseURL && !url:
-    default:
-      result = '[empty]';
-      break;
+  const clientIp = getClientIp(request);
+  if (clientIp) {
+    result['X-Client-Ip'] = clientIp;
+  }
+
+  const cookie = request.get('cookie');
+  if (cookie) {
+    result.Cookie = cookie;
+  }
+
+  // добавляем специфичные заголовки
+  for (const key of Object.keys(request.headers)) {
+    const value = request.header(key);
+
+    if (key.toLowerCase().indexOf('simaland-') === 0 && value) {
+      result[key] = value;
+    }
   }
 
   return result;

@@ -1,24 +1,21 @@
 import { SeverityLevel } from '@sentry/browser';
 import Axios, { AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
-import type { Request } from 'express';
-import type { StrictMap } from './types';
-import type { ConfigSource, BaseConfig } from '../../config/types';
-import { Logger, Breadcrumb, DetailedError } from '../../log';
+import type { StrictMap } from '../types';
+import type { ConfigSource } from '../../../config/types';
+import { Logger, Breadcrumb, DetailedError } from '../../../log';
 import {
   SharedData,
   DoneSharedData,
   FailSharedData,
   LogMiddlewareHandler,
-} from '../../utils/axios/middleware/log';
-import { applyAxiosDefaults } from '../../utils/axios/utils';
-import { displayUrl } from '../node/node/http-client';
+} from '../../../utils/axios/middleware/log';
+import { applyAxiosDefaults } from '../../../utils/axios/utils';
 import {
   SagaErrorInfo,
   SagaInterruptInfo,
   SagaMiddlewareHandler,
-} from '../../utils/redux-saga/types';
-import net from 'node:net';
+} from '../../../utils/redux-saga/types';
 
 /** Реализация пула хостов. */
 export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
@@ -321,49 +318,32 @@ export abstract class HttpStatus {
 }
 
 /**
- * Формирует заголовки для исходящих запросов с сервера по соглашению.
- * @param config Конфиг.
- * @param request Входящий запрос.
- * @return Заголовки для исходящих запросов.
+ * Объединяет значения опций baseURL и url (axios) в одну строку для логирования.
+ * @param baseURL Опция baseURL.
+ * @param url Опция url.
+ * @return Отображение. Не является валидным URL.
  */
-export function getRequestHeaders(config: BaseConfig, request: Request): Record<string, string> {
-  const result: Record<string, string> = {
-    'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
-  };
+export function displayUrl(
+  baseURL: AxiosRequestConfig['baseURL'] = '',
+  url: AxiosRequestConfig['url'] = '',
+) {
+  let result: string;
 
-  const clientIp = getClientIp(request);
-  if (clientIp) {
-    result['X-Client-Ip'] = clientIp;
-  }
-
-  const cookie = request.get('cookie');
-  if (cookie) {
-    result.Cookie = cookie;
-  }
-
-  // добавляем специфичные заголовки
-  for (const key of Object.keys(request.headers)) {
-    const value = request.header(key);
-
-    if (key.toLowerCase().indexOf('simaland-') === 0 && value) {
-      result[key] = value;
-    }
+  switch (true) {
+    case Boolean(baseURL && url):
+      result = `${baseURL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+      break;
+    case Boolean(baseURL) && !url:
+      result = baseURL;
+      break;
+    case !baseURL && Boolean(url):
+      result = url;
+      break;
+    case !baseURL && !url:
+    default:
+      result = '[empty]';
+      break;
   }
 
   return result;
-}
-
-/**
- * Определяет IP входящего запроса.
- * @param request Входящий запрос.
- * @return IP.
- */
-export function getClientIp(request: Request): string | undefined {
-  const headerValue =
-    request.get('x-client-ip') ||
-    request.get('x-forwarded-for') ||
-    request.socket.remoteAddress ||
-    '';
-
-  return net.isIP(headerValue) ? headerValue : undefined;
 }
