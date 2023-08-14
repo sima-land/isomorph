@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Status } from '@sima-land/isomorph/utils/redux/remote-data';
+import { Status } from '@sima-land/isomorph/utils/redux';
 import { UserData } from '../types';
 
 export interface UserState {

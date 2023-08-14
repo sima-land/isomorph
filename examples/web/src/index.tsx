@@ -1,6 +1,6 @@
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { ErrorBoundary } from '@sima-land/isomorph/utils/react/error-handlers';
+import { ErrorBoundary } from '@sima-land/isomorph/utils/react';
 import { ExampleApp } from './app';
 import { TOKEN } from './tokens';
 import { configureStore } from '@reduxjs/toolkit';

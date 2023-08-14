@@ -1,5 +1,5 @@
-import type { BaseConfig } from '@sima-land/isomorph/config/types';
-import type { SauceResponse } from '@sima-land/isomorph/http-client/sauce';
+import type { BaseConfig } from '@sima-land/isomorph/config';
+import type { SauceResponse } from '@sima-land/isomorph/utils/axios';
 
 export interface Config extends BaseConfig {
   devtoolsEnabled: boolean;
