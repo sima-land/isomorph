@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc  */
 import {
   BrowserClient,
   Hub,
@@ -18,6 +17,10 @@ import { CreateAxiosDefaults } from 'axios';
 import { create } from 'middleware-axios';
 import { logMiddleware } from '../../../utils/axios';
 
+/**
+ * Провайдер источника конфигурации.
+ * @return Источник конфигурации.
+ */
 export function provideConfigSource(): ConfigSource {
   // ВАЖНО: по умолчанию рассчитываем на process.env который предоставляется сборщиком (например webpack)
   if (typeof process !== 'undefined' && process.env) {
@@ -27,6 +30,11 @@ export function provideConfigSource(): ConfigSource {
   return createConfigSource({});
 }
 
+/**
+ * Провайдер Logger'а.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Logger.
+ */
 export function provideLogger(resolve: Resolve): Logger {
   const source = resolve(KnownToken.Config.source);
 
@@ -50,12 +58,22 @@ export function provideLogger(resolve: Resolve): Logger {
   return logger;
 }
 
+/**
+ * Провайдер клиентской части "моста" для передачи данных между сервером и клиентом.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Клиентская часть "моста".
+ */
 export function provideBridgeClientSide(resolve: Resolve): BridgeClientSide<unknown> {
   const config = resolve(KnownToken.Config.base);
 
   return SsrBridge.resolve(config.appName);
 }
 
+/**
+ * Провайдер известных http-хостов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Пул известных http-хостов.
+ */
 export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpApiKey> {
   const source = resolve(KnownToken.Config.source);
 
@@ -70,6 +88,11 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
   );
 }
 
+/**
+ * Провайдер фабрики http-клиентов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Фабрика.
+ */
 export function provideHttpClientFactory(resolve: Resolve) {
   const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
 

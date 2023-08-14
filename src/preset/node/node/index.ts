@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { KnownToken } from '../../../tokens';
 import { provideBaseConfig } from '../../isomorphic/providers';
 import { Preset, createPreset } from '../../../di';
