@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { Preset, createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import { provideSagaMiddleware, provideHttpClientLogHandler } from '../../isomorphic/providers';

@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { ResponseError, createCookieStore } from '../../../../http';
 import { Resolve } from '../../../../di';
 import { KnownToken } from '../../../../tokens';
@@ -13,6 +12,11 @@ import { Fragment } from 'react';
 import { HelmetContext, RegularHelmet, getResponseFormat } from '../utils';
 import { renderToString } from 'react-dom/server';
 
+/**
+ * Провайдер фабрики http-клиентов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Фабрика.
+ */
 export function provideHttpClientFactory(resolve: Resolve) {
   // @todo а что если привести все зависимости к виду:
   // const getAppConfig = resolve.lazy(KnownToken.Config.base);
@@ -60,6 +64,11 @@ export function provideHttpClientFactory(resolve: Resolve) {
   };
 }
 
+/**
+ * Провайдер главной функции обработчика входящего http-запроса.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Главная функция.
+ */
 export function provideHandlerMain(resolve: Resolve): VoidFunction {
   const config = resolve(KnownToken.Config.base);
   const logger = resolve(KnownToken.logger);
@@ -71,6 +80,11 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
 
   const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
+  /**
+   * Рендер JSX-элемента в строку.
+   * @param element Элемент.
+   * @return Строка.
+   */
   const elementToString = (element: JSX.Element) => {
     res.emit(RESPONSE_EVENT_TYPE.renderStart);
     const result = renderToString(element);
@@ -151,6 +165,10 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
   };
 }
 
+/**
+ * Провайдер render-функции.
+ * @return Render-Функция.
+ */
 export function providePageRender() {
   return () => (
     <>
@@ -160,6 +178,11 @@ export function providePageRender() {
   );
 }
 
+/**
+ * Провайдер helmet-компонента. Этот компонент является контейнером для результата render-функции.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Helmet-компонент.
+ */
 export function providePageHelmet(resolve: Resolve) {
   const config = resolve(KnownToken.Config.base);
   const { req } = resolve(KnownToken.Http.Handler.context);
@@ -169,6 +192,11 @@ export function providePageHelmet(resolve: Resolve) {
     : Fragment;
 }
 
+/**
+ * Провайдер специфичных параметров, которые frontend-микросервис будет получать в запросе.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Параметры.
+ */
 export function provideSpecificParams(resolve: Resolve): Record<string, unknown> {
   const context = resolve(KnownToken.Http.Handler.context);
 

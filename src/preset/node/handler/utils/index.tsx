@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { ReactNode, createContext, useContext } from 'react';
 import { PageAssets } from '../../../isomorphic/types';
 import { Handler, Request } from 'express';
@@ -17,6 +16,12 @@ body {
 }
 `;
 
+/**
+ * Простой Helmet-компонент.
+ * Выведет html, head и body.
+ * @param props Свойства.
+ * @return Элемент.
+ */
 export function RegularHelmet({ children }: { children?: ReactNode }) {
   const { title, assets } = useContext(HelmetContext);
 
@@ -51,11 +56,20 @@ export function RegularHelmet({ children }: { children?: ReactNode }) {
 export class SpecificExtras {
   private _meta: any;
 
+  /**
+   * Установит мета-данные.
+   * @param meta Данные.
+   * @return Контекст.
+   */
   setMeta(meta: any): this {
     this._meta = meta;
     return this;
   }
 
+  /**
+   * Вернет установленные мета-данные.
+   * @return Данные.
+   */
   getMeta(): unknown {
     return this._meta;
   }

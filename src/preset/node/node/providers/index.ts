@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import type { ConventionalFluentInfo, Logger, LogHandler } from '../../../../log/types';
 import { BridgeServerSide, SsrBridge } from '../../../../utils/ssr';
 import { ConfigSource, createConfigSource } from '../../../../config';
@@ -39,6 +38,10 @@ import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { create } from 'middleware-axios';
 
+/**
+ * Провайдер источника конфигурации.
+ * @return Источник конфигурации.
+ */
 export function provideConfigSource(): ConfigSource {
   const envName = process.env.NODE_ENV;
 
@@ -50,6 +53,11 @@ export function provideConfigSource(): ConfigSource {
   return createConfigSource(process.env);
 }
 
+/**
+ * Провайдер Logger'а.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Logger.
+ */
 export function provideLogger(resolve: Resolve): Logger {
   const logger = createLogger();
 
@@ -60,6 +68,11 @@ export function provideLogger(resolve: Resolve): Logger {
   return logger;
 }
 
+/**
+ * Провайдер обработчика логирования для Sentry.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Обработчик.
+ */
 export function provideSentryHandler(resolve: Resolve): LogHandler {
   const source = resolve(KnownToken.Config.source);
 
@@ -75,6 +88,11 @@ export function provideSentryHandler(resolve: Resolve): LogHandler {
   return createSentryHandler(getCurrentHub);
 }
 
+/**
+ * Провайдер обработчика логирования для Pino.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Обработчик.
+ */
 export function providePinoHandler(resolve: Resolve): LogHandler {
   const config = resolve(KnownToken.Config.base);
 
@@ -95,6 +113,11 @@ export function providePinoHandler(resolve: Resolve): LogHandler {
   return createPinoHandler(pinoLogger);
 }
 
+/**
+ * Провайдер объекта Tracer.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Tracer.
+ */
 export function provideTracer(resolve: Resolve): Tracer {
   const config = resolve(KnownToken.Config.base);
   const provider = resolve(KnownToken.Tracing.tracerProvider);
@@ -102,6 +125,11 @@ export function provideTracer(resolve: Resolve): Tracer {
   return provider.getTracer(config.appName, config.appVersion);
 }
 
+/**
+ * Провайдер объекта SpanExporter.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return SpanExporter.
+ */
 export function provideSpanExporter(resolve: Resolve): SpanExporter {
   const source = resolve(KnownToken.Config.source);
 
@@ -110,6 +138,11 @@ export function provideSpanExporter(resolve: Resolve): SpanExporter {
   });
 }
 
+/**
+ * Провайдер объекта BasicTracerProvider.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return BasicTracerProvider.
+ */
 export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
   const exporter = resolve(KnownToken.Tracing.spanExporter);
   const resource = resolve(KnownToken.Tracing.tracerProviderResource);
@@ -122,6 +155,11 @@ export function provideTracerProvider(resolve: Resolve): BasicTracerProvider {
   return provider;
 }
 
+/**
+ * Провайдер объекта Resource.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Resource.
+ */
 export function provideTracerProviderResource(resolve: Resolve): Resource {
   const config = resolve(KnownToken.Config.base);
 
@@ -133,18 +171,35 @@ export function provideTracerProviderResource(resolve: Resolve): Resource {
   });
 }
 
+/**
+ * Провайдер фабрики http-клиентов.
+ * @return Фабрика.
+ */
 export function provideHttpClientFactory() {
   return create;
 }
 
+/**
+ * Провайдер фабрики http-серверов.
+ * @return Фабрика.
+ */
 export function provideHttpServerFactory() {
   return Express;
 }
 
+/**
+ * Провайдер промежуточного слоя учета входящих http-запросов.
+ * @return Промежуточный слой.
+ */
 export function provideHttpServerRequestMiddleware(): Handler {
   return Handlers.requestHandler();
 }
 
+/**
+ * Провайдер промежуточного слоя логирования входящих http-запросов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Промежуточный слой.
+ */
 export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
   const logger = resolve(KnownToken.logger);
@@ -183,6 +238,11 @@ export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
   };
 }
 
+/**
+ * Провайдер промежуточного слоя сбора метрик входящих http-запросов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Промежуточный слой.
+ */
 export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
 
@@ -211,6 +271,12 @@ export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
     buckets: [0.1, 15, 50, 100, 250, 500, 800, 1500],
   });
 
+  /**
+   * Функция формирования labels.
+   * @param req Request.
+   * @param res Response.
+   * @return Labels.
+   */
   const getLabels = (
     req: Request,
     res: Response,
@@ -253,6 +319,11 @@ export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
   };
 }
 
+/**
+ * Провайдер промежуточного слоя трассировки входящих http-запросов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Промежуточный слой.
+ */
 export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
   const tracer = resolve(KnownToken.Tracing.tracer);
 
@@ -305,16 +376,30 @@ export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
   };
 }
 
+/**
+ * Провайдер промежуточного слоя обработки ошибок в рамках ответ на http-запросы.
+ * @return Промежуточный слой.
+ */
 export function provideHttpServerErrorMiddleware(): ErrorRequestHandler {
   return Handlers.errorHandler();
 }
 
+/**
+ * Провайдер серверной части "моста" для передачи данных между сервером и клиентом.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Серверная часть "моста".
+ */
 export function provideSsrBridgeServerSide(resolve: Resolve): BridgeServerSide {
   const config = resolve(KnownToken.Config.base);
 
   return SsrBridge.prepare(config.appName);
 }
 
+/**
+ * Провайдер известных http-хостов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Пул известных http-хостов.
+ */
 export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpApiKey> {
   const source = resolve(KnownToken.Config.source);
 
@@ -329,6 +414,10 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
   );
 }
 
+/**
+ * Провайдер express-приложения метрик.
+ * @return Пул известных http-хостов.
+ */
 export function provideMetricsHttpApp(): Application {
   PromClient.collectDefaultMetrics();
 
