@@ -1,6 +1,6 @@
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
-import { sauce } from '@sima-land/isomorph/http-client/sauce';
-import { PresetBrowser } from '@sima-land/isomorph/preset/browser';
+import { sauce } from '@sima-land/isomorph/utils/axios';
+import { PresetWeb } from '@sima-land/isomorph/preset/web';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 import { Api, Config } from '../types';
 import { TOKEN } from '../tokens';
@@ -8,8 +8,8 @@ import { TOKEN } from '../tokens';
 export function ExampleApp() {
   const app = createApplication();
 
-  // используем пресет "browser" с базовыми компонентами, такими как logger и тд
-  app.preset(PresetBrowser());
+  // используем пресет "web" с базовыми компонентами, такими как logger и тд
+  app.preset(PresetWeb());
 
   // добавляем в приложение собственные компоненты
   app.bind(TOKEN.Project.config).toProvider(provideConfig);
