@@ -12,6 +12,7 @@ export interface StorageUtils
  * Возвращает объект для безопасной работы с браузерным хранилищем (LocalStorage, SessionStorage).
  * @param getStorage Функция, которая должна вернуть целевое хранилище.
  * @return Объект-обертка для безопасной работы с браузерным хранилищем.
+ * @todo Пересмотреть и перенести из browser?
  */
 export function createStorageUtils(getStorage: () => Storage): StorageUtils {
   function isAvailable(): boolean {
