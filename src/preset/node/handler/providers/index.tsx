@@ -132,16 +132,14 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
         }
 
         case 'json': {
-          res.json(
-            JSON.stringify({
-              markup: elementToString(jsx),
-              bundle_js: assets.js,
-              bundle_css: assets.css,
-              critical_js: assets.criticalJs,
-              critical_css: assets.criticalCss,
-              meta,
-            } satisfies ConventionalJson),
-          );
+          res.json({
+            markup: elementToString(jsx),
+            bundle_js: assets.js,
+            bundle_css: assets.css,
+            critical_js: assets.criticalJs,
+            critical_css: assets.criticalCss,
+            meta,
+          } satisfies ConventionalJson);
           break;
         }
       }
