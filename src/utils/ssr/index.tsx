@@ -51,6 +51,7 @@ export const SsrBridge = {
 
 /**
  * Скрипт, формирующий глобально доступные на странице данные.
+ * @todo Перенести в utils/react.
  * @param props Свойства.
  * @return Элемент.
  */

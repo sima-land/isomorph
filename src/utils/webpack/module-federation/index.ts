@@ -1,6 +1,8 @@
 import type { ModuleFederationPluginOptions, ReadyOptions } from './types';
-import { container, Compiler, WebpackError } from 'webpack';
+import * as webpack from 'webpack';
 import { createExternalConfig, DEFAULT_SHARED } from './utils';
+
+const { container, WebpackError } = webpack;
 
 /** @internal */
 export const LIBRARY_ERROR_TEXT = [
@@ -64,7 +66,7 @@ class CustomModuleFederationPlugin {
   /**
    * @param compiler Компилятор.
    */
-  apply(compiler: Compiler) {
+  apply(compiler: webpack.Compiler) {
     const { remotes, remoteEntriesGlobalKey, containersGlobalKey, shared, ...restOptions } =
       this.readyOptions;
 

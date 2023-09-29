@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { sauce } from '@sima-land/isomorph/utils/axios';
-import { PresetHandler } from '@sima-land/isomorph/preset/node/handler';
+import { PresetHandler } from '@sima-land/isomorph/preset/node';
 import { Provider } from 'react-redux';
 import { HttpApi } from '../../app/types';
 import { UsersPage, UsersSlice } from './parts';

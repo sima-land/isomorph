@@ -3,7 +3,7 @@ module.exports = {
   setupFiles: ['./.jest/setup.js'],
   globalSetup: './.jest/global-setup.js',
   transform: {
-    '^.+\\.(t|j)sx?$': 'babel-jest',
+    '^.+\\.(t|j)sx?$': ['babel-jest', { configFile: './.jest/babel.config.js' }],
   },
   transformIgnorePatterns: ['/node_modules/'],
   clearMocks: true,

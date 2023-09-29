@@ -1,4 +1,3 @@
-import { pick, pickBy } from 'lodash';
 import { defineEnv, asEnvVariables } from './utils';
 import type { Compiler, WebpackPluginInstance } from 'webpack';
 import type { EnvPluginOptions } from './types';
@@ -51,18 +50,27 @@ export class EnvPlugin implements WebpackPluginInstance {
     // define values based on target
     switch (target) {
       case 'web': {
-        values = {
-          ...this.options.define,
-          ...pick(env, [...this.options.additional, 'NODE_ENV']),
-          ...pickBy(env, (_, key) => key.startsWith('PUBLIC_')),
-        };
+        const targetKeys = [...this.options.additional, 'NODE_ENV'];
+
+        values = { ...this.options.define };
+
+        for (const name of Object.keys(env)) {
+          if (targetKeys.includes(name) || name.startsWith('PUBLIC_')) {
+            values[name] = env[name];
+          }
+        }
         break;
       }
       case 'node': {
-        values = {
-          ...this.options.define,
-          ...pick(env, [...this.options.additional, 'NODE_ENV']),
-        };
+        const targetKeys = [...this.options.additional, 'NODE_ENV'];
+
+        values = { ...this.options.define };
+
+        for (const name of Object.keys(env)) {
+          if (targetKeys.includes(name) || name.startsWith('PUBLIC_')) {
+            values[name] = env[name];
+          }
+        }
         break;
       }
       default: {
