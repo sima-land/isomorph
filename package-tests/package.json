@@ -1,0 +1,9 @@
+{
+  "name": "isomorph-package-tests",
+  "scripts": {
+    "test": "node test.mjs"
+  },
+  "dependencies": {
+    "@sima-land/isomorph": ".."
+  }
+}
