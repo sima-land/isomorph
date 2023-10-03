@@ -1,9 +1,10 @@
 {
   "name": "isomorph-package-tests",
   "scripts": {
-    "test": "node test.mjs"
+    "preparing": "cd .. && npm run build && npm pack",
+    "test": "node test.mjs && node test.cjs"
   },
   "dependencies": {
-    "@sima-land/isomorph": ".."
+    "@sima-land/isomorph": "file:../sima-land-isomorph-0.0.0.tgz"
   }
 }

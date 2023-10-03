@@ -103,6 +103,12 @@
       "import": "./dist/esm/preset/node/handler/utils/index.js",
       "default": "./dist/esm/preset/node/handler/utils/index.js"
     },
+    "./utils": {
+      "types": "./dist/types/utils/index.d.ts",
+      "require": "./dist/cjs/utils/index.js",
+      "import": "./dist/esm/utils/index.js",
+      "default": "./dist/esm/utils/index.js"
+    },
     "./utils/axios": {
       "types": "./dist/types/utils/axios/index.d.ts",
       "require": "./dist/cjs/utils/axios/index.js",
