@@ -1,17 +1,14 @@
 /* eslint-disable require-jsdoc */
-import {
-  ActionReducerMapBuilder,
-  Draft,
-  PayloadAction,
-  PayloadActionCreator,
-  createAction,
-  createSelector,
-} from '@reduxjs/toolkit';
+
+// @todo "* as" сделано для работы в Node.js ESM но есть подозрение что на tree shaking плохо скажется
+import * as redux from '@reduxjs/toolkit';
+
+const { createAction, createSelector } = redux;
 
 interface RemoteDataActions<TData, TError = unknown, TPayload = void> {
-  request: PayloadActionCreator<TPayload, string>;
-  success: PayloadActionCreator<TData, string>;
-  failure: PayloadActionCreator<TError, string>;
+  request: redux.PayloadActionCreator<TPayload, string>;
+  success: redux.PayloadActionCreator<TData, string>;
+  failure: redux.PayloadActionCreator<TError, string>;
 }
 
 /**
@@ -78,14 +75,14 @@ export abstract class RemoteData {
   >() {
     // ВАЖНО: не используем возможности immer здесь чтобы набор можно было использовать без immer.
     return {
-      request(state: S | Draft<S>): S | Draft<S> {
+      request(state: S | redux.Draft<S>): S | redux.Draft<S> {
         return {
           ...state,
           status: STATUS.fetching,
         };
       },
 
-      success(state: S | Draft<S>, action: PayloadAction<TData>): S | Draft<S> {
+      success(state: S | redux.Draft<S>, action: redux.PayloadAction<TData>): S | redux.Draft<S> {
         return {
           ...state,
           data: action.payload,
@@ -94,7 +91,7 @@ export abstract class RemoteData {
         };
       },
 
-      failure(state: S | Draft<S>, action: PayloadAction<TError>): S | Draft<S> {
+      failure(state: S | redux.Draft<S>, action: redux.PayloadAction<TError>): S | redux.Draft<S> {
         return {
           ...state,
           error: action.payload,
@@ -112,7 +109,7 @@ export abstract class RemoteData {
    */
   static applyHandlers<TData, TError>(
     actions: RemoteDataActions<TData, TError, any | never>,
-    builder: Pick<ActionReducerMapBuilder<RemoteDataState<TData, TError>>, 'addCase'>,
+    builder: Pick<redux.ActionReducerMapBuilder<RemoteDataState<TData, TError>>, 'addCase'>,
   ): void {
     const handlers = RemoteData.createHandlers<TData, TError>();
 

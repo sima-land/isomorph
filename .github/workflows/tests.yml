@@ -25,5 +25,12 @@ jobs:
           npm run lint
           npm run type-check
 
-      - name: Test
-        run: npm run test:coverage -- --forceExit
+      - name: Unit tests
+        run: npm run test -- --coverage --forceExit
+
+      - name: Package tests
+        working-directory: ./package-tests
+        run: |
+          npm run preparing
+          npm install
+          npm run test

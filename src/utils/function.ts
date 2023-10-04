@@ -1,5 +1,3 @@
-import { identity } from 'lodash';
-
 interface SafetyDoneInfo<T> {
   ok: true;
   result: T;
@@ -47,7 +45,7 @@ export function safetyAsync<T, P extends any[], F>(
  */
 export function safetyAsync<T, P extends any[], F>(
   fn: (...args: P) => Promise<T>,
-  format: SafetyFormatter<T, F> = identity,
+  format: SafetyFormatter<T, F> = value => value as F,
 ): (...args: P) => Promise<F> {
   return async function safetyWrapper(...args: P) {
     try {

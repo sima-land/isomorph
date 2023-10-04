@@ -17,6 +17,7 @@ export interface StrictMap<Key extends string> {
 
 /**
  * Контекст обработчика express.
+ * @todo Перенести!
  */
 export interface HandlerContext {
   req: Request;

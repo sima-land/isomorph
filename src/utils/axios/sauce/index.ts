@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { safetyAsync, SafetyInfo } from '../../function';
+import { safetyAsync, SafetyInfo } from '../..';
 import type { AxiosInstanceWrapper, MethodName } from 'middleware-axios';
 
 // @todo передавать заголовки ответа

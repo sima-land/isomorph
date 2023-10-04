@@ -1,5 +1,5 @@
 import { createToken } from '@sima-land/isomorph/di';
-import { KnownToken } from '../../../dist/tokens';
+import { KnownToken } from '@sima-land/isomorph/tokens';
 import type { Config, Api } from './types';
 
 export const TOKEN = {

@@ -30,7 +30,7 @@ jobs:
           npm run type-check
 
       - name: Test
-        run: npm run test:coverage -- --forceExit
+        run: npm run test -- --coverage --forceExit
 
       - name: Build package
         run: |
@@ -38,8 +38,8 @@ jobs:
           npm pkg delete scripts.prepare
           npm run build
 
-      - name: Publish build
-        run: npm publish ./dist --access public
+      - name: Publish package
+        run: npm publish ./ --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
 

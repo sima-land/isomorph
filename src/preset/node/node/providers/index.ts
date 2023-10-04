@@ -8,7 +8,7 @@ import { HttpApiHostPool } from '../../../isomorphic/utils';
 import { KnownToken } from '../../../../tokens';
 import { Resolve } from '../../../../di';
 import { StrictMap, KnownHttpApiKey } from '../../../isomorphic/types';
-import { toMilliseconds } from '../../../../utils/number';
+import { toMilliseconds } from '../../../../utils';
 import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
 import { getClientIp } from '../utils/http-server';
 
