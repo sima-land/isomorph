@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "Example of server application",
   "scripts": {
-    "preparing": "cd ../.. && npm run build && npm pack",
+    "preparing": "cd ../.. && npm run build && npm pack && cd examples/node && npm i --no-save ../../sima-land-isomorph-0.0.0.tgz",
     "dev": "NODE_ENV='development' webpack watch",
     "start": "NODE_ENV='development' node ./dist/index.js",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx",
@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.6",
-    "@sima-land/isomorph": "file:../../sima-land-isomorph-0.0.0.tgz",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.3",
