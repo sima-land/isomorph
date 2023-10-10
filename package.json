@@ -158,6 +158,13 @@
       "default": "./dist/esm/utils/webpack/index.js"
     }
   },
+  "typesVersions": {
+    ">=4.2": {
+      "*": [
+        "dist/types/*"
+      ]
+    }
+  },
   "scripts": {
     "prepare": "husky install",
     "type-check": "tsc -p . --noEmit",

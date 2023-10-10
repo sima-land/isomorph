@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "Example of browser application",
   "scripts": {
-    "preparing": "cd ../.. && npm run build && npm pack",
+    "preparing": "cd ../.. && npm run build && npm pack && cd examples/web && npm i --no-save ../../sima-land-isomorph-0.0.0.tgz",
     "dev": "NODE_ENV='development' webpack serve",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "type-check": "tsc -p . --noEmit"
@@ -13,7 +13,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
-    "@sima-land/isomorph": "file:../../sima-land-isomorph-0.0.0.tgz",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.4",
