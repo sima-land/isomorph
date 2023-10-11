@@ -12,7 +12,7 @@ module.exports = {
     [
       '@babel/preset-react',
       {
-        runtime: 'automatic',
+        runtime: 'classic', // ВАЖНО: для того чтобы ESM работал и в react 17 и в react 18
       },
     ],
     '@babel/preset-typescript',
