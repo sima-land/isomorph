@@ -304,7 +304,7 @@ export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
             method: req.method,
             route: req.baseUrl + req.path,
           },
-          toMilliseconds(renderStart - renderFinish),
+          toMilliseconds(renderFinish - renderStart),
         );
       });
     });
