@@ -49,6 +49,12 @@
       "import": "./dist/esm/tokens.js",
       "default": "./dist/esm/tokens.js"
     },
+    "./preset/isomorphic": {
+      "types": "./dist/types/preset/isomorphic/index.d.ts",
+      "require": "./dist/cjs/preset/isomorphic/index.js",
+      "import": "./dist/esm/preset/isomorphic/index.js",
+      "default": "./dist/esm/preset/isomorphic/index.js"
+    },
     "./preset/isomorphic/providers": {
       "types": "./dist/types/preset/isomorphic/providers/index.d.ts",
       "require": "./dist/cjs/preset/isomorphic/providers/index.js",

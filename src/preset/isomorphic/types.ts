@@ -1,5 +1,4 @@
 import type { Provider, Token } from '../../di';
-import type { Request, Response, NextFunction } from 'express';
 
 export interface PresetTuner {
   (tools: { override: <T>(token: Token<T>, provider: Provider<T>) => void }): void;
@@ -13,16 +12,6 @@ export type KnownHttpApiKey = 'ilium' | 'simaV3' | 'simaV4' | 'simaV6';
 export interface StrictMap<Key extends string> {
   /** Возвращает значение по ключу. */
   get(key: Key): string;
-}
-
-/**
- * Контекст обработчика express.
- * @todo Перенести!
- */
-export interface HandlerContext {
-  req: Request;
-  res: Response;
-  next: NextFunction;
 }
 
 /**
