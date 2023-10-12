@@ -10,6 +10,13 @@
   "files": [
     "dist",
     "src",
+    "cache",
+    "config",
+    "di",
+    "http",
+    "log",
+    "preset",
+    "utils",
     "README.md"
   ],
   "exports": {
@@ -164,6 +171,7 @@
       "default": "./dist/esm/utils/webpack/index.js"
     }
   },
+  "types": "index.d.ts",
   "typesVersions": {
     ">=4.2": {
       "*": [
@@ -174,12 +182,13 @@
   "scripts": {
     "prepare": "husky install",
     "type-check": "tsc -p . --noEmit",
-    "build:before": "rm -rf dist",
+    "build:before": "rm -rf dist cache config di http log preset utils",
     "build:esm": "babel src --config-file ./babel.config.esm.js -d dist/esm --source-maps --extensions '.ts,.tsx' --ignore='**/__test__/**/*' --ignore='**/*.d.ts' && echo '{ \"type\": \"module\" }' > dist/esm/package.json",
     "build:cjs": "babel src --config-file ./babel.config.cjs.js -d dist/cjs --source-maps --extensions '.ts,.tsx' --ignore='**/__test__/**/*' --ignore='**/*.d.ts' && echo '{ \"type\": \"commonjs\" }' > dist/cjs/package.json",
     "build:types": "tsc --project tsconfig.types.json",
     "post-build-esm": "node scripts/post-build-esm.mjs",
-    "build": "npm run build:before && npm run build:esm && npm run build:cjs && npm run build:types && npm run post-build-esm",
+    "post-build-pkg": "node scripts/post-build-pkg.mjs",
+    "build": "npm run build:before && npm run build:esm && npm run build:cjs && npm run build:types && npm run post-build-esm && npm run post-build-pkg",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "test": "jest"
   },
@@ -198,6 +207,7 @@
     "@types/react-dom": "^18.2.6",
     "@types/webpack": "^5.28.1",
     "babel-jest": "^29.5.0",
+    "fs-extra": "^11.1.1",
     "husky": "^8.0.3",
     "jest": "^28.1.3",
     "jest-environment-jsdom": "^28.1.3",
