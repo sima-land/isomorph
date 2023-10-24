@@ -96,7 +96,7 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
 export function provideHttpClientFactory(resolve: Resolve) {
   const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
 
-  return function createHttpClient(config: CreateAxiosDefaults = {}) {
+  return (config: CreateAxiosDefaults = {}) => {
     // @todo убрать as any
     const client = create(config as any);
 
