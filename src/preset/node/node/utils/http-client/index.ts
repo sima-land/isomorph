@@ -1,9 +1,9 @@
 import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
+import type { Request } from 'express';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { BaseConfig } from '../../../../../config';
-import { Request } from 'express';
 import { getClientIp } from '../http-server';
 import { displayUrl } from '../../../../isomorphic/utils';
 

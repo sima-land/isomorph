@@ -93,7 +93,7 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
     return result;
   };
 
-  return async function main() {
+  return async () => {
     try {
       const assets = await getAssets();
       const meta = extras.getMeta();

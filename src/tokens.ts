@@ -59,7 +59,7 @@ export const KnownToken = {
     // @todo переименовать в Axios?
     Client: {
       factory:
-        createToken<(defaults?: CreateAxiosDefaults) => AxiosInstanceWrapper>('client/factory'),
+        createToken<(config?: CreateAxiosDefaults) => AxiosInstanceWrapper>('client/factory'),
       Middleware: {
         Log: {
           handler: createToken<LogMiddlewareHandlerInit>('log/handler'),
