@@ -10,13 +10,6 @@
   "files": [
     "dist",
     "src",
-    "cache",
-    "config",
-    "di",
-    "http",
-    "log",
-    "preset",
-    "utils",
     "README.md"
   ],
   "exports": {
@@ -171,11 +164,82 @@
       "default": "./dist/esm/utils/webpack/index.js"
     }
   },
-  "types": "index.d.ts",
   "typesVersions": {
     ">=4.2": {
-      "*": [
-        "dist/types/*"
+      "./cache": [
+        "./dist/types/cache/index.d.ts"
+      ],
+      "./config": [
+        "./dist/types/config/index.d.ts"
+      ],
+      "./di": [
+        "./dist/types/di/index.d.ts"
+      ],
+      "./http": [
+        "./dist/types/http/index.d.ts"
+      ],
+      "./log": [
+        "./dist/types/log/index.d.ts"
+      ],
+      "./tokens": [
+        "./dist/types/tokens.d.ts"
+      ],
+      "./preset/isomorphic": [
+        "./dist/types/preset/isomorphic/index.d.ts"
+      ],
+      "./preset/isomorphic/providers": [
+        "./dist/types/preset/isomorphic/providers/index.d.ts"
+      ],
+      "./preset/isomorphic/utils": [
+        "./dist/types/preset/isomorphic/utils/index.d.ts"
+      ],
+      "./preset/web": [
+        "./dist/types/preset/web/index.d.ts"
+      ],
+      "./preset/web/providers": [
+        "./dist/types/preset/web/providers/index.d.ts"
+      ],
+      "./preset/node": [
+        "./dist/types/preset/node/index.d.ts"
+      ],
+      "./preset/node/node/providers": [
+        "./dist/types/preset/node/node/providers/index.d.ts"
+      ],
+      "./preset/node/node/utils": [
+        "./dist/types/preset/node/node/utils/index.d.ts"
+      ],
+      "./preset/node/handler/providers": [
+        "./dist/types/preset/node/handler/providers/index.d.ts"
+      ],
+      "./preset/node/handler/utils": [
+        "./dist/types/preset/node/handler/utils/index.d.ts"
+      ],
+      "./utils": [
+        "./dist/types/utils/index.d.ts"
+      ],
+      "./utils/axios": [
+        "./dist/types/utils/axios/index.d.ts"
+      ],
+      "./utils/express": [
+        "./dist/types/utils/express/index.d.ts"
+      ],
+      "./utils/react": [
+        "./dist/types/utils/react/index.d.ts"
+      ],
+      "./utils/redux": [
+        "./dist/types/utils/redux/index.d.ts"
+      ],
+      "./utils/redux-saga": [
+        "./dist/types/utils/redux-saga/index.d.ts"
+      ],
+      "./utils/ssr": [
+        "./dist/types/utils/ssr/index.d.ts"
+      ],
+      "./utils/web/analytics": [
+        "./dist/types/utils/web/analytics/index.d.ts"
+      ],
+      "./utils/webpack": [
+        "./dist/types/utils/webpack/index.d.ts"
       ]
     }
   },
@@ -187,8 +251,7 @@
     "build:cjs": "babel src --config-file ./babel.config.cjs.js -d dist/cjs --source-maps --extensions '.ts,.tsx' --ignore='**/__test__/**/*' --ignore='**/*.d.ts' && node scripts/make-pkg-cjs.mjs",
     "build:types": "tsc --project tsconfig.types.json",
     "post-build-esm": "node scripts/post-build-esm.mjs",
-    "post-build-pkg": "node scripts/post-build-pkg.mjs",
-    "build": "npm run build:before && npm run build:esm && npm run build:cjs && npm run build:types && npm run post-build-esm && npm run post-build-pkg",
+    "build": "npm run build:before && npm run build:esm && npm run build:cjs && npm run build:types && npm run post-build-esm",
     "lint": "eslint --cache ./src --ext .js,.jsx,.ts,.tsx",
     "test": "jest"
   },
@@ -217,7 +280,7 @@
   },
   "dependencies": {
     "@humanwhocodes/env": "^2.2.2",
-    "@krutoo/fetch-tools": "^0.0.9",
+    "@krutoo/fetch-tools": "^0.0.10",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/exporter-prometheus": "^0.38.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.39.1",
