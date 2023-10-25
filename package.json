@@ -166,79 +166,79 @@
   },
   "typesVersions": {
     ">=4.2": {
-      "./cache": [
+      "cache": [
         "./dist/types/cache/index.d.ts"
       ],
-      "./config": [
+      "config": [
         "./dist/types/config/index.d.ts"
       ],
-      "./di": [
+      "di": [
         "./dist/types/di/index.d.ts"
       ],
-      "./http": [
+      "http": [
         "./dist/types/http/index.d.ts"
       ],
-      "./log": [
+      "log": [
         "./dist/types/log/index.d.ts"
       ],
-      "./tokens": [
+      "tokens": [
         "./dist/types/tokens.d.ts"
       ],
-      "./preset/isomorphic": [
+      "preset/isomorphic": [
         "./dist/types/preset/isomorphic/index.d.ts"
       ],
-      "./preset/isomorphic/providers": [
+      "preset/isomorphic/providers": [
         "./dist/types/preset/isomorphic/providers/index.d.ts"
       ],
-      "./preset/isomorphic/utils": [
+      "preset/isomorphic/utils": [
         "./dist/types/preset/isomorphic/utils/index.d.ts"
       ],
-      "./preset/web": [
+      "preset/web": [
         "./dist/types/preset/web/index.d.ts"
       ],
-      "./preset/web/providers": [
+      "preset/web/providers": [
         "./dist/types/preset/web/providers/index.d.ts"
       ],
-      "./preset/node": [
+      "preset/node": [
         "./dist/types/preset/node/index.d.ts"
       ],
-      "./preset/node/node/providers": [
+      "preset/node/node/providers": [
         "./dist/types/preset/node/node/providers/index.d.ts"
       ],
-      "./preset/node/node/utils": [
+      "preset/node/node/utils": [
         "./dist/types/preset/node/node/utils/index.d.ts"
       ],
-      "./preset/node/handler/providers": [
+      "preset/node/handler/providers": [
         "./dist/types/preset/node/handler/providers/index.d.ts"
       ],
-      "./preset/node/handler/utils": [
+      "preset/node/handler/utils": [
         "./dist/types/preset/node/handler/utils/index.d.ts"
       ],
-      "./utils": [
+      "utils": [
         "./dist/types/utils/index.d.ts"
       ],
-      "./utils/axios": [
+      "utils/axios": [
         "./dist/types/utils/axios/index.d.ts"
       ],
-      "./utils/express": [
+      "utils/express": [
         "./dist/types/utils/express/index.d.ts"
       ],
-      "./utils/react": [
+      "utils/react": [
         "./dist/types/utils/react/index.d.ts"
       ],
-      "./utils/redux": [
+      "utils/redux": [
         "./dist/types/utils/redux/index.d.ts"
       ],
-      "./utils/redux-saga": [
+      "utils/redux-saga": [
         "./dist/types/utils/redux-saga/index.d.ts"
       ],
-      "./utils/ssr": [
+      "utils/ssr": [
         "./dist/types/utils/ssr/index.d.ts"
       ],
-      "./utils/web/analytics": [
+      "utils/web/analytics": [
         "./dist/types/utils/web/analytics/index.d.ts"
       ],
-      "./utils/webpack": [
+      "utils/webpack": [
         "./dist/types/utils/webpack/index.d.ts"
       ]
     }
