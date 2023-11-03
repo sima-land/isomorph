@@ -157,6 +157,12 @@
       "import": "./dist/esm/utils/web/analytics/index.js",
       "default": "./dist/esm/utils/web/analytics/index.js"
     },
+    "./utils/web/storage": {
+      "types": "./dist/types/utils/web/storage/index.d.ts",
+      "require": "./dist/cjs/utils/web/storage/index.js",
+      "import": "./dist/esm/utils/web/storage/index.js",
+      "default": "./dist/esm/utils/web/storage/index.js"
+    },
     "./utils/webpack": {
       "types": "./dist/types/utils/webpack/index.d.ts",
       "require": "./dist/cjs/utils/webpack/index.js",
@@ -237,6 +243,9 @@
       ],
       "utils/web/analytics": [
         "./dist/types/utils/web/analytics/index.d.ts"
+      ],
+      "utils/web/storage": [
+        "./dist/types/utils/web/storage/index.d.ts"
       ],
       "utils/webpack": [
         "./dist/types/utils/webpack/index.d.ts"
