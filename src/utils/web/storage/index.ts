@@ -3,8 +3,7 @@
 /**
  * Интерфейс объекта-обертки для безопасной работы с WebStorage.
  */
-export interface StorageUtils
-  extends Pick<Storage, 'clear' | 'getItem' | 'key' | 'removeItem' | 'setItem' | 'length'> {
+export interface SafeStorage extends Storage {
   isAvailable: () => boolean;
 }
 
@@ -12,10 +11,9 @@ export interface StorageUtils
  * Возвращает объект для безопасной работы с браузерным хранилищем (LocalStorage, SessionStorage).
  * @param getStorage Функция, которая должна вернуть целевое хранилище.
  * @return Объект-обертка для безопасной работы с браузерным хранилищем.
- * @todo Пересмотреть и перенести из browser?
  */
-export function createStorageUtils(getStorage: () => Storage): StorageUtils {
-  function isAvailable(): boolean {
+export function createSafeStorage(getStorage: () => Storage): SafeStorage {
+  const isAvailable = (): boolean => {
     try {
       const testKey = `storage_test_key::${Date.now()}`;
 
@@ -26,48 +24,49 @@ export function createStorageUtils(getStorage: () => Storage): StorageUtils {
     } catch {
       return false;
     }
-  }
+  };
 
-  function clear(): void {
+  const clear = (): void => {
     if (isAvailable()) {
       getStorage().clear();
     }
-  }
+  };
 
-  function getItem(name: string): string | null {
+  const getItem = (name: string): string | null => {
     if (isAvailable()) {
       return getStorage().getItem(name);
     }
 
     return null;
-  }
+  };
 
-  function key(index: number): string | null {
+  const key = (index: number): string | null => {
     if (isAvailable()) {
       return getStorage().key(index);
     }
-    return null;
-  }
 
-  function removeItem(name: string): void {
+    return null;
+  };
+
+  const removeItem = (name: string): void => {
     if (isAvailable()) {
       getStorage().removeItem(name);
     }
-  }
+  };
 
-  function setItem(name: string, value: string): void {
+  const setItem = (name: string, value: string): void => {
     if (isAvailable()) {
       getStorage().setItem(name, value);
     }
-  }
+  };
 
-  function length(): number {
+  const getLength = (): number => {
     if (isAvailable()) {
       return getStorage().length;
     }
 
     return 0;
-  }
+  };
 
   return {
     isAvailable,
@@ -78,7 +77,7 @@ export function createStorageUtils(getStorage: () => Storage): StorageUtils {
     removeItem,
     setItem,
     get length() {
-      return length();
+      return getLength();
     },
   };
 }
