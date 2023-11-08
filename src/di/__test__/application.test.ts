@@ -125,10 +125,10 @@ describe('Application', () => {
 
     const server = childApp.get(TOKEN.server);
 
-    expect(spy).toBeCalledTimes(0);
+    expect(spy).toHaveBeenCalledTimes(0);
     server.start();
-    expect(spy).toBeCalledTimes(1);
-    expect(spy).toBeCalledWith(1200);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(1200);
   });
 
   it('should prevent reattach', () => {
@@ -177,8 +177,8 @@ describe('Application', () => {
       spy(knight.attack());
     });
 
-    expect(spy).toBeCalledTimes(1);
-    expect(spy).toBeCalledWith(17);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(17);
   });
 
   it('should properly handle circular dependencies', () => {

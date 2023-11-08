@@ -174,7 +174,7 @@ describe('HttpClientLogging', () => {
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
 
-    expect(logger.info).toBeCalledTimes(2);
+    expect(logger.info).toHaveBeenCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
       new Breadcrumb({
         category: 'http.request',
@@ -223,7 +223,7 @@ describe('HttpClientLogging', () => {
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
 
-    expect(logger.info).toBeCalledTimes(2);
+    expect(logger.info).toHaveBeenCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
       new Breadcrumb({
         category: 'http.request',
@@ -274,7 +274,7 @@ describe('HttpClientLogging', () => {
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
 
-    expect(logger.info).toBeCalledTimes(2);
+    expect(logger.info).toHaveBeenCalledTimes(2);
     expect((logger.info as jest.Mock).mock.calls[0]).toEqual([
       new Breadcrumb({
         category: 'http.request',
@@ -322,14 +322,14 @@ describe('HttpClientLogging', () => {
 
     const handler = new HttpClientLogging(logger, { config, defaults });
 
-    expect(logger.error).toBeCalledTimes(0);
-    expect(logger.info).toBeCalledTimes(0);
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
 
     handler.beforeRequest();
     handler.onCatch({ config, defaults, error });
 
-    expect(logger.error).toBeCalledTimes(1);
-    expect(logger.info).toBeCalledTimes(2);
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.info).toHaveBeenCalledTimes(2);
   });
 
   it('should log axios error without status', async () => {
@@ -351,14 +351,14 @@ describe('HttpClientLogging', () => {
 
     const handler = new HttpClientLogging(logger, { config, defaults });
 
-    expect(logger.error).toBeCalledTimes(0);
-    expect(logger.info).toBeCalledTimes(0);
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
 
     handler.beforeRequest();
     handler.onCatch({ config, defaults, error });
 
-    expect(logger.error).toBeCalledTimes(1);
-    expect(logger.info).toBeCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.info).toHaveBeenCalledTimes(1);
 
     const loggerErrorArgument: any = (logger.error as jest.Mock).mock.calls[0][0];
 
@@ -404,14 +404,14 @@ describe('HttpClientLogging', () => {
 
     const handler = new HttpClientLogging(logger, { config, defaults });
 
-    expect(logger.error).toBeCalledTimes(0);
-    expect(logger.info).toBeCalledTimes(0);
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
 
     handler.beforeRequest();
     handler.onCatch({ config, defaults, error });
 
-    expect(logger.error).toBeCalledTimes(1);
-    expect(logger.info).toBeCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.info).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -424,28 +424,28 @@ describe('SagaLogging', () => {
   it('should handle saga error properly', () => {
     const handler = new SagaLogging(logger);
 
-    expect(logger.error).toBeCalledTimes(0);
+    expect(logger.error).toHaveBeenCalledTimes(0);
     handler.onSagaError(new Error('my test error'), { sagaStack: 'my test stack' });
-    expect(logger.error).toBeCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledTimes(1);
   });
 
   it('should handle config error properly', () => {
     const handler = new SagaLogging(logger);
     const error = new Error('my test error');
 
-    expect(logger.error).toBeCalledTimes(0);
+    expect(logger.error).toHaveBeenCalledTimes(0);
     handler.onConfigError(error);
-    expect(logger.error).toBeCalledTimes(1);
-    expect(logger.error).toBeCalledWith(error);
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith(error);
   });
 
   it('should handle timeout interrupt properly', () => {
     const handler = new SagaLogging(logger);
     const info = { timeout: 250 };
 
-    expect(logger.error).toBeCalledTimes(0);
+    expect(logger.error).toHaveBeenCalledTimes(0);
     handler.onTimeoutInterrupt(info);
-    expect(logger.error).toBeCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledTimes(1);
   });
 });
 

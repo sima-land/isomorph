@@ -34,9 +34,9 @@ describe('tracingMiddleware', () => {
     const defaults = { baseURL: 'https://www.test.com/', headers: {} as any };
     await middleware(config, next, defaults);
 
-    expect(currentSpan.setAttributes).toBeCalledTimes(1);
-    expect(currentSpan.end).toBeCalledTimes(1);
-    expect(currentSpan.setStatus).toBeCalledTimes(0);
+    expect(currentSpan.setAttributes).toHaveBeenCalledTimes(1);
+    expect(currentSpan.end).toHaveBeenCalledTimes(1);
+    expect(currentSpan.setStatus).toHaveBeenCalledTimes(0);
   });
 
   it('should handle failure response', async () => {
@@ -68,16 +68,16 @@ describe('tracingMiddleware', () => {
 
     await middleware(config, next, defaults).catch(() => Promise.resolve());
 
-    expect(currentSpan.setAttributes).toBeCalledTimes(1);
-    expect(currentSpan.setAttributes).toBeCalledWith({
+    expect(currentSpan.setAttributes).toHaveBeenCalledTimes(1);
+    expect(currentSpan.setAttributes).toHaveBeenCalledWith({
       [SemanticAttributes.HTTP_URL]: 'https://www.test.com/api/v3/{id}/something',
       [SemanticAttributes.HTTP_METHOD]: 'GET',
       'request.params': JSON.stringify({}),
       'request.headers': JSON.stringify({}),
       'request.id': 12341241,
     });
-    expect(currentSpan.end).toBeCalledTimes(1);
-    expect(currentSpan.setStatus).toBeCalledTimes(1);
+    expect(currentSpan.end).toHaveBeenCalledTimes(1);
+    expect(currentSpan.setStatus).toHaveBeenCalledTimes(1);
   });
 });
 
