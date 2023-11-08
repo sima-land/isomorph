@@ -96,10 +96,10 @@ export function getResponseFormat(req: Request): 'html' | 'json' {
  * @return Обработчик.
  */
 export function HandlerProvider(getApp: () => Application) {
-  return function provider(resolve: Resolve): Handler {
+  return (resolve: Resolve): Handler => {
     const parent = resolve(CURRENT_APP);
 
-    return function handler(req, res, next) {
+    return (req, res, next) => {
       const app = getApp();
 
       app.attach(parent);

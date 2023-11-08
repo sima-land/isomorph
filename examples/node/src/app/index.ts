@@ -1,6 +1,6 @@
 import { TOKEN } from '../tokens';
 import { AppConfig } from './types';
-import express, { Application as ExpressApp } from 'express';
+import express from 'express';
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { PresetNode, HandlerProvider } from '@sima-land/isomorph/preset/node';
 import { UsersPageApp } from '../pages/users';
@@ -36,7 +36,7 @@ function provideAppConfig(resolve: Resolve): AppConfig {
   };
 }
 
-function provideHttpServer(resolve: Resolve): ExpressApp {
+function provideHttpServer(resolve: Resolve): express.Application {
   const usersHandler = resolve(TOKEN.Project.Http.Pages.users);
   const postsHandler = resolve(TOKEN.Project.Http.Pages.posts);
   const healthCheckHandler = resolve(TOKEN.Lib.Http.Server.Handlers.healthCheck);
@@ -52,13 +52,16 @@ function provideHttpServer(resolve: Resolve): ExpressApp {
 
   // регистрируем промежуточные слои
   app.use(express.static('dist/static'));
-  app.use(['/', '/users', '/posts'], [requestHandle, logging, metrics, tracing, errorHandle]);
+  app.use(['/', '/users', '/posts'], [requestHandle, logging, metrics, tracing]);
 
   // регистрируем роуты
   app.get('/', postsHandler);
   app.get('/posts', postsHandler);
   app.get('/users', usersHandler);
   app.get('/healthcheck', healthCheckHandler);
+
+  // регистрируем промежуточный слой обработки ошибок
+  app.use(['/', '/users', '/posts'], [errorHandle]);
 
   return app;
 }
