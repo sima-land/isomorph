@@ -59,24 +59,24 @@ describe('ModuleFederationPlugin', () => {
       const compiler = createCompilerMock();
       const instance = new ModuleFederationPlugin({ name: 'test-module' });
 
-      expect(getSpy(container.ModuleFederationPlugin).apply).toBeCalledTimes(0);
+      expect(getSpy(container.ModuleFederationPlugin).apply).toHaveBeenCalledTimes(0);
 
       instance.apply(compiler);
 
-      expect(getSpy(container.ModuleFederationPlugin).apply).toBeCalledTimes(1);
-      expect(getSpy(container.ModuleFederationPlugin).apply).toBeCalledWith(compiler);
+      expect(getSpy(container.ModuleFederationPlugin).apply).toHaveBeenCalledTimes(1);
+      expect(getSpy(container.ModuleFederationPlugin).apply).toHaveBeenCalledWith(compiler);
     });
 
     it('should not creat and throw error, if library property pass to plugin', () => {
       expect(() => {
         new ModuleFederationPlugin({ library: 'test' } as any);
-      }).toThrowError(LIBRARY_ERROR_TEXT);
+      }).toThrow(LIBRARY_ERROR_TEXT);
     });
 
     it('should not creat and throw error, if remotes property incorrect', () => {
       expect(() => {
         new ModuleFederationPlugin({ remotes: { remoteOne: {} } } as any);
-      }).toThrowError(REMOTE_ERROR_TEXT);
+      }).toThrow(REMOTE_ERROR_TEXT);
     });
   });
 
@@ -93,7 +93,7 @@ describe('ModuleFederationPlugin', () => {
 
       instance.apply(compiler);
 
-      expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+      expect(getSpy(container.ModuleFederationPlugin).constructor).toHaveBeenCalledWith({
         name: 'service-name',
         library: {
           type: 'global',
@@ -131,7 +131,7 @@ describe('ModuleFederationPlugin', () => {
       });
 
       instance.apply(compiler);
-      expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+      expect(getSpy(container.ModuleFederationPlugin).constructor).toHaveBeenCalledWith({
         name: 'service-name',
         library: {
           type: 'global',
@@ -174,7 +174,7 @@ describe('ModuleFederationPlugin', () => {
       });
 
       instance.apply(compiler);
-      expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+      expect(getSpy(container.ModuleFederationPlugin).constructor).toHaveBeenCalledWith({
         name: 'service-name',
         library: {
           type: 'global',
@@ -220,7 +220,7 @@ describe('ModuleFederationPlugin', () => {
       });
 
       instance.apply(compiler);
-      expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+      expect(getSpy(container.ModuleFederationPlugin).constructor).toHaveBeenCalledWith({
         name: 'service-name',
         filename: 'path/to/RemoteEntry.js',
         library: {
@@ -260,7 +260,7 @@ describe('ModuleFederationPlugin', () => {
         });
 
         instance.apply(compiler);
-        expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+        expect(getSpy(container.ModuleFederationPlugin).constructor).toHaveBeenCalledWith({
           name: 'service-name',
           library: {
             type: 'global',
@@ -279,7 +279,7 @@ describe('ModuleFederationPlugin', () => {
         });
 
         instance.apply(compiler);
-        expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+        expect(getSpy(container.ModuleFederationPlugin).constructor).toHaveBeenCalledWith({
           name: 'service-name',
           library: {
             type: 'global',
@@ -298,7 +298,7 @@ describe('ModuleFederationPlugin', () => {
         });
 
         instance.apply(compiler);
-        expect(getSpy(container.ModuleFederationPlugin).constructor).toBeCalledWith({
+        expect(getSpy(container.ModuleFederationPlugin).constructor).toHaveBeenCalledWith({
           name: 'service-name',
           library: {
             type: 'global',

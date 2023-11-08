@@ -26,11 +26,11 @@ describe('okoPush', () => {
       prop2: 2,
     };
 
-    expect((window as any).oko.push).toBeCalledTimes(0);
+    expect((window as any).oko.push).toHaveBeenCalledTimes(0);
 
     okoPush(testData);
 
-    expect((window as any).oko.push).toBeCalledTimes(1);
+    expect((window as any).oko.push).toHaveBeenCalledTimes(1);
     expect((window as any).oko.push.mock.calls[0][0]).toEqual({
       prop1: 1,
       prop2: 2,

@@ -52,11 +52,11 @@ describe('logMiddleware', () => {
 
     await middleware(config, next, defaults);
 
-    expect(handler.beforeRequest).toBeCalledTimes(1);
-    expect(handler.beforeRequest).toBeCalledWith({ config, defaults });
-    expect(handler.afterResponse).toBeCalledTimes(1);
-    expect(handler.afterResponse).toBeCalledWith({ config, defaults, response });
-    expect(handler.onCatch).toBeCalledTimes(0);
+    expect(handler.beforeRequest).toHaveBeenCalledTimes(1);
+    expect(handler.beforeRequest).toHaveBeenCalledWith({ config, defaults });
+    expect(handler.afterResponse).toHaveBeenCalledTimes(1);
+    expect(handler.afterResponse).toHaveBeenCalledWith({ config, defaults, response });
+    expect(handler.onCatch).toHaveBeenCalledTimes(0);
   });
 
   it('should works properly with error', async () => {
@@ -77,11 +77,11 @@ describe('logMiddleware', () => {
 
     await middleware(config, next, defaults).catch(() => null);
 
-    expect(handler.beforeRequest).toBeCalledTimes(1);
-    expect(handler.beforeRequest).toBeCalledWith({ config, defaults });
-    expect(handler.afterResponse).toBeCalledTimes(0);
-    expect(handler.onCatch).toBeCalledTimes(1);
-    expect(handler.onCatch).toBeCalledWith({ config, defaults, error });
+    expect(handler.beforeRequest).toHaveBeenCalledTimes(1);
+    expect(handler.beforeRequest).toHaveBeenCalledWith({ config, defaults });
+    expect(handler.afterResponse).toHaveBeenCalledTimes(0);
+    expect(handler.onCatch).toHaveBeenCalledTimes(1);
+    expect(handler.onCatch).toHaveBeenCalledWith({ config, defaults, error });
   });
 
   it('should handle handler factory', async () => {
@@ -110,12 +110,12 @@ describe('logMiddleware', () => {
 
     await middleware(config, next, defaults);
 
-    expect(handlerFactory).toBeCalledTimes(1);
-    expect(handlerFactory).toBeCalledWith({ config, defaults });
-    expect(handler.beforeRequest).toBeCalledTimes(1);
-    expect(handler.beforeRequest).toBeCalledWith({ config, defaults });
-    expect(handler.afterResponse).toBeCalledTimes(1);
-    expect(handler.afterResponse).toBeCalledWith({ config, defaults, response });
-    expect(handler.onCatch).toBeCalledTimes(0);
+    expect(handlerFactory).toHaveBeenCalledTimes(1);
+    expect(handlerFactory).toHaveBeenCalledWith({ config, defaults });
+    expect(handler.beforeRequest).toHaveBeenCalledTimes(1);
+    expect(handler.beforeRequest).toHaveBeenCalledWith({ config, defaults });
+    expect(handler.afterResponse).toHaveBeenCalledTimes(1);
+    expect(handler.afterResponse).toHaveBeenCalledWith({ config, defaults, response });
+    expect(handler.onCatch).toHaveBeenCalledTimes(0);
   });
 });

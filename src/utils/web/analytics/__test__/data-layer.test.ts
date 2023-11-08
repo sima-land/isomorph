@@ -26,11 +26,11 @@ describe('dataLayerPush', () => {
       prop2: 2,
     };
 
-    expect((window as any).dataLayer.push).toBeCalledTimes(0);
+    expect((window as any).dataLayer.push).toHaveBeenCalledTimes(0);
 
     dataLayerPush(testData);
 
-    expect((window as any).dataLayer.push).toBeCalledTimes(1);
+    expect((window as any).dataLayer.push).toHaveBeenCalledTimes(1);
     expect((window as any).dataLayer.push.mock.calls[0][0]).toEqual({
       prop1: 1,
       prop2: 2,

@@ -45,7 +45,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
 
-    expect(handlerException).toBeCalledWith(error, { componentStack: expect.any(String) });
+    expect(handlerException).toHaveBeenCalledWith(error, { componentStack: expect.any(String) });
     expect(container).toMatchSnapshot();
   });
 });
