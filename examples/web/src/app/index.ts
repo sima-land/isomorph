@@ -30,7 +30,7 @@ export function provideConfig(resolve: Resolve): Config {
 
 export function provideApi(resolve: Resolve): Api {
   const knownHosts = resolve(KnownToken.Http.Api.knownHosts);
-  const createClient = resolve(KnownToken.Http.Client.factory);
+  const createClient = resolve(KnownToken.Axios.factory);
   const client = sauce(createClient({ baseURL: knownHosts.get('simaV3') }));
 
   return {

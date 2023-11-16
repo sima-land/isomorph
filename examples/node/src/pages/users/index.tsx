@@ -25,7 +25,7 @@ export function UsersPageApp() {
 }
 
 function provideHttpApi(resolve: Resolve): HttpApi {
-  const createClient = resolve(TOKEN.Lib.Http.Client.factory);
+  const createClient = resolve(TOKEN.Lib.Axios.factory);
 
   const client = sauce(createClient({ baseURL: 'https://jsonplaceholder.typicode.com/' }));
 

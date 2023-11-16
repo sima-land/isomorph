@@ -7,7 +7,8 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "isolatedModules": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "types": ["bun-types", "jest"]
   },
   "include": ["./src"],
   "exclude": ["node_modules"]

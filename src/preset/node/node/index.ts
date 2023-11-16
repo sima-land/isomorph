@@ -48,16 +48,16 @@ export function PresetNode(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Metrics.httpApp, provideMetricsHttpApp);
 
   // http client
-  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
+  preset.set(KnownToken.Axios.factory, provideHttpClientFactory);
 
   // http server
-  preset.set(KnownToken.Http.Server.factory, provideHttpServerFactory);
-  preset.set(KnownToken.Http.Server.Handlers.healthCheck, healthCheck);
-  preset.set(KnownToken.Http.Server.Middleware.request, provideHttpServerRequestMiddleware);
-  preset.set(KnownToken.Http.Server.Middleware.log, provideHttpServerLogMiddleware);
-  preset.set(KnownToken.Http.Server.Middleware.metrics, provideHttpServerMetricsMiddleware);
-  preset.set(KnownToken.Http.Server.Middleware.tracing, provideHttpServerTracingMiddleware);
-  preset.set(KnownToken.Http.Server.Middleware.error, provideHttpServerErrorMiddleware);
+  preset.set(KnownToken.Express.factory, provideHttpServerFactory);
+  preset.set(KnownToken.Express.Handlers.healthCheck, healthCheck);
+  preset.set(KnownToken.Express.Middleware.request, provideHttpServerRequestMiddleware);
+  preset.set(KnownToken.Express.Middleware.log, provideHttpServerLogMiddleware);
+  preset.set(KnownToken.Express.Middleware.metrics, provideHttpServerMetricsMiddleware);
+  preset.set(KnownToken.Express.Middleware.tracing, provideHttpServerTracingMiddleware);
+  preset.set(KnownToken.Express.Middleware.error, provideHttpServerErrorMiddleware);
 
   // http api
   preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);

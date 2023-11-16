@@ -103,8 +103,8 @@ export function HandlerProvider(getApp: () => Application) {
       const app = getApp();
 
       app.attach(parent);
-      app.bind(KnownToken.Http.Handler.context).toValue({ req, res, next });
-      app.get(KnownToken.Http.Handler.main)();
+      app.bind(KnownToken.ExpressHandler.context).toValue({ req, res, next });
+      app.get(KnownToken.ExpressHandler.main)();
     };
   };
 }

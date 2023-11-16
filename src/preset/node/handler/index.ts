@@ -25,11 +25,11 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
 
   // http client
-  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
-  preset.set(KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler);
+  preset.set(KnownToken.Axios.factory, provideHttpClientFactory);
+  preset.set(KnownToken.Axios.Middleware.Log.handler, provideHttpClientLogHandler);
 
   // http handler
-  preset.set(KnownToken.Http.Handler.main, provideHandlerMain);
+  preset.set(KnownToken.ExpressHandler.main, provideHandlerMain);
   preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
   preset.set(KnownToken.Http.Handler.Response.specificExtras, () => new SpecificExtras());
   preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));
