@@ -3,8 +3,8 @@ import { BaseConfig } from '../../../config/types';
 import { Resolve } from '../../../di';
 import { LogMiddlewareHandlerInit } from '../../../utils/axios/middleware/log';
 import { KnownToken } from '../../../tokens';
-import { createSagaMiddleware, SagaExtendedMiddleware } from '../../../utils/redux-saga';
 import { HttpClientLogging, SagaLogging } from '../utils';
+import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
 
 /**
  * Провайдер базовой конфигурации приложения.
@@ -22,10 +22,17 @@ export function provideBaseConfig(resolve: Resolve): BaseConfig {
  * @param resolve Функция для получения зависимости по токену.
  * @return Промежуточный слой для redux-хранилища.
  */
-export function provideSagaMiddleware(resolve: Resolve): SagaExtendedMiddleware {
+export function provideSagaMiddleware(resolve: Resolve): SagaMiddleware {
   const logger = resolve(KnownToken.logger);
 
-  return createSagaMiddleware(new SagaLogging(logger));
+  const logHandler = new SagaLogging(logger);
+
+  return createSagaMiddleware({
+    /** @inheritdoc */
+    onError(error, errorInfo) {
+      logHandler.onSagaError(error, errorInfo);
+    },
+  });
 }
 
 /**

@@ -26,7 +26,7 @@ export function PresetWeb(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Config.source, provideConfigSource);
   preset.set(KnownToken.Config.base, provideBaseConfig);
   preset.set(KnownToken.logger, provideLogger);
-  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideSagaMiddleware);
   preset.set(KnownToken.Axios.factory, provideHttpClientFactory);
   preset.set(KnownToken.Axios.Middleware.Log.handler, provideHttpClientLogHandler);
   preset.set(KnownToken.SsrBridge.clientSide, provideBridgeClientSide);

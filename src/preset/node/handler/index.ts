@@ -22,7 +22,7 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   const preset = createPreset();
 
   // saga
-  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideSagaMiddleware);
 
   // http client
   preset.set(KnownToken.Axios.factory, provideHttpClientFactory);

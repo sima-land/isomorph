@@ -6,7 +6,7 @@ import type { ConfigSource, BaseConfig } from './config/types';
 import type { Logger } from './log/types';
 import type { Cache } from './cache/types';
 import type { LogMiddlewareHandlerInit } from './utils/axios/middleware/log';
-import type { SagaExtendedMiddleware } from './utils/redux-saga';
+import type { SagaMiddleware } from 'redux-saga';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { Tracer } from '@opentelemetry/api';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
@@ -32,10 +32,6 @@ export const KnownToken = {
   // log
   logger: createToken<Logger>('logger'),
 
-  // saga runner
-  // @todo переименовать в Redux.Middleware.saga?
-  sagaMiddleware: createToken<SagaExtendedMiddleware>('saga-middleware'),
-
   // tracing
   Tracing: {
     tracer: createToken<Tracer>('tracing/tracer'),
@@ -59,6 +55,7 @@ export const KnownToken = {
 
     fetch: createToken<typeof fetch>('fetch'),
     Fetch: {
+      abortController: createToken<AbortController>('fetch/abort-controller'),
       middleware: createToken<Middleware[]>('fetch/middleware'),
     },
 
@@ -114,6 +111,13 @@ export const KnownToken = {
   ExpressHandler: {
     main: createToken<() => void>('express-handler/main'),
     context: createToken<HandlerContext>('express-handler/context'),
+  },
+
+  // redux
+  Redux: {
+    Middleware: {
+      saga: createToken<SagaMiddleware>('saga-middleware'),
+    },
   },
 
   // SSR

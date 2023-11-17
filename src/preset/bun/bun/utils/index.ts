@@ -1,33 +1,16 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import { DoneLogData, FailLogData, Handler, LogData, LogHandler, StatusError } from '../../../http';
-import { Breadcrumb, DetailedError, Logger } from '../../../log';
-import { severityFromStatus } from '../../../preset/isomorphic/utils';
-import { toMilliseconds } from '../../../utils';
-
-/**
- * Утилиты для работы с Request, Response, URL, Headers, URLSearchParams.
- */
-export const FetchUtil = {
-  getParams(url: string | URL) {
-    return Object.fromEntries(new URL(url).searchParams.entries());
-  },
-
-  setParams(url: URL, params: Record<string, string | number | undefined | null>): void {
-    for (const [paramName, paramValue] of Object.entries(params)) {
-      if (paramValue !== null && paramValue !== undefined) {
-        url.searchParams.set(paramName, String(paramValue));
-      }
-    }
-  },
-
-  withoutParams(url: string | URL): URL {
-    const result = new URL(url);
-
-    result.search = '';
-
-    return result;
-  },
-} as const;
+import {
+  DoneLogData,
+  FailLogData,
+  FetchUtil,
+  Handler,
+  LogData,
+  LogHandler,
+  StatusError,
+} from '../../../../http';
+import { Breadcrumb, DetailedError, Logger } from '../../../../log';
+import { severityFromStatus } from '../../../isomorphic/utils';
+import { toMilliseconds } from '../../../../utils';
 
 export function healthCheck(): Handler {
   const startTime = Date.now();
@@ -51,9 +34,11 @@ export function getClientIp(request: Request): string | null {
  */
 export class FetchLogging implements LogHandler {
   logger: Logger;
+  disabled: boolean;
 
   constructor(logger: Logger) {
     this.logger = logger;
+    this.disabled = false;
   }
 
   onRequest({ request }: LogData) {
@@ -64,7 +49,7 @@ export class FetchLogging implements LogHandler {
         data: {
           url: FetchUtil.withoutParams(request.url),
           method: request.method,
-          params: FetchUtil.getParams(request.url),
+          params: Object.fromEntries(new URL(request.url).searchParams.entries()),
         },
         level: 'info',
       }),
@@ -80,7 +65,7 @@ export class FetchLogging implements LogHandler {
           url: FetchUtil.withoutParams(request.url),
           method: request.method,
           status_code: response.status,
-          params: FetchUtil.getParams(request.url),
+          params: Object.fromEntries(new URL(request.url).searchParams.entries()),
         },
         level: 'info',
       }),
@@ -103,7 +88,7 @@ export class FetchLogging implements LogHandler {
                   url: FetchUtil.withoutParams(request.url),
                   method: request.method,
                   headers: request.headers,
-                  params: FetchUtil.getParams(request.url),
+                  params: Object.fromEntries(new URL(request.url).searchParams.entries()),
                   // @todo data
                 },
               },
@@ -133,7 +118,7 @@ export class FetchLogging implements LogHandler {
             url: FetchUtil.withoutParams(request.url),
             method: request.method,
             status_code: statusCode,
-            params: FetchUtil.getParams(request.url),
+            params: Object.fromEntries(new URL(request.url).searchParams.entries()),
           },
           level: 'error',
         }),
@@ -168,8 +153,8 @@ export class ServeLogging implements LogHandler {
   }
 
   onResponse({ response, request }: DoneLogData) {
-    const start = this.timeMap.get(request) ?? 0n;
     const finish = process.hrtime.bigint();
+    const start = this.timeMap.get(request) ?? finish;
 
     this.logger.info({
       type: 'http.response[outgoing]',
@@ -179,9 +164,15 @@ export class ServeLogging implements LogHandler {
       remote_ip: getClientIp(request),
       latency: toMilliseconds(finish - start),
     });
+
+    // ВАЖНО: обязательно чистим
+    this.timeMap.delete(request);
   }
 
-  onCatch({ error }: FailLogData) {
+  onCatch({ error, request }: FailLogData) {
     this.logger.error(error);
+
+    // ВАЖНО: обязательно чистим
+    this.timeMap.delete(request);
   }
 }

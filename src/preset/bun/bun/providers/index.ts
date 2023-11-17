@@ -1,22 +1,14 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import { Resolve } from '../../../di';
-import { KnownToken } from '../../../tokens';
-import { ConfigSource, createConfigSource } from '../../../config';
-import { Logger, createLogger } from '../../../log';
-import {
-  Handler,
-  Middleware,
-  StatusError,
-  applyMiddleware,
-  configureFetch,
-  log,
-  validateStatus,
-} from '../../../http';
-import { FetchLogging, ServeLogging, healthCheck } from '../utils';
-import { providePinoHandler } from '../../node/node/providers';
+import { Resolve } from '../../../../di';
+import { KnownToken } from '../../../../tokens';
+import { ConfigSource, createConfigSource } from '../../../../config';
+import { Logger, createLogger } from '../../../../log';
+import { Handler, Middleware, applyMiddleware, configureFetch, log } from '../../../../http';
+import { ServeLogging, healthCheck } from '../utils';
+import { providePinoHandler } from '../../../node/node/providers';
 import { route, router } from '@krutoo/fetch-tools';
 
-export const ProvideBun = {
+export const BunProviders = {
   configSource(): ConfigSource {
     return createConfigSource(Bun.env);
   },
@@ -36,19 +28,8 @@ export const ProvideBun = {
     return configureFetch(fetch, applyMiddleware(...middleware));
   },
 
-  fetchMiddleware(resolve: Resolve): Middleware[] {
-    const logger = resolve(KnownToken.logger);
-
-    return [
-      validateStatus(status => status >= 200 && status < 300, {
-        getThrowable: response => new StatusError(response),
-      }),
-      log(new FetchLogging(logger)),
-      // @todo metrics (PresetHandler)
-      // @todo tracing (PresetHandler)
-      // @todo cookie from incoming request (PresetHandler)
-      // @todo "simaland-*" headers from incoming request (PresetHandler)
-    ];
+  fetchMiddleware(): Middleware[] {
+    return [];
   },
 
   serve(resolve: Resolve): Handler {
@@ -70,9 +51,11 @@ export const ProvideBun = {
     const logger = resolve(KnownToken.logger);
 
     return [
-      log(new ServeLogging(logger)),
       // @todo metrics
       // @todo tracing
+
+      // ВАЖНО: log должен быть последним слоем
+      log(new ServeLogging(logger)),
     ];
   },
 } as const;
