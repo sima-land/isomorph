@@ -5,13 +5,13 @@ import { PresetTuner } from '../../isomorphic/types';
 import { healthCheck } from '../../../utils/express/handler/health-check';
 import {
   provideConfigSource,
-  provideHttpClientFactory,
-  provideHttpServerErrorMiddleware,
-  provideHttpServerFactory,
-  provideHttpServerLogMiddleware,
-  provideHttpServerMetricsMiddleware,
-  provideHttpServerRequestMiddleware,
-  provideHttpServerTracingMiddleware,
+  provideAxiosFactory,
+  provideExpressErrorMiddleware,
+  provideExpressFactory,
+  provideExpressLogMiddleware,
+  provideExpressMetricsMiddleware,
+  provideExpressRequestMiddleware,
+  provideExpressTracingMiddleware,
   provideKnownHttpApiHosts,
   provideLogger,
   provideMetricsHttpApp,
@@ -48,16 +48,16 @@ export function PresetNode(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Metrics.httpApp, provideMetricsHttpApp);
 
   // http client
-  preset.set(KnownToken.Axios.factory, provideHttpClientFactory);
+  preset.set(KnownToken.Axios.factory, provideAxiosFactory);
 
   // http server
-  preset.set(KnownToken.Express.factory, provideHttpServerFactory);
+  preset.set(KnownToken.Express.factory, provideExpressFactory);
   preset.set(KnownToken.Express.Handlers.healthCheck, healthCheck);
-  preset.set(KnownToken.Express.Middleware.request, provideHttpServerRequestMiddleware);
-  preset.set(KnownToken.Express.Middleware.log, provideHttpServerLogMiddleware);
-  preset.set(KnownToken.Express.Middleware.metrics, provideHttpServerMetricsMiddleware);
-  preset.set(KnownToken.Express.Middleware.tracing, provideHttpServerTracingMiddleware);
-  preset.set(KnownToken.Express.Middleware.error, provideHttpServerErrorMiddleware);
+  preset.set(KnownToken.Express.Middleware.request, provideExpressRequestMiddleware);
+  preset.set(KnownToken.Express.Middleware.log, provideExpressLogMiddleware);
+  preset.set(KnownToken.Express.Middleware.metrics, provideExpressMetricsMiddleware);
+  preset.set(KnownToken.Express.Middleware.tracing, provideExpressTracingMiddleware);
+  preset.set(KnownToken.Express.Middleware.error, provideExpressErrorMiddleware);
 
   // http api
   preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);

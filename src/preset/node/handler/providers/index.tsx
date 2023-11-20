@@ -17,7 +17,7 @@ import { renderToString } from 'react-dom/server';
  * @param resolve Функция для получения зависимости по токену.
  * @return Фабрика.
  */
-export function provideHttpClientFactory(resolve: Resolve) {
+export function provideAxiosFactory(resolve: Resolve) {
   // @todo а что если привести все зависимости к виду:
   // const getAppConfig = resolve.lazy(KnownToken.Config.base);
 

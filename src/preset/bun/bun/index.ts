@@ -1,12 +1,13 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
+import { PresetTuner } from '../../isomorphic';
 import { provideBaseConfig } from '../../isomorphic/providers';
 import { provideKnownHttpApiHosts, provideSsrBridgeServerSide } from '../../node/node/providers';
 import { BunProviders } from './providers';
 
 // @todo возможно стоит переименовать в PresetServer (так как в теории это можно использовать не только в Bun но и в Deno, Node.js)
-export function PresetBun() {
+export function PresetBun(customize?: PresetTuner) {
   const preset = createPreset();
 
   // config
@@ -35,6 +36,10 @@ export function PresetBun() {
 
   // ssr bridge
   preset.set(KnownToken.SsrBridge.serverSide, provideSsrBridgeServerSide);
+
+  if (customize) {
+    customize({ override: preset.set.bind(preset) });
+  }
 
   return preset;
 }

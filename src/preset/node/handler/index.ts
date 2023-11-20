@@ -1,9 +1,9 @@
 import { Preset, createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { provideSagaMiddleware, provideHttpClientLogHandler } from '../../isomorphic/providers';
+import { provideReduxSagaMiddleware, provideAxiosLogHandler } from '../../isomorphic/providers';
 import { PresetTuner } from '../../isomorphic/types';
 import {
-  provideHttpClientFactory,
+  provideAxiosFactory,
   provideHandlerMain,
   provideSpecificParams,
   providePageHelmet,
@@ -22,11 +22,11 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   const preset = createPreset();
 
   // saga
-  preset.set(KnownToken.Redux.Middleware.saga, provideSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideReduxSagaMiddleware);
 
   // http client
-  preset.set(KnownToken.Axios.factory, provideHttpClientFactory);
-  preset.set(KnownToken.Axios.Middleware.Log.handler, provideHttpClientLogHandler);
+  preset.set(KnownToken.Axios.factory, provideAxiosFactory);
+  preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
 
   // http handler
   preset.set(KnownToken.ExpressHandler.main, provideHandlerMain);

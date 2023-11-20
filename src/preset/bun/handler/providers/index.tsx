@@ -39,7 +39,7 @@ export const HandlerProviders = {
       return result;
     };
 
-    const main = async (request: Request): Promise<Response> => {
+    const handler = async (request: Request): Promise<Response> => {
       try {
         const assets = await getAssets();
         const meta = extras.getMeta();
@@ -123,7 +123,7 @@ export const HandlerProviders = {
       }
     };
 
-    return applyMiddleware(
+    const enhancer = applyMiddleware(
       // отменяем запросы исходящие в рамках обработчика
       async (request, next) => {
         const response = await next(request);
@@ -132,7 +132,9 @@ export const HandlerProviders = {
 
         return response;
       },
-    )(main);
+    );
+
+    return enhancer(handler);
   },
 
   pageHelmet(resolve: Resolve) {

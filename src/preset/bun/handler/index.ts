@@ -1,11 +1,13 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { provideSagaMiddleware } from '../../isomorphic/providers';
+import { PresetTuner } from '../../isomorphic';
+import { provideReduxSagaMiddleware } from '../../isomorphic/providers';
+import { providePageRender } from '../../node/handler/providers';
 import { SpecificExtras } from '../../node/handler/utils';
 import { HandlerProviders } from './providers';
 
-export function PresetHandler() {
+export function PresetHandler(customize?: PresetTuner) {
   const preset = createPreset();
 
   // http fetch
@@ -17,10 +19,16 @@ export function PresetHandler() {
   preset.set(KnownToken.Http.Handler.main, HandlerProviders.handlerMain);
   preset.set(KnownToken.Http.Handler.Request.specificParams, HandlerProviders.specificParams);
   preset.set(KnownToken.Http.Handler.Response.specificExtras, () => new SpecificExtras());
+  preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));
   preset.set(KnownToken.Http.Handler.Page.helmet, HandlerProviders.pageHelmet);
+  preset.set(KnownToken.Http.Handler.Page.render, providePageRender);
 
   // redux saga
-  preset.set(KnownToken.Redux.Middleware.saga, provideSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideReduxSagaMiddleware);
+
+  if (customize) {
+    customize({ override: preset.set.bind(preset) });
+  }
 
   return preset;
 }

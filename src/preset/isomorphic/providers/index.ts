@@ -18,11 +18,22 @@ export function provideBaseConfig(resolve: Resolve): BaseConfig {
 }
 
 /**
- * Провайдер кастомной версии createSagaMiddleware из redux-saga.
+ * Провайдер обработчика логирования исходящих http-запросов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Обработчик.
+ */
+export function provideAxiosLogHandler(resolve: Resolve): LogMiddlewareHandlerInit {
+  const logger = resolve(KnownToken.logger);
+
+  return data => new HttpClientLogging(logger, data);
+}
+
+/**
+ * Провайдер промежуточного слоя redux-saga для redux-хранилища.
  * @param resolve Функция для получения зависимости по токену.
  * @return Промежуточный слой для redux-хранилища.
  */
-export function provideSagaMiddleware(resolve: Resolve): SagaMiddleware {
+export function provideReduxSagaMiddleware(resolve: Resolve): SagaMiddleware {
   const logger = resolve(KnownToken.logger);
 
   const logHandler = new SagaLogging(logger);
@@ -33,15 +44,4 @@ export function provideSagaMiddleware(resolve: Resolve): SagaMiddleware {
       logHandler.onSagaError(error, errorInfo);
     },
   });
-}
-
-/**
- * Провайдер обработчика логирования исходящих http-запросов.
- * @param resolve Функция для получения зависимости по токену.
- * @return Обработчик.
- */
-export function provideHttpClientLogHandler(resolve: Resolve): LogMiddlewareHandlerInit {
-  const logger = resolve(KnownToken.logger);
-
-  return data => new HttpClientLogging(logger, data);
 }
