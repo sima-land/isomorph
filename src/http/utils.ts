@@ -13,15 +13,17 @@ export const FetchUtil = {
     for (const [paramName, paramValue] of Object.entries(params)) {
       if (paramValue === null) {
         url.searchParams.delete(paramName);
-        return;
+        continue;
       }
 
       if (paramValue !== undefined) {
         url.searchParams.set(paramName, String(paramValue));
-        return;
+        continue;
       }
     }
   },
+
+  // @todo resetPrams?
 
   /**
    * Получив URL и параметры вернет новый URL с примененными параметрами.
@@ -43,10 +45,10 @@ export const FetchUtil = {
    * @return URL.
    */
   withoutParams(url: string | URL): URL {
-    const result = new URL(url);
+    const resultUrl = new URL(url);
 
-    result.search = '';
+    resultUrl.search = '';
 
-    return result;
+    return resultUrl;
   },
 } as const;
