@@ -1,4 +1,4 @@
-export type URLSearchParamsInit = Record<string, string | number | boolean | undefined | null>;
+import type { URLSearchParamsInit, ResponseDone, ResponseFail } from './types';
 
 /**
  * Утилиты для работы с URL, URLSearchParams, Headers, Request, Response.
@@ -50,5 +50,38 @@ export const FetchUtil = {
     resultUrl.search = '';
 
     return resultUrl;
+  },
+
+  /**
+   * Возвращает кортеж обработчиков для Promise из fetch.
+   * Полученный Promise никогда не уйдет в состояние rejected.
+   * @return Кортеж.
+   */
+  eitherResponse<T = unknown>() {
+    return [
+      (response: Response): Promise<ResponseDone<T> | ResponseFail<T>> => {
+        if (response.ok) {
+          return response.json().then(data => ({
+            ok: true,
+            data: data as T,
+            error: null,
+            status: response.status,
+            statusText: response.statusText,
+          }));
+        } else {
+          return Promise.resolve({
+            ok: false,
+            error: `Request failed with status ${response.status}`,
+            status: response.status,
+            statusText: response.statusText,
+          });
+        }
+      },
+      (error: unknown): Promise<ResponseFail<T>> =>
+        Promise.resolve({
+          ok: false,
+          error,
+        }),
+    ] as const;
   },
 } as const;
