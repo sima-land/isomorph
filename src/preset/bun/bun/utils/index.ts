@@ -6,10 +6,8 @@ import {
   Handler,
   LogData,
   LogHandler,
-  StatusError,
 } from '../../../../http';
 import { Breadcrumb, DetailedError, Logger } from '../../../../log';
-import { severityFromStatus } from '../../../isomorphic/utils';
 import { toMilliseconds } from '../../../../utils';
 
 export function healthCheck(): Handler {
@@ -67,65 +65,29 @@ export class FetchLogging implements LogHandler {
           status_code: response.status,
           params: Object.fromEntries(new URL(request.url).searchParams.entries()),
         },
-        level: 'info',
+        level: response.ok ? 'info' : 'error',
       }),
     );
   }
 
   onCatch({ error, request }: FailLogData) {
-    if (error instanceof StatusError) {
-      const statusCode = error.response.status;
-
-      this.logger.error(
-        new DetailedError(
-          `HTTP request failed, status code: ${statusCode}, error message: ${error.message}`,
+    this.logger.error(
+      new DetailedError(String(error), {
+        level: 'error',
+        context: [
           {
-            level: severityFromStatus(error.response?.status),
-            context: [
-              {
-                key: 'Request details',
-                data: {
-                  url: FetchUtil.withoutParams(request.url),
-                  method: request.method,
-                  headers: request.headers,
-                  params: Object.fromEntries(new URL(request.url).searchParams.entries()),
-                  // @todo data
-                },
-              },
-              {
-                key: 'Response details',
-                data: {
-                  // копируем так как в Sentry падает ошибка: **non-serializable** (TypeError: Object.getPrototypeOf(...) is null)
-                  headers: {
-                    ...error.response?.headers,
-                    cookie: undefined,
-                    Cookie: undefined,
-                  },
-
-                  // @todo data, error
-                },
-              },
-            ],
+            key: 'Outgoing request details',
+            data: {
+              url: FetchUtil.withoutParams(request.url),
+              method: request.method,
+              headers: request.headers,
+              params: Object.fromEntries(new URL(request.url).searchParams.entries()),
+              // @todo data
+            },
           },
-        ),
-      );
-
-      this.logger.info(
-        new Breadcrumb({
-          category: 'http.response',
-          type: 'http',
-          data: {
-            url: FetchUtil.withoutParams(request.url),
-            method: request.method,
-            status_code: statusCode,
-            params: Object.fromEntries(new URL(request.url).searchParams.entries()),
-          },
-          level: 'error',
-        }),
-      );
-    } else {
-      this.logger.error(error);
-    }
+        ],
+      }),
+    );
   }
 }
 
@@ -170,7 +132,23 @@ export class ServeLogging implements LogHandler {
   }
 
   onCatch({ error, request }: FailLogData) {
-    this.logger.error(error);
+    this.logger.error(
+      new DetailedError(String(error), {
+        level: 'error',
+        context: [
+          {
+            key: 'Incoming request details',
+            data: {
+              url: FetchUtil.withoutParams(request.url),
+              method: request.method,
+              headers: request.headers,
+              params: Object.fromEntries(new URL(request.url).searchParams.entries()),
+              // @todo data
+            },
+          },
+        ],
+      }),
+    );
 
     // ВАЖНО: обязательно чистим
     this.timeMap.delete(request);

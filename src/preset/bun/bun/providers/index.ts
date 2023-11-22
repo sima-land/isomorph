@@ -7,6 +7,8 @@ import { Handler, Middleware, applyMiddleware, configureFetch, log } from '../..
 import { ServeLogging, healthCheck } from '../utils';
 import { providePinoHandler } from '../../../node/node/providers';
 import { route, router } from '@krutoo/fetch-tools';
+import { getCurrentHub, init, runWithAsyncContext } from '@sentry/bun';
+import { createSentryHandler } from '../../../../log/handler/sentry';
 
 export const BunProviders = {
   configSource(): ConfigSource {
@@ -16,10 +18,28 @@ export const BunProviders = {
   logger(resolve: Resolve): Logger {
     const logger = createLogger();
 
-    logger.subscribe(providePinoHandler(resolve));
-    // @todo sentry
+    logger.subscribe(BunProviders.logHandlerPino(resolve));
+    logger.subscribe(BunProviders.logHandlerSentry(resolve));
 
     return logger;
+  },
+
+  logHandlerPino(resolve: Resolve) {
+    return providePinoHandler(resolve);
+  },
+
+  logHandlerSentry(resolve: Resolve) {
+    const source = resolve(KnownToken.Config.source);
+
+    init({
+      dsn: source.require('SENTRY_DSN'),
+      release: source.require('SENTRY_RELEASE'),
+      environment: source.require('SENTRY_ENVIRONMENT'),
+    });
+
+    // ВАЖНО: передаем функцию чтобы брать текущий hub в момент вызова метода logger'а
+    // это нужно чтобы хлебные крошки в ошибках Sentry группировались по запросам
+    return createSentryHandler(getCurrentHub);
   },
 
   fetch(resolve: Resolve): typeof fetch {
@@ -51,6 +71,9 @@ export const BunProviders = {
     const logger = resolve(KnownToken.logger);
 
     return [
+      // ВАЖНО: изолируем хлебные крошки чтобы они группировались по входящим запросам
+      (request, next) => runWithAsyncContext(async () => next(request)),
+
       // @todo metrics
       // @todo tracing
 

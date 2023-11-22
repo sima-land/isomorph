@@ -6,18 +6,16 @@ import { HelmetContext, RegularHelmet } from '../../../node/handler/utils';
 import {
   Middleware,
   ResponseError,
-  StatusError,
   applyMiddleware,
   configureFetch,
   cookie,
   createCookieStore,
   defaultHeaders,
   log,
-  validateStatus,
 } from '../../../../http';
 import { Fragment } from 'react';
-import { FetchLogging, getClientIp } from '../../bun/utils';
-import { BaseConfig } from '../../../../config';
+import { FetchLogging } from '../../bun/utils';
+import { getForwardedHeaders, getResponseFormat } from '../utils';
 
 export const HandlerProviders = {
   handlerMain(resolve: Resolve) {
@@ -124,7 +122,7 @@ export const HandlerProviders = {
     };
 
     const enhancer = applyMiddleware(
-      // отменяем запросы исходящие в рамках обработчика
+      // отменяем запросы, исходящие в рамках обработчика
       async (request, next) => {
         const response = await next(request);
 
@@ -190,10 +188,6 @@ export const HandlerProviders = {
 
       defaultHeaders(getForwardedHeaders(config, context.request)),
 
-      validateStatus(status => status >= 200 && status < 300, {
-        getThrowable: response => new StatusError(response),
-      }),
-
       // @todo metrics
       // @todo tracing
 
@@ -202,39 +196,3 @@ export const HandlerProviders = {
     ];
   },
 } as const;
-
-function getResponseFormat(request: Request): 'html' | 'json' {
-  let result: 'html' | 'json' = 'html';
-
-  if ((request.headers.get('accept') || '').toLowerCase().includes('application/json')) {
-    result = 'json';
-  }
-
-  return result;
-}
-
-function getForwardedHeaders(config: BaseConfig, request: Request): Headers {
-  const result = new Headers();
-
-  // user agent
-  result.set('User-Agent', `simaland-${config.appName}/${config.appVersion}`);
-
-  // client ip
-  const clientIp = getClientIp(request);
-
-  if (clientIp) {
-    result.set('X-Client-Ip', clientIp);
-  }
-
-  // service headers
-  for (const [headerName, headerValue] of request.headers.entries()) {
-    if (
-      headerName.toLowerCase().startsWith('simaland-') &&
-      headerName.toLowerCase() !== 'simaland-params'
-    ) {
-      result.set(headerName, headerValue);
-    }
-  }
-
-  return result;
-}
