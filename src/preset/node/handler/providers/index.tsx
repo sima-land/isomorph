@@ -144,7 +144,7 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
         }
       }
     } catch (error) {
-      let message;
+      let message: string;
       let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
 
       if (error instanceof Error) {

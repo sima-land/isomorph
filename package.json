@@ -263,7 +263,7 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "type-check": "tsc -p . --noEmit",
+    "type-check": "npx tsc -p . --noEmit && npx tsc --project tsconfig.bun.json --noEmit",
     "build:before": "rm -rf dist cache config di http log preset utils",
     "build:esm": "babel src --config-file ./babel.config.esm.js -d dist/esm --source-maps --extensions '.ts,.tsx' --ignore='**/__test__/**/*' --ignore='**/*.d.ts' && node scripts/make-pkg-esm.mjs",
     "build:cjs": "babel src --config-file ./babel.config.cjs.js -d dist/cjs --source-maps --extensions '.ts,.tsx' --ignore='**/__test__/**/*' --ignore='**/*.d.ts' && node scripts/make-pkg-cjs.mjs",

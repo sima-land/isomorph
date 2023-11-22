@@ -100,7 +100,7 @@ export const HandlerProviders = {
           }
         }
       } catch (error) {
-        let message;
+        let message: string;
         let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
 
         if (error instanceof Error) {
@@ -175,24 +175,35 @@ export const HandlerProviders = {
     // @todo set-cookie в ответ от сервера (но только если во входящих ответах есть set-cookie)
     const cookieStore = createCookieStore(context.request.headers.get('cookie') ?? undefined);
 
-    const logHandler = new FetchLogging(logger);
+    const logging = new FetchLogging(logger);
 
-    abortController.signal.addEventListener('abort', () => {
-      logHandler.disabled = true;
-    });
+    abortController.signal.addEventListener(
+      'abort',
+      () => {
+        logging.disabled = true;
+      },
+      { capture: true },
+    );
 
     return [
+      // ВАЖНО: слой логирования ошибки ПЕРЕД остальными слоями чтобы не упустить ошибки выше
+      log({
+        onCatch: data => logging.onRequest(data),
+      }),
+
       (request, next) => next(new Request(request, { signal: abortController.signal })),
 
       cookie(cookieStore),
 
       defaultHeaders(getForwardedHeaders(config, context.request)),
 
-      // @todo metrics
-      // @todo tracing
+      // @todo metrics, tracing
 
-      // ВАЖНО: log должен быть последним слоем
-      log(logHandler),
+      // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
+      log({
+        onRequest: data => logging.onRequest(data),
+        onResponse: data => logging.onResponse(data),
+      }),
     ];
   },
 } as const;

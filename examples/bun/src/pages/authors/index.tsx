@@ -3,6 +3,7 @@ import { PresetHandler } from '@sima-land/isomorph/preset/bun';
 import { TOKEN } from '../../tokens';
 import { Layout } from '../../components/Layout';
 import { Nav } from '../../components/Nav';
+import { createAuthorApi } from '../../entities/author';
 
 export function AuthorsPageApp() {
   const app = createApplication();
@@ -15,16 +16,24 @@ export function AuthorsPageApp() {
     }),
   );
 
+  app.bind(TOKEN.Entities.Author.api).toProvider(provideAuthorApi);
+
   return app;
 }
 
+function provideAuthorApi(resolve: Resolve) {
+  return createAuthorApi({
+    host: 'https://jsonplaceholder.typicode.com/',
+    fetch: resolve(TOKEN.Lib.Http.fetch),
+  });
+}
+
 function provideRender(resolve: Resolve) {
-  const fetch = resolve(TOKEN.Lib.Http.fetch);
+  const api = resolve(TOKEN.Entities.Author.api);
 
   return async () => {
-    const authors = (await fetch('https://jsonplaceholder.typicode.com/users').then(res =>
-      res.json(),
-    )) as Array<{ id: number; name: string; username: string }>;
+    const response = await api.getAll();
+    const authors = response.ok ? response.data : [];
 
     return (
       <Layout>

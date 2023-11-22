@@ -70,15 +70,24 @@ export const BunProviders = {
   serveMiddleware(resolve: Resolve): Middleware[] {
     const logger = resolve(KnownToken.logger);
 
+    const logging = new ServeLogging(logger);
+
     return [
       // ВАЖНО: изолируем хлебные крошки чтобы они группировались по входящим запросам
       (request, next) => runWithAsyncContext(async () => next(request)),
 
-      // @todo metrics
-      // @todo tracing
+      // ВАЖНО: слой логирования ошибки ПЕРЕД остальными слоями чтобы не упустить ошибки выше
+      log({
+        onCatch: data => logging.onRequest(data),
+      }),
 
-      // ВАЖНО: log должен быть последним слоем
-      log(new ServeLogging(logger)),
+      // @todo metrics, tracing
+
+      // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
+      log({
+        onRequest: data => logging.onRequest(data),
+        onResponse: data => logging.onResponse(data),
+      }),
     ];
   },
 } as const;

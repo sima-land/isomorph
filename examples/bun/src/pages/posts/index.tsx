@@ -3,6 +3,7 @@ import { PresetHandler } from '@sima-land/isomorph/preset/bun';
 import { TOKEN } from '../../tokens';
 import { Layout } from '../../components/Layout';
 import { Nav } from '../../components/Nav';
+import { createPostApi } from '../../entities/post';
 
 export function PostsPageApp() {
   const app = createApplication();
@@ -15,16 +16,24 @@ export function PostsPageApp() {
     }),
   );
 
+  app.bind(TOKEN.Entities.Post.api).toProvider(providePostApi);
+
   return app;
 }
 
+function providePostApi(resolve: Resolve) {
+  return createPostApi({
+    host: 'https://jsonplaceholder.typicode.com/',
+    fetch: resolve(TOKEN.Lib.Http.fetch),
+  });
+}
+
 function provideRender(resolve: Resolve) {
-  const fetch = resolve(TOKEN.Lib.Http.fetch);
+  const api = resolve(TOKEN.Entities.Post.api);
 
   return async () => {
-    const posts = (await fetch('https://jsonplaceholder.typicode.com/posts').then(res =>
-      res.json(),
-    )) as Array<{ id: number; title: string; body: string }>;
+    const response = await api.getAll();
+    const posts = response.ok ? response.data : [];
 
     return (
       <Layout>

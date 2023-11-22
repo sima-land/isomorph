@@ -54,6 +54,10 @@ class ApplicationImplementation implements Application {
   }
 
   get<T>(token: Token<T>): T {
+    return this.resolve(token, []);
+  }
+
+  protected resolve<T>(token: Token<T>, chain: Token<any>[]): T {
     if (!this.initialized) {
       this.bind(CURRENT_APP).toValue(this);
 
@@ -64,10 +68,6 @@ class ApplicationImplementation implements Application {
       this.initialized = true;
     }
 
-    return this.resolve(token, []);
-  }
-
-  protected resolve<T>(token: Token<T>, chain: Token<any>[]): T {
     const nextChain = () => [...chain, token];
 
     if (chain.includes(token)) {
