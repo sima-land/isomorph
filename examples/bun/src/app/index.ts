@@ -7,12 +7,15 @@ import { AuthorsPageApp } from '../pages/authors';
 export function MainApp() {
   const app = createApplication();
 
+  // используем пресет "PresetBun"
   app.preset(
     PresetBun(({ override }) => {
+      // переопределяем провайдеры пресета
       override(TOKEN.Lib.Http.Serve.routes, provideRoutes);
     }),
   );
 
+  // добавляем в приложение собственные компоненты
   app.bind(TOKEN.Pages.posts).toProvider(HandlerProvider(PostsPageApp));
   app.bind(TOKEN.Pages.authors).toProvider(HandlerProvider(AuthorsPageApp));
 

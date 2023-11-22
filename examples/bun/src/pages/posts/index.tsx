@@ -7,8 +7,10 @@ import { Nav } from '../../components/Nav';
 export function PostsPageApp() {
   const app = createApplication();
 
+  // используем пресет "PresetHandler"
   app.preset(
     PresetHandler(({ override }) => {
+      // переопределяем провайдеры пресета
       override(TOKEN.Lib.Http.Handler.Page.render, provideRender);
     }),
   );
