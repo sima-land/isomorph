@@ -2,7 +2,7 @@
 import { createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import { PresetTuner } from '../../isomorphic';
-import { provideReduxSagaMiddleware } from '../../isomorphic/providers';
+import { provideReduxMiddlewareSaga } from '../../isomorphic/providers';
 import { providePageRender } from '../../node/handler/providers';
 import { SpecificExtras } from '../../node/handler/utils';
 import { HandlerProviders } from './providers';
@@ -24,7 +24,7 @@ export function PresetHandler(customize?: PresetTuner) {
   preset.set(KnownToken.Http.Handler.Page.render, providePageRender);
 
   // redux saga
-  preset.set(KnownToken.Redux.Middleware.saga, provideReduxSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
 
   if (customize) {
     customize({ override: preset.set.bind(preset) });

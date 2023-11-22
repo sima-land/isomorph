@@ -33,7 +33,7 @@ export function provideAxiosLogHandler(resolve: Resolve): LogMiddlewareHandlerIn
  * @param resolve Функция для получения зависимости по токену.
  * @return Промежуточный слой для redux-хранилища.
  */
-export function provideReduxSagaMiddleware(resolve: Resolve): SagaMiddleware {
+export function provideReduxMiddlewareSaga(resolve: Resolve): SagaMiddleware {
   const logger = resolve(KnownToken.logger);
 
   const logHandler = new SagaLogging(logger);

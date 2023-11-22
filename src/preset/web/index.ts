@@ -3,7 +3,7 @@ import { KnownToken } from '../../tokens';
 import { PresetTuner } from '../isomorphic/types';
 import {
   provideBaseConfig,
-  provideReduxSagaMiddleware,
+  provideReduxMiddlewareSaga,
   provideAxiosLogHandler,
 } from '../isomorphic/providers';
 import {
@@ -26,7 +26,7 @@ export function PresetWeb(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Config.source, provideConfigSource);
   preset.set(KnownToken.Config.base, provideBaseConfig);
   preset.set(KnownToken.logger, provideLogger);
-  preset.set(KnownToken.Redux.Middleware.saga, provideReduxSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
   preset.set(KnownToken.Axios.factory, provideAxiosFactory);
   preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
   preset.set(KnownToken.SsrBridge.clientSide, provideBridgeClientSide);

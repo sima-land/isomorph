@@ -1,6 +1,6 @@
 import { Preset, createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { provideReduxSagaMiddleware, provideAxiosLogHandler } from '../../isomorphic/providers';
+import { provideReduxMiddlewareSaga, provideAxiosLogHandler } from '../../isomorphic/providers';
 import { PresetTuner } from '../../isomorphic/types';
 import {
   provideAxiosFactory,
@@ -22,7 +22,7 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   const preset = createPreset();
 
   // saga
-  preset.set(KnownToken.Redux.Middleware.saga, provideReduxSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
 
   // http client
   preset.set(KnownToken.Axios.factory, provideAxiosFactory);

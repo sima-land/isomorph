@@ -109,6 +109,12 @@
       "import": "./dist/esm/preset/node/handler/utils/index.js",
       "default": "./dist/esm/preset/node/handler/utils/index.js"
     },
+    "./preset/bun": {
+      "types": "./dist/types/preset/bun/index.d.ts",
+      "require": "./dist/cjs/preset/bun/index.js",
+      "import": "./dist/esm/preset/bun/index.js",
+      "default": "./dist/esm/preset/bun/index.js"
+    },
     "./utils": {
       "types": "./dist/types/utils/index.d.ts",
       "require": "./dist/cjs/utils/index.js",
@@ -219,6 +225,9 @@
       ],
       "preset/node/handler/utils": [
         "./dist/types/preset/node/handler/utils/index.d.ts"
+      ],
+      "preset/bun": [
+        "./dist/types/preset/bun/index.d.ts"
       ],
       "utils": [
         "./dist/types/utils/index.d.ts"
