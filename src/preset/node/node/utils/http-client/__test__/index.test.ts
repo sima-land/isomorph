@@ -1,7 +1,7 @@
 import { Context } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
-import { tracingMiddleware, getRequestInfo, hideFirstId, getRequestHeaders } from '..';
+import { tracingMiddleware, getRequestInfo, hideFirstId, getForwardedHeaders } from '..';
 import { BaseConfig } from '../../../../../../config';
 import { Request } from 'express';
 
@@ -192,7 +192,7 @@ describe('getRequestHeaders', () => {
       },
     } as any;
 
-    const result = getRequestHeaders(config, request);
+    const result = getForwardedHeaders(config, request);
 
     expect(result).toEqual({
       'X-Client-Ip': '127.0.0.1',
@@ -223,7 +223,7 @@ describe('getRequestHeaders', () => {
       },
     } as any;
 
-    const result = getRequestHeaders(config, request);
+    const result = getForwardedHeaders(config, request);
 
     expect(result).toEqual({
       'User-Agent': `simaland-foo/0.0.1`,

@@ -1,7 +1,7 @@
 import { ResponseError, createCookieStore } from '../../../../http';
 import { Resolve } from '../../../../di';
 import { KnownToken } from '../../../../tokens';
-import { getRequestHeaders, tracingMiddleware } from '../../node/utils/http-client';
+import { getForwardedHeaders, tracingMiddleware } from '../../node/utils/http-client';
 import { CreateAxiosDefaults } from 'axios';
 import { create } from 'middleware-axios';
 import { HttpStatus } from '../../../isomorphic/utils';
@@ -42,7 +42,7 @@ export function provideAxiosFactory(resolve: Resolve) {
     }
   });
 
-  const defaultHeaders = getRequestHeaders(appConfig, context.req);
+  const defaultHeaders = getForwardedHeaders(appConfig, context.req);
 
   return (config: CreateAxiosDefaults = {}) => {
     const client = create({
