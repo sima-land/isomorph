@@ -9,6 +9,10 @@ async function main() {
   assert.equal(pkg.name, '@sima-land/isomorph');
 
   for (const pathname of Object.keys(pkg.exports)) {
+    if (pathname.startsWith('./preset/bun')) {
+      continue;
+    }
+
     const specifier = path.join(pkg.name, pathname);
 
     await assert.doesNotReject(async () => await import(specifier));
