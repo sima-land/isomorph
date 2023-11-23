@@ -75,4 +75,36 @@ describe('FetchUtil', () => {
     expect(outputUrl.searchParams.get('five')).toBe(null);
     expect(outputUrl.searchParams.get('six')).toBe(null);
   });
+
+  it('eitherResponse', async () => {
+    const [handleDone, handleFail] = FetchUtil.eitherResponse();
+
+    expect(typeof handleDone === 'function').toBe(true);
+    expect(typeof handleFail === 'function').toBe(true);
+
+    const responseDone = new Response('{ "data": "foo" }', { status: 200, statusText: 'GOOD' });
+    const responseFail = new Response('{ "data": "bar" }', { status: 400, statusText: 'BAD' });
+
+    expect(await handleDone(responseDone)).toEqual({
+      ok: true,
+      data: { data: 'foo' },
+      error: null,
+      status: 200,
+      statusText: 'GOOD',
+    });
+
+    expect(await handleDone(responseFail)).toEqual({
+      ok: false,
+      error: `Request failed with status 400`,
+      status: 400,
+      statusText: 'BAD',
+    });
+
+    const error = new Error('Fetch failed');
+
+    expect(await handleFail(error)).toEqual({
+      ok: false,
+      error,
+    });
+  });
 });
