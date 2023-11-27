@@ -39,14 +39,14 @@ function provideAppConfig(resolve: Resolve): AppConfig {
 function provideHttpServer(resolve: Resolve): express.Application {
   const usersHandler = resolve(TOKEN.Project.Http.Pages.users);
   const postsHandler = resolve(TOKEN.Project.Http.Pages.posts);
-  const healthCheckHandler = resolve(TOKEN.Lib.Http.Server.Handlers.healthCheck);
+  const healthCheckHandler = resolve(TOKEN.Lib.Express.Handlers.healthCheck);
 
   // промежуточные слои (express) доступные из пресета PresetNode
-  const requestHandle = resolve(TOKEN.Lib.Http.Server.Middleware.request);
-  const logging = resolve(TOKEN.Lib.Http.Server.Middleware.log);
-  const metrics = resolve(TOKEN.Lib.Http.Server.Middleware.metrics);
-  const tracing = resolve(TOKEN.Lib.Http.Server.Middleware.tracing);
-  const errorHandle = resolve(TOKEN.Lib.Http.Server.Middleware.error);
+  const requestHandle = resolve(TOKEN.Lib.Express.Middleware.request);
+  const logging = resolve(TOKEN.Lib.Express.Middleware.log);
+  const metrics = resolve(TOKEN.Lib.Express.Middleware.metrics);
+  const tracing = resolve(TOKEN.Lib.Express.Middleware.tracing);
+  const errorHandle = resolve(TOKEN.Lib.Express.Middleware.error);
 
   const app = express();
 

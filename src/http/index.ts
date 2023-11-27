@@ -12,3 +12,4 @@ export type {
 export { configureFetch, applyMiddleware, createCookieStore } from '@krutoo/fetch-tools';
 export { log, cookie, defaultHeaders, validateStatus } from '@krutoo/fetch-tools/middleware';
 export { StatusError, ResponseError } from './errors';
+export { FetchUtil } from './utils';

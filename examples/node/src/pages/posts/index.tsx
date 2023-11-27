@@ -26,7 +26,7 @@ export function PostsPageApp() {
 
 function provideRender(resolve: Resolve) {
   const httpApi = resolve(TOKEN.Project.Http.api);
-  const sagaMiddleware = resolve(TOKEN.Lib.sagaMiddleware);
+  const sagaMiddleware = resolve(TOKEN.Lib.Redux.Middleware.saga);
 
   return async () => {
     const store = configureStore({
@@ -34,7 +34,7 @@ function provideRender(resolve: Resolve) {
       middleware: [sagaMiddleware],
     });
 
-    await sagaMiddleware.run(PostsSlice.saga, { api: httpApi });
+    await sagaMiddleware.run(PostsSlice.saga, { api: httpApi }).toPromise();
 
     return (
       <Provider store={store}>
@@ -45,7 +45,7 @@ function provideRender(resolve: Resolve) {
 }
 
 function provideHttpApi(resolve: Resolve): HttpApi {
-  const createClient = resolve(TOKEN.Lib.Http.Client.factory);
+  const createClient = resolve(TOKEN.Lib.Axios.factory);
 
   const client = sauce(createClient({ baseURL: 'https://jsonplaceholder.typicode.com/' }));
 

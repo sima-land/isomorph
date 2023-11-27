@@ -175,7 +175,7 @@ export function provideTracerProviderResource(resolve: Resolve): Resource {
  * Провайдер фабрики http-клиентов.
  * @return Фабрика.
  */
-export function provideHttpClientFactory() {
+export function provideAxiosFactory() {
   return create;
 }
 
@@ -183,7 +183,7 @@ export function provideHttpClientFactory() {
  * Провайдер фабрики http-серверов.
  * @return Фабрика.
  */
-export function provideHttpServerFactory() {
+export function provideExpressFactory() {
   return Express;
 }
 
@@ -191,7 +191,7 @@ export function provideHttpServerFactory() {
  * Провайдер промежуточного слоя учета входящих http-запросов.
  * @return Промежуточный слой.
  */
-export function provideHttpServerRequestMiddleware(): Handler {
+export function provideExpressRequestMiddleware(): Handler {
   return Handlers.requestHandler();
 }
 
@@ -200,7 +200,7 @@ export function provideHttpServerRequestMiddleware(): Handler {
  * @param resolve Функция для получения зависимости по токену.
  * @return Промежуточный слой.
  */
-export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
+export function provideExpressLogMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
   const logger = resolve(KnownToken.logger);
 
@@ -243,7 +243,7 @@ export function provideHttpServerLogMiddleware(resolve: Resolve): Handler {
  * @param resolve Функция для получения зависимости по токену.
  * @return Промежуточный слой.
  */
-export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
+export function provideExpressMetricsMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
 
   const ConventionalLabels = {
@@ -324,7 +324,7 @@ export function provideHttpServerMetricsMiddleware(resolve: Resolve): Handler {
  * @param resolve Функция для получения зависимости по токену.
  * @return Промежуточный слой.
  */
-export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
+export function provideExpressTracingMiddleware(resolve: Resolve): Handler {
   const tracer = resolve(KnownToken.Tracing.tracer);
 
   /**
@@ -380,7 +380,7 @@ export function provideHttpServerTracingMiddleware(resolve: Resolve): Handler {
  * Провайдер промежуточного слоя обработки ошибок в рамках ответ на http-запросы.
  * @return Промежуточный слой.
  */
-export function provideHttpServerErrorMiddleware(): ErrorRequestHandler {
+export function provideExpressErrorMiddleware(): ErrorRequestHandler {
   return Handlers.errorHandler();
 }
 

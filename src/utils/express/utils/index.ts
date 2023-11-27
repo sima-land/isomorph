@@ -5,7 +5,7 @@ import type { Handler } from 'express';
  * @param list Промежуточные слои.
  * @return Промежуточный слой.
  */
-export function composeMiddleware(list: Handler[]) {
+export function composeMiddleware(list: Handler[]): Handler {
   return list.reduce((a, b) => (req, res, next) => {
     a(req, res, err => {
       if (err) {

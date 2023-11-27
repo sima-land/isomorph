@@ -101,7 +101,7 @@ export function hideFirstId(url: string): [string, number | undefined] {
  * @param request Входящий запрос.
  * @return Заголовки для исходящих запросов.
  */
-export function getRequestHeaders(config: BaseConfig, request: Request): Record<string, string> {
+export function getForwardedHeaders(config: BaseConfig, request: Request): Record<string, string> {
   const result: Record<string, string> = {
     'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
   };
@@ -120,7 +120,11 @@ export function getRequestHeaders(config: BaseConfig, request: Request): Record<
   for (const key of Object.keys(request.headers)) {
     const value = request.header(key);
 
-    if (key.toLowerCase().indexOf('simaland-') === 0 && value) {
+    if (
+      key.toLowerCase().startsWith('simaland-') &&
+      key.toLowerCase() !== 'simaland-params' &&
+      value
+    ) {
       result[key] = value;
     }
   }

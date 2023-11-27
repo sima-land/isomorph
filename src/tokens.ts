@@ -6,7 +6,7 @@ import type { ConfigSource, BaseConfig } from './config/types';
 import type { Logger } from './log/types';
 import type { Cache } from './cache/types';
 import type { LogMiddlewareHandlerInit } from './utils/axios/middleware/log';
-import type { SagaExtendedMiddleware } from './utils/redux-saga';
+import type { SagaMiddleware } from 'redux-saga';
 import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { Tracer } from '@opentelemetry/api';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
@@ -17,6 +17,7 @@ import type { HandlerContext } from './preset/node/types';
 import type { SpecificExtras } from './preset/node/handler/utils';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper } from 'middleware-axios';
+import type { Handler, Middleware } from './http';
 
 export const KnownToken = {
   // config
@@ -30,10 +31,6 @@ export const KnownToken = {
 
   // log
   logger: createToken<Logger>('logger'),
-
-  // saga runner
-  // @todo переименовать в Redux.Middleware.saga?
-  sagaMiddleware: createToken<SagaExtendedMiddleware>('saga-middleware'),
 
   // tracing
   Tracing: {
@@ -56,36 +53,21 @@ export const KnownToken = {
       knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http/api/known-hosts'),
     },
 
-    // @todo переименовать в Axios?
-    Client: {
-      factory:
-        createToken<(config?: CreateAxiosDefaults) => AxiosInstanceWrapper>('client/factory'),
-      Middleware: {
-        Log: {
-          handler: createToken<LogMiddlewareHandlerInit>('log/handler'),
-        },
-      },
+    fetch: createToken<typeof fetch>('fetch'),
+    Fetch: {
+      abortController: createToken<AbortController>('fetch/abort-controller'),
+      middleware: createToken<Middleware[]>('fetch/middleware'),
     },
 
-    // @todo переименовать в Express?
-    Server: {
-      factory: createToken<() => express.Application>('server/factory'),
-      Handlers: {
-        healthCheck: createToken<express.Handler>('handler/health-check'),
-      },
-      Middleware: {
-        request: createToken<express.Handler>('middleware/request'),
-        log: createToken<express.Handler>('middleware/log'),
-        tracing: createToken<express.Handler>('middleware/tracing'),
-        metrics: createToken<express.Handler>('middleware/metrics'),
-        error: createToken<express.ErrorRequestHandler>('middleware/error'),
-      },
+    serve: createToken<Handler>('serve'),
+    Serve: {
+      routes: createToken<Array<[string, Handler]>>('serve/routes'),
+      middleware: createToken<Middleware[]>('serve/middleware'),
     },
 
-    // @todo переименовать в ExpressHandler?
     Handler: {
-      main: createToken<() => void>('handler/main'),
-      context: createToken<HandlerContext>('handler/context'),
+      main: createToken<Handler>('handler/main'),
+      context: createToken<{ request: Request }>('handler/context'),
       Request: {
         specificParams: createToken<Record<string, unknown>>('request/specific-params'),
       },
@@ -97,6 +79,44 @@ export const KnownToken = {
         helmet: createToken<ElementType<{ children: ReactNode }>>('page/helmet'),
         render: createToken<() => JSX.Element | Promise<JSX.Element>>('page/render'),
       },
+    },
+  },
+
+  // axios
+  Axios: {
+    factory: createToken<(config?: CreateAxiosDefaults) => AxiosInstanceWrapper>('axios/factory'),
+    Middleware: {
+      Log: {
+        handler: createToken<LogMiddlewareHandlerInit>('express/middleware/log/handler'),
+      },
+    },
+  },
+
+  // express
+  Express: {
+    factory: createToken<() => express.Application>('express/factory'),
+    Handlers: {
+      healthCheck: createToken<express.Handler>('express/handler/health-check'),
+    },
+    Middleware: {
+      request: createToken<express.Handler>('express/middleware/request'),
+      log: createToken<express.Handler>('express/middleware/log'),
+      tracing: createToken<express.Handler>('express/middleware/tracing'),
+      metrics: createToken<express.Handler>('express/middleware/metrics'),
+      error: createToken<express.ErrorRequestHandler>('express/middleware/error'),
+    },
+  },
+
+  // express handler
+  ExpressHandler: {
+    main: createToken<() => void>('express-handler/main'),
+    context: createToken<HandlerContext>('express-handler/context'),
+  },
+
+  // redux
+  Redux: {
+    Middleware: {
+      saga: createToken<SagaMiddleware>('saga-middleware'),
     },
   },
 

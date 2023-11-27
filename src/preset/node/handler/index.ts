@@ -1,9 +1,9 @@
 import { Preset, createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { provideSagaMiddleware, provideHttpClientLogHandler } from '../../isomorphic/providers';
+import { provideReduxMiddlewareSaga, provideAxiosLogHandler } from '../../isomorphic/providers';
 import { PresetTuner } from '../../isomorphic/types';
 import {
-  provideHttpClientFactory,
+  provideAxiosFactory,
   provideHandlerMain,
   provideSpecificParams,
   providePageHelmet,
@@ -22,14 +22,14 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   const preset = createPreset();
 
   // saga
-  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
+  preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
 
   // http client
-  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
-  preset.set(KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler);
+  preset.set(KnownToken.Axios.factory, provideAxiosFactory);
+  preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
 
   // http handler
-  preset.set(KnownToken.Http.Handler.main, provideHandlerMain);
+  preset.set(KnownToken.ExpressHandler.main, provideHandlerMain);
   preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
   preset.set(KnownToken.Http.Handler.Response.specificExtras, () => new SpecificExtras());
   preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));

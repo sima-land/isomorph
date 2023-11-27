@@ -1,7 +1,7 @@
 import { ResponseError, createCookieStore } from '../../../../http';
 import { Resolve } from '../../../../di';
 import { KnownToken } from '../../../../tokens';
-import { getRequestHeaders, tracingMiddleware } from '../../node/utils/http-client';
+import { getForwardedHeaders, tracingMiddleware } from '../../node/utils/http-client';
 import { CreateAxiosDefaults } from 'axios';
 import { create } from 'middleware-axios';
 import { HttpStatus } from '../../../isomorphic/utils';
@@ -17,14 +17,14 @@ import { renderToString } from 'react-dom/server';
  * @param resolve Функция для получения зависимости по токену.
  * @return Фабрика.
  */
-export function provideHttpClientFactory(resolve: Resolve) {
+export function provideAxiosFactory(resolve: Resolve) {
   // @todo а что если привести все зависимости к виду:
   // const getAppConfig = resolve.lazy(KnownToken.Config.base);
 
   const appConfig = resolve(KnownToken.Config.base);
   const tracer = resolve(KnownToken.Tracing.tracer);
-  const context = resolve(KnownToken.Http.Handler.context);
-  const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
+  const context = resolve(KnownToken.ExpressHandler.context);
+  const logHandler = resolve(KnownToken.Axios.Middleware.Log.handler);
 
   // @todo добавить при необходимости (но тогда в логе будет значительно больше ошибок)
   // можно не отсылать ошибки из клиента если ответ от сервера уже ушел (writableEnded)
@@ -42,7 +42,7 @@ export function provideHttpClientFactory(resolve: Resolve) {
     }
   });
 
-  const defaultHeaders = getRequestHeaders(appConfig, context.req);
+  const defaultHeaders = getForwardedHeaders(appConfig, context.req);
 
   return (config: CreateAxiosDefaults = {}) => {
     const client = create({
@@ -76,7 +76,7 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
   const render = resolve(KnownToken.Http.Handler.Page.render);
   const extras = resolve(KnownToken.Http.Handler.Response.specificExtras);
   const Helmet = resolve(KnownToken.Http.Handler.Page.helmet);
-  const { req, res } = resolve(KnownToken.Http.Handler.context);
+  const { req, res } = resolve(KnownToken.ExpressHandler.context);
 
   const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
@@ -144,7 +144,7 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
         }
       }
     } catch (error) {
-      let message;
+      let message: string;
       let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
 
       if (error instanceof Error) {
@@ -183,7 +183,7 @@ export function providePageRender() {
  */
 export function providePageHelmet(resolve: Resolve) {
   const config = resolve(KnownToken.Config.base);
-  const { req } = resolve(KnownToken.Http.Handler.context);
+  const { req } = resolve(KnownToken.ExpressHandler.context);
 
   return config.env === 'development' && getResponseFormat(req) === 'html'
     ? RegularHelmet
@@ -196,7 +196,7 @@ export function providePageHelmet(resolve: Resolve) {
  * @return Параметры.
  */
 export function provideSpecificParams(resolve: Resolve): Record<string, unknown> {
-  const context = resolve(KnownToken.Http.Handler.context);
+  const context = resolve(KnownToken.ExpressHandler.context);
 
   try {
     const headerValue = context.req.header('simaland-params');

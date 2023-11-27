@@ -26,12 +26,3 @@ coverage
 
 # npm pack default result
 sima-land-isomorph-0.0.0.tgz
-
-# child package.json
-cache
-config
-di
-http
-log
-preset
-utils

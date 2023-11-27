@@ -3,13 +3,13 @@ import { KnownToken } from '../../tokens';
 import { PresetTuner } from '../isomorphic/types';
 import {
   provideBaseConfig,
-  provideSagaMiddleware,
-  provideHttpClientLogHandler,
+  provideReduxMiddlewareSaga,
+  provideAxiosLogHandler,
 } from '../isomorphic/providers';
 import {
   provideBridgeClientSide,
   provideConfigSource,
-  provideHttpClientFactory,
+  provideAxiosFactory,
   provideKnownHttpApiHosts,
   provideLogger,
 } from './providers';
@@ -26,9 +26,9 @@ export function PresetWeb(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Config.source, provideConfigSource);
   preset.set(KnownToken.Config.base, provideBaseConfig);
   preset.set(KnownToken.logger, provideLogger);
-  preset.set(KnownToken.sagaMiddleware, provideSagaMiddleware);
-  preset.set(KnownToken.Http.Client.factory, provideHttpClientFactory);
-  preset.set(KnownToken.Http.Client.Middleware.Log.handler, provideHttpClientLogHandler);
+  preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
+  preset.set(KnownToken.Axios.factory, provideAxiosFactory);
+  preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
   preset.set(KnownToken.SsrBridge.clientSide, provideBridgeClientSide);
   preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
 

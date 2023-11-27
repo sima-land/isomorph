@@ -24,8 +24,28 @@ export function UsersPageApp() {
   return app;
 }
 
+function provideRender(resolve: Resolve) {
+  const httpApi = resolve(TOKEN.Project.Http.api);
+  const sagaMiddleware = resolve(TOKEN.Lib.Redux.Middleware.saga);
+
+  return async () => {
+    const store = configureStore({
+      reducer: UsersSlice.reducer,
+      middleware: [sagaMiddleware],
+    });
+
+    await sagaMiddleware.run(UsersSlice.saga, { api: httpApi }).toPromise();
+
+    return (
+      <Provider store={store}>
+        <UsersPage />
+      </Provider>
+    );
+  };
+}
+
 function provideHttpApi(resolve: Resolve): HttpApi {
-  const createClient = resolve(TOKEN.Lib.Http.Client.factory);
+  const createClient = resolve(TOKEN.Lib.Axios.factory);
 
   const client = sauce(createClient({ baseURL: 'https://jsonplaceholder.typicode.com/' }));
 
@@ -36,25 +56,5 @@ function provideHttpApi(resolve: Resolve): HttpApi {
     getUsers() {
       return client.get('users/');
     },
-  };
-}
-
-function provideRender(resolve: Resolve) {
-  const httpApi = resolve(TOKEN.Project.Http.api);
-  const sagaMiddleware = resolve(TOKEN.Lib.sagaMiddleware);
-
-  return async () => {
-    const store = configureStore({
-      reducer: UsersSlice.reducer,
-      middleware: [sagaMiddleware],
-    });
-
-    await sagaMiddleware.run(UsersSlice.saga, { api: httpApi });
-
-    return (
-      <Provider store={store}>
-        <UsersPage />
-      </Provider>
-    );
   };
 }

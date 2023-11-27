@@ -93,8 +93,8 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
  * @param resolve Функция для получения зависимости по токену.
  * @return Фабрика.
  */
-export function provideHttpClientFactory(resolve: Resolve) {
-  const logHandler = resolve(KnownToken.Http.Client.Middleware.Log.handler);
+export function provideAxiosFactory(resolve: Resolve) {
+  const logHandler = resolve(KnownToken.Axios.Middleware.Log.handler);
 
   return (config: CreateAxiosDefaults = {}) => {
     // @todo убрать as any
