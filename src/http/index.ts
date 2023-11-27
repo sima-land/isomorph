@@ -8,6 +8,9 @@ export type {
   LogHandler,
   LogHandlerFactory,
   CookieStore,
+  EitherResponse,
+  ResponseDone,
+  ResponseFail,
 } from './types';
 export { configureFetch, applyMiddleware, createCookieStore } from '@krutoo/fetch-tools';
 export { log, cookie, defaultHeaders, validateStatus } from '@krutoo/fetch-tools/middleware';
