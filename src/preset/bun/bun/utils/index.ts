@@ -1,25 +1,7 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import {
-  DoneLogData,
-  FailLogData,
-  FetchUtil,
-  Handler,
-  LogData,
-  LogHandler,
-} from '../../../../http';
+import { DoneLogData, FailLogData, FetchUtil, LogData, LogHandler } from '../../../../http';
 import { Breadcrumb, DetailedError, Logger } from '../../../../log';
 import { toMilliseconds } from '../../../../utils';
-
-export function healthCheck(): Handler {
-  const startTime = Date.now();
-
-  return () =>
-    new Response(JSON.stringify({ uptime: Date.now() - startTime }), {
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
-}
 
 export function getClientIp(request: Request): string | null {
   const headerValue = request.headers.get('x-client-ip') || request.headers.get('x-forwarded-for');

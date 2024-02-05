@@ -4,11 +4,12 @@ import { KnownToken } from '../../../../tokens';
 import { ConfigSource, createConfigSource } from '../../../../config';
 import { Logger, createLogger } from '../../../../log';
 import { Handler, Middleware, applyMiddleware, configureFetch, log } from '../../../../http';
-import { ServeLogging, healthCheck } from '../utils';
+import { ServeLogging } from '../utils';
 import { providePinoHandler } from '../../../node/node/providers';
 import { route, router } from '@krutoo/fetch-tools';
 import { getCurrentHub, init, runWithAsyncContext } from '@sentry/bun';
 import { createSentryHandler } from '../../../../log/handler/sentry';
+import { healthCheck } from '../../../isomorphic/utils';
 
 export const BunProviders = {
   configSource(): ConfigSource {
