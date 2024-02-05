@@ -8,7 +8,7 @@ import {
 import { Logger, Breadcrumb, DetailedError } from '../../../../log';
 import {
   HttpApiHostPool,
-  HttpClientLogging,
+  AxiosLogging,
   SagaLogging,
   severityFromStatus,
   HttpStatus,
@@ -169,7 +169,7 @@ describe('HttpClientLogging', () => {
       config,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -218,7 +218,7 @@ describe('HttpClientLogging', () => {
       config: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -269,7 +269,7 @@ describe('HttpClientLogging', () => {
       config: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -320,7 +320,7 @@ describe('HttpClientLogging', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     expect(logger.error).toHaveBeenCalledTimes(0);
     expect(logger.info).toHaveBeenCalledTimes(0);
@@ -349,7 +349,7 @@ describe('HttpClientLogging', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     expect(logger.error).toHaveBeenCalledTimes(0);
     expect(logger.info).toHaveBeenCalledTimes(0);
@@ -402,7 +402,7 @@ describe('HttpClientLogging', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     expect(logger.error).toHaveBeenCalledTimes(0);
     expect(logger.info).toHaveBeenCalledTimes(0);

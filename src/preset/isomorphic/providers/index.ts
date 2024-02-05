@@ -3,7 +3,7 @@ import { BaseConfig } from '../../../config/types';
 import { Resolve } from '../../../di';
 import { LogMiddlewareHandlerInit } from '../../../utils/axios/middleware/log';
 import { KnownToken } from '../../../tokens';
-import { HttpClientLogging, SagaLogging } from '../utils';
+import { AxiosLogging, SagaLogging } from '../utils';
 import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
 
 /**
@@ -25,7 +25,7 @@ export function provideBaseConfig(resolve: Resolve): BaseConfig {
 export function provideAxiosLogHandler(resolve: Resolve): LogMiddlewareHandlerInit {
   const logger = resolve(KnownToken.logger);
 
-  return data => new HttpClientLogging(logger, data);
+  return data => new AxiosLogging(logger, data);
 }
 
 /**

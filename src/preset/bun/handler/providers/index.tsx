@@ -14,7 +14,7 @@ import {
   log,
 } from '../../../../http';
 import { Fragment } from 'react';
-import { FetchLogging } from '../../bun/utils';
+import { FetchLogging } from '../../../isomorphic/utils';
 import { getForwardedHeaders, getResponseFormat } from '../utils';
 
 export const HandlerProviders = {

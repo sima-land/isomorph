@@ -16,7 +16,7 @@ import {
   SagaInterruptInfo,
   SagaMiddlewareHandler,
 } from '../../../utils/redux-saga/types';
-import { Handler } from '../../../http';
+import { DoneLogData, FailLogData, FetchUtil, Handler, LogData, LogHandler } from '../../../http';
 
 /** Реализация пула хостов. */
 export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
@@ -73,10 +73,78 @@ export function severityFromStatus(status: unknown): SeverityLevel {
 }
 
 /**
+ * Обработчик логирования внешних http-запросов.
+ */
+export class FetchLogging implements LogHandler {
+  logger: Logger;
+  disabled: boolean;
+
+  /** @inheritdoc */
+  constructor(logger: Logger) {
+    this.logger = logger;
+    this.disabled = false;
+  }
+
+  /** @inheritdoc */
+  onRequest({ request }: LogData) {
+    this.logger.info(
+      new Breadcrumb({
+        category: 'http.request',
+        type: 'http',
+        data: {
+          url: FetchUtil.withoutParams(request.url),
+          method: request.method,
+          params: Object.fromEntries(new URL(request.url).searchParams.entries()),
+        },
+        level: 'info',
+      }),
+    );
+  }
+
+  /** @inheritdoc */
+  onResponse({ response, request }: DoneLogData) {
+    this.logger.info(
+      new Breadcrumb({
+        category: 'http.response',
+        type: 'http',
+        data: {
+          url: FetchUtil.withoutParams(request.url),
+          method: request.method,
+          status_code: response.status,
+          params: Object.fromEntries(new URL(request.url).searchParams.entries()),
+        },
+        level: response.ok ? 'info' : 'error',
+      }),
+    );
+  }
+
+  /** @inheritdoc */
+  onCatch({ error, request }: FailLogData) {
+    this.logger.error(
+      new DetailedError(String(error), {
+        level: 'error',
+        context: [
+          {
+            key: 'Outgoing request details',
+            data: {
+              url: FetchUtil.withoutParams(request.url),
+              method: request.method,
+              headers: request.headers,
+              params: Object.fromEntries(new URL(request.url).searchParams.entries()),
+              // @todo data
+            },
+          },
+        ],
+      }),
+    );
+  }
+}
+
+/**
  * Обработчик для промежуточного слоя логирования исходящих http-запросов.
  * Отправляет хлебные крошки и данные ошибки, пригодные для Sentry.
  */
-export class HttpClientLogging implements LogMiddlewareHandler {
+export class AxiosLogging implements LogMiddlewareHandler {
   protected logger: Logger;
 
   protected readonly requestInfo: ReturnType<typeof applyAxiosDefaults> & {

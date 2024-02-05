@@ -24,12 +24,14 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   // saga
   preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
 
-  // http client
+  // axios
   preset.set(KnownToken.Axios.factory, provideAxiosFactory);
   preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
 
-  // http handler
+  // express handler
   preset.set(KnownToken.ExpressHandler.main, provideHandlerMain);
+
+  // http handler
   preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
   preset.set(KnownToken.Http.Handler.Response.specificExtras, () => new SpecificExtras());
   preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));
