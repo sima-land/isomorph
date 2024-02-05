@@ -92,7 +92,7 @@ export class FetchLogging implements LogHandler {
         category: 'http.request',
         type: 'http',
         data: {
-          url: FetchUtil.withoutParams(request.url),
+          url: FetchUtil.withoutParams(request.url).href,
           method: request.method,
           params: Object.fromEntries(new URL(request.url).searchParams.entries()),
         },
@@ -108,7 +108,7 @@ export class FetchLogging implements LogHandler {
         category: 'http.response',
         type: 'http',
         data: {
-          url: FetchUtil.withoutParams(request.url),
+          url: FetchUtil.withoutParams(request.url).href,
           method: request.method,
           status_code: response.status,
           params: Object.fromEntries(new URL(request.url).searchParams.entries()),
@@ -127,7 +127,7 @@ export class FetchLogging implements LogHandler {
           {
             key: 'Outgoing request details',
             data: {
-              url: FetchUtil.withoutParams(request.url),
+              url: FetchUtil.withoutParams(request.url).href,
               method: request.method,
               headers: request.headers,
               params: Object.fromEntries(new URL(request.url).searchParams.entries()),
