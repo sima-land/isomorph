@@ -5,15 +5,18 @@ import {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { Logger, Breadcrumb, DetailedError } from '../../../../log';
+import { Logger, Breadcrumb, DetailedError, createLogger } from '../../../../log';
 import {
   HttpApiHostPool,
-  HttpClientLogging,
+  AxiosLogging,
   SagaLogging,
   severityFromStatus,
   HttpStatus,
   displayUrl,
+  healthCheck,
+  FetchLogging,
 } from '..';
+import { FetchUtil } from '../../../../http';
 
 describe('displayUrl', () => {
   const cases: Array<{ name: string; url: string; baseURL: string; expectedUrl: string }> = [
@@ -87,15 +90,6 @@ describe('displayUrl', () => {
   }
 });
 
-const logger: Logger = {
-  log: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-  subscribe: jest.fn(),
-};
-
 describe('HttpApiHostPool', () => {
   it('.get() should return value from map', () => {
     const source = new Env({
@@ -146,6 +140,15 @@ describe('severityFromStatus', () => {
 });
 
 describe('HttpClientLogging', () => {
+  const logger: Logger = {
+    log: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    subscribe: jest.fn(),
+  };
+
   beforeEach(() => {
     (logger.info as jest.Mock).mockClear();
     (logger.error as jest.Mock).mockClear();
@@ -169,7 +172,7 @@ describe('HttpClientLogging', () => {
       config,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -218,7 +221,7 @@ describe('HttpClientLogging', () => {
       config: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -269,7 +272,7 @@ describe('HttpClientLogging', () => {
       config: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     handler.beforeRequest();
     handler.afterResponse({ config, defaults, response });
@@ -320,7 +323,7 @@ describe('HttpClientLogging', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     expect(logger.error).toHaveBeenCalledTimes(0);
     expect(logger.info).toHaveBeenCalledTimes(0);
@@ -349,7 +352,7 @@ describe('HttpClientLogging', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     expect(logger.error).toHaveBeenCalledTimes(0);
     expect(logger.info).toHaveBeenCalledTimes(0);
@@ -402,7 +405,7 @@ describe('HttpClientLogging', () => {
       headers: {} as any,
     };
 
-    const handler = new HttpClientLogging(logger, { config, defaults });
+    const handler = new AxiosLogging(logger, { config, defaults });
 
     expect(logger.error).toHaveBeenCalledTimes(0);
     expect(logger.info).toHaveBeenCalledTimes(0);
@@ -416,6 +419,15 @@ describe('HttpClientLogging', () => {
 });
 
 describe('SagaLogging', () => {
+  const logger: Logger = {
+    log: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    subscribe: jest.fn(),
+  };
+
   beforeEach(() => {
     (logger.info as jest.Mock).mockClear();
     (logger.error as jest.Mock).mockClear();
@@ -537,5 +549,176 @@ describe('HttpStatus', () => {
         expect(next).toHaveBeenCalledWith({ ...config, validateStatus: validator });
       }
     });
+  });
+});
+
+describe('FetchLogging', () => {
+  it('onRequest should work properly', () => {
+    const spy = jest.fn();
+    const logger = createLogger();
+    const handler = new FetchLogging(logger);
+
+    logger.subscribe(spy);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onRequest({
+      request: new Request(
+        FetchUtil.withParams('https://test.com', {
+          foo: 'bar',
+        }),
+        { method: 'GET' },
+      ),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toEqual({
+      type: 'info',
+      data: new Breadcrumb({
+        category: 'http.request',
+        type: 'http',
+        data: {
+          url: 'https://test.com/',
+          method: 'GET',
+          params: { foo: 'bar' },
+        },
+        level: 'info',
+      }),
+    });
+  });
+
+  it('onResponse should work properly', () => {
+    const spy = jest.fn();
+    const logger = createLogger();
+    const handler = new FetchLogging(logger);
+
+    logger.subscribe(spy);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onResponse({
+      request: new Request(
+        FetchUtil.withParams('https://test.com', {
+          foo: 'bar',
+        }),
+        { method: 'GET' },
+      ),
+      response: new Response('', { status: 201 }),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toEqual({
+      type: 'info',
+      data: new Breadcrumb({
+        category: 'http.response',
+        type: 'http',
+        data: {
+          url: 'https://test.com/',
+          method: 'GET',
+          params: { foo: 'bar' },
+          status_code: 201,
+        },
+        level: 'info',
+      }),
+    });
+  });
+
+  it('onResponse should handles "ok" property', () => {
+    const spy = jest.fn();
+    const logger = createLogger();
+    const handler = new FetchLogging(logger);
+
+    logger.subscribe(spy);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onResponse({
+      request: new Request(
+        FetchUtil.withParams('https://test.com', {
+          foo: 'bar',
+        }),
+        { method: 'GET' },
+      ),
+      response: new Response('', { status: 500 }),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toEqual({
+      type: 'info',
+      data: new Breadcrumb({
+        category: 'http.response',
+        type: 'http',
+        data: {
+          url: 'https://test.com/',
+          method: 'GET',
+          params: { foo: 'bar' },
+          status_code: 500,
+        },
+        level: 'error',
+      }),
+    });
+  });
+
+  it('onCatch should work properly', () => {
+    const spy = jest.fn();
+    const logger = createLogger();
+    const handler = new FetchLogging(logger);
+
+    logger.subscribe(spy);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({
+      request: new Request(
+        FetchUtil.withParams('https://test.com', {
+          foo: 'bar',
+        }),
+        { method: 'GET' },
+      ),
+      error: new Error('Test error'),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toEqual({
+      type: 'error',
+      data: new DetailedError('Error: Test error', {
+        level: 'error',
+        context: [
+          {
+            key: 'Outgoing request details',
+            data: {
+              url: 'https://test.com',
+              method: 'GET',
+              params: { foo: 'bar' },
+            },
+          },
+        ],
+      }),
+    });
+  });
+});
+
+describe('healthCheck', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
+  it('handler should return response', async () => {
+    const handler = healthCheck();
+    const request = new Request('');
+
+    const res1 = await handler(request);
+    expect(res1.headers.get('content-type')).toBe('application/json');
+    expect(await res1.json()).toEqual({ uptime: 0 });
+
+    jest.advanceTimersByTime(1000);
+
+    const res2 = await handler(request);
+    expect(res2.headers.get('content-type')).toBe('application/json');
+    expect(await res2.json()).toEqual({ uptime: 1000 });
   });
 });
