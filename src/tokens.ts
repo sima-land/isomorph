@@ -16,7 +16,7 @@ import type { KnownHttpApiKey, PageAssets, StrictMap } from './preset/isomorphic
 import type { HandlerContext } from './preset/node/types';
 import type { SpecificExtras } from './preset/node/handler/utils';
 import type { CreateAxiosDefaults } from 'axios';
-import type { AxiosInstanceWrapper } from 'middleware-axios';
+import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
 import type { Handler, Middleware } from './http';
 
 export const KnownToken = {
@@ -85,9 +85,10 @@ export const KnownToken = {
   // axios
   Axios: {
     factory: createToken<(config?: CreateAxiosDefaults) => AxiosInstanceWrapper>('axios/factory'),
+    middleware: createToken<AxiosMiddleware<any>[]>('axios/middleware'),
     Middleware: {
       Log: {
-        handler: createToken<LogMiddlewareHandlerInit>('express/middleware/log/handler'),
+        handler: createToken<LogMiddlewareHandlerInit>('axios/middleware/log/handler'),
       },
     },
   },

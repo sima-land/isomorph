@@ -7,7 +7,6 @@ import {
   Middleware,
   ResponseError,
   applyMiddleware,
-  configureFetch,
   cookie,
   createCookieStore,
   defaultHeaders,
@@ -15,6 +14,7 @@ import {
 } from '../../../../http';
 import { Fragment } from 'react';
 import { FetchLogging } from '../../../isomorphic/utils';
+import { provideAbortController, provideFetch } from '../../../isomorphic/providers';
 import { getForwardedHeaders, getResponseFormat } from '../utils';
 
 export const HandlerProviders = {
@@ -156,15 +156,9 @@ export const HandlerProviders = {
     }
   },
 
-  fetch(resolve: Resolve): typeof fetch {
-    const middleware = resolve(KnownToken.Http.Fetch.middleware);
+  fetch: provideFetch,
 
-    return configureFetch(fetch, applyMiddleware(...middleware));
-  },
-
-  fetchAbortController(): AbortController {
-    return new AbortController();
-  },
+  fetchAbortController: provideAbortController,
 
   fetchMiddleware(resolve: Resolve): Middleware[] {
     const config = resolve(KnownToken.Config.base);
@@ -188,7 +182,7 @@ export const HandlerProviders = {
     return [
       // ВАЖНО: слой логирования ошибки ПЕРЕД остальными слоями чтобы не упустить ошибки выше
       log({
-        onCatch: data => logging.onRequest(data),
+        onCatch: data => logging.onCatch(data),
       }),
 
       (request, next) => next(new Request(request, { signal: abortController.signal })),
