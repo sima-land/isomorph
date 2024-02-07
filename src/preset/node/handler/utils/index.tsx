@@ -80,7 +80,7 @@ export class SpecificExtras {
  * @param req Запрос.
  * @return Формат.
  */
-export function getResponseFormat(req: Request): 'html' | 'json' {
+export function getPageResponseFormat(req: Request): 'html' | 'json' {
   let result: 'html' | 'json' = 'html';
 
   if ((req.header('accept') || '').toLowerCase().includes('application/json')) {

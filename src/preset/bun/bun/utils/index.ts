@@ -2,15 +2,11 @@
 import { DoneLogData, FailLogData, FetchUtil, LogData, LogHandler } from '../../../../http';
 import { DetailedError, Logger } from '../../../../log';
 import { toMilliseconds } from '../../../../utils';
-
-export function getClientIp(request: Request): string | null {
-  const headerValue = request.headers.get('x-client-ip') || request.headers.get('x-forwarded-for');
-
-  return headerValue;
-}
+import { getClientIp } from '../../../server/utils';
 
 /**
  * Логирование обработки входящих http-запросов.
+ * @todo Перенести в preset/server?
  */
 export class ServeLogging implements LogHandler {
   logger: Logger;

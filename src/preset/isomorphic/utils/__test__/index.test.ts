@@ -116,6 +116,21 @@ describe('HttpApiHostPool', () => {
       pool.get('bar' as any);
     }).toThrow(`Known HTTP API not found by key "bar"`);
   });
+
+  it('should handle absolute option', () => {
+    const source = new Env({
+      API_HOST_FOOBAR: 'http://www.foobar.com',
+    });
+
+    const pool = new HttpApiHostPool(
+      {
+        foobar: 'API_HOST_FOOBAR',
+      },
+      source,
+    );
+
+    expect(pool.get('foobar', { absolute: true })).toEqual('http://www.foobar.com');
+  });
 });
 
 describe('severityFromStatus', () => {

@@ -34,7 +34,7 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
   }
 
   /** @inheritDoc */
-  get(key: Key): string {
+  get(key: Key, { absolute }: { absolute?: boolean } = {}): string {
     const variableName = this.map[key];
 
     if (!variableName) {
@@ -42,7 +42,13 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
     }
 
     // "лениво" берём переменную, именно в момент вызова (чтобы не заставлять указывать в сервисах все переменные разом)
-    return this.source.require(variableName);
+    const value = this.source.require(variableName);
+
+    if (absolute) {
+      return new Request(value).url;
+    }
+
+    return value;
   }
 }
 

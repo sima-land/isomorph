@@ -12,12 +12,13 @@ import type { Tracer } from '@opentelemetry/api';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { Resource } from '@opentelemetry/resources';
 import type { ElementType, ReactNode } from 'react';
-import type { KnownHttpApiKey, PageAssets, StrictMap } from './preset/isomorphic/types';
+import type { KnownHttpApiKey, PageAssets } from './preset/isomorphic/types';
 import type { HandlerContext } from './preset/node/types';
 import type { SpecificExtras } from './preset/node/handler/utils';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
-import type { Handler, Middleware } from './http';
+import type { CookieStore, Handler, Middleware } from './http';
+import type { HttpApiHostPool } from './preset/isomorphic/utils';
 
 export const KnownToken = {
   // config
@@ -50,12 +51,13 @@ export const KnownToken = {
   // http
   Http: {
     Api: {
-      knownHosts: createToken<StrictMap<KnownHttpApiKey>>('http/api/known-hosts'),
+      knownHosts: createToken<HttpApiHostPool<KnownHttpApiKey>>('http/api/known-hosts'),
     },
 
     fetch: createToken<typeof fetch>('fetch'),
     Fetch: {
       abortController: createToken<AbortController>('fetch/abort-controller'),
+      cookieStore: createToken<CookieStore>('fetch/cookie-store'),
       middleware: createToken<Middleware[]>('fetch/middleware'),
     },
 

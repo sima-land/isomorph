@@ -7,7 +7,7 @@ import { createSentryHandler } from '../../../../log/handler/sentry';
 import { HttpApiHostPool } from '../../../isomorphic/utils';
 import { KnownToken } from '../../../../tokens';
 import { Resolve } from '../../../../di';
-import { StrictMap, KnownHttpApiKey } from '../../../isomorphic/types';
+import { KnownHttpApiKey } from '../../../isomorphic/types';
 import { toMilliseconds } from '../../../../utils';
 import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
 import { getClientIp } from '../utils/http-server';
@@ -400,7 +400,7 @@ export function provideSsrBridgeServerSide(resolve: Resolve): BridgeServerSide {
  * @param resolve Функция для получения зависимости по токену.
  * @return Пул известных http-хостов.
  */
-export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpApiKey> {
+export function provideKnownHttpApiHosts(resolve: Resolve): HttpApiHostPool<KnownHttpApiKey> {
   const source = resolve(KnownToken.Config.source);
 
   return new HttpApiHostPool(
@@ -409,6 +409,7 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
       simaV3: 'API_URL_SIMALAND_V3',
       simaV4: 'API_URL_SIMALAND_V4',
       simaV6: 'API_URL_SIMALAND_V6',
+      chponkiV2: 'API_URL_CHPONKI_V2',
     },
     source,
   );

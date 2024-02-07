@@ -4,6 +4,7 @@ import { Resolve } from '../../../../di';
 import { KnownToken } from '../../../../tokens';
 import { HelmetContext, RegularHelmet } from '../../../node/handler/utils';
 import {
+  CookieStore,
   Middleware,
   ResponseError,
   applyMiddleware,
@@ -14,8 +15,7 @@ import {
 } from '../../../../http';
 import { Fragment } from 'react';
 import { FetchLogging } from '../../../isomorphic/utils';
-import { provideAbortController, provideFetch } from '../../../isomorphic/providers';
-import { getForwardedHeaders, getResponseFormat } from '../utils';
+import { getForwardedHeaders, getPageResponseFormat } from '../../../server/utils';
 
 export const HandlerProviders = {
   handlerMain(resolve: Resolve) {
@@ -48,7 +48,7 @@ export const HandlerProviders = {
           </HelmetContext.Provider>
         );
 
-        switch (getResponseFormat(request)) {
+        switch (getPageResponseFormat(request)) {
           case 'html': {
             const headers = new Headers();
 
@@ -139,7 +139,7 @@ export const HandlerProviders = {
     const config = resolve(KnownToken.Config.base);
     const { request } = resolve(KnownToken.Http.Handler.context);
 
-    return config.env === 'development' && getResponseFormat(request) === 'html'
+    return config.env === 'development' && getPageResponseFormat(request) === 'html'
       ? RegularHelmet
       : Fragment;
   },
@@ -156,18 +156,12 @@ export const HandlerProviders = {
     }
   },
 
-  fetch: provideFetch,
-
-  fetchAbortController: provideAbortController,
-
   fetchMiddleware(resolve: Resolve): Middleware[] {
     const config = resolve(KnownToken.Config.base);
     const logger = resolve(KnownToken.logger);
     const context = resolve(KnownToken.Http.Handler.context);
+    const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
     const abortController = resolve(KnownToken.Http.Fetch.abortController);
-
-    // @todo set-cookie в ответ от сервера (но только если во входящих ответах есть set-cookie)
-    const cookieStore = createCookieStore(context.request.headers.get('cookie') ?? undefined);
 
     const logging = new FetchLogging(logger);
 
@@ -185,7 +179,19 @@ export const HandlerProviders = {
         onCatch: data => logging.onCatch(data),
       }),
 
-      (request, next) => next(new Request(request, { signal: abortController.signal })),
+      (request, next) => {
+        const innerController = new AbortController();
+
+        abortController.signal.addEventListener('abort', () => {
+          innerController.abort();
+        });
+
+        request.signal?.addEventListener('abort', () => {
+          innerController.abort();
+        });
+
+        return next(new Request(request, { signal: innerController.signal }));
+      },
 
       cookie(cookieStore),
 
@@ -199,5 +205,11 @@ export const HandlerProviders = {
         onResponse: data => logging.onResponse(data),
       }),
     ];
+  },
+
+  cookieStore(resolve: Resolve): CookieStore {
+    const context = resolve(KnownToken.Http.Handler.context);
+
+    return createCookieStore(context.request.headers.get('cookie') ?? undefined);
   },
 } as const;
