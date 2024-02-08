@@ -36,7 +36,6 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { create } from 'middleware-axios';
 
 /**
  * Провайдер источника конфигурации.
@@ -169,14 +168,6 @@ export function provideTracerProviderResource(resolve: Resolve): Resource {
     [SemanticResourceAttributes.SERVICE_VERSION]: config.appVersion,
     [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: config.env,
   });
-}
-
-/**
- * Провайдер фабрики http-клиентов.
- * @return Фабрика.
- */
-export function provideAxiosFactory() {
-  return create;
 }
 
 /**

@@ -6,18 +6,17 @@ import {
   defaultHeaders,
   log,
 } from '../../../../http';
-import { Resolve } from '../../../../di';
+import type { Resolve } from '../../../../di';
 import { KnownToken } from '../../../../tokens';
 import {
   getForwardedHeaders as getForwardedHeadersExpress,
   tracingMiddleware as tracingMiddlewareAxios,
 } from '../../node/utils/http-client';
-import { CreateAxiosDefaults } from 'axios';
-import { create } from 'middleware-axios';
+import type { Middleware as AxiosMiddleware } from 'middleware-axios';
 import { FetchLogging, HttpStatus } from '../../../isomorphic/utils';
 import { cookieMiddleware, logMiddleware } from '../../../../utils/axios';
 import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
-import { ConventionalJson } from '../../../isomorphic/types';
+import type { ConventionalJson } from '../../../isomorphic/types';
 import { Fragment } from 'react';
 import { HelmetContext, RegularHelmet, getPageResponseFormat } from '../utils';
 import { renderToString } from 'react-dom/server';
@@ -181,6 +180,10 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
       onCatch: data => logging.onCatch(data),
     }),
 
+    // пробрасываемые заголовки по соглашению
+    defaultHeaders(getForwardedHeadersExpress(config, context.req)),
+
+    // обрывание по сигналу из обработчика входящего запроса и по сигналу из конфига исходящего запроса
     (request, next) => {
       const innerController = new AbortController();
 
@@ -197,8 +200,6 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
 
     cookie(cookieStore),
 
-    defaultHeaders(getForwardedHeadersExpress(config, context.req)),
-
     tracingMiddleware(tracer, context.res.locals.tracing.rootContext),
 
     // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
@@ -214,7 +215,7 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
  * @param resolve Функция для получения зависимости по токену.
  * @return Фабрика.
  */
-export function provideAxiosFactory(resolve: Resolve) {
+export function provideAxiosMiddleware(resolve: Resolve): AxiosMiddleware<any>[] {
   // @todo а что если привести все зависимости к виду:
   // const getAppConfig = resolve.lazy(KnownToken.Config.base);
 
@@ -225,53 +226,40 @@ export function provideAxiosFactory(resolve: Resolve) {
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
   const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
 
-  // @todo добавить при необходимости (но тогда в логе будет значительно больше ошибок)
-  // можно не отсылать ошибки из клиента если ответ от сервера уже ушел (writableEnded)
-  // const controller = new AbortController();
-  // context.res.on('finish', () => {
-  //   controller.abort();
-  // });
+  return [
+    // пробрасываемые заголовки по соглашению
+    async (config, next) => {
+      await next({
+        ...config,
+        headers: {
+          ...getForwardedHeadersExpress(appConfig, context.req),
 
-  // @todo унести в провайдер стора кук
-  // cookieStore.subscribe(() => {
-  //   if (!context.res.writableEnded) {
-  //     context.res.setHeader('set-cookie', cookieStore.getCookies());
-  //   }
-  // });
+          // ВАЖНО: заголовки из конфига важнее, поэтому идут в конце
+          ...config.headers,
+        },
+      });
+    },
 
-  return (config: CreateAxiosDefaults = {}) => {
-    const client = create({
-      ...config,
-      headers: {
-        ...getForwardedHeadersExpress(appConfig, context.req),
-
-        // @todo убрать as any
-        ...(config.headers as any),
-      },
-    });
-
-    // @todo объединить сигналы из аргумента request и из провайдера
-    client.use(async (requestConfig, next) => {
+    // обрывание по сигналу из обработчика входящего запроса и по сигналу из конфига исходящего запроса
+    async (config, next) => {
       const innerController = new AbortController();
 
       abortController.signal.addEventListener('abort', () => {
         innerController.abort();
       });
 
-      requestConfig.signal?.addEventListener?.('abort', () => {
+      config.signal?.addEventListener?.('abort', () => {
         innerController.abort();
       });
 
-      next({ ...requestConfig, signal: innerController.signal });
-    });
+      await next({ ...config, signal: innerController.signal });
+    },
 
-    client.use(HttpStatus.axiosMiddleware());
-    client.use(tracingMiddlewareAxios(tracer, context.res.locals.tracing.rootContext));
-    client.use(logMiddleware(logHandler));
-    client.use(cookieMiddleware(cookieStore));
-
-    return client;
-  };
+    HttpStatus.axiosMiddleware(),
+    tracingMiddlewareAxios(tracer, context.res.locals.tracing.rootContext),
+    logMiddleware(logHandler),
+    cookieMiddleware(cookieStore),
+  ];
 }
 
 /**

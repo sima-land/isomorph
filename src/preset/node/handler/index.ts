@@ -8,7 +8,7 @@ import {
 } from '../../isomorphic/providers';
 import { PresetTuner } from '../../isomorphic/types';
 import {
-  provideAxiosFactory,
+  provideAxiosMiddleware,
   provideHandlerMain,
   provideSpecificParams,
   providePageHelmet,
@@ -38,7 +38,7 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
 
   // axios
-  preset.set(KnownToken.Axios.factory, provideAxiosFactory);
+  preset.set(KnownToken.Axios.middleware, provideAxiosMiddleware);
   preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
 
   // express handler
