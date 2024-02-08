@@ -1,11 +1,10 @@
 import { KnownToken } from '../../../tokens';
-import { provideBaseConfig, provideFetch } from '../../isomorphic/providers';
+import { provideAxiosFactory, provideBaseConfig, provideFetch } from '../../isomorphic/providers';
 import { Preset, createPreset } from '../../../di';
 import { PresetTuner } from '../../isomorphic/types';
 import { healthCheck } from '../../../utils/express/handler/health-check';
 import {
   provideConfigSource,
-  provideAxiosFactory,
   provideExpressErrorMiddleware,
   provideExpressFactory,
   provideExpressLogMiddleware,
@@ -53,6 +52,7 @@ export function PresetNode(customize?: PresetTuner): Preset {
 
   // axios
   preset.set(KnownToken.Axios.factory, provideAxiosFactory);
+  preset.set(KnownToken.Axios.middleware, () => []);
 
   // express
   preset.set(KnownToken.Express.factory, provideExpressFactory);

@@ -13,8 +13,6 @@ import { createSentryHandler } from '../../../log/handler/sentry';
 import { BridgeClientSide, SsrBridge } from '../../../utils/ssr';
 import { KnownHttpApiKey } from '../../isomorphic/types';
 import { FetchLogging, HttpApiHostPool, HttpStatus } from '../../isomorphic/utils';
-import { CreateAxiosDefaults } from 'axios';
-import { create } from 'middleware-axios';
 import { logMiddleware } from '../../../utils/axios';
 import { log } from '../../../http';
 
@@ -107,25 +105,6 @@ export function provideKnownHttpApiHosts(resolve: Resolve): HttpApiHostPool<Know
 }
 
 /**
- * Провайдер фабрики http-клиентов.
- * @param resolve Функция для получения зависимости по токену.
- * @return Фабрика.
- */
-export function provideAxiosFactory(resolve: Resolve) {
-  const logHandler = resolve(KnownToken.Axios.Middleware.Log.handler);
-
-  return (config: CreateAxiosDefaults = {}) => {
-    // @todo убрать as any
-    const client = create(config as any);
-
-    client.use(HttpStatus.axiosMiddleware());
-    client.use(logMiddleware(logHandler));
-
-    return client;
-  };
-}
-
-/**
  * Провайдер промежуточных слоев для fetch.
  * @param resolve Функция для получения зависимости по токену.
  * @return Фабрика.
@@ -134,4 +113,15 @@ export function provideFetchMiddleware(resolve: Resolve) {
   const logger = resolve(KnownToken.logger);
 
   return [log(new FetchLogging(logger))];
+}
+
+/**
+ * Провайдер фабрики http-клиентов.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Фабрика.
+ */
+export function provideAxiosMiddleware(resolve: Resolve) {
+  const logHandler = resolve(KnownToken.Axios.Middleware.Log.handler);
+
+  return [HttpStatus.axiosMiddleware(), logMiddleware(logHandler)];
 }
