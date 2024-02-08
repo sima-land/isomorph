@@ -1,5 +1,5 @@
 import { KnownToken } from '../../../tokens';
-import { provideBaseConfig } from '../../isomorphic/providers';
+import { provideBaseConfig, provideFetch } from '../../isomorphic/providers';
 import { Preset, createPreset } from '../../../di';
 import { PresetTuner } from '../../isomorphic/types';
 import { healthCheck } from '../../../utils/express/handler/health-check';
@@ -47,10 +47,14 @@ export function PresetNode(customize?: PresetTuner): Preset {
   // metrics
   preset.set(KnownToken.Metrics.httpApp, provideMetricsHttpApp);
 
-  // http client
+  // fetch
+  preset.set(KnownToken.Http.fetch, provideFetch);
+  preset.set(KnownToken.Http.Fetch.middleware, () => []);
+
+  // axios
   preset.set(KnownToken.Axios.factory, provideAxiosFactory);
 
-  // http server
+  // express
   preset.set(KnownToken.Express.factory, provideExpressFactory);
   preset.set(KnownToken.Express.Handlers.healthCheck, healthCheck);
   preset.set(KnownToken.Express.Middleware.request, provideExpressRequestMiddleware);

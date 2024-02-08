@@ -1,6 +1,6 @@
 import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
-import type { Request } from 'express';
+import type express from 'express';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { BaseConfig } from '../../../../../config';
@@ -101,7 +101,10 @@ export function hideFirstId(url: string): [string, number | undefined] {
  * @param request Входящий запрос.
  * @return Заголовки для исходящих запросов.
  */
-export function getForwardedHeaders(config: BaseConfig, request: Request): Record<string, string> {
+export function getForwardedHeaders(
+  config: BaseConfig,
+  request: express.Request,
+): Record<string, string> {
   const result: Record<string, string> = {
     'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
   };

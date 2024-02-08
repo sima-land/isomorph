@@ -2,7 +2,11 @@
 import { createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import { PresetTuner } from '../../isomorphic';
-import { provideReduxMiddlewareSaga } from '../../isomorphic/providers';
+import {
+  provideAbortController,
+  provideFetch,
+  provideReduxMiddlewareSaga,
+} from '../../isomorphic/providers';
 import { providePageRender } from '../../node/handler/providers';
 import { SpecificExtras } from '../../node/handler/utils';
 import { HandlerProviders } from './providers';
@@ -11,8 +15,9 @@ export function PresetHandler(customize?: PresetTuner) {
   const preset = createPreset();
 
   // http fetch
-  preset.set(KnownToken.Http.fetch, HandlerProviders.fetch);
-  preset.set(KnownToken.Http.Fetch.abortController, HandlerProviders.fetchAbortController);
+  preset.set(KnownToken.Http.fetch, provideFetch);
+  preset.set(KnownToken.Http.Fetch.abortController, provideAbortController);
+  preset.set(KnownToken.Http.Fetch.cookieStore, HandlerProviders.cookieStore);
   preset.set(KnownToken.Http.Fetch.middleware, HandlerProviders.fetchMiddleware);
 
   // handler

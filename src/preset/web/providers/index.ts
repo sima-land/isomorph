@@ -11,11 +11,12 @@ import { Logger, createLogger } from '../../../log';
 import { KnownToken } from '../../../tokens';
 import { createSentryHandler } from '../../../log/handler/sentry';
 import { BridgeClientSide, SsrBridge } from '../../../utils/ssr';
-import { KnownHttpApiKey, StrictMap } from '../../isomorphic/types';
-import { HttpApiHostPool, HttpStatus } from '../../isomorphic/utils';
+import { KnownHttpApiKey } from '../../isomorphic/types';
+import { FetchLogging, HttpApiHostPool, HttpStatus } from '../../isomorphic/utils';
 import { CreateAxiosDefaults } from 'axios';
 import { create } from 'middleware-axios';
 import { logMiddleware } from '../../../utils/axios';
+import { log } from '../../../http';
 
 /**
  * Провайдер источника конфигурации.
@@ -37,6 +38,7 @@ export function provideConfigSource(): ConfigSource {
  */
 export function provideLogger(resolve: Resolve): Logger {
   const source = resolve(KnownToken.Config.source);
+  const config = resolve(KnownToken.Config.base);
 
   const client = new BrowserClient({
     transport: makeFetchTransport,
@@ -54,6 +56,21 @@ export function provideLogger(resolve: Resolve): Logger {
   const logger = createLogger();
 
   logger.subscribe(createSentryHandler(hub));
+
+  if (config.env === 'development') {
+    logger.subscribe(event => {
+      switch (event.type) {
+        case 'debug':
+          // eslint-disable-next-line no-console
+          console.debug(event.data);
+          break;
+        case 'error':
+          // eslint-disable-next-line no-console
+          console.error(event.data);
+          break;
+      }
+    });
+  }
 
   return logger;
 }
@@ -74,7 +91,7 @@ export function provideBridgeClientSide(resolve: Resolve): BridgeClientSide<unkn
  * @param resolve Функция для получения зависимости по токену.
  * @return Пул известных http-хостов.
  */
-export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpApiKey> {
+export function provideKnownHttpApiHosts(resolve: Resolve): HttpApiHostPool<KnownHttpApiKey> {
   const source = resolve(KnownToken.Config.source);
 
   return new HttpApiHostPool<KnownHttpApiKey>(
@@ -83,6 +100,7 @@ export function provideKnownHttpApiHosts(resolve: Resolve): StrictMap<KnownHttpA
       simaV3: 'PUBLIC_API_URL_SIMALAND_V3',
       simaV4: 'PUBLIC_API_URL_SIMALAND_V4',
       simaV6: 'PUBLIC_API_URL_SIMALAND_V6',
+      chponkiV2: 'PUBLIC_API_URL_CHPONKI_V2',
     },
     source,
   );
@@ -105,4 +123,15 @@ export function provideAxiosFactory(resolve: Resolve) {
 
     return client;
   };
+}
+
+/**
+ * Провайдер промежуточных слоев для fetch.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Фабрика.
+ */
+export function provideFetchMiddleware(resolve: Resolve) {
+  const logger = resolve(KnownToken.logger);
+
+  return [log(new FetchLogging(logger))];
 }

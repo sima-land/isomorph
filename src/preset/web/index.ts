@@ -5,6 +5,7 @@ import {
   provideBaseConfig,
   provideReduxMiddlewareSaga,
   provideAxiosLogHandler,
+  provideFetch,
 } from '../isomorphic/providers';
 import {
   provideBridgeClientSide,
@@ -12,6 +13,7 @@ import {
   provideAxiosFactory,
   provideKnownHttpApiHosts,
   provideLogger,
+  provideFetchMiddleware,
 } from './providers';
 
 /**
@@ -31,6 +33,8 @@ export function PresetWeb(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
   preset.set(KnownToken.SsrBridge.clientSide, provideBridgeClientSide);
   preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
+  preset.set(KnownToken.Http.fetch, provideFetch);
+  preset.set(KnownToken.Http.Fetch.middleware, provideFetchMiddleware);
 
   if (customize) {
     customize({ override: preset.set.bind(preset) });
