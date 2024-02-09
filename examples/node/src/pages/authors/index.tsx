@@ -3,9 +3,9 @@ import { PresetHandler } from '@sima-land/isomorph/preset/node';
 import { TOKEN } from '../../tokens';
 import { Layout } from '../../components/Layout';
 import { Nav } from '../../components/Nav';
-import { createPostApi } from '../../entities/post';
+import { createAuthorApi } from '../../entities/author';
 
-export function PostsPageApp() {
+export function AuthorsPageApp() {
   const app = createApplication();
 
   // используем пресет "PresetHandler"
@@ -17,27 +17,27 @@ export function PostsPageApp() {
   );
 
   // добавляем в приложение собственные компоненты
-  app.bind(TOKEN.Entities.Post.api).toProvider(providePostApi);
+  app.bind(TOKEN.Entities.Author.api).toProvider(provideAuthorApi);
 
   return app;
 }
 
 function provideRender(resolve: Resolve) {
-  const api = resolve(TOKEN.Entities.Post.api);
+  const api = resolve(TOKEN.Entities.Author.api);
 
   return async () => {
     const response = await api.getAll();
-    const posts = response.ok ? response.data : [];
+    const authors = response.ok ? response.data : [];
 
     return (
       <Layout>
-        <h1>Posts</h1>
+        <h1>Authors</h1>
         <Nav />
         <div>
-          {posts.map(item => (
+          {authors.map(item => (
             <article key={item.id}>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
+              <h3>{item.username}</h3>
+              <p>{item.name}</p>
             </article>
           ))}
         </div>
@@ -46,8 +46,8 @@ function provideRender(resolve: Resolve) {
   };
 }
 
-function providePostApi(resolve: Resolve) {
-  return createPostApi({
+function provideAuthorApi(resolve: Resolve) {
+  return createAuthorApi({
     host: 'https://jsonplaceholder.typicode.com/',
     fetch: resolve(TOKEN.Lib.Http.fetch),
   });
