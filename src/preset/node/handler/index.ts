@@ -2,18 +2,19 @@ import { Preset, createPreset } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import {
   provideReduxMiddlewareSaga,
-  provideAxiosLogHandler,
   provideFetch,
   provideAbortController,
 } from '../../isomorphic/providers';
 import { PresetTuner } from '../../isomorphic/types';
 import {
   provideAxiosMiddleware,
+  provideAxiosLogHandler,
   provideHandlerMain,
   provideSpecificParams,
   providePageHelmet,
   providePageRender,
   provideFetchMiddleware,
+  provideFetchLogHandler,
   provideCookieStore,
 } from './providers';
 import { SpecificExtras } from './utils';
@@ -33,6 +34,7 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Http.Fetch.middleware, provideFetchMiddleware);
   preset.set(KnownToken.Http.Fetch.cookieStore, provideCookieStore);
   preset.set(KnownToken.Http.Fetch.abortController, provideAbortController);
+  preset.set(KnownToken.Http.Fetch.Middleware.Log.handler, provideFetchLogHandler);
 
   // saga
   preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);

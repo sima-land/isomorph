@@ -12,6 +12,8 @@ import {
   createCookieStore,
   defaultHeaders,
   log,
+  LogHandler,
+  LogHandlerFactory,
 } from '../../../../http';
 import { Fragment } from 'react';
 import { FetchLogging } from '../../../isomorphic/utils';
@@ -122,7 +124,7 @@ export const HandlerProviders = {
     };
 
     const enhancer = applyMiddleware(
-      // отменяем запросы, исходящие в рамках обработчика
+      // ВАЖНО: прерываем исходящие в рамках обработчика http-запросы
       async (request, next) => {
         const response = await next(request);
 
@@ -158,35 +160,34 @@ export const HandlerProviders = {
 
   fetchMiddleware(resolve: Resolve): Middleware[] {
     const config = resolve(KnownToken.Config.base);
-    const logger = resolve(KnownToken.logger);
     const context = resolve(KnownToken.Http.Handler.context);
+    const logHandler = resolve(KnownToken.Http.Fetch.Middleware.Log.handler);
     const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
     const abortController = resolve(KnownToken.Http.Fetch.abortController);
 
-    const logging = new FetchLogging(logger);
-
-    abortController.signal.addEventListener(
-      'abort',
-      () => {
-        logging.disabled = true;
-      },
-      { capture: true },
-    );
-
     return [
       // ВАЖНО: слой логирования ошибки ПЕРЕД остальными слоями чтобы не упустить ошибки выше
-      log({
-        onCatch: data => logging.onCatch(data),
+      log(initData => {
+        if (typeof logHandler === 'function') {
+          return {
+            onCatch: data => logHandler(initData).onCatch?.(data),
+          };
+        }
+
+        return {
+          onCatch: data => logHandler.onCatch?.(data),
+        };
       }),
 
+      // обрывание по сигналу из обработчика входящего запроса и по сигналу из конфига исходящего запроса
       (request, next) => {
         const innerController = new AbortController();
 
-        abortController.signal.addEventListener('abort', () => {
+        request.signal?.addEventListener('abort', () => {
           innerController.abort();
         });
 
-        request.signal?.addEventListener('abort', () => {
+        abortController.signal.addEventListener('abort', () => {
           innerController.abort();
         });
 
@@ -200,11 +201,37 @@ export const HandlerProviders = {
       // @todo metrics, tracing
 
       // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
-      log({
-        onRequest: data => logging.onRequest(data),
-        onResponse: data => logging.onResponse(data),
+      log(initData => {
+        if (typeof logHandler === 'function') {
+          return {
+            onRequest: data => logHandler(initData).onRequest?.(data),
+            onResponse: data => logHandler(initData).onResponse?.(data),
+          };
+        }
+
+        return {
+          onRequest: data => logHandler.onRequest?.(data),
+          onResponse: data => logHandler.onResponse?.(data),
+        };
       }),
     ];
+  },
+
+  /**
+   * Провайдер обработчика логирования axios.
+   * @param resolve Функция для получения зависимости по токену.
+   * @return Обработчик логирования.
+   */
+  fetchLogHandler(resolve: Resolve): LogHandler | LogHandlerFactory {
+    const logger = resolve(KnownToken.logger);
+    const abortController = resolve(KnownToken.Http.Fetch.abortController);
+
+    const logHandler = new FetchLogging(logger);
+
+    // ВАЖНО: отключаем логирование если запрос прерван
+    logHandler.disabled = () => abortController.signal.aborted;
+
+    return logHandler;
   },
 
   cookieStore(resolve: Resolve): CookieStore {

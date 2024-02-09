@@ -79,20 +79,50 @@ export function severityFromStatus(status: unknown): SeverityLevel {
 }
 
 /**
+ * Объект, который может быть помечен как disabled.
+ * @todo Возможно стоит заменить наследование от этого класса на передачу параметра в конструктор.
+ * Например в виде объекта класса DisableController (по аналогии с AbortController).
+ * Чтобы нельзя было включить обработчик в том месте где хочется.
+ */
+export class Disablable {
+  disabled: boolean | (() => boolean);
+
+  /** @inheritdoc */
+  constructor() {
+    this.disabled = false;
+  }
+
+  /**
+   * Определяет отключен ли обработчик.
+   * @return Отключен ли обработчик.
+   */
+  protected isDisabled() {
+    if (typeof this.disabled === 'function') {
+      return this.disabled();
+    }
+
+    return this.disabled;
+  }
+}
+
+/**
  * Обработчик логирования внешних http-запросов.
  */
-export class FetchLogging implements LogHandler {
+export class FetchLogging extends Disablable implements LogHandler {
   logger: Logger;
-  disabled: boolean;
 
   /** @inheritdoc */
   constructor(logger: Logger) {
+    super();
     this.logger = logger;
-    this.disabled = false;
   }
 
   /** @inheritdoc */
   onRequest({ request }: LogData) {
+    if (this.isDisabled()) {
+      return;
+    }
+
     this.logger.info(
       new Breadcrumb({
         category: 'http.request',
@@ -109,6 +139,10 @@ export class FetchLogging implements LogHandler {
 
   /** @inheritdoc */
   onResponse({ response, request }: DoneLogData) {
+    if (this.isDisabled()) {
+      return;
+    }
+
     this.logger.info(
       new Breadcrumb({
         category: 'http.response',
@@ -126,6 +160,10 @@ export class FetchLogging implements LogHandler {
 
   /** @inheritdoc */
   onCatch({ error, request }: FailLogData) {
+    if (this.isDisabled()) {
+      return;
+    }
+
     this.logger.error(
       new DetailedError(String(error), {
         level: 'error',
@@ -150,8 +188,8 @@ export class FetchLogging implements LogHandler {
  * Обработчик для промежуточного слоя логирования исходящих http-запросов.
  * Отправляет хлебные крошки и данные ошибки, пригодные для Sentry.
  */
-export class AxiosLogging implements LogMiddlewareHandler {
-  protected logger: Logger;
+export class AxiosLogging extends Disablable implements LogMiddlewareHandler {
+  logger: Logger;
 
   protected readonly requestInfo: ReturnType<typeof applyAxiosDefaults> & {
     readyURL: string;
@@ -163,6 +201,7 @@ export class AxiosLogging implements LogMiddlewareHandler {
    * @param data Данные запроса.
    */
   constructor(logger: Logger, data: SharedData) {
+    super();
     const config = applyAxiosDefaults(data.config, data.defaults);
 
     this.logger = logger;
@@ -177,6 +216,10 @@ export class AxiosLogging implements LogMiddlewareHandler {
    * Отправит хлебные крошки перед запросом.
    */
   beforeRequest() {
+    if (this.isDisabled()) {
+      return;
+    }
+
     const { readyURL, method, params } = this.requestInfo;
 
     this.logger.info(
@@ -198,6 +241,10 @@ export class AxiosLogging implements LogMiddlewareHandler {
    * @param data Данные ответа.
    */
   afterResponse({ response }: DoneSharedData) {
+    if (this.isDisabled()) {
+      return;
+    }
+
     const { readyURL, method, params } = this.requestInfo;
 
     this.logger.info(
@@ -220,6 +267,10 @@ export class AxiosLogging implements LogMiddlewareHandler {
    * @param data Данные запроса.
    */
   onCatch({ error }: FailSharedData) {
+    if (this.isDisabled()) {
+      return;
+    }
+
     if (Axios.isAxiosError(error)) {
       const { requestInfo } = this;
       const statusCode = error.response?.status || 'UNKNOWN';
