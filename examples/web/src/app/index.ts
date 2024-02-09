@@ -1,8 +1,8 @@
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { sauce } from '@sima-land/isomorph/utils/axios';
+import { FetchUtil } from '@sima-land/isomorph/http';
 import { PresetWeb } from '@sima-land/isomorph/preset/web';
-import { KnownToken } from '@sima-land/isomorph/tokens';
-import { Api, Config } from '../types';
+import { Api, Config, UserData } from '../types';
 import { TOKEN } from '../tokens';
 
 export function ExampleApp() {
@@ -19,8 +19,8 @@ export function ExampleApp() {
 }
 
 export function provideConfig(resolve: Resolve): Config {
-  const source = resolve(KnownToken.Config.source);
-  const base = resolve(KnownToken.Config.base);
+  const source = resolve(TOKEN.Lib.Config.source);
+  const base = resolve(TOKEN.Lib.Config.base);
 
   return {
     ...base,
@@ -29,16 +29,23 @@ export function provideConfig(resolve: Resolve): Config {
 }
 
 export function provideApi(resolve: Resolve): Api {
-  const knownHosts = resolve(KnownToken.Http.Api.knownHosts);
-  const createClient = resolve(KnownToken.Axios.factory);
-  const client = sauce(createClient({ baseURL: knownHosts.get('simaV3') }));
+  const knownHosts = resolve(TOKEN.Lib.Http.Api.knownHosts);
+  const createAxios = resolve(TOKEN.Lib.Axios.factory);
+  const fetch = resolve(TOKEN.Lib.Http.fetch);
+
+  const baseURL = new Request(knownHosts.get('simaV3')).url;
 
   return {
     getCurrencies() {
-      return client.get('currency/');
+      // можем использовать axios из DI
+      const axios = sauce(createAxios({ baseURL }));
+      return axios.get('currency/');
     },
     getUser() {
-      return client.get('user/');
+      // а можем использовать fetch из DI
+      return fetch(new URL('user/', baseURL)).then(
+        ...FetchUtil.eitherResponse<{ items: UserData[] }>(),
+      );
     },
   };
 }

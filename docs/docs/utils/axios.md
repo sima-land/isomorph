@@ -48,4 +48,21 @@ client.use(cookieMiddleware(cookieStore));
 
 ## Sauce
 
-TODO
+Пакет предоставляет функцию `sauce` позволяющую сделать возвращаемые из методов экземпляра `AxiosInstance` промисы "безопасными".
+
+"Безопасный" промис никогда не перейдет в состояние rejected. Вместо этого в состоянии resolved резултатом будет объект-обертка над `AxiosResponse`.
+
+```js
+import { create } from 'axios';
+import { sauce } from '@sima-land/isomorph/utils/axios';
+
+const client = sauce(create({ baseURL: 'http://some-api.com/' }));
+
+const { ok, data, error } = await client.get('/some-endpoint');
+
+if (ok) {
+  console.log(data);
+} else {
+  console.error(error);
+}
+```

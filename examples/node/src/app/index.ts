@@ -1,10 +1,10 @@
 import { TOKEN } from '../tokens';
 import { AppConfig } from './types';
-import express from 'express';
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { PresetNode, HandlerProvider } from '@sima-land/isomorph/preset/node';
-import { UsersPageApp } from '../pages/users';
+import { AuthorsPageApp } from '../pages/authors';
 import { PostsPageApp } from '../pages/posts';
+import express from 'express';
 
 export function MainApp() {
   const app = createApplication();
@@ -13,10 +13,10 @@ export function MainApp() {
   app.preset(PresetNode());
 
   // добавляем в приложение собственные компоненты
-  app.bind(TOKEN.Project.config).toProvider(provideAppConfig);
-  app.bind(TOKEN.Project.Http.server).toProvider(provideHttpServer);
-  app.bind(TOKEN.Project.Http.Pages.users).toProvider(HandlerProvider(UsersPageApp));
-  app.bind(TOKEN.Project.Http.Pages.posts).toProvider(HandlerProvider(PostsPageApp));
+  app.bind(TOKEN.config).toProvider(provideAppConfig);
+  app.bind(TOKEN.server).toProvider(provideHttpServer);
+  app.bind(TOKEN.Pages.posts).toProvider(HandlerProvider(PostsPageApp));
+  app.bind(TOKEN.Pages.authors).toProvider(HandlerProvider(AuthorsPageApp));
 
   return app;
 }
@@ -37,8 +37,8 @@ function provideAppConfig(resolve: Resolve): AppConfig {
 }
 
 function provideHttpServer(resolve: Resolve): express.Application {
-  const usersHandler = resolve(TOKEN.Project.Http.Pages.users);
-  const postsHandler = resolve(TOKEN.Project.Http.Pages.posts);
+  const postsHandler = resolve(TOKEN.Pages.posts);
+  const authorsHandler = resolve(TOKEN.Pages.authors);
   const healthCheckHandler = resolve(TOKEN.Lib.Express.Handlers.healthCheck);
 
   // промежуточные слои (express) доступные из пресета PresetNode
@@ -51,13 +51,12 @@ function provideHttpServer(resolve: Resolve): express.Application {
   const app = express();
 
   // регистрируем промежуточные слои
-  app.use(express.static('dist/static'));
   app.use(['/', '/users', '/posts'], [requestHandle, logging, metrics, tracing]);
 
   // регистрируем роуты
   app.get('/', postsHandler);
   app.get('/posts', postsHandler);
-  app.get('/users', usersHandler);
+  app.get('/authors', authorsHandler);
   app.get('/healthcheck', healthCheckHandler);
 
   // регистрируем промежуточный слой обработки ошибок
