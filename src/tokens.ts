@@ -17,7 +17,7 @@ import type { HandlerContext } from './preset/node/types';
 import type { SpecificExtras } from './preset/node/handler/utils';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
-import type { CookieStore, Handler, Middleware } from './http';
+import type { CookieStore, Handler, LogHandler, LogHandlerFactory, Middleware } from './http';
 import type { HttpApiHostPool } from './preset/isomorphic/utils';
 
 export const KnownToken = {
@@ -59,6 +59,11 @@ export const KnownToken = {
       abortController: createToken<AbortController>('fetch/abort-controller'),
       cookieStore: createToken<CookieStore>('fetch/cookie-store'),
       middleware: createToken<Middleware[]>('fetch/middleware'),
+      Middleware: {
+        Log: {
+          handler: createToken<LogHandler | LogHandlerFactory>('fetch/middleware/log/handler'),
+        },
+      },
     },
 
     serve: createToken<Handler>('serve'),

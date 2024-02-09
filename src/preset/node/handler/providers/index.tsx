@@ -1,4 +1,6 @@
 import {
+  LogHandler,
+  LogHandlerFactory,
   Middleware,
   ResponseError,
   cookie,
@@ -13,8 +15,8 @@ import {
   tracingMiddleware as tracingMiddlewareAxios,
 } from '../../node/utils/http-client';
 import type { Middleware as AxiosMiddleware } from 'middleware-axios';
-import { FetchLogging, HttpStatus } from '../../../isomorphic/utils';
-import { cookieMiddleware, logMiddleware } from '../../../../utils/axios';
+import { AxiosLogging, FetchLogging, HttpStatus } from '../../../isomorphic/utils';
+import { LogMiddlewareHandlerInit, cookieMiddleware, logMiddleware } from '../../../../utils/axios';
 import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
 import type { ConventionalJson } from '../../../isomorphic/types';
 import { Fragment } from 'react';
@@ -118,9 +120,10 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
 
       res.status(statusCode).send(message);
       logger.error(error);
-    } finally {
-      abortController.abort();
     }
+
+    // ВАЖНО: прерываем исходящие в рамках обработчика http-запросы
+    abortController.abort();
   };
 }
 
@@ -158,26 +161,24 @@ export function providePageHelmet(resolve: Resolve) {
  */
 export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
   const config = resolve(KnownToken.Config.base);
-  const logger = resolve(KnownToken.logger);
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.ExpressHandler.context);
+  const logHandler = resolve(KnownToken.Http.Fetch.Middleware.Log.handler);
   const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
 
-  const logging = new FetchLogging(logger);
-
-  abortController.signal.addEventListener(
-    'abort',
-    () => {
-      logging.disabled = true;
-    },
-    { capture: true },
-  );
-
   return [
     // ВАЖНО: слой логирования ошибки ПЕРЕД остальными слоями чтобы не упустить ошибки выше
-    log({
-      onCatch: data => logging.onCatch(data),
+    log(initData => {
+      if (typeof logHandler === 'function') {
+        return {
+          onCatch: data => logHandler(initData).onCatch?.(data),
+        };
+      }
+
+      return {
+        onCatch: data => logHandler.onCatch?.(data),
+      };
     }),
 
     // пробрасываемые заголовки по соглашению
@@ -187,11 +188,11 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
     (request, next) => {
       const innerController = new AbortController();
 
-      abortController.signal.addEventListener('abort', () => {
+      request.signal?.addEventListener('abort', () => {
         innerController.abort();
       });
 
-      request.signal?.addEventListener('abort', () => {
+      abortController.signal.addEventListener('abort', () => {
         innerController.abort();
       });
 
@@ -203,11 +204,37 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
     tracingMiddleware(tracer, context.res.locals.tracing.rootContext),
 
     // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
-    log({
-      onRequest: data => logging.onRequest(data),
-      onResponse: data => logging.onResponse(data),
+    log(initData => {
+      if (typeof logHandler === 'function') {
+        return {
+          onRequest: data => logHandler(initData).onRequest?.(data),
+          onResponse: data => logHandler(initData).onResponse?.(data),
+        };
+      }
+
+      return {
+        onRequest: data => logHandler.onRequest?.(data),
+        onResponse: data => logHandler.onResponse?.(data),
+      };
     }),
   ];
+}
+
+/**
+ * Провайдер обработчика логирования axios.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Обработчик логирования.
+ */
+export function provideFetchLogHandler(resolve: Resolve): LogHandler | LogHandlerFactory {
+  const logger = resolve(KnownToken.logger);
+  const abortController = resolve(KnownToken.Http.Fetch.abortController);
+
+  const logHandler = new FetchLogging(logger);
+
+  // ВАЖНО: отключаем логирование если запрос прерван
+  logHandler.disabled = () => abortController.signal.aborted;
+
+  return logHandler;
 }
 
 /**
@@ -216,15 +243,12 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
  * @return Фабрика.
  */
 export function provideAxiosMiddleware(resolve: Resolve): AxiosMiddleware<any>[] {
-  // @todo а что если привести все зависимости к виду:
-  // const getAppConfig = resolve.lazy(KnownToken.Config.base);
-
   const appConfig = resolve(KnownToken.Config.base);
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.ExpressHandler.context);
   const logHandler = resolve(KnownToken.Axios.Middleware.Log.handler);
-  const abortController = resolve(KnownToken.Http.Fetch.abortController);
   const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
+  const abortController = resolve(KnownToken.Http.Fetch.abortController);
 
   return [
     // пробрасываемые заголовки по соглашению
@@ -263,6 +287,25 @@ export function provideAxiosMiddleware(resolve: Resolve): AxiosMiddleware<any>[]
 }
 
 /**
+ * Провайдер обработчика логирования axios.
+ * @param resolve Функция для получения зависимости по токену.
+ * @return Обработчик логирования.
+ */
+export function provideAxiosLogHandler(resolve: Resolve): LogMiddlewareHandlerInit {
+  const logger = resolve(KnownToken.logger);
+  const abortController = resolve(KnownToken.Http.Fetch.abortController);
+
+  return data => {
+    const logHandler = new AxiosLogging(logger, data);
+
+    // ВАЖНО: отключаем логирование если запрос прерван
+    logHandler.disabled = () => abortController.signal.aborted;
+
+    return logHandler;
+  };
+}
+
+/**
  * Провайдер специфичных параметров, которые frontend-микросервис будет получать в запросе.
  * @param resolve Функция для получения зависимости по токену.
  * @return Параметры.
@@ -295,3 +338,6 @@ export function provideCookieStore(resolve: Resolve) {
 
   return createCookieStore(context.req.header('cookie'));
 }
+
+// @todo а что если привести все зависимости к виду:
+// const getAppConfig = resolve.lazy(KnownToken.Config.base);

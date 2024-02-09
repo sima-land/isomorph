@@ -154,7 +154,7 @@ describe('severityFromStatus', () => {
   });
 });
 
-describe('HttpClientLogging', () => {
+describe('AxiosLogging', () => {
   const logger: Logger = {
     log: jest.fn(),
     info: jest.fn(),
@@ -167,6 +167,43 @@ describe('HttpClientLogging', () => {
   beforeEach(() => {
     (logger.info as jest.Mock).mockClear();
     (logger.error as jest.Mock).mockClear();
+  });
+
+  it('methods should do nothing when disabled', () => {
+    const spy = jest.fn();
+    const someLogger = createLogger();
+    const handler = new AxiosLogging(someLogger, { config: {}, defaults: { headers: {} as any } });
+
+    someLogger.subscribe(spy);
+    handler.disabled = () => true;
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.beforeRequest();
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.afterResponse({
+      response: {
+        status: 200,
+        statusText: '200',
+        data: {},
+        headers: {},
+        config: {} as any,
+      },
+      config: {},
+      defaults: { headers: {} as any },
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({
+      config: {},
+      defaults: { headers: {} as any },
+      error: new Error('fake error'),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
   });
 
   it('should log ready url properly when baseURL and url provided', async () => {
@@ -568,6 +605,37 @@ describe('HttpStatus', () => {
 });
 
 describe('FetchLogging', () => {
+  it('methods should do nothing when disabled', () => {
+    const spy = jest.fn();
+    const logger = createLogger();
+    const handler = new FetchLogging(logger);
+
+    logger.subscribe(spy);
+    handler.disabled = true;
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onRequest({
+      request: new Request('https://test.com'),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onResponse({
+      request: new Request('https://test.com'),
+      response: new Response('foobar'),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({
+      request: new Request('https://test.com'),
+      error: new Error('fake error'),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
+  });
+
   it('onRequest should work properly', () => {
     const spy = jest.fn();
     const logger = createLogger();

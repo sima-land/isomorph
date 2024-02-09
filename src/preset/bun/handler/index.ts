@@ -19,6 +19,7 @@ export function PresetHandler(customize?: PresetTuner) {
   preset.set(KnownToken.Http.Fetch.abortController, provideAbortController);
   preset.set(KnownToken.Http.Fetch.cookieStore, HandlerProviders.cookieStore);
   preset.set(KnownToken.Http.Fetch.middleware, HandlerProviders.fetchMiddleware);
+  preset.set(KnownToken.Http.Fetch.Middleware.Log.handler, HandlerProviders.fetchLogHandler);
 
   // handler
   preset.set(KnownToken.Http.Handler.main, HandlerProviders.handlerMain);
