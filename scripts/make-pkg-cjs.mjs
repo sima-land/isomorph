@@ -13,4 +13,4 @@ fs.readFile('./package.json', 'utf-8')
     peerDependencies,
   }))
   .then(data => fs.outputFile('dist/cjs/package.json', JSON.stringify(data, null, 2)))
-  .then(() => console.log('[ui-quarks] CJS pkg emit done'));
+  .then(() => console.log('CJS pkg emit done'));

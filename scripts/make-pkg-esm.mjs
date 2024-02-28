@@ -13,4 +13,4 @@ fs.readFile('./package.json', 'utf-8')
     peerDependencies,
   }))
   .then(data => fs.outputFile('dist/esm/package.json', JSON.stringify(data, null, 2)))
-  .then(() => console.log('[ui-quarks] ESM pkg emit done'));
+  .then(() => console.log('ESM pkg emit done'));
