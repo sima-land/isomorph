@@ -15,6 +15,7 @@ import { toMilliseconds } from '../../../../utils';
 import { ServerMiddleware } from '../../../server/types';
 import { applyServerMiddleware } from '../../../server/utils';
 import PromClient from 'prom-client';
+import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
 
 export const BunProviders = {
   configSource(): ConfigSource {
@@ -63,8 +64,8 @@ export const BunProviders = {
     return router(
       // маршруты с промежуточными слоями
       ...routes.map(([pathname, handler]) => {
-        const enhanced = enhance(handler);
-        return route(pathname, request => enhanced(request, { events: new EventTarget() }));
+        const enhancedHandler = enhance(handler);
+        return route(pathname, request => enhancedHandler(request, { events: new EventTarget() }));
       }),
 
       // @todo вместо routes обрабатывать pageRoutes с помощью route.get() из новой версии fetch-tools (для явности)
@@ -128,12 +129,13 @@ export const BunProviders = {
 
       // @todo tracing
 
+      // метрики
       async (request, next, context) => {
         const responseStart = process.hrtime.bigint();
         let renderStart = 0n;
 
         context.events.addEventListener(
-          'render:start',
+          RESPONSE_EVENT_TYPE.renderStart,
           () => {
             renderStart = process.hrtime.bigint();
           },
@@ -141,7 +143,7 @@ export const BunProviders = {
         );
 
         context.events.addEventListener(
-          'render:finish',
+          RESPONSE_EVENT_TYPE.renderFinish,
           () => {
             const renderFinish = process.hrtime.bigint();
 
