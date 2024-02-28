@@ -18,6 +18,8 @@ import {
 import { Fragment } from 'react';
 import { FetchLogging } from '../../../isomorphic/utils';
 import { getForwardedHeaders, getPageResponseFormat } from '../../../server/utils';
+import { PageAssets } from '../../../isomorphic/types';
+import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
 
 export const HandlerProviders = {
   handlerMain(resolve: Resolve) {
@@ -28,15 +30,66 @@ export const HandlerProviders = {
     const extras = resolve(KnownToken.Http.Handler.Response.specificExtras);
     const Helmet = resolve(KnownToken.Http.Handler.Page.helmet);
     const abortController = resolve(KnownToken.Http.Fetch.abortController);
+    const context = resolve(KnownToken.Http.Handler.context);
 
     const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
     const elementToString = (element: JSX.Element) => {
-      // @todo dispatch renderStart event for metrics/tracing
+      context.events.dispatchEvent(new Event(RESPONSE_EVENT_TYPE.renderStart));
       const result = renderToString(element);
-      // @todo dispatch renderFinish event for metrics/tracing
+      context.events.dispatchEvent(new Event(RESPONSE_EVENT_TYPE.renderFinish));
 
       return result;
+    };
+
+    const getResponseHTML = (jsx: React.JSX.Element, assets: PageAssets, meta: unknown) => {
+      const headers = new Headers();
+
+      headers.set('content-type', 'text/html');
+      headers.set('simaland-bundle-js', assets.js);
+      headers.set('simaland-bundle-css', assets.css);
+
+      if (assets.criticalJs) {
+        headers.set('simaland-critical-js', assets.criticalJs);
+      }
+
+      if (assets.criticalCss) {
+        headers.set('simaland-critical-css', assets.criticalCss);
+      }
+
+      if (meta) {
+        headers.set('simaland-meta', JSON.stringify(meta));
+      }
+
+      // ВАЖНО: DOCTYPE обязательно нужен так как влияет на то как браузер будет парсить html/css
+      // ВАЖНО: DOCTYPE нужен только когда отдаем полноценную страницу
+      if (config.env === 'development') {
+        return new Response(`<!DOCTYPE html>${elementToString(jsx)}`, {
+          headers,
+        });
+      } else {
+        return new Response(elementToString(jsx), {
+          headers,
+        });
+      }
+    };
+
+    const getResponseJSON = (jsx: React.JSX.Element, assets: PageAssets, meta: unknown) => {
+      const headers = new Headers();
+
+      headers.set('content-type', 'application/json');
+
+      return new Response(
+        JSON.stringify({
+          markup: elementToString(jsx),
+          bundle_js: assets.js,
+          bundle_css: assets.css,
+          critical_js: assets.criticalJs,
+          critical_css: assets.criticalCss,
+          meta,
+        }),
+        { headers },
+      );
     };
 
     const handler = async (request: Request): Promise<Response> => {
@@ -52,53 +105,10 @@ export const HandlerProviders = {
 
         switch (getPageResponseFormat(request)) {
           case 'html': {
-            const headers = new Headers();
-
-            headers.set('content-type', 'text/html');
-            headers.set('simaland-bundle-js', assets.js);
-            headers.set('simaland-bundle-css', assets.css);
-
-            if (assets.criticalJs) {
-              headers.set('simaland-critical-js', assets.criticalJs);
-            }
-
-            if (assets.criticalCss) {
-              headers.set('simaland-critical-css', assets.criticalCss);
-            }
-
-            if (meta) {
-              headers.set('simaland-meta', JSON.stringify(meta));
-            }
-
-            // ВАЖНО: DOCTYPE обязательно нужен так как влияет на то как браузер будет парсить html/css
-            // ВАЖНО: DOCTYPE нужен только когда отдаем полноценную страницу
-            if (config.env === 'development') {
-              return new Response(`<!DOCTYPE html>${elementToString(jsx)}`, {
-                headers,
-              });
-            } else {
-              return new Response(elementToString(jsx), {
-                headers,
-              });
-            }
+            return getResponseHTML(jsx, assets, meta);
           }
-
           case 'json': {
-            const headers = new Headers();
-
-            headers.set('content-type', 'application/json');
-
-            return new Response(
-              JSON.stringify({
-                markup: elementToString(jsx),
-                bundle_js: assets.js,
-                bundle_css: assets.css,
-                critical_js: assets.criticalJs,
-                critical_css: assets.criticalCss,
-                meta,
-              }),
-              { headers },
-            );
+            return getResponseJSON(jsx, assets, meta);
           }
         }
       } catch (error) {

@@ -1,2 +1,2 @@
-export { tracingMiddleware } from './http-client';
+export { axiosTracingMiddleware } from './http-client';
 export { getClientIp } from './http-server';

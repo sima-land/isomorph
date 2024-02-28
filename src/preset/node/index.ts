@@ -1,3 +1,3 @@
-export type { HandlerContext } from './types';
+export type { ExpressHandlerContext } from './types';
 export { PresetNode } from './node';
 export { PresetHandler, HandlerProvider } from './handler';

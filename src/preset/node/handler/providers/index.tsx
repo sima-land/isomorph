@@ -12,7 +12,7 @@ import type { Resolve } from '../../../../di';
 import { KnownToken } from '../../../../tokens';
 import {
   getForwardedHeaders as getForwardedHeadersExpress,
-  tracingMiddleware as tracingMiddlewareAxios,
+  axiosTracingMiddleware,
 } from '../../node/utils/http-client';
 import type { Middleware as AxiosMiddleware } from 'middleware-axios';
 import { AxiosLogging, FetchLogging, HttpStatus } from '../../../isomorphic/utils';
@@ -22,7 +22,7 @@ import type { ConventionalJson } from '../../../isomorphic/types';
 import { Fragment } from 'react';
 import { HelmetContext, RegularHelmet, getPageResponseFormat } from '../utils';
 import { renderToString } from 'react-dom/server';
-import { tracingMiddleware } from '../../../server/utils';
+import { fetchTracingMiddleware } from '../../../server/utils';
 
 /**
  * Провайдер главной функции обработчика входящего http-запроса.
@@ -201,7 +201,7 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
 
     cookie(cookieStore),
 
-    tracingMiddleware(tracer, context.res.locals.tracing.rootContext),
+    fetchTracingMiddleware(tracer, context.res.locals.tracing.rootContext),
 
     // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
     log(initData => {
@@ -280,7 +280,7 @@ export function provideAxiosMiddleware(resolve: Resolve): AxiosMiddleware<any>[]
     },
 
     HttpStatus.axiosMiddleware(),
-    tracingMiddlewareAxios(tracer, context.res.locals.tracing.rootContext),
+    axiosTracingMiddleware(tracer, context.res.locals.tracing.rootContext),
     logMiddleware(logHandler),
     cookieMiddleware(cookieStore),
   ];
