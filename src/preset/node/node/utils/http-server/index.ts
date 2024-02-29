@@ -8,8 +8,8 @@ import net from 'node:net';
  */
 export function getClientIp(request: Request): string | undefined {
   const headerValue =
-    request.get('x-client-ip') ||
-    request.get('x-forwarded-for') ||
+    request.header('x-client-ip') ||
+    request.header('x-forwarded-for') ||
     request.socket.remoteAddress ||
     '';
 

@@ -21,7 +21,7 @@ export function PresetBun(customize?: PresetTuner) {
   // @todo
 
   // metrics
-  // @todo
+  preset.set(KnownToken.Metrics.httpHandler, BunProviders.serveMetrics);
 
   // http fetch
   preset.set(KnownToken.Http.fetch, BunProviders.fetch);

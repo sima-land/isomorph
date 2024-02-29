@@ -1,11 +1,11 @@
 import { Context } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
-import { tracingMiddleware, getRequestInfo, hideFirstId, getForwardedHeaders } from '..';
+import { axiosTracingMiddleware, getRequestInfo, hideFirstId, getForwardedHeaders } from '..';
 import { BaseConfig } from '../../../../../../config';
 import { Request } from 'express';
 
-describe('tracingMiddleware', () => {
+describe('axiosTracingMiddleware', () => {
   it('should handle success response', async () => {
     let currentSpan: Span = null as any;
 
@@ -25,7 +25,7 @@ describe('tracingMiddleware', () => {
 
     const context: Context = {} as any;
 
-    const middleware = tracingMiddleware(tracer, context);
+    const middleware = axiosTracingMiddleware(tracer, context);
 
     expect(currentSpan).toBe(null);
 
@@ -58,7 +58,7 @@ describe('tracingMiddleware', () => {
 
     const context: Context = {} as any;
 
-    const middleware = tracingMiddleware(tracer, context);
+    const middleware = axiosTracingMiddleware(tracer, context);
 
     expect(currentSpan).toBe(null);
 

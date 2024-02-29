@@ -1,5 +1,6 @@
 import type { BaseConfig } from '../../../config';
 import type { Middleware } from '../../../http';
+import type { ServerEnhancer, ServerMiddleware } from '../types';
 import { SpanStatusCode, type Context, type Tracer } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { hideFirstId } from '../../node/node/utils/http-client';
@@ -70,7 +71,7 @@ export function getClientIp(request: Request): string | null {
  * @param rootContext Контекст.
  * @return Промежуточный слой трассировки.
  */
-export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middleware {
+export function fetchTracingMiddleware(tracer: Tracer, rootContext: Context): Middleware {
   return async (request, next) => {
     const [url, foundId] = hideFirstId(new URL(request.url).pathname);
     const span = tracer.startSpan(`HTTP ${request.method} ${url}`, undefined, rootContext);
@@ -102,5 +103,20 @@ export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middlew
       // не прячем ошибку
       throw error;
     }
+  };
+}
+
+/** @inheritdoc */
+export function applyServerMiddleware(...list: ServerMiddleware[]): ServerEnhancer {
+  return handler => {
+    let result = handler;
+
+    for (const item of list.reverse()) {
+      const next = result;
+      result = async (request, context) =>
+        item(request, (req, ctx) => next(req, ctx ?? context), context);
+    }
+
+    return result;
   };
 }

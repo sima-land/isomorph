@@ -3,7 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 /**
  * Контекст обработчика express.
  */
-export interface HandlerContext {
+export interface ExpressHandlerContext {
   req: Request;
   res: Response;
   next: NextFunction;

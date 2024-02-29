@@ -13,7 +13,7 @@ import { displayUrl } from '../../../../isomorphic/utils';
  * @param rootContext Контекст.
  * @return Middleware.
  */
-export function tracingMiddleware(tracer: Tracer, rootContext: Context): Middleware<any> {
+export function axiosTracingMiddleware(tracer: Tracer, rootContext: Context): Middleware<any> {
   return async function trace(config, next, defaults) {
     const { method, url, foundId } = getRequestInfo(config, defaults);
     const span = tracer.startSpan(`HTTP ${method} ${url}`, undefined, rootContext);
@@ -114,7 +114,7 @@ export function getForwardedHeaders(
     result['X-Client-Ip'] = clientIp;
   }
 
-  const cookie = request.get('cookie');
+  const cookie = request.header('cookie');
   if (cookie) {
     result.Cookie = cookie;
   }

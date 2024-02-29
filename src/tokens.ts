@@ -13,12 +13,13 @@ import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace
 import type { Resource } from '@opentelemetry/resources';
 import type { ElementType, ReactNode } from 'react';
 import type { KnownHttpApiKey, PageAssets } from './preset/isomorphic/types';
-import type { HandlerContext } from './preset/node/types';
+import type { ExpressHandlerContext } from './preset/node/types';
 import type { SpecificExtras } from './preset/node/handler/utils';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
 import type { CookieStore, Handler, LogHandler, LogHandlerFactory, Middleware } from './http';
 import type { HttpApiHostPool } from './preset/isomorphic/utils';
+import type { ServerHandlerContext, ServerHandler, ServerMiddleware } from './preset/server/types';
 
 export const KnownToken = {
   // config
@@ -46,6 +47,7 @@ export const KnownToken = {
   // metrics
   Metrics: {
     httpApp: createToken<express.Application>('metrics/http-app'),
+    httpHandler: createToken<Handler>('metrics/http-handler'),
   },
 
   // http
@@ -68,13 +70,13 @@ export const KnownToken = {
 
     serve: createToken<Handler>('serve'),
     Serve: {
-      routes: createToken<Array<[string, Handler]>>('serve/routes'),
-      middleware: createToken<Middleware[]>('serve/middleware'),
+      routes: createToken<Array<[string, ServerHandler]>>('serve/routes'),
+      middleware: createToken<ServerMiddleware[]>('serve/middleware'),
     },
 
     Handler: {
-      main: createToken<Handler>('handler/main'),
-      context: createToken<{ request: Request }>('handler/context'),
+      main: createToken<ServerHandler>('handler/main'),
+      context: createToken<ServerHandlerContext & { request: Request }>('handler/context'),
       Request: {
         specificParams: createToken<Record<string, unknown>>('request/specific-params'),
       },
@@ -118,7 +120,7 @@ export const KnownToken = {
   // express handler
   ExpressHandler: {
     main: createToken<() => void>('express-handler/main'),
-    context: createToken<HandlerContext>('express-handler/context'),
+    context: createToken<ExpressHandlerContext>('express-handler/context'),
   },
 
   // redux
