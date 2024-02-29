@@ -50,6 +50,15 @@ export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
 
     return value;
   }
+
+  /**
+   * Возвращает объект в котором ключи - переданные имена хостов а значения - хосты.
+   * @param keys Названия хостов.
+   * @return Объект.
+   */
+  getAll(keys: Key[] = Object.keys(this.map) as Key[]): Record<Key, string> {
+    return Object.fromEntries(keys.map(key => [key, this.get(key)])) as Record<Key, string>;
+  }
 }
 
 /**

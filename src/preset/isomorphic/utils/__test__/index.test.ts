@@ -131,6 +131,51 @@ describe('HttpApiHostPool', () => {
 
     expect(pool.get('foobar', { absolute: true })).toEqual('http://www.foobar.com');
   });
+
+  it('getAll() should return all hosts', () => {
+    const source = new Env({
+      API_HOST_FOO: 'http://www.foo.com',
+      API_HOST_BAR: 'http://www.bar.com',
+      API_HOST_BAZ: 'http://www.baz.com',
+    });
+
+    const pool = new HttpApiHostPool(
+      {
+        foo: 'API_HOST_FOO',
+        bar: 'API_HOST_BAR',
+        baz: 'API_HOST_BAZ',
+      },
+      source,
+    );
+
+    expect(pool.getAll()).toEqual({
+      foo: 'http://www.foo.com',
+      bar: 'http://www.bar.com',
+      baz: 'http://www.baz.com',
+    });
+  });
+
+  it('getAll(keys) should return hosts for keys', () => {
+    const source = new Env({
+      API_HOST_FOO: 'http://www.foo.com',
+      API_HOST_BAR: 'http://www.bar.com',
+      API_HOST_BAZ: 'http://www.baz.com',
+    });
+
+    const pool = new HttpApiHostPool(
+      {
+        foo: 'API_HOST_FOO',
+        bar: 'API_HOST_BAR',
+        baz: 'API_HOST_BAZ',
+      },
+      source,
+    );
+
+    expect(pool.getAll(['foo', 'baz'])).toEqual({
+      foo: 'http://www.foo.com',
+      baz: 'http://www.baz.com',
+    });
+  });
 });
 
 describe('severityFromStatus', () => {
