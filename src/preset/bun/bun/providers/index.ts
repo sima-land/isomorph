@@ -12,7 +12,7 @@ import { createSentryHandler } from '../../../../log/handler/sentry';
 import { healthCheck } from '../../../isomorphic/utils';
 import { provideFetch } from '../../../isomorphic/providers';
 import { toMilliseconds } from '../../../../utils';
-import { ServerMiddleware } from '../../../server/types';
+import { ServerHandler, ServerMiddleware } from '../../../server/types';
 import { applyServerMiddleware } from '../../../server/utils';
 import PromClient from 'prom-client';
 import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
@@ -58,22 +58,35 @@ export const BunProviders = {
   serve(resolve: Resolve): Handler {
     const middleware = resolve(KnownToken.Http.Serve.middleware);
     const routes = resolve(KnownToken.Http.Serve.routes);
+    const serviceRoutes = resolve(KnownToken.Http.Serve.serviceRoutes);
 
     const enhance = applyServerMiddleware(...middleware);
 
     return router(
       // маршруты с промежуточными слоями
-      ...routes.map(([pathname, handler]) => {
+      ...routes.map(([pattern, handler]) => {
         const enhancedHandler = enhance(handler);
-        return route(pathname, request => enhancedHandler(request, { events: new EventTarget() }));
+
+        return route.get(pattern, request =>
+          enhancedHandler(request, { events: new EventTarget() }),
+        );
       }),
 
       // @todo вместо routes обрабатывать pageRoutes с помощью route.get() из новой версии fetch-tools (для явности)
       // @todo также добавить apiRoutes и обрабатывать их с помощью с помощью route()?
 
       // служебные маршруты (без промежуточных слоев)
-      route('/healthcheck', healthCheck()),
+      ...serviceRoutes.map(([pattern, handler]) =>
+        route(pattern, request => handler(request, { events: new EventTarget() })),
+      ),
     );
+  },
+
+  serviceRoutes(): Array<[string, ServerHandler]> {
+    return [
+      // служебные маршруты (без промежуточных слоев)
+      ['/healthcheck', healthCheck()],
+    ];
   },
 
   serveMiddleware(resolve: Resolve): ServerMiddleware[] {
@@ -184,14 +197,15 @@ export const BunProviders = {
     // @todo задействовать когда Bun реализует pref_hooks.monitorEventLoopDelay (https://github.com/siimon/prom-client/issues/570)
     // PromClient.collectDefaultMetrics();
 
-    // @todo здесь или в другом компоненте надо проверять путь и метод запроса
-    return async () => {
-      const metrics = await PromClient.register.metrics();
-      const headers = new Headers();
+    return router(
+      route.get('/', async () => {
+        const metrics = await PromClient.register.metrics();
+        const headers = new Headers();
 
-      headers.set('Content-Type', PromClient.register.contentType);
+        headers.set('Content-Type', PromClient.register.contentType);
 
-      return new Response(metrics, { headers });
-    };
+        return new Response(metrics, { headers });
+      }),
+    );
   },
 } as const;

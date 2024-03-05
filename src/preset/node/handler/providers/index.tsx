@@ -188,13 +188,21 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
     (request, next) => {
       const innerController = new AbortController();
 
-      request.signal?.addEventListener('abort', () => {
-        innerController.abort();
-      });
+      request.signal?.addEventListener(
+        'abort',
+        () => {
+          innerController.abort();
+        },
+        { once: true },
+      );
 
-      abortController.signal.addEventListener('abort', () => {
-        innerController.abort();
-      });
+      abortController.signal.addEventListener(
+        'abort',
+        () => {
+          innerController.abort();
+        },
+        { once: true },
+      );
 
       return next(new Request(request, { signal: innerController.signal }));
     },
@@ -268,13 +276,21 @@ export function provideAxiosMiddleware(resolve: Resolve): AxiosMiddleware<any>[]
     async (config, next) => {
       const innerController = new AbortController();
 
-      abortController.signal.addEventListener('abort', () => {
-        innerController.abort();
-      });
+      abortController.signal.addEventListener(
+        'abort',
+        () => {
+          innerController.abort();
+        },
+        { once: true },
+      );
 
-      config.signal?.addEventListener?.('abort', () => {
-        innerController.abort();
-      });
+      config.signal?.addEventListener?.(
+        'abort',
+        () => {
+          innerController.abort();
+        },
+        { once: true },
+      );
 
       await next({ ...config, signal: innerController.signal });
     },
