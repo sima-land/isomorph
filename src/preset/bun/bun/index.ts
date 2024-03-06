@@ -29,6 +29,7 @@ export function PresetBun(customize?: PresetTuner) {
 
   // http serve
   preset.set(KnownToken.Http.serve, BunProviders.serve);
+  preset.set(KnownToken.Http.Serve.serviceRoutes, BunProviders.serviceRoutes);
   preset.set(KnownToken.Http.Serve.middleware, BunProviders.serveMiddleware);
 
   // http api

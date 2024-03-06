@@ -71,6 +71,7 @@ export const KnownToken = {
     serve: createToken<Handler>('serve'),
     Serve: {
       routes: createToken<Array<[string, ServerHandler]>>('serve/routes'),
+      serviceRoutes: createToken<Array<[string, ServerHandler]>>('serve/service-routes'),
       middleware: createToken<ServerMiddleware[]>('serve/middleware'),
     },
 

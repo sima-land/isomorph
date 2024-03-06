@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@humanwhocodes/env": "^2.2.2",
-    "@krutoo/fetch-tools": "^0.0.11",
+    "@krutoo/fetch-tools": "^0.0.12",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/exporter-prometheus": "^0.38.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.39.1",
@@ -146,6 +146,12 @@
       "require": "./dist/cjs/preset/web/providers/index.js",
       "import": "./dist/esm/preset/web/providers/index.js",
       "default": "./dist/esm/preset/web/providers/index.js"
+    },
+    "./preset/server": {
+      "types": "./dist/types/preset/server/index.d.ts",
+      "require": "./dist/cjs/preset/server/index.js",
+      "import": "./dist/esm/preset/server/index.js",
+      "default": "./dist/esm/preset/server/index.js"
     },
     "./preset/node": {
       "types": "./dist/types/preset/node/index.d.ts",
@@ -278,6 +284,9 @@
       ],
       "preset/web/providers": [
         "./dist/types/preset/web/providers/index.d.ts"
+      ],
+      "preset/server": [
+        "./dist/types/preset/server/index.d.ts"
       ],
       "preset/node": [
         "./dist/types/preset/node/index.d.ts"
