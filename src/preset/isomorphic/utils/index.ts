@@ -16,7 +16,7 @@ import {
   SagaInterruptInfo,
   SagaMiddlewareHandler,
 } from '../../../utils/redux-saga/types';
-import { DoneLogData, FailLogData, FetchUtil, Handler, LogData, LogHandler } from '../../../http';
+import { DoneLogData, FailLogData, FetchUtil, LogData, LogHandler } from '../../../http';
 
 /** Реализация пула хостов. */
 export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
@@ -481,20 +481,4 @@ export function displayUrl(
   }
 
   return result;
-}
-
-/**
- * Возвращает новый обработчик входящих запросов.
- * Обработчик возвращает ответ в формате JSON, тело - объект с полем "uptime" типа number.
- * @return Обработчик.
- */
-export function healthCheck(): Handler {
-  const startTime = Date.now();
-
-  return () =>
-    new Response(JSON.stringify({ uptime: Date.now() - startTime }), {
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
 }
