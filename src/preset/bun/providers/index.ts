@@ -18,6 +18,7 @@ import {
   getServeMeasuring,
 } from '../../server/utils';
 import PromClient from 'prom-client';
+import { statsHandler } from '../utils';
 
 export const BunProviders = {
   configSource(): ConfigSource {
@@ -88,6 +89,7 @@ export const BunProviders = {
     return [
       // служебные маршруты (без промежуточных слоев)
       ['/healthcheck', healthCheck()],
+      ['/stats', statsHandler()],
     ];
   },
 

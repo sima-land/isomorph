@@ -4,7 +4,7 @@
   "description": "Example of http server application on Bun",
   "scripts": {
     "preparing": "cd ../.. && npm run build && npm pack && cd examples/bun && npm i --no-save ../../sima-land-isomorph-0.0.0.tgz",
-    "dev": "NODE_ENV=development bun run ./src/index.ts",
+    "dev": "NODE_ENV=development bun --watch run ./src/index.ts",
     "type-check": "tsc -p . --noEmit"
   },
   "author": "www.sima-land.ru team",

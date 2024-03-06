@@ -1,5 +1,5 @@
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
-import { PresetHandler } from '@sima-land/isomorph/preset/bun';
+import { PresetBunHandler } from '@sima-land/isomorph/preset/bun-handler';
 import { TOKEN } from '../../tokens';
 import { Layout } from '../../components/Layout';
 import { Nav } from '../../components/Nav';
@@ -10,7 +10,7 @@ export function PostsPageApp() {
 
   // используем пресет "PresetHandler"
   app.preset(
-    PresetHandler(({ override }) => {
+    PresetBunHandler(({ override }) => {
       // переопределяем провайдеры пресета
       override(TOKEN.Lib.Http.Handler.Page.render, provideRender);
     }),

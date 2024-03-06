@@ -2,7 +2,7 @@ import { createToken } from '@sima-land/isomorph/di';
 import { KnownToken } from '@sima-land/isomorph/tokens';
 
 // чтобы токены можно было использовать как в браузере так и на сервере импорты должны содержать только типы
-import type { Handler } from '@sima-land/isomorph/http';
+import type { ServerHandler } from '@sima-land/isomorph/preset/server';
 import type { AuthorApi } from './entities/author';
 import type { PostApi } from './entities/post';
 
@@ -20,7 +20,7 @@ export const TOKEN = {
     },
   },
   Pages: {
-    posts: createToken<Handler>('pages/posts'),
-    authors: createToken<Handler>('pages/authors'),
+    posts: createToken<ServerHandler>('pages/posts'),
+    authors: createToken<ServerHandler>('pages/authors'),
   },
 } as const;
