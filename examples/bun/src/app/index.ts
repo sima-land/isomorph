@@ -3,6 +3,7 @@ import { PresetBun, HandlerProvider } from '@sima-land/isomorph/preset/bun';
 import { TOKEN } from '../tokens';
 import { PostsPageApp } from '../pages/posts';
 import { AuthorsPageApp } from '../pages/authors';
+import { ServerHandler } from '@sima-land/isomorph/preset/server';
 
 export function MainApp() {
   const app = createApplication();
@@ -11,7 +12,7 @@ export function MainApp() {
   app.preset(
     PresetBun(({ override }) => {
       // переопределяем провайдеры пресета
-      override(TOKEN.Lib.Http.Serve.routes, provideRoutes);
+      override(TOKEN.Lib.Http.Serve.routes, providePageRoutes);
     }),
   );
 
@@ -22,7 +23,8 @@ export function MainApp() {
   return app;
 }
 
-function provideRoutes(resolve: Resolve) {
+function providePageRoutes(resolve: Resolve): Array<[string, ServerHandler]> {
+  // определяем маршруты страниц
   return [
     ['/', resolve(TOKEN.Pages.posts)],
     ['/posts', resolve(TOKEN.Pages.posts)],

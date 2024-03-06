@@ -11,12 +11,16 @@ import {
   cookie,
   createCookieStore,
   defaultHeaders,
-  log,
   LogHandler,
   LogHandlerFactory,
 } from '../../../http';
 import { Fragment } from 'react';
-import { FetchLogging } from '../../isomorphic/utils';
+import {
+  FetchLogging,
+  getFetchErrorLogging,
+  getFetchExtraAborting,
+  getFetchLogging,
+} from '../../isomorphic/utils';
 import { getForwardedHeaders, getPageResponseFormat } from '../../server/utils';
 import { PageAssets } from '../../isomorphic/types';
 import { RESPONSE_EVENT_TYPE } from '../../isomorphic/constants';
@@ -177,40 +181,10 @@ export const HandlerProviders = {
 
     return [
       // ВАЖНО: слой логирования ошибки ПЕРЕД остальными слоями чтобы не упустить ошибки выше
-      log(initData => {
-        if (typeof logHandler === 'function') {
-          return {
-            onCatch: data => logHandler(initData).onCatch?.(data),
-          };
-        }
-
-        return {
-          onCatch: data => logHandler.onCatch?.(data),
-        };
-      }),
+      getFetchErrorLogging(logHandler),
 
       // обрывание по сигналу из обработчика входящего запроса и по сигналу из конфига исходящего запроса
-      (request, next) => {
-        const innerController = new AbortController();
-
-        request.signal?.addEventListener(
-          'abort',
-          () => {
-            innerController.abort();
-          },
-          { once: true },
-        );
-
-        abortController.signal.addEventListener(
-          'abort',
-          () => {
-            innerController.abort();
-          },
-          { once: true },
-        );
-
-        return next(new Request(request, { signal: innerController.signal }));
-      },
+      getFetchExtraAborting(abortController),
 
       cookie(cookieStore),
 
@@ -219,19 +193,7 @@ export const HandlerProviders = {
       // @todo metrics, tracing
 
       // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
-      log(initData => {
-        if (typeof logHandler === 'function') {
-          return {
-            onRequest: data => logHandler(initData).onRequest?.(data),
-            onResponse: data => logHandler(initData).onResponse?.(data),
-          };
-        }
-
-        return {
-          onRequest: data => logHandler.onRequest?.(data),
-          onResponse: data => logHandler.onResponse?.(data),
-        };
-      }),
+      getFetchLogging(logHandler),
     ];
   },
 

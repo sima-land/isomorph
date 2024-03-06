@@ -46,6 +46,7 @@ module.exports = {
     new EnvPlugin(),
     new NodemonPlugin({
       script: './dist/index.js',
+      exec: 'node --inspect',
       watch: path.resolve('./dist'),
     }),
     new MiniCssExtractPlugin({

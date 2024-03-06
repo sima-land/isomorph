@@ -6,7 +6,6 @@ import {
   cookie,
   createCookieStore,
   defaultHeaders,
-  log,
 } from '../../../../http';
 import type { Resolve } from '../../../../di';
 import { KnownToken } from '../../../../tokens';
@@ -15,7 +14,14 @@ import {
   axiosTracingMiddleware,
 } from '../../node/utils/http-client';
 import type { Middleware as AxiosMiddleware } from 'middleware-axios';
-import { AxiosLogging, FetchLogging, HttpStatus } from '../../../isomorphic/utils';
+import {
+  AxiosLogging,
+  FetchLogging,
+  HttpStatus,
+  getFetchErrorLogging,
+  getFetchExtraAborting,
+  getFetchLogging,
+} from '../../../isomorphic/utils';
 import { LogMiddlewareHandlerInit, cookieMiddleware, logMiddleware } from '../../../../utils/axios';
 import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
 import type { ConventionalJson } from '../../../isomorphic/types';
@@ -169,62 +175,20 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
 
   return [
     // ВАЖНО: слой логирования ошибки ПЕРЕД остальными слоями чтобы не упустить ошибки выше
-    log(initData => {
-      if (typeof logHandler === 'function') {
-        return {
-          onCatch: data => logHandler(initData).onCatch?.(data),
-        };
-      }
-
-      return {
-        onCatch: data => logHandler.onCatch?.(data),
-      };
-    }),
+    getFetchErrorLogging(logHandler),
 
     // пробрасываемые заголовки по соглашению
     defaultHeaders(getForwardedHeadersExpress(config, context.req)),
 
     // обрывание по сигналу из обработчика входящего запроса и по сигналу из конфига исходящего запроса
-    (request, next) => {
-      const innerController = new AbortController();
-
-      request.signal?.addEventListener(
-        'abort',
-        () => {
-          innerController.abort();
-        },
-        { once: true },
-      );
-
-      abortController.signal.addEventListener(
-        'abort',
-        () => {
-          innerController.abort();
-        },
-        { once: true },
-      );
-
-      return next(new Request(request, { signal: innerController.signal }));
-    },
+    getFetchExtraAborting(abortController),
 
     cookie(cookieStore),
 
     getFetchTracing(tracer, context.res.locals.tracing.rootContext),
 
     // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
-    log(initData => {
-      if (typeof logHandler === 'function') {
-        return {
-          onRequest: data => logHandler(initData).onRequest?.(data),
-          onResponse: data => logHandler(initData).onResponse?.(data),
-        };
-      }
-
-      return {
-        onRequest: data => logHandler.onRequest?.(data),
-        onResponse: data => logHandler.onResponse?.(data),
-      };
-    }),
+    getFetchLogging(logHandler),
   ];
 }
 

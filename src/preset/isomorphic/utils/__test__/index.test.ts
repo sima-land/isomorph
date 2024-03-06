@@ -14,6 +14,9 @@ import {
   HttpStatus,
   displayUrl,
   FetchLogging,
+  getFetchLogging,
+  getFetchErrorLogging,
+  getFetchExtraAborting,
 } from '..';
 import { FetchUtil } from '../../../../http';
 
@@ -822,5 +825,127 @@ describe('FetchLogging', () => {
         ],
       }),
     });
+  });
+});
+
+describe('getFetchLogging', () => {
+  it('should log only request and response', async () => {
+    const requestSpy = jest.fn();
+    const responseSpy = jest.fn();
+    const catchSpy = jest.fn();
+
+    const middleware = getFetchLogging({
+      onRequest: requestSpy,
+      onResponse: responseSpy,
+      onCatch: catchSpy,
+    });
+
+    await middleware(new Request('http://test.com'), () =>
+      Promise.resolve<Response>(new Response('OK')),
+    );
+
+    expect(requestSpy).toHaveBeenCalledTimes(1);
+    expect(responseSpy).toHaveBeenCalledTimes(1);
+    expect(catchSpy).toHaveBeenCalledTimes(0);
+  });
+
+  it('should handle function as handlerInit', async () => {
+    const requestSpy = jest.fn();
+    const responseSpy = jest.fn();
+    const catchSpy = jest.fn();
+
+    const middleware = getFetchLogging(() => ({
+      onRequest: requestSpy,
+      onResponse: responseSpy,
+      onCatch: catchSpy,
+    }));
+
+    await middleware(new Request('http://test.com'), () =>
+      Promise.resolve<Response>(new Response('OK')),
+    );
+
+    expect(requestSpy).toHaveBeenCalledTimes(1);
+    expect(responseSpy).toHaveBeenCalledTimes(1);
+    expect(catchSpy).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe('getFetchErrorLogging', () => {
+  it('should log only catch stage', async () => {
+    const requestSpy = jest.fn();
+    const responseSpy = jest.fn();
+    const catchSpy = jest.fn();
+
+    const middleware = getFetchErrorLogging({
+      onRequest: requestSpy,
+      onResponse: responseSpy,
+      onCatch: catchSpy,
+    });
+
+    await Promise.resolve(
+      middleware(new Request('http://test.com'), () => Promise.reject('FAKE ERROR')),
+    ).catch(() => {});
+
+    expect(requestSpy).toHaveBeenCalledTimes(0);
+    expect(responseSpy).toHaveBeenCalledTimes(0);
+    expect(catchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should handle function as handlerInit', async () => {
+    const requestSpy = jest.fn();
+    const responseSpy = jest.fn();
+    const catchSpy = jest.fn();
+
+    const middleware = getFetchErrorLogging(() => ({
+      onRequest: requestSpy,
+      onResponse: responseSpy,
+      onCatch: catchSpy,
+    }));
+
+    await Promise.resolve(
+      middleware(new Request('http://test.com'), () => Promise.reject('FAKE ERROR')),
+    ).catch(() => {});
+
+    expect(requestSpy).toHaveBeenCalledTimes(0);
+    expect(responseSpy).toHaveBeenCalledTimes(0);
+    expect(catchSpy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('getFetchExtraAborting', () => {
+  it('should handle controller', async () => {
+    const controller1 = new AbortController();
+    const controller2 = new AbortController();
+    const middleware = getFetchExtraAborting(controller1);
+
+    let request = new Request('http://stub.com');
+
+    await middleware(new Request('http://test.com', { signal: controller2.signal }), req => {
+      request = req;
+      return Promise.resolve<Response>(new Response('OK'));
+    });
+
+    expect(request.signal.aborted).toBe(false);
+
+    controller1.abort();
+    expect(request.signal.aborted).toBe(true);
+  });
+
+  it('should handle controller from request', async () => {
+    const controller1 = new AbortController();
+    const controller2 = new AbortController();
+    const middleware = getFetchExtraAborting(controller1);
+
+    let request = new Request('http://stub.com');
+
+    await middleware(new Request('http://test.com', { signal: controller2.signal }), req => {
+      request = req;
+      return Promise.resolve<Response>(new Response('OK'));
+    });
+
+    expect(request.signal.aborted).toBe(false);
+
+    controller2.abort();
+    expect(request.signal.aborted).toBe(true);
   });
 });

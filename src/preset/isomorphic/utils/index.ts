@@ -1,6 +1,6 @@
 import { SeverityLevel } from '@sentry/browser';
 import Axios, { AxiosRequestConfig } from 'axios';
-import type { Middleware } from 'middleware-axios';
+import type { Middleware as AxiosMiddleware } from 'middleware-axios';
 import type { StrictMap } from '../types';
 import type { ConfigSource } from '../../../config/types';
 import { Logger, Breadcrumb, DetailedError } from '../../../log';
@@ -16,7 +16,16 @@ import {
   SagaInterruptInfo,
   SagaMiddlewareHandler,
 } from '../../../utils/redux-saga/types';
-import { DoneLogData, FailLogData, FetchUtil, LogData, LogHandler } from '../../../http';
+import {
+  DoneLogData,
+  FailLogData,
+  FetchUtil,
+  LogData,
+  LogHandler,
+  LogHandlerFactory,
+  Middleware,
+  log,
+} from '../../../http';
 
 /** Реализация пула хостов. */
 export class HttpApiHostPool<Key extends string> implements StrictMap<Key> {
@@ -88,10 +97,76 @@ export function severityFromStatus(status: unknown): SeverityLevel {
 }
 
 /**
+ * Возвращает новый промежуточный слой логирования исходящего запроса и входящего ответа.
+ * @param handlerInit Обработчик.
+ * @return Промежуточный слой.
+ */
+export function getFetchLogging(handlerInit: LogHandler | LogHandlerFactory): Middleware {
+  const getHandler: LogHandlerFactory =
+    typeof handlerInit === 'function' ? handlerInit : () => handlerInit;
+
+  return log({
+    onRequest: data => {
+      getHandler(data).onRequest?.(data);
+    },
+    onResponse: data => {
+      getHandler(data).onResponse?.(data);
+    },
+  });
+}
+
+/**
+ * Возвращает новый промежуточный слой логирования ошибки исходящего запроса.
+ * @param handlerInit Обработчик.
+ * @return Промежуточный слой.
+ */
+export function getFetchErrorLogging(handlerInit: LogHandler | LogHandlerFactory): Middleware {
+  const getHandler: LogHandlerFactory =
+    typeof handlerInit === 'function' ? handlerInit : () => handlerInit;
+
+  return log({
+    onCatch: data => {
+      getHandler(data).onCatch?.(data);
+    },
+  });
+}
+
+/**
+ * Возвращает новый промежуточный слой обрывания по заданному контроллеру.
+ * Учитывает передачу контроллера в запросе.
+ * @param controller Контроллер.
+ * @return Промежуточный слой.
+ */
+export function getFetchExtraAborting(controller: AbortController): Middleware {
+  return (request, next) => {
+    const innerController = new AbortController();
+
+    request.signal?.addEventListener(
+      'abort',
+      () => {
+        innerController.abort();
+      },
+      { once: true },
+    );
+
+    controller.signal.addEventListener(
+      'abort',
+      () => {
+        innerController.abort();
+      },
+      { once: true },
+    );
+
+    return next(new Request(request, { signal: innerController.signal }));
+  };
+}
+
+/**
  * Объект, который может быть помечен как disabled.
  * @todo Возможно стоит заменить наследование от этого класса на передачу параметра в конструктор.
  * Например в виде объекта класса DisableController (по аналогии с AbortController).
  * Чтобы нельзя было включить обработчик в том месте где хочется.
+ * Также возможно стоит просто научить классы принимать AbortController.
  */
 export class Disablable {
   disabled: boolean | (() => boolean);
@@ -424,7 +499,7 @@ export abstract class HttpStatus {
    * Валидация применяется только если в конфиге запроса не указан validateStatus.
    * @return Промежуточный слой.
    */
-  static axiosMiddleware(): Middleware<unknown> {
+  static axiosMiddleware(): AxiosMiddleware<unknown> {
     return async (config, next, defaults) => {
       if (config.validateStatus !== undefined || defaults.validateStatus !== undefined) {
         // если validateStatus указан явно то не применяем валидацию по умолчанию
