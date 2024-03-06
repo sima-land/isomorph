@@ -22,7 +22,7 @@ import type { ConventionalJson } from '../../../isomorphic/types';
 import { Fragment } from 'react';
 import { HelmetContext, RegularHelmet, getPageResponseFormat } from '../utils';
 import { renderToString } from 'react-dom/server';
-import { fetchTracingMiddleware } from '../../../server/utils';
+import { getFetchTracing } from '../../../server/utils';
 
 /**
  * Провайдер главной функции обработчика входящего http-запроса.
@@ -209,7 +209,7 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
 
     cookie(cookieStore),
 
-    fetchTracingMiddleware(tracer, context.res.locals.tracing.rootContext),
+    getFetchTracing(tracer, context.res.locals.tracing.rootContext),
 
     // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
     log(initData => {

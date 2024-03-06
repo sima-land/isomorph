@@ -1,8 +1,8 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { renderToString } from 'react-dom/server';
-import { Resolve } from '../../../../di';
-import { KnownToken } from '../../../../tokens';
-import { HelmetContext, RegularHelmet } from '../../../node/handler/utils';
+import { Resolve } from '../../../di';
+import { KnownToken } from '../../../tokens';
+import { HelmetContext, RegularHelmet } from '../../node/handler/utils';
 import {
   CookieStore,
   Middleware,
@@ -14,12 +14,12 @@ import {
   log,
   LogHandler,
   LogHandlerFactory,
-} from '../../../../http';
+} from '../../../http';
 import { Fragment } from 'react';
-import { FetchLogging } from '../../../isomorphic/utils';
-import { getForwardedHeaders, getPageResponseFormat } from '../../../server/utils';
-import { PageAssets } from '../../../isomorphic/types';
-import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
+import { FetchLogging } from '../../isomorphic/utils';
+import { getForwardedHeaders, getPageResponseFormat } from '../../server/utils';
+import { PageAssets } from '../../isomorphic/types';
+import { RESPONSE_EVENT_TYPE } from '../../isomorphic/constants';
 
 export const HandlerProviders = {
   handlerMain(resolve: Resolve) {
