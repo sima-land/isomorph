@@ -1,11 +1,11 @@
-import { Preset, createPreset } from '../../../di';
-import { KnownToken } from '../../../tokens';
+import { Preset, createPreset } from '../../di';
+import { KnownToken } from '../../tokens';
 import {
   provideReduxMiddlewareSaga,
   provideFetch,
   provideAbortController,
-} from '../../isomorphic/providers';
-import { PresetTuner } from '../../isomorphic/types';
+} from '../isomorphic/providers';
+import { PresetTuner } from '../isomorphic/types';
 import {
   provideAxiosMiddleware,
   provideAxiosLogHandler,
@@ -59,5 +59,3 @@ export function PresetHandler(customize?: PresetTuner): Preset {
 
   return preset;
 }
-
-export { HandlerProvider } from './utils';

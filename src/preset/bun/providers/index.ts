@@ -4,7 +4,7 @@ import { KnownToken } from '../../../tokens';
 import { ConfigSource, createConfigSource } from '../../../config';
 import { Logger, createLogger } from '../../../log';
 import { Handler, Middleware } from '../../../http';
-import { providePinoHandler } from '../../node/node/providers';
+import { providePinoHandler } from '../../node/providers';
 import { route, router } from '@krutoo/fetch-tools';
 import { getCurrentHub, init, runWithAsyncContext } from '@sentry/bun';
 import { createSentryHandler } from '../../../log/handler/sentry';

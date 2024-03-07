@@ -2,7 +2,7 @@ import { Context } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
 import { axiosTracingMiddleware, getRequestInfo, getForwardedHeaders } from '..';
-import { BaseConfig } from '../../../../../../config';
+import { BaseConfig } from '../../../../../config';
 import express from 'express';
 
 describe('axiosTracingMiddleware', () => {

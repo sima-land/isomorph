@@ -6,27 +6,27 @@ import {
   cookie,
   createCookieStore,
   defaultHeaders,
-} from '../../../../http';
-import type { Resolve } from '../../../../di';
-import { KnownToken } from '../../../../tokens';
+} from '../../../http';
+import type { Resolve } from '../../../di';
+import { KnownToken } from '../../../tokens';
 import {
   getForwardedHeaders as getForwardedHeadersExpress,
   axiosTracingMiddleware,
 } from '../../node/utils/http-client';
 import type { Middleware as AxiosMiddleware } from 'middleware-axios';
-import { AxiosLogging } from '../../../isomorphic/utils/axios-logging';
-import { FetchLogging } from '../../../isomorphic/utils/fetch-logging';
-import { HttpStatus } from '../../../isomorphic/utils/http-status';
-import { getFetchLogging } from '../../../isomorphic/utils/get-fetch-logging';
-import { getFetchErrorLogging } from '../../../isomorphic/utils/get-fetch-error-logging';
-import { getFetchExtraAborting } from '../../../isomorphic/utils/get-fetch-extra-aborting';
-import { LogMiddlewareHandlerInit, cookieMiddleware, logMiddleware } from '../../../../utils/axios';
-import { PAGE_HANDLER_EVENT_TYPE } from '../../../server/constants';
-import type { ConventionalJson } from '../../../isomorphic/types';
+import { AxiosLogging } from '../../isomorphic/utils/axios-logging';
+import { FetchLogging } from '../../isomorphic/utils/fetch-logging';
+import { HttpStatus } from '../../isomorphic/utils/http-status';
+import { getFetchLogging } from '../../isomorphic/utils/get-fetch-logging';
+import { getFetchErrorLogging } from '../../isomorphic/utils/get-fetch-error-logging';
+import { getFetchExtraAborting } from '../../isomorphic/utils/get-fetch-extra-aborting';
+import { LogMiddlewareHandlerInit, cookieMiddleware, logMiddleware } from '../../../utils/axios';
+import { PAGE_HANDLER_EVENT_TYPE } from '../../server/constants';
+import type { ConventionalJson } from '../../isomorphic/types';
 import { Fragment } from 'react';
 import { HelmetContext, RegularHelmet, getPageResponseFormat } from '../utils';
 import { renderToString } from 'react-dom/server';
-import { getFetchTracing } from '../../../server/utils/get-fetch-tracing';
+import { getFetchTracing } from '../../server/utils/get-fetch-tracing';
 
 /**
  * Провайдер главной функции обработчика входящего http-запроса.
