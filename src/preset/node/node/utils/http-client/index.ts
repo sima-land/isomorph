@@ -5,7 +5,7 @@ import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { BaseConfig } from '../../../../../config';
 import { getClientIp } from '../http-server';
-import { displayUrl } from '../../../../isomorphic/utils';
+import { displayUrl } from '../../../../isomorphic/utils/display-url';
 import { hideFirstId } from '../../../../isomorphic/utils/hide-first-id';
 
 /**

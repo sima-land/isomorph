@@ -12,7 +12,9 @@ import { KnownToken } from '../../../tokens';
 import { createSentryHandler } from '../../../log/handler/sentry';
 import { BridgeClientSide, SsrBridge } from '../../../utils/ssr';
 import { KnownHttpApiKey } from '../../isomorphic/types';
-import { FetchLogging, HttpApiHostPool, HttpStatus } from '../../isomorphic/utils';
+import { FetchLogging } from '../../isomorphic/utils/fetch-logging';
+import { HttpApiHostPool } from '../../isomorphic/utils/http-api-host-pool';
+import { HttpStatus } from '../../isomorphic/utils/http-status';
 import { logMiddleware } from '../../../utils/axios';
 import { log } from '../../../http';
 

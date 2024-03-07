@@ -18,7 +18,7 @@ import type { SpecificExtras } from './preset/node/handler/utils';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
 import type { CookieStore, Handler, LogHandler, LogHandlerFactory, Middleware } from './http';
-import type { HttpApiHostPool } from './preset/isomorphic/utils';
+import type { HttpApiHostPool } from './preset/isomorphic/utils/http-api-host-pool';
 import type { ServerHandlerContext, ServerHandler, ServerMiddleware } from './preset/server/types';
 
 export const KnownToken = {

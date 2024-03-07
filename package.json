@@ -123,29 +123,11 @@
       "import": "./dist/esm/preset/isomorphic/index.js",
       "default": "./dist/esm/preset/isomorphic/index.js"
     },
-    "./preset/isomorphic/providers": {
-      "types": "./dist/types/preset/isomorphic/providers/index.d.ts",
-      "require": "./dist/cjs/preset/isomorphic/providers/index.js",
-      "import": "./dist/esm/preset/isomorphic/providers/index.js",
-      "default": "./dist/esm/preset/isomorphic/providers/index.js"
-    },
-    "./preset/isomorphic/utils": {
-      "types": "./dist/types/preset/isomorphic/utils/index.d.ts",
-      "require": "./dist/cjs/preset/isomorphic/utils/index.js",
-      "import": "./dist/esm/preset/isomorphic/utils/index.js",
-      "default": "./dist/esm/preset/isomorphic/utils/index.js"
-    },
     "./preset/web": {
       "types": "./dist/types/preset/web/index.d.ts",
       "require": "./dist/cjs/preset/web/index.js",
       "import": "./dist/esm/preset/web/index.js",
       "default": "./dist/esm/preset/web/index.js"
-    },
-    "./preset/web/providers": {
-      "types": "./dist/types/preset/web/providers/index.d.ts",
-      "require": "./dist/cjs/preset/web/providers/index.js",
-      "import": "./dist/esm/preset/web/providers/index.js",
-      "default": "./dist/esm/preset/web/providers/index.js"
     },
     "./preset/server": {
       "types": "./dist/types/preset/server/index.d.ts",
@@ -279,17 +261,8 @@
       "preset/isomorphic": [
         "./dist/types/preset/isomorphic/index.d.ts"
       ],
-      "preset/isomorphic/providers": [
-        "./dist/types/preset/isomorphic/providers/index.d.ts"
-      ],
-      "preset/isomorphic/utils": [
-        "./dist/types/preset/isomorphic/utils/index.d.ts"
-      ],
       "preset/web": [
         "./dist/types/preset/web/index.d.ts"
-      ],
-      "preset/web/providers": [
-        "./dist/types/preset/web/providers/index.d.ts"
       ],
       "preset/server": [
         "./dist/types/preset/server/index.d.ts"
