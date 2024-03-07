@@ -9,7 +9,7 @@ import { KnownToken } from '../../../../tokens';
 import { Resolve } from '../../../../di';
 import { KnownHttpApiKey } from '../../../isomorphic/types';
 import { toMilliseconds } from '../../../../utils';
-import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
+import { PAGE_HANDLER_EVENT_TYPE } from '../../../server/constants';
 import { getClientIp } from '../utils/http-server';
 
 // Node.js specific packages
@@ -283,10 +283,10 @@ export function provideExpressMetricsMiddleware(resolve: Resolve): Handler {
 
     requestCount.inc(getLabels(req, res), 1);
 
-    res.once(RESPONSE_EVENT_TYPE.renderStart, () => {
+    res.once(PAGE_HANDLER_EVENT_TYPE.renderStart, () => {
       const renderStart = process.hrtime.bigint();
 
-      res.once(RESPONSE_EVENT_TYPE.renderFinish, () => {
+      res.once(PAGE_HANDLER_EVENT_TYPE.renderFinish, () => {
         const renderFinish = process.hrtime.bigint();
 
         renderDuration.observe(
@@ -351,10 +351,10 @@ export function provideExpressTracingMiddleware(resolve: Resolve): Handler {
       renderSpan: null,
     };
 
-    res.once(RESPONSE_EVENT_TYPE.renderStart, () => {
+    res.once(PAGE_HANDLER_EVENT_TYPE.renderStart, () => {
       res.locals.tracing.renderSpan = tracer.startSpan('render', undefined, rootContext);
 
-      res.once(RESPONSE_EVENT_TYPE.renderFinish, () => {
+      res.once(PAGE_HANDLER_EVENT_TYPE.renderFinish, () => {
         res.locals.tracing.renderSpan.end();
       });
     });
