@@ -14,14 +14,12 @@ import {
   axiosTracingMiddleware,
 } from '../../node/utils/http-client';
 import type { Middleware as AxiosMiddleware } from 'middleware-axios';
-import {
-  AxiosLogging,
-  FetchLogging,
-  HttpStatus,
-  getFetchErrorLogging,
-  getFetchExtraAborting,
-  getFetchLogging,
-} from '../../../isomorphic/utils';
+import { AxiosLogging } from '../../../isomorphic/utils/axios-logging';
+import { FetchLogging } from '../../../isomorphic/utils/fetch-logging';
+import { HttpStatus } from '../../../isomorphic/utils/http-status';
+import { getFetchLogging } from '../../../isomorphic/utils/get-fetch-logging';
+import { getFetchErrorLogging } from '../../../isomorphic/utils/get-fetch-error-logging';
+import { getFetchExtraAborting } from '../../../isomorphic/utils/get-fetch-extra-aborting';
 import { LogMiddlewareHandlerInit, cookieMiddleware, logMiddleware } from '../../../../utils/axios';
 import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
 import type { ConventionalJson } from '../../../isomorphic/types';

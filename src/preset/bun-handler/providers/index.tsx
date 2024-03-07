@@ -15,12 +15,10 @@ import {
   LogHandlerFactory,
 } from '../../../http';
 import { Fragment } from 'react';
-import {
-  FetchLogging,
-  getFetchErrorLogging,
-  getFetchExtraAborting,
-  getFetchLogging,
-} from '../../isomorphic/utils';
+import { getFetchErrorLogging } from '../../isomorphic/utils/get-fetch-error-logging';
+import { getFetchExtraAborting } from '../../isomorphic/utils/get-fetch-extra-aborting';
+import { getFetchLogging } from '../../isomorphic/utils/get-fetch-logging';
+import { FetchLogging } from '../../isomorphic/utils/fetch-logging';
 import { PageAssets } from '../../isomorphic/types';
 import { RESPONSE_EVENT_TYPE } from '../../isomorphic/constants';
 import { getPageResponseFormat } from '../../server/utils/get-page-response-format';

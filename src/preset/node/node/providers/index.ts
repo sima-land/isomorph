@@ -4,7 +4,7 @@ import { ConfigSource, createConfigSource } from '../../../../config';
 import { createLogger } from '../../../../log';
 import { createPinoHandler } from '../../../../log/handler/pino';
 import { createSentryHandler } from '../../../../log/handler/sentry';
-import { HttpApiHostPool } from '../../../isomorphic/utils';
+import { HttpApiHostPool } from '../../../isomorphic/utils/http-api-host-pool';
 import { KnownToken } from '../../../../tokens';
 import { Resolve } from '../../../../di';
 import { KnownHttpApiKey } from '../../../isomorphic/types';
