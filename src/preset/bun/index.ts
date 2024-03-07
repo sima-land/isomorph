@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { PresetTuner } from '../isomorphic';
@@ -6,8 +5,13 @@ import { provideBaseConfig } from '../isomorphic/providers';
 import { provideKnownHttpApiHosts, provideSsrBridgeServerSide } from '../node/node/providers';
 import { BunProviders } from './providers';
 
-// @todo возможно стоит переименовать в PresetServer (так как в теории это можно использовать не только в Bun но и в Deno, Node.js)
+/**
+ * Возвращает preset с зависимостями для запуска приложения в Bun.
+ * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
+ * @return Preset.
+ */
 export function PresetBun(customize?: PresetTuner) {
+  // @todo возможно стоит переименовать в PresetServer (так как в теории это можно использовать не только в Bun но и в Deno, Node.js)
   const preset = createPreset();
 
   // config

@@ -21,9 +21,10 @@ import {
   getFetchExtraAborting,
   getFetchLogging,
 } from '../../isomorphic/utils';
-import { getForwardedHeaders, getPageResponseFormat } from '../../server/utils';
 import { PageAssets } from '../../isomorphic/types';
 import { RESPONSE_EVENT_TYPE } from '../../isomorphic/constants';
+import { getPageResponseFormat } from '../../server/utils/get-page-response-format';
+import { getForwardedHeaders } from '../../server/utils/get-forwarded-headers';
 
 export const HandlerProviders = {
   handlerMain(resolve: Resolve) {

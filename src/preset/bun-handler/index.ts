@@ -11,6 +11,11 @@ import { providePageRender } from '../node/handler/providers';
 import { SpecificExtras } from '../node/handler/utils';
 import { HandlerProviders } from './providers';
 
+/**
+ * Возвращает preset с зависимостями для формирования обработчика входящего http-запроса.
+ * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
+ * @return Preset.
+ */
 export function PresetBunHandler(customize?: PresetTuner) {
   const preset = createPreset();
 
