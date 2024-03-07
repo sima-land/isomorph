@@ -21,7 +21,7 @@ import { getFetchLogging } from '../../../isomorphic/utils/get-fetch-logging';
 import { getFetchErrorLogging } from '../../../isomorphic/utils/get-fetch-error-logging';
 import { getFetchExtraAborting } from '../../../isomorphic/utils/get-fetch-extra-aborting';
 import { LogMiddlewareHandlerInit, cookieMiddleware, logMiddleware } from '../../../../utils/axios';
-import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
+import { PAGE_HANDLER_EVENT_TYPE } from '../../../server/constants';
 import type { ConventionalJson } from '../../../isomorphic/types';
 import { Fragment } from 'react';
 import { HelmetContext, RegularHelmet, getPageResponseFormat } from '../utils';
@@ -51,9 +51,9 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
    * @return Строка.
    */
   const elementToString = (element: JSX.Element) => {
-    res.emit(RESPONSE_EVENT_TYPE.renderStart);
+    res.emit(PAGE_HANDLER_EVENT_TYPE.renderStart);
     const result = renderToString(element);
-    res.emit(RESPONSE_EVENT_TYPE.renderFinish);
+    res.emit(PAGE_HANDLER_EVENT_TYPE.renderFinish);
 
     return result;
   };

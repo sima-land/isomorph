@@ -1,6 +1,6 @@
 import type { BaseConfig } from '../../../config';
 import type { ServerMiddleware } from '../types';
-import { RESPONSE_EVENT_TYPE } from '../../isomorphic/constants';
+import { PAGE_HANDLER_EVENT_TYPE } from '../constants';
 import { toMilliseconds } from '../../../utils';
 import PromClient from 'prom-client';
 
@@ -58,7 +58,7 @@ export function getServeMeasuring(config: BaseConfig): ServerMiddleware {
     let renderStart = 0n;
 
     context.events.addEventListener(
-      RESPONSE_EVENT_TYPE.renderStart,
+      PAGE_HANDLER_EVENT_TYPE.renderStart,
       () => {
         renderStart = process.hrtime.bigint();
       },
@@ -66,7 +66,7 @@ export function getServeMeasuring(config: BaseConfig): ServerMiddleware {
     );
 
     context.events.addEventListener(
-      RESPONSE_EVENT_TYPE.renderFinish,
+      PAGE_HANDLER_EVENT_TYPE.renderFinish,
       () => {
         const renderFinish = process.hrtime.bigint();
 

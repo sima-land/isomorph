@@ -1,5 +1,5 @@
 import { BaseConfig } from '../../../../config';
-import { RESPONSE_EVENT_TYPE } from '../../../isomorphic/constants';
+import { PAGE_HANDLER_EVENT_TYPE } from '../../constants';
 import { getServeMeasuring } from '../get-serve-measuring';
 
 describe('getServeMeasuring', () => {
@@ -17,8 +17,8 @@ describe('getServeMeasuring', () => {
       await middleware(
         new Request('http://test.com'),
         () => {
-          events.dispatchEvent(new Event(RESPONSE_EVENT_TYPE.renderStart));
-          events.dispatchEvent(new Event(RESPONSE_EVENT_TYPE.renderFinish));
+          events.dispatchEvent(new Event(PAGE_HANDLER_EVENT_TYPE.renderStart));
+          events.dispatchEvent(new Event(PAGE_HANDLER_EVENT_TYPE.renderFinish));
           return Promise.resolve<Response>(new Response('OK'));
         },
         {

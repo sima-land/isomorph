@@ -20,7 +20,7 @@ import { getFetchExtraAborting } from '../../isomorphic/utils/get-fetch-extra-ab
 import { getFetchLogging } from '../../isomorphic/utils/get-fetch-logging';
 import { FetchLogging } from '../../isomorphic/utils/fetch-logging';
 import { PageAssets } from '../../isomorphic/types';
-import { RESPONSE_EVENT_TYPE } from '../../isomorphic/constants';
+import { PAGE_HANDLER_EVENT_TYPE } from '../../server/constants';
 import { getPageResponseFormat } from '../../server/utils/get-page-response-format';
 import { getForwardedHeaders } from '../../server/utils/get-forwarded-headers';
 
@@ -38,9 +38,9 @@ export const HandlerProviders = {
     const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
     const elementToString = (element: JSX.Element) => {
-      context.events.dispatchEvent(new Event(RESPONSE_EVENT_TYPE.renderStart));
+      context.events.dispatchEvent(new Event(PAGE_HANDLER_EVENT_TYPE.renderStart));
       const result = renderToString(element);
-      context.events.dispatchEvent(new Event(RESPONSE_EVENT_TYPE.renderFinish));
+      context.events.dispatchEvent(new Event(PAGE_HANDLER_EVENT_TYPE.renderFinish));
 
       return result;
     };
