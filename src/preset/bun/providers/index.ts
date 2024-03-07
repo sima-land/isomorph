@@ -10,15 +10,13 @@ import { getCurrentHub, init, runWithAsyncContext } from '@sentry/bun';
 import { createSentryHandler } from '../../../log/handler/sentry';
 import { provideFetch } from '../../isomorphic/providers';
 import { ServerHandler, ServerMiddleware } from '../../server/types';
-import {
-  applyServerMiddleware,
-  healthCheck,
-  getServeLogging,
-  getServeErrorLogging,
-  getServeMeasuring,
-} from '../../server/utils';
-import PromClient from 'prom-client';
 import { statsHandler } from '../utils';
+import { getHealthCheck } from '../../server/utils/get-health-check';
+import { getServeLogging } from '../../server/utils/get-serve-logging';
+import { getServeErrorLogging } from '../../server/utils/get-serve-error-logging';
+import { getServeMeasuring } from '../../server/utils/get-serve-measuring';
+import { applyServerMiddleware } from '../../server/utils/apply-server-middleware';
+import PromClient from 'prom-client';
 
 export const BunProviders = {
   configSource(): ConfigSource {
@@ -88,7 +86,7 @@ export const BunProviders = {
   serviceRoutes(): Array<[string, ServerHandler]> {
     return [
       // служебные маршруты (без промежуточных слоев)
-      ['/healthcheck', healthCheck()],
+      ['/healthcheck', getHealthCheck()],
       ['/stats', statsHandler()],
     ];
   },

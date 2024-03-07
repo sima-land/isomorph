@@ -1,9 +1,9 @@
 import { Context } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
-import { axiosTracingMiddleware, getRequestInfo, hideFirstId, getForwardedHeaders } from '..';
+import { axiosTracingMiddleware, getRequestInfo, getForwardedHeaders } from '..';
 import { BaseConfig } from '../../../../../../config';
-import { Request } from 'express';
+import express from 'express';
 
 describe('axiosTracingMiddleware', () => {
   it('should handle success response', async () => {
@@ -144,29 +144,6 @@ describe('getRequestInfo', () => {
   });
 });
 
-describe('hideFirstId', () => {
-  const cases = [
-    {
-      input: '/api/v2/something/123456/some-bff/123456',
-      output: ['/api/v2/something/{id}/some-bff/123456', 123456],
-    },
-    {
-      input: '/api/v2/something/222/some-bff/333',
-      output: ['/api/v2/something/{id}/some-bff/333', 222],
-    },
-    {
-      input: '/api/v2/something/45320/some-bff',
-      output: ['/api/v2/something/{id}/some-bff', 45320],
-    },
-  ];
-
-  it('should replace first id only', () => {
-    cases.forEach(({ input, output }) => {
-      expect(hideFirstId(input)).toEqual(output);
-    });
-  });
-});
-
 describe('getRequestHeaders', () => {
   it('should return headers', () => {
     const config: BaseConfig = {
@@ -175,7 +152,7 @@ describe('getRequestHeaders', () => {
       env: 'test',
     };
 
-    const request: Request = {
+    const request: express.Request = {
       socket: {
         remoteAddress: '127.0.0.1',
       },
@@ -210,7 +187,7 @@ describe('getRequestHeaders', () => {
       env: 'test',
     };
 
-    const request: Request = {
+    const request: express.Request = {
       socket: {
         remoteAddress: undefined,
       },

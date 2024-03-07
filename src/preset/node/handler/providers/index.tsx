@@ -28,7 +28,7 @@ import type { ConventionalJson } from '../../../isomorphic/types';
 import { Fragment } from 'react';
 import { HelmetContext, RegularHelmet, getPageResponseFormat } from '../utils';
 import { renderToString } from 'react-dom/server';
-import { getFetchTracing } from '../../../server/utils';
+import { getFetchTracing } from '../../../server/utils/get-fetch-tracing';
 
 /**
  * Провайдер главной функции обработчика входящего http-запроса.
