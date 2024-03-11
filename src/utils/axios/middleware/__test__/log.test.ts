@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosDefaults, AxiosResponse } from 'axios';
+import { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
 import { Next } from 'middleware-axios';
 import { logMiddleware, LogMiddlewareHandler } from '../log';
 
@@ -31,7 +31,7 @@ describe('logMiddleware', () => {
   it('should works properly without error', async () => {
     const config: AxiosRequestConfig<any> = {};
 
-    const defaults: AxiosDefaults<any> = {
+    const defaults: AxiosInstance['defaults'] = {
       headers: {} as any,
       baseURL: 'https://sima.com/',
     };
@@ -62,7 +62,7 @@ describe('logMiddleware', () => {
   it('should works properly with error', async () => {
     const config: AxiosRequestConfig<any> = {};
 
-    const defaults: AxiosDefaults<any> = {
+    const defaults: AxiosInstance['defaults'] = {
       headers: {} as any,
       baseURL: 'https://sima.com/',
     };
@@ -87,7 +87,7 @@ describe('logMiddleware', () => {
   it('should handle handler factory', async () => {
     const config: AxiosRequestConfig<any> = {};
 
-    const defaults: AxiosDefaults<any> = {
+    const defaults: AxiosInstance['defaults'] = {
       headers: {} as any,
       baseURL: 'https://sima.com/',
     };

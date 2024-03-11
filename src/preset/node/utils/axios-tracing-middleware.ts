@@ -1,4 +1,4 @@
-import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, HeadersDefaults } from 'axios';
 import type { Middleware } from 'middleware-axios';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -24,8 +24,11 @@ export function axiosTracingMiddleware(tracer: Tracer, rootContext: Context): Mi
         ...config.params,
       }),
       'request.headers': JSON.stringify({
-        ...defaults.headers[method.toLowerCase() as 'get'],
+        // @todo непонятно как доставать заголовки из defaults потому что там на одном уровне заголовки и таблицы заголовков
+        ...defaults.headers.common,
+        ...defaults.headers[method.toLowerCase() as keyof HeadersDefaults],
         ...config.headers,
+        // @todo возможно стоит убрать cookie/Cookie
       }),
 
       // если нашли id - добавляем в теги
@@ -59,7 +62,7 @@ export function axiosTracingMiddleware(tracer: Tracer, rootContext: Context): Mi
  */
 export function getRequestInfo(
   config: AxiosRequestConfig,
-  defaults: AxiosDefaults,
+  defaults: AxiosInstance['defaults'],
 ): {
   method: string;
   url: string;

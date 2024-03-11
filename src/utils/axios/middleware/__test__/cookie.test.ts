@@ -1,4 +1,4 @@
-import { AxiosDefaults, InternalAxiosRequestConfig } from 'axios';
+import { AxiosHeaders, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { Next } from 'middleware-axios';
 import { cookieMiddleware } from '../cookie';
 import { createCookieStore } from '../../../../http';
@@ -23,15 +23,15 @@ describe('cookieMiddleware', () => {
         headers: {},
       }),
     );
-    const defaults: AxiosDefaults = {
+    const defaults: AxiosInstance['defaults'] = {
       headers: {
-        get: {},
-        post: {},
-        put: {},
-        delete: {},
-        patch: {},
-        common: {},
-        head: {},
+        get: new AxiosHeaders(),
+        post: new AxiosHeaders(),
+        put: new AxiosHeaders(),
+        delete: new AxiosHeaders(),
+        patch: new AxiosHeaders(),
+        common: new AxiosHeaders(),
+        head: new AxiosHeaders(),
       },
     };
 
@@ -73,15 +73,15 @@ describe('cookieMiddleware', () => {
         } as any,
       }),
     );
-    const defaults: AxiosDefaults = {
+    const defaults: AxiosInstance['defaults'] = {
       headers: {
-        get: {},
-        post: {},
-        put: {},
-        delete: {},
-        patch: {},
-        common: {},
-        head: {},
+        get: new AxiosHeaders(),
+        post: new AxiosHeaders(),
+        put: new AxiosHeaders(),
+        delete: new AxiosHeaders(),
+        patch: new AxiosHeaders(),
+        common: new AxiosHeaders(),
+        head: new AxiosHeaders(),
       },
     };
 

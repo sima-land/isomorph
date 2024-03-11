@@ -49,13 +49,13 @@ export function provideAxiosFactory(resolve: Resolve) {
   const middleware = resolve(KnownToken.Axios.middleware);
 
   return (config: CreateAxiosDefaults = {}) => {
-    const client = create(config as any); // @todo убрать as any
+    const instance = create(config);
 
     for (const item of middleware) {
-      client.use(item);
+      instance.use(item);
     }
 
-    return client;
+    return instance;
   };
 }
 
