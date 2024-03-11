@@ -1,5 +1,5 @@
 import { createApplication, Resolve } from '@sima-land/isomorph/di';
-import { PresetHandler } from '@sima-land/isomorph/preset/node';
+import { PresetHandler } from '@sima-land/isomorph/preset/node-handler';
 import { TOKEN } from '../../tokens';
 import { Layout } from '../../components/Layout';
 import { Nav } from '../../components/Nav';
@@ -47,8 +47,10 @@ function provideRender(resolve: Resolve) {
 }
 
 function providePostApi(resolve: Resolve) {
+  const fetch = resolve(TOKEN.Lib.Http.fetch);
+
   return createPostApi({
     host: 'https://jsonplaceholder.typicode.com/',
-    fetch: resolve(TOKEN.Lib.Http.fetch),
+    fetch,
   });
 }

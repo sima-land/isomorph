@@ -47,8 +47,10 @@ function provideRender(resolve: Resolve) {
 }
 
 function providePostApi(resolve: Resolve) {
+  const fetch = resolve(TOKEN.Lib.Http.fetch);
+
   return createPostApi({
     host: 'https://jsonplaceholder.typicode.com/',
-    fetch: resolve(TOKEN.Lib.Http.fetch),
+    fetch,
   });
 }

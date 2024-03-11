@@ -49,4 +49,5 @@ export function PresetBun(customize?: PresetTuner) {
   return preset;
 }
 
-export { HandlerProvider } from './utils';
+export { HandlerProvider } from '../server/utils/handler-provider';
+export { getStatsHandler } from './utils/get-stats-handler';
