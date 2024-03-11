@@ -7,8 +7,8 @@ import {
   provideFetch,
   provideReduxMiddlewareSaga,
 } from '../isomorphic/providers';
-import { providePageRender } from '../node/handler/providers';
-import { SpecificExtras } from '../node/handler/utils';
+import { providePageRender } from '../node-handler/providers';
+import { SpecificExtras } from '../node-handler/utils';
 import { HandlerProviders } from './providers';
 
 /**

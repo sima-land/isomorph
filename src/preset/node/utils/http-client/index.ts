@@ -3,10 +3,10 @@ import type { Middleware } from 'middleware-axios';
 import type express from 'express';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { BaseConfig } from '../../../../../config';
+import { BaseConfig } from '../../../../config';
 import { getClientIp } from '../http-server';
-import { displayUrl } from '../../../../isomorphic/utils/display-url';
-import { hideFirstId } from '../../../../isomorphic/utils/hide-first-id';
+import { displayUrl } from '../../../isomorphic/utils/display-url';
+import { hideFirstId } from '../../../isomorphic/utils/hide-first-id';
 
 /**
  * Возвращает новый middleware для трассировки исходящих запросов.

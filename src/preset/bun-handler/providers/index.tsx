@@ -2,7 +2,7 @@
 import { renderToString } from 'react-dom/server';
 import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { HelmetContext, RegularHelmet } from '../../node/handler/utils';
+import { HelmetContext, RegularHelmet } from '../../node-handler/utils';
 import {
   CookieStore,
   Middleware,

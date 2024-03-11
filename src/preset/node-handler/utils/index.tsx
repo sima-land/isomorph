@@ -1,9 +1,10 @@
 import { ReactNode, createContext, useContext } from 'react';
-import { PageAssets } from '../../../isomorphic/types';
-import { Handler, Request } from 'express';
-import { Application, CURRENT_APP, Resolve } from '../../../../di';
-import { KnownToken } from '../../../../tokens';
+import { PageAssets } from '../../isomorphic/types';
+import express from 'express';
 
+/**
+ * @todo Перенести в preset/server.
+ */
 export const HelmetContext = createContext<{ title?: string; assets?: PageAssets }>({});
 
 const resetCSS = `
@@ -21,6 +22,7 @@ body {
  * Выведет html, head и body.
  * @param props Свойства.
  * @return Элемент.
+ * @todo Перенести в preset/server.
  */
 export function RegularHelmet({ children }: { children?: ReactNode }) {
   const { title, assets } = useContext(HelmetContext);
@@ -52,6 +54,7 @@ export function RegularHelmet({ children }: { children?: ReactNode }) {
 
 /**
  * Специфичные для наших микросервисов дополнительные данные ответа.
+ * @todo Перенести в preset/server.
  */
 export class SpecificExtras {
   private _meta: any;
@@ -80,7 +83,7 @@ export class SpecificExtras {
  * @param req Запрос.
  * @return Формат.
  */
-export function getPageResponseFormat(req: Request): 'html' | 'json' {
+export function getPageResponseFormat(req: express.Request): 'html' | 'json' {
   let result: 'html' | 'json' = 'html';
 
   if ((req.header('accept') || '').toLowerCase().includes('application/json')) {
@@ -88,23 +91,4 @@ export function getPageResponseFormat(req: Request): 'html' | 'json' {
   }
 
   return result;
-}
-
-/**
- * Возвращает express-handler, создающий дочернее di-приложение при запросе.
- * @param getApp Должна вернуть di-приложения запроса.
- * @return Обработчик.
- */
-export function HandlerProvider(getApp: () => Application) {
-  return (resolve: Resolve): Handler => {
-    const parent = resolve(CURRENT_APP);
-
-    return (req, res, next) => {
-      const app = getApp();
-
-      app.attach(parent);
-      app.bind(KnownToken.ExpressHandler.context).toValue({ req, res, next });
-      app.get(KnownToken.ExpressHandler.main)();
-    };
-  };
 }

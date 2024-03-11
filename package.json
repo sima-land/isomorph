@@ -141,29 +141,11 @@
       "import": "./dist/esm/preset/node/index.js",
       "default": "./dist/esm/preset/node/index.js"
     },
-    "./preset/node/node/providers": {
-      "types": "./dist/types/preset/node/node/providers/index.d.ts",
-      "require": "./dist/cjs/preset/node/node/providers/index.js",
-      "import": "./dist/esm/preset/node/node/providers/index.js",
-      "default": "./dist/esm/preset/node/node/providers/index.js"
-    },
-    "./preset/node/node/utils": {
-      "types": "./dist/types/preset/node/node/utils/index.d.ts",
-      "require": "./dist/cjs/preset/node/node/utils/index.js",
-      "import": "./dist/esm/preset/node/node/utils/index.js",
-      "default": "./dist/esm/preset/node/node/utils/index.js"
-    },
-    "./preset/node/handler/providers": {
-      "types": "./dist/types/preset/node/handler/providers/index.d.ts",
-      "require": "./dist/cjs/preset/node/handler/providers/index.js",
-      "import": "./dist/esm/preset/node/handler/providers/index.js",
-      "default": "./dist/esm/preset/node/handler/providers/index.js"
-    },
-    "./preset/node/handler/utils": {
-      "types": "./dist/types/preset/node/handler/utils/index.d.ts",
-      "require": "./dist/cjs/preset/node/handler/utils/index.js",
-      "import": "./dist/esm/preset/node/handler/utils/index.js",
-      "default": "./dist/esm/preset/node/handler/utils/index.js"
+    "./preset/node-handler": {
+      "types": "./dist/types/preset/node-handler/index.d.ts",
+      "require": "./dist/cjs/preset/node-handler/index.js",
+      "import": "./dist/esm/preset/node-handler/index.js",
+      "default": "./dist/esm/preset/node-handler/index.js"
     },
     "./preset/bun": {
       "types": "./dist/types/preset/bun/index.d.ts",
@@ -270,17 +252,8 @@
       "preset/node": [
         "./dist/types/preset/node/index.d.ts"
       ],
-      "preset/node/node/providers": [
-        "./dist/types/preset/node/node/providers/index.d.ts"
-      ],
-      "preset/node/node/utils": [
-        "./dist/types/preset/node/node/utils/index.d.ts"
-      ],
-      "preset/node/handler/providers": [
-        "./dist/types/preset/node/handler/providers/index.d.ts"
-      ],
-      "preset/node/handler/utils": [
-        "./dist/types/preset/node/handler/utils/index.d.ts"
+      "preset/node-handler": [
+        "./dist/types/preset/node-handler/index.d.ts"
       ],
       "preset/bun": [
         "./dist/types/preset/bun/index.d.ts"
