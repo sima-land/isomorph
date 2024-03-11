@@ -2,7 +2,6 @@
 import { renderToString } from 'react-dom/server';
 import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { HelmetContext, RegularHelmet } from '../../node-handler/utils';
 import {
   CookieStore,
   Middleware,
@@ -21,6 +20,7 @@ import { getFetchLogging } from '../../isomorphic/utils/get-fetch-logging';
 import { FetchLogging } from '../../isomorphic/utils/fetch-logging';
 import { PageAssets } from '../../isomorphic/types';
 import { PAGE_HANDLER_EVENT_TYPE } from '../../server/constants';
+import { HelmetContext, RegularHelmet } from '../../server/utils/regular-helmet';
 import { getPageResponseFormat } from '../../server/utils/get-page-response-format';
 import { getForwardedHeaders } from '../../server/utils/get-forwarded-headers';
 

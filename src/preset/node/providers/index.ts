@@ -10,7 +10,7 @@ import { Resolve } from '../../../di';
 import { KnownHttpApiKey } from '../../isomorphic/types';
 import { toMilliseconds } from '../../../utils';
 import { PAGE_HANDLER_EVENT_TYPE } from '../../server/constants';
-import { getClientIp } from '../utils/http-server';
+import { getClientIp } from '../utils/get-client-ip';
 
 // Node.js specific packages
 import os from 'node:os';
@@ -36,6 +36,7 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { getHandlerMetrics, LABEL_NAMES } from '../../server/utils/get-handler-metrics';
 
 /**
  * Провайдер источника конфигурации.
@@ -236,31 +237,7 @@ export function provideExpressLogMiddleware(resolve: Resolve): Handler {
  */
 export function provideExpressMetricsMiddleware(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);
-
-  const ConventionalLabels = {
-    HTTP_RESPONSE: ['version', 'route', 'code', 'method'],
-    SSR: ['version', 'route', 'method'],
-  } as const;
-
-  const requestCount = new PromClient.Counter({
-    name: 'http_request_count',
-    help: 'Incoming HTTP request count',
-    labelNames: ConventionalLabels.HTTP_RESPONSE,
-  });
-
-  const responseDuration = new PromClient.Histogram({
-    name: 'http_response_duration_ms',
-    help: 'Duration of incoming HTTP requests in ms',
-    labelNames: ConventionalLabels.HTTP_RESPONSE,
-    buckets: [30, 100, 200, 500, 1000, 2500, 5000, 10000],
-  });
-
-  const renderDuration = new PromClient.Histogram({
-    name: 'render_duration_ms',
-    help: 'Duration of SSR ms',
-    labelNames: ConventionalLabels.SSR,
-    buckets: [0.1, 15, 50, 100, 250, 500, 800, 1500],
-  });
+  const { requestCount, renderDuration, responseDuration } = getHandlerMetrics();
 
   /**
    * Функция формирования labels.
@@ -271,12 +248,20 @@ export function provideExpressMetricsMiddleware(resolve: Resolve): Handler {
   const getLabels = (
     req: Request,
     res: Response,
-  ): Record<(typeof ConventionalLabels.HTTP_RESPONSE)[number], string | number> => ({
+  ): Record<(typeof LABEL_NAMES.httpResponse)[number], string | number> => ({
     version: config.appVersion,
     route: req.baseUrl + req.path,
     code: res.statusCode,
     method: req.method,
   });
+
+  /** @inheritdoc */
+  const getRenderLabels = (request: Request) =>
+    ({
+      version: config.appVersion,
+      method: request.method,
+      route: request.url,
+    }) satisfies Record<(typeof LABEL_NAMES.pageRender)[number], string | number>;
 
   return (req, res, next) => {
     const responseStart = process.hrtime.bigint();
@@ -289,14 +274,7 @@ export function provideExpressMetricsMiddleware(resolve: Resolve): Handler {
       res.once(PAGE_HANDLER_EVENT_TYPE.renderFinish, () => {
         const renderFinish = process.hrtime.bigint();
 
-        renderDuration.observe(
-          {
-            version: config.appVersion,
-            method: req.method,
-            route: req.baseUrl + req.path,
-          },
-          toMilliseconds(renderFinish - renderStart),
-        );
+        renderDuration.observe(getRenderLabels(req), toMilliseconds(renderFinish - renderStart));
       });
     });
 

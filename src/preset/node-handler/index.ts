@@ -17,7 +17,7 @@ import {
   provideFetchLogHandler,
   provideCookieStore,
 } from './providers';
-import { SpecificExtras } from './utils';
+import { SpecificExtras } from '../server/utils/specific-extras';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.

@@ -14,7 +14,7 @@ import type { Resource } from '@opentelemetry/resources';
 import type { ElementType, ReactNode } from 'react';
 import type { KnownHttpApiKey, PageAssets } from './preset/isomorphic/types';
 import type { ExpressHandlerContext } from './preset/node/types';
-import type { SpecificExtras } from './preset/node-handler/utils';
+import type { SpecificExtras } from './preset/server/utils/specific-extras';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
 import type { CookieStore, Handler, LogHandler, LogHandlerFactory, Middleware } from './http';

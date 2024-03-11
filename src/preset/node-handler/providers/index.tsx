@@ -9,10 +9,8 @@ import {
 } from '../../../http';
 import type { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import {
-  getForwardedHeaders as getForwardedHeadersExpress,
-  axiosTracingMiddleware,
-} from '../../node/utils/http-client';
+import { getForwardedHeaders as getForwardedHeadersExpress } from '../../node/utils/get-forwarded-headers';
+import { axiosTracingMiddleware } from '../../node/utils/axios-tracing-middleware';
 import type { Middleware as AxiosMiddleware } from 'middleware-axios';
 import { AxiosLogging } from '../../isomorphic/utils/axios-logging';
 import { FetchLogging } from '../../isomorphic/utils/fetch-logging';
@@ -24,9 +22,10 @@ import { LogMiddlewareHandlerInit, cookieMiddleware, logMiddleware } from '../..
 import { PAGE_HANDLER_EVENT_TYPE } from '../../server/constants';
 import type { ConventionalJson } from '../../isomorphic/types';
 import { Fragment } from 'react';
-import { HelmetContext, RegularHelmet, getPageResponseFormat } from '../utils';
+import { getPageResponseFormat } from '../../node/utils/get-page-response-format';
 import { renderToString } from 'react-dom/server';
 import { getFetchTracing } from '../../server/utils/get-fetch-tracing';
+import { HelmetContext, RegularHelmet } from '../../server/utils/regular-helmet';
 
 /**
  * Провайдер главной функции обработчика входящего http-запроса.

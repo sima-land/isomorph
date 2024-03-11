@@ -1,11 +1,9 @@
 import { Context } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
-import { axiosTracingMiddleware, getRequestInfo, getForwardedHeaders } from '..';
-import { BaseConfig } from '../../../../../config';
-import express from 'express';
+import { axiosTracingMiddleware, getRequestInfo } from '../axios-tracing-middleware';
 
-describe('axiosTracingMiddleware', () => {
+describe('getAxiosTracing', () => {
   it('should handle success response', async () => {
     let currentSpan: Span = null as any;
 
@@ -141,69 +139,5 @@ describe('getRequestInfo', () => {
     for (const { baseURL, url, expectedUrl } of cases) {
       expect(getRequestInfo({ url }, { baseURL, headers: null as any }).url).toBe(expectedUrl);
     }
-  });
-});
-
-describe('getRequestHeaders', () => {
-  it('should return headers', () => {
-    const config: BaseConfig = {
-      appName: 'foo',
-      appVersion: '0.0.1',
-      env: 'test',
-    };
-
-    const request: express.Request = {
-      socket: {
-        remoteAddress: '127.0.0.1',
-      },
-      headers: {
-        cookie: 'userid=12345',
-        'simaland-a': 'aaa',
-        'simaland-b': 'bbb',
-      },
-      get(key: string) {
-        return this.headers[key];
-      },
-      header(key: string) {
-        return this.headers[key];
-      },
-    } as any;
-
-    const result = getForwardedHeaders(config, request);
-
-    expect(result).toEqual({
-      'X-Client-Ip': '127.0.0.1',
-      'User-Agent': `simaland-foo/0.0.1`,
-      Cookie: 'userid=12345',
-      'simaland-a': 'aaa',
-      'simaland-b': 'bbb',
-    });
-  });
-
-  it('should return headers when lot of data is undefined', () => {
-    const config: BaseConfig = {
-      appName: 'foo',
-      appVersion: '0.0.1',
-      env: 'test',
-    };
-
-    const request: express.Request = {
-      socket: {
-        remoteAddress: undefined,
-      },
-      headers: {},
-      get(key: string) {
-        return this.headers[key];
-      },
-      header(key: string) {
-        return this.headers[key];
-      },
-    } as any;
-
-    const result = getForwardedHeaders(config, request);
-
-    expect(result).toEqual({
-      'User-Agent': `simaland-foo/0.0.1`,
-    });
   });
 });
