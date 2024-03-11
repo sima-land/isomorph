@@ -10,7 +10,7 @@ import { getCurrentHub, init, runWithAsyncContext } from '@sentry/bun';
 import { createSentryHandler } from '../../../log/handler/sentry';
 import { provideFetch } from '../../isomorphic/providers';
 import { ServerHandler, ServerMiddleware } from '../../server/types';
-import { statsHandler } from '../utils';
+import { getStatsHandler } from '../utils/get-stats-handler';
 import { getHealthCheck } from '../../server/utils/get-health-check';
 import { getServeLogging } from '../../server/utils/get-serve-logging';
 import { getServeErrorLogging } from '../../server/utils/get-serve-error-logging';
@@ -87,7 +87,7 @@ export const BunProviders = {
     return [
       // служебные маршруты (без промежуточных слоев)
       ['/healthcheck', getHealthCheck()],
-      ['/stats', statsHandler()],
+      ['/stats', getStatsHandler()],
     ];
   },
 

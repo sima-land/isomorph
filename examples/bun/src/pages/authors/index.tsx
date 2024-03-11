@@ -47,8 +47,10 @@ function provideRender(resolve: Resolve) {
 }
 
 function provideAuthorApi(resolve: Resolve) {
+  const fetch = resolve(TOKEN.Lib.Http.fetch);
+
   return createAuthorApi({
     host: 'https://jsonplaceholder.typicode.com/',
-    fetch: resolve(TOKEN.Lib.Http.fetch),
+    fetch,
   });
 }
