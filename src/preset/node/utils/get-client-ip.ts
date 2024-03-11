@@ -1,4 +1,4 @@
-import type { Request } from 'express';
+import type express from 'express';
 import net from 'node:net';
 
 /**
@@ -6,7 +6,7 @@ import net from 'node:net';
  * @param request Входящий запрос.
  * @return IP.
  */
-export function getClientIp(request: Request): string | undefined {
+export function getClientIp(request: express.Request): string | undefined {
   const headerValue =
     request.header('x-client-ip') ||
     request.header('x-forwarded-for') ||

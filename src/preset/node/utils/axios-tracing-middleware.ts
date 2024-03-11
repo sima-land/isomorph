@@ -1,12 +1,9 @@
 import type { AxiosDefaults, AxiosRequestConfig } from 'axios';
 import type { Middleware } from 'middleware-axios';
-import type express from 'express';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { BaseConfig } from '../../../../config';
-import { getClientIp } from '../http-server';
-import { displayUrl } from '../../../isomorphic/utils/display-url';
-import { hideFirstId } from '../../../isomorphic/utils/hide-first-id';
+import { displayUrl } from '../../isomorphic/utils/display-url';
+import { hideFirstId } from '../../isomorphic/utils/hide-first-id';
 
 /**
  * Возвращает новый middleware для трассировки исходящих запросов.
@@ -79,44 +76,4 @@ export function getRequestInfo(
     url: displayUrl(baseURL, url),
     foundId,
   };
-}
-
-/**
- * Формирует заголовки для исходящих запросов с сервера по соглашению.
- * @param config Конфиг.
- * @param request Входящий запрос.
- * @return Заголовки для исходящих запросов.
- */
-export function getForwardedHeaders(
-  config: BaseConfig,
-  request: express.Request,
-): Record<string, string> {
-  const result: Record<string, string> = {
-    'User-Agent': `simaland-${config.appName}/${config.appVersion}`,
-  };
-
-  const clientIp = getClientIp(request);
-  if (clientIp) {
-    result['X-Client-Ip'] = clientIp;
-  }
-
-  const cookie = request.header('cookie');
-  if (cookie) {
-    result.Cookie = cookie;
-  }
-
-  // добавляем специфичные заголовки
-  for (const key of Object.keys(request.headers)) {
-    const value = request.header(key);
-
-    if (
-      key.toLowerCase().startsWith('simaland-') &&
-      key.toLowerCase() !== 'simaland-params' &&
-      value
-    ) {
-      result[key] = value;
-    }
-  }
-
-  return result;
 }

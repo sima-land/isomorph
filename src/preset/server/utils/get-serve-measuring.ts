@@ -2,7 +2,7 @@ import type { BaseConfig } from '../../../config';
 import type { ServerMiddleware } from '../types';
 import { PAGE_HANDLER_EVENT_TYPE } from '../constants';
 import { toMilliseconds } from '../../../utils';
-import PromClient from 'prom-client';
+import { LABEL_NAMES, getHandlerMetrics } from './get-handler-metrics';
 
 /**
  * Возвращает новый промежуточный слой метрки входящего http-запроса.
@@ -10,31 +10,7 @@ import PromClient from 'prom-client';
  * @return Промежуточный слой.
  */
 export function getServeMeasuring(config: BaseConfig): ServerMiddleware {
-  const ConventionalLabels = {
-    HTTP_RESPONSE: ['version', 'route', 'code', 'method'],
-    SSR: ['version', 'route', 'method'],
-  } as const;
-
-  // @todo скорее всего стоит сделать обертки над классами из PromClient чтобы вызывать у них методы замера а они уже сами вычисляли лейблы и тд
-  const requestCount = new PromClient.Counter({
-    name: 'http_request_count',
-    help: 'Incoming HTTP request count',
-    labelNames: ConventionalLabels.HTTP_RESPONSE,
-  });
-
-  const responseDuration = new PromClient.Histogram({
-    name: 'http_response_duration_ms',
-    help: 'Duration of incoming HTTP requests in ms',
-    labelNames: ConventionalLabels.HTTP_RESPONSE,
-    buckets: [30, 100, 200, 500, 1000, 2500, 5000, 10000],
-  });
-
-  const renderDuration = new PromClient.Histogram({
-    name: 'render_duration_ms',
-    help: 'Duration of SSR ms',
-    labelNames: ConventionalLabels.SSR,
-    buckets: [0.1, 15, 50, 100, 250, 500, 800, 1500],
-  });
+  const { requestCount, renderDuration, responseDuration } = getHandlerMetrics();
 
   /** @inheritdoc */
   const getResponseLabels = (req: Request, res: Response) =>
@@ -43,7 +19,7 @@ export function getServeMeasuring(config: BaseConfig): ServerMiddleware {
       route: req.url,
       code: res.status,
       method: req.method,
-    }) satisfies Record<(typeof ConventionalLabels.HTTP_RESPONSE)[number], string | number>;
+    }) satisfies Record<(typeof LABEL_NAMES.httpResponse)[number], string | number>;
 
   /** @inheritdoc */
   const getRenderLabels = (request: Request) =>
@@ -51,7 +27,7 @@ export function getServeMeasuring(config: BaseConfig): ServerMiddleware {
       version: config.appVersion,
       method: request.method,
       route: request.url,
-    }) satisfies Record<(typeof ConventionalLabels.SSR)[number], string | number>;
+    }) satisfies Record<(typeof LABEL_NAMES.pageRender)[number], string | number>;
 
   return async (request, next, context) => {
     const responseStart = process.hrtime.bigint();

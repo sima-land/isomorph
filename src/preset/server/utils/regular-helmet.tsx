@@ -1,10 +1,6 @@
 import { ReactNode, createContext, useContext } from 'react';
 import { PageAssets } from '../../isomorphic/types';
-import express from 'express';
 
-/**
- * @todo Перенести в preset/server.
- */
 export const HelmetContext = createContext<{ title?: string; assets?: PageAssets }>({});
 
 const resetCSS = `
@@ -18,11 +14,9 @@ body {
 `;
 
 /**
- * Простой Helmet-компонент.
- * Выведет html, head и body.
+ * Простой Helmet-компонент. Выведет html, head и body.
  * @param props Свойства.
  * @return Элемент.
- * @todo Перенести в preset/server.
  */
 export function RegularHelmet({ children }: { children?: ReactNode }) {
   const { title, assets } = useContext(HelmetContext);
@@ -50,45 +44,4 @@ export function RegularHelmet({ children }: { children?: ReactNode }) {
       </body>
     </html>
   );
-}
-
-/**
- * Специфичные для наших микросервисов дополнительные данные ответа.
- * @todo Перенести в preset/server.
- */
-export class SpecificExtras {
-  private _meta: any;
-
-  /**
-   * Установит мета-данные.
-   * @param meta Данные.
-   * @return Контекст.
-   */
-  setMeta(meta: any): this {
-    this._meta = meta;
-    return this;
-  }
-
-  /**
-   * Вернет установленные мета-данные.
-   * @return Данные.
-   */
-  getMeta(): unknown {
-    return this._meta;
-  }
-}
-
-/**
- * Определит формат ответа.
- * @param req Запрос.
- * @return Формат.
- */
-export function getPageResponseFormat(req: express.Request): 'html' | 'json' {
-  let result: 'html' | 'json' = 'html';
-
-  if ((req.header('accept') || '').toLowerCase().includes('application/json')) {
-    result = 'json';
-  }
-
-  return result;
 }
