@@ -2,11 +2,9 @@
 import { createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { PresetTuner } from '../isomorphic';
-import {
-  provideAbortController,
-  provideFetch,
-  provideReduxMiddlewareSaga,
-} from '../isomorphic/providers';
+import { provideAbortController } from '../isomorphic/providers/abort-controller';
+import { provideFetch } from '../isomorphic/providers/fetch';
+import { provideReduxMiddlewareSaga } from '../isomorphic/providers/redux-middleware-saga';
 import { providePageRender } from '../node-handler/providers/page-render';
 import { SpecificExtras } from '../server/utils/specific-extras';
 import { HandlerProviders } from './providers';

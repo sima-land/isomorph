@@ -1,5 +1,7 @@
 import { KnownToken } from '../../tokens';
-import { provideAxiosFactory, provideBaseConfig, provideFetch } from '../isomorphic/providers';
+import { provideAxiosFactory } from '../isomorphic/providers/axios-factory';
+import { provideFetch } from '../isomorphic/providers/fetch';
+import { provideBaseConfig } from '../isomorphic/providers/base-config';
 import { Preset, createPreset } from '../../di';
 import { PresetTuner } from '../isomorphic/types';
 import { healthCheck } from '../../utils/express/handler/health-check';
