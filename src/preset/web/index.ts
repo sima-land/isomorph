@@ -8,14 +8,12 @@ import {
   provideAxiosLogHandler,
   provideReduxMiddlewareSaga,
 } from '../isomorphic/providers';
-import {
-  provideConfigSource,
-  provideLogger,
-  provideKnownHttpApiHosts,
-  provideFetchMiddleware,
-  provideAxiosMiddleware,
-  provideBridgeClientSide,
-} from './providers';
+import { provideConfigSource } from './providers/config-source';
+import { provideLogger } from './providers/logger';
+import { provideKnownHttpApiHosts } from './providers/known-http-api-hosts';
+import { provideFetchMiddleware } from './providers/fetch-middleware';
+import { provideAxiosMiddleware } from './providers/axios-middleware';
+import { provideSsrBridgeClientSide } from './providers/ssr-bridge-client-side';
 
 /**
  * Возвращает preset с зависимостями для frontend-микросервисов в браузере.
@@ -33,7 +31,7 @@ export function PresetWeb(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Axios.factory, provideAxiosFactory);
   preset.set(KnownToken.Axios.middleware, provideAxiosMiddleware);
   preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
-  preset.set(KnownToken.SsrBridge.clientSide, provideBridgeClientSide);
+  preset.set(KnownToken.SsrBridge.clientSide, provideSsrBridgeClientSide);
   preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
   preset.set(KnownToken.Http.fetch, provideFetch);
   preset.set(KnownToken.Http.Fetch.middleware, provideFetchMiddleware);

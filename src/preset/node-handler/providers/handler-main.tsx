@@ -37,6 +37,16 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
     return result;
   };
 
+  // @todo https://github.com/sima-land/isomorph/issues/69
+  // const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
+  // cookieStore.subscribe(setCookieList => {
+  //   for (const setCookie of setCookieList) {
+  //     const parsed = parseSetCookieHeader(setCookie);
+
+  //     parsed && res.cookie(parsed.name, parsed.value, parsed.attrs);
+  //   }
+  // });
+
   return async () => {
     try {
       const assets = await getAssets();

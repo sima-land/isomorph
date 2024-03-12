@@ -1,5 +1,5 @@
-import { createCookieStore } from '../../../http';
 import type { Resolve } from '../../../di';
+import { CookieStore, createCookieStore } from '../../../http';
 import { KnownToken } from '../../../tokens';
 
 /**
@@ -7,23 +7,8 @@ import { KnownToken } from '../../../tokens';
  * @param resolve Функция для получения зависимости по токену.
  * @return Хранилище cookie.
  */
-export function provideCookieStore(resolve: Resolve) {
+export function provideCookieStore(resolve: Resolve): CookieStore {
   const context = resolve(KnownToken.ExpressHandler.context);
 
-  const store = createCookieStore(context.req.header('cookie'));
-
-  // @todo
-  // store.subscribe(setCookieList => {
-  //   for (const setCookie of setCookieList) {
-  //     const parsed = parseSetCookieHeader(setCookie);
-
-  //     if (!parsed) {
-  //       return;
-  //     }
-
-  //     context.res.cookie(parsed.name, parsed.value, parsed.attrs);
-  //   }
-  // });
-
-  return store;
+  return createCookieStore(context.req.header('cookie'));
 }

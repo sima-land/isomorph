@@ -35,6 +35,13 @@ export const HandlerProviders = {
     const abortController = resolve(KnownToken.Http.Fetch.abortController);
     const context = resolve(KnownToken.Http.Handler.context);
 
+    // @todo https://github.com/sima-land/isomorph/issues/69
+    // const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
+    // const forwardedSetCookie: string[] = [];
+    // const unsubscribeCookieStore = cookieStore.subscribe(setCookieList => {
+    //   forwardedSetCookie.push(...setCookieList);
+    // });
+
     const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
     const elementToString = (element: JSX.Element) => {
@@ -137,6 +144,16 @@ export const HandlerProviders = {
     };
 
     const enhancer = applyMiddleware(
+      // @todo https://github.com/sima-land/isomorph/issues/69
+      // async (request, next) => {
+      //   const response = await next(request);
+      //   for (const item of forwardedSetCookie) {
+      //     response.headers.append('set-cookie', item);
+      //   }
+      //   unsubscribeCookieStore();
+      //   return response;
+      // },
+
       // ВАЖНО: прерываем исходящие в рамках обработчика http-запросы
       async (request, next) => {
         const response = await next(request);
