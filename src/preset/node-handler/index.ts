@@ -6,17 +6,15 @@ import {
   provideAbortController,
 } from '../isomorphic/providers';
 import { PresetTuner } from '../isomorphic/types';
-import {
-  provideAxiosMiddleware,
-  provideAxiosLogHandler,
-  provideHandlerMain,
-  provideSpecificParams,
-  providePageHelmet,
-  providePageRender,
-  provideFetchMiddleware,
-  provideFetchLogHandler,
-  provideCookieStore,
-} from './providers';
+import { provideAxiosMiddleware } from './providers/axios-middleware';
+import { provideAxiosLogHandler } from './providers/axios-log-handler';
+import { provideHandlerMain } from './providers/handler-main';
+import { provideSpecificParams } from './providers/specific-params';
+import { providePageHelmet } from './providers/page-helmet';
+import { providePageRender } from './providers/page-render';
+import { provideFetchMiddleware } from './providers/fetch-middleware';
+import { provideFetchLogHandler } from './providers/fetch-log-handler';
+import { provideCookieStore } from './providers/cookie-store';
 import { SpecificExtras } from '../server/utils/specific-extras';
 
 /**
