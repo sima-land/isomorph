@@ -1,10 +1,8 @@
 import { Preset, createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
-import {
-  provideReduxMiddlewareSaga,
-  provideFetch,
-  provideAbortController,
-} from '../isomorphic/providers';
+import { provideReduxMiddlewareSaga } from '../isomorphic/providers/redux-middleware-saga';
+import { provideFetch } from '../isomorphic/providers/fetch';
+import { provideAbortController } from '../isomorphic/providers/abort-controller';
 import { PresetTuner } from '../isomorphic/types';
 import { provideAxiosMiddleware } from './providers/axios-middleware';
 import { provideAxiosLogHandler } from './providers/axios-log-handler';

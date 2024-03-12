@@ -8,7 +8,7 @@ import { providePinoHandler } from '../../node/providers/log-handler-pino';
 import { route, router } from '@krutoo/fetch-tools';
 import { getCurrentHub, init, runWithAsyncContext } from '@sentry/bun';
 import { createSentryHandler } from '../../../log/handler/sentry';
-import { provideFetch } from '../../isomorphic/providers';
+import { provideFetch } from '../../isomorphic/providers/fetch';
 import { ServerHandler, ServerMiddleware } from '../../server/types';
 import { getStatsHandler } from '../utils/get-stats-handler';
 import { getHealthCheck } from '../../server/utils/get-health-check';

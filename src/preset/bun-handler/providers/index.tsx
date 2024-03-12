@@ -206,7 +206,7 @@ export const HandlerProviders = {
 
       defaultHeaders(getForwardedHeaders(config, context.request)),
 
-      // @todo metrics, tracing
+      // @todo tracing
 
       // ВАЖНО: слой логирования запроса и ответа ПОСЛЕ остальных слоев чтобы использовать актуальные данные
       getFetchLogging(logHandler),

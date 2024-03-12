@@ -1,13 +1,11 @@
 import { createPreset, Preset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { PresetTuner } from '../isomorphic/types';
-import {
-  provideBaseConfig,
-  provideFetch,
-  provideAxiosFactory,
-  provideAxiosLogHandler,
-  provideReduxMiddlewareSaga,
-} from '../isomorphic/providers';
+import { provideBaseConfig } from '../isomorphic/providers/base-config';
+import { provideFetch } from '../isomorphic/providers/fetch';
+import { provideAxiosFactory } from '../isomorphic/providers/axios-factory';
+import { provideAxiosLogHandler } from '../isomorphic/providers/axios-log-handler';
+import { provideReduxMiddlewareSaga } from '../isomorphic/providers/redux-middleware-saga';
 import { provideConfigSource } from './providers/config-source';
 import { provideLogger } from './providers/logger';
 import { provideKnownHttpApiHosts } from './providers/known-http-api-hosts';
