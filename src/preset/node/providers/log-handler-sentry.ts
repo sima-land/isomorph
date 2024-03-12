@@ -9,7 +9,7 @@ import { KnownToken } from '../../../tokens';
  * @param resolve Функция для получения зависимости по токену.
  * @return Обработчик.
  */
-export function provideSentryHandler(resolve: Resolve): LogHandler {
+export function provideLogHandlerSentry(resolve: Resolve): LogHandler {
   const source = resolve(KnownToken.Config.source);
 
   // экспериментально пробуем не использовать вручную созданный клиент

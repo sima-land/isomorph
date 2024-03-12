@@ -1,7 +1,7 @@
 import { Resolve } from '../../../di';
 import { Logger, createLogger } from '../../../log';
-import { providePinoHandler } from './log-handler-pino';
-import { provideSentryHandler } from './log-handler-sentry';
+import { provideLogHandlerPino } from './log-handler-pino';
+import { provideLogHandlerSentry } from './log-handler-sentry';
 
 /**
  * Провайдер Logger'а.
@@ -12,8 +12,8 @@ export function provideLogger(resolve: Resolve): Logger {
   const logger = createLogger();
 
   // @todo возможно надо придумать как не давать вызывать провайдеры внутри провайдеров
-  logger.subscribe(providePinoHandler(resolve));
-  logger.subscribe(provideSentryHandler(resolve));
+  logger.subscribe(provideLogHandlerPino(resolve));
+  logger.subscribe(provideLogHandlerSentry(resolve));
 
   return logger;
 }

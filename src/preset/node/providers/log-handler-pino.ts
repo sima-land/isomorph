@@ -10,7 +10,7 @@ import { KnownToken } from '../../../tokens';
  * @param resolve Функция для получения зависимости по токену.
  * @return Обработчик.
  */
-export function providePinoHandler(resolve: Resolve): LogHandler {
+export function provideLogHandlerPino(resolve: Resolve): LogHandler {
   const config = resolve(KnownToken.Config.base);
 
   const pinoLogger = pino(
