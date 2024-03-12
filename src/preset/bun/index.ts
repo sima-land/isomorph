@@ -2,7 +2,8 @@ import { createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { PresetTuner } from '../isomorphic';
 import { provideBaseConfig } from '../isomorphic/providers';
-import { provideKnownHttpApiHosts, provideSsrBridgeServerSide } from '../node/providers';
+import { provideKnownHttpApiHosts } from '../node/providers/known-http-api-hosts';
+import { provideSsrBridgeServerSide } from '../node/providers/ssr-bridge-server-side';
 import { BunProviders } from './providers';
 
 /**

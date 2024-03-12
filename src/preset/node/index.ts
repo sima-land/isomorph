@@ -3,23 +3,21 @@ import { provideAxiosFactory, provideBaseConfig, provideFetch } from '../isomorp
 import { Preset, createPreset } from '../../di';
 import { PresetTuner } from '../isomorphic/types';
 import { healthCheck } from '../../utils/express/handler/health-check';
-import {
-  provideConfigSource,
-  provideExpressErrorMiddleware,
-  provideExpressFactory,
-  provideExpressLogMiddleware,
-  provideExpressMetricsMiddleware,
-  provideExpressRequestMiddleware,
-  provideExpressTracingMiddleware,
-  provideKnownHttpApiHosts,
-  provideLogger,
-  provideMetricsHttpApp,
-  provideSpanExporter,
-  provideSsrBridgeServerSide,
-  provideTracer,
-  provideTracerProvider,
-  provideTracerProviderResource,
-} from './providers';
+import { provideConfigSource } from './providers/config-source';
+import { provideExpressErrorMiddleware } from './providers/express-error-middleware';
+import { provideExpressFactory } from './providers/express-factory';
+import { provideExpressLogMiddleware } from './providers/express-log-middleware';
+import { provideExpressMetricsMiddleware } from './providers/express-metrics-middleware';
+import { provideExpressRequestMiddleware } from './providers/express-request-middleware';
+import { provideExpressTracingMiddleware } from './providers/express-tracing-middleware';
+import { provideKnownHttpApiHosts } from './providers/known-http-api-hosts';
+import { provideLogger } from './providers/logger';
+import { provideMetricsHttpApp } from './providers/metrics-http-app';
+import { provideSpanExporter } from './providers/span-exporter';
+import { provideSsrBridgeServerSide } from './providers/ssr-bridge-server-side';
+import { provideTracer } from './providers/tracer';
+import { provideTracerProvider } from './providers/tracer-provider';
+import { provideTracerProviderResource } from './providers/tracer-provider-resource';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
