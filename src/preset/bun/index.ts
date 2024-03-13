@@ -2,9 +2,16 @@ import { createPreset } from '../../di';
 import { KnownToken } from '../../tokens';
 import { PresetTuner } from '../isomorphic';
 import { provideBaseConfig } from '../isomorphic/providers/base-config';
+import { provideFetch } from '../isomorphic/providers/fetch';
 import { provideKnownHttpApiHosts } from '../node/providers/known-http-api-hosts';
 import { provideSsrBridgeServerSide } from '../node/providers/ssr-bridge-server-side';
-import { BunProviders } from './providers';
+import { provideConfigSource } from './providers/config-source';
+import { provideLogger } from './providers/logger';
+import { provideServe } from './providers/serve';
+import { provideServeMetrics } from './providers/serve-metrics';
+import { provideFetchMiddleware } from './providers/fetch-middleware';
+import { provideServiceRoutes } from './providers/service-routes';
+import { provideServeMiddleware } from './providers/serve-middleware';
 
 /**
  * Возвращает preset с зависимостями для запуска приложения в Bun.
@@ -16,26 +23,26 @@ export function PresetBun(customize?: PresetTuner) {
   const preset = createPreset();
 
   // config
-  preset.set(KnownToken.Config.source, BunProviders.configSource);
+  preset.set(KnownToken.Config.source, provideConfigSource);
   preset.set(KnownToken.Config.base, provideBaseConfig);
 
   // log
-  preset.set(KnownToken.logger, BunProviders.logger);
+  preset.set(KnownToken.logger, provideLogger);
 
   // tracing
   // @todo
 
   // metrics
-  preset.set(KnownToken.Metrics.httpHandler, BunProviders.serveMetrics);
+  preset.set(KnownToken.Metrics.httpHandler, provideServeMetrics);
 
   // http fetch
-  preset.set(KnownToken.Http.fetch, BunProviders.fetch);
-  preset.set(KnownToken.Http.Fetch.middleware, BunProviders.fetchMiddleware);
+  preset.set(KnownToken.Http.fetch, provideFetch);
+  preset.set(KnownToken.Http.Fetch.middleware, provideFetchMiddleware);
 
   // http serve
-  preset.set(KnownToken.Http.serve, BunProviders.serve);
-  preset.set(KnownToken.Http.Serve.serviceRoutes, BunProviders.serviceRoutes);
-  preset.set(KnownToken.Http.Serve.middleware, BunProviders.serveMiddleware);
+  preset.set(KnownToken.Http.serve, provideServe);
+  preset.set(KnownToken.Http.Serve.serviceRoutes, provideServiceRoutes);
+  preset.set(KnownToken.Http.Serve.middleware, provideServeMiddleware);
 
   // http api
   preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
