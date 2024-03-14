@@ -76,4 +76,8 @@ export function PresetNode(customize?: PresetTuner): Preset {
   return preset;
 }
 
+// доступные утилиты
+export { getClientIp } from './utils/get-client-ip';
+export { getForwardedHeaders } from './utils/get-forwarded-headers';
+export { getPageResponseFormat } from './utils/get-page-response-format';
 export { HandlerProvider } from './utils/handler-provider';

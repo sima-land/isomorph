@@ -17,6 +17,7 @@ import { SpecificExtras } from '../server/utils/specific-extras';
 /**
  * Возвращает preset с зависимостями для формирования обработчика входящего http-запроса.
  * @param customize Получит функцию с помощью которой можно переопределить предустановленные провайдеры.
+ * @todo Возможно стоит переименовать в PresetPageHandler.
  * @return Preset.
  */
 export function PresetBunHandler(customize?: PresetTuner) {
