@@ -1,8 +1,9 @@
 import type { ServerEnhancer, ServerMiddleware } from '../types';
 
 /**
+ * Возвращает Enhancer который накидывает на обработчик промежуточные слои.
+ * В будущем может быть перенесен в `@krutoo/fetch-tools` в более абстрактном виде.
  * @inheritdoc
- * @internal
  */
 export function applyServerMiddleware(...list: ServerMiddleware[]): ServerEnhancer {
   return handler => {

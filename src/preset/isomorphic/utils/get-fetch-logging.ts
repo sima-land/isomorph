@@ -4,6 +4,7 @@ import { log, type LogHandler, type LogHandlerFactory, type Middleware } from '.
  * Возвращает новый промежуточный слой логирования исходящего запроса и входящего ответа.
  * @param handlerInit Обработчик.
  * @return Промежуточный слой.
+ * @todo Возможно стоит переименовать в getFetchRequestLogging.
  */
 export function getFetchLogging(handlerInit: LogHandler | LogHandlerFactory): Middleware {
   const getHandler: LogHandlerFactory =
