@@ -4,16 +4,20 @@ import { provideReduxMiddlewareSaga } from '../isomorphic/providers/redux-middle
 import { provideFetch } from '../isomorphic/providers/fetch';
 import { provideAbortController } from '../isomorphic/providers/abort-controller';
 import { PresetTuner } from '../isomorphic/types';
+import { provideFormatPageResponse } from '../server/providers/format-page-response';
+import { provideElementToString } from '../server/providers/element-to-string';
 import { provideAxiosMiddleware } from './providers/axios-middleware';
 import { provideAxiosLogHandler } from './providers/axios-log-handler';
 import { provideHandlerMain } from './providers/handler-main';
 import { provideSpecificParams } from './providers/specific-params';
-import { providePageHelmet } from './providers/page-helmet';
-import { providePageRender } from './providers/page-render';
+import { providePageHelmet } from '../server/providers/page-helmet';
+import { providePageRender } from '../server/providers/page-render';
 import { provideFetchMiddleware } from './providers/fetch-middleware';
-import { provideFetchLogHandler } from './providers/fetch-log-handler';
+import { provideFetchLogHandler } from '../server/providers/fetch-log-handler';
 import { provideCookieStore } from './providers/cookie-store';
 import { SpecificExtras } from '../server/utils/specific-extras';
+import { provideAcceptType } from './providers/accepts-type';
+import { provideResponseEvents } from './providers/response-events';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -43,11 +47,15 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   preset.set(KnownToken.ExpressHandler.main, provideHandlerMain);
 
   // http handler
+  preset.set(KnownToken.Http.Handler.Request.acceptType, provideAcceptType);
   preset.set(KnownToken.Http.Handler.Request.specificParams, provideSpecificParams);
   preset.set(KnownToken.Http.Handler.Response.specificExtras, () => new SpecificExtras());
+  preset.set(KnownToken.Http.Handler.Response.events, provideResponseEvents);
   preset.set(KnownToken.Http.Handler.Page.assets, () => ({ js: '', css: '' }));
   preset.set(KnownToken.Http.Handler.Page.helmet, providePageHelmet);
   preset.set(KnownToken.Http.Handler.Page.render, providePageRender);
+  preset.set(KnownToken.Http.Handler.Page.elementToString, provideElementToString);
+  preset.set(KnownToken.Http.Handler.Page.formatResponse, provideFormatPageResponse);
 
   if (customize) {
     customize({ override: preset.set.bind(preset) });
