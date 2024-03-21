@@ -1,3 +1,5 @@
+import type { PageAssets } from '../isomorphic';
+
 /**
  * На сервере между промежуточными слоями надо обмениваться данными поэтому появился такой интерфейс.
  * Возможно в будущем он перейдет в `@krutoo/fetch-tools`.
@@ -20,4 +22,21 @@ export interface ServerMiddleware {
     next: (req: Request, ctx?: ServerHandlerContext) => Response | Promise<Response>,
     context: ServerHandlerContext,
   ): Response | Promise<Response>;
+}
+
+export interface PageResponseFormatResult {
+  body: string;
+  headers: Headers;
+}
+
+export interface PageResponseFormatter {
+  (
+    jsx: JSX.Element,
+    assets: PageAssets,
+    meta: unknown,
+  ): PageResponseFormatResult | Promise<PageResponseFormatResult>;
+}
+
+export interface RenderToString {
+  (jsx: JSX.Element): string | Promise<string>;
 }
