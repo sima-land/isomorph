@@ -1,3 +1,6 @@
+import type { LogLevel } from '../log';
+import type { ResponseErrorInit } from './types';
+
 /**
  * Ошибка валидации статуса ответа.
  * @todo Переименовать в HttpStatusValidationError?
@@ -28,15 +31,26 @@ export class StatusError extends Error {
  * Ошибка в процессе формирования ответа.
  */
 export class ResponseError extends Error {
+  logLevel: LogLevel | null;
   statusCode: number;
+  redirectLocation: string | null;
 
   /**
    * @param message Сообщение.
-   * @param statusCode Код ответа.
+   * @param statusCodeOrInit Код ответа.
    */
-  constructor(message: string, statusCode = 500) {
+  constructor(message: string, statusCodeOrInit: number | ResponseErrorInit = 500) {
     super(message);
     this.name = 'ResponseError';
-    this.statusCode = statusCode;
+
+    if (typeof statusCodeOrInit === 'number') {
+      this.logLevel = 'error';
+      this.statusCode = statusCodeOrInit;
+      this.redirectLocation = null;
+    } else {
+      this.logLevel = statusCodeOrInit.logLevel ?? 'error';
+      this.statusCode = statusCodeOrInit.statusCode ?? 500;
+      this.redirectLocation = statusCodeOrInit.redirectLocation ?? null;
+    }
   }
 }

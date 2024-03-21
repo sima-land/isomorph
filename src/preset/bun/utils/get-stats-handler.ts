@@ -7,9 +7,10 @@ import type { Handler } from '../../../http';
 export function getStatsHandler(): Handler {
   /** @inheritdoc */
   const getHeapStats = async () => {
+    // ВАЖНО: должны быть именно кавычки "'" по причине https://github.com/web-infra-dev/rspack/issues/5938#issuecomment-2000393152
     const jsc = await import(
       /* webpackIgnore: true */
-      `bun:jsc`
+      'bun:jsc'
     );
 
     return jsc.heapStats();

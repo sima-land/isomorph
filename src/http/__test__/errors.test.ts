@@ -32,4 +32,24 @@ describe('ResponseError', () => {
     expect(error.message).toBe('Hello!');
     expect(error.statusCode).toBe(500);
   });
+
+  it('should handle init', () => {
+    const error = new ResponseError('Need redirect', {
+      statusCode: 301,
+      redirectLocation: '/hello.php',
+      logLevel: 'debug',
+    });
+
+    expect(error.logLevel).toBe('debug');
+    expect(error.statusCode).toBe(301);
+    expect(error.redirectLocation).toBe('/hello.php');
+  });
+
+  it('should handle empty init', () => {
+    const error = new ResponseError('Need redirect', {});
+
+    expect(error.logLevel).toBe('error');
+    expect(error.statusCode).toBe(500);
+    expect(error.redirectLocation).toBe(null);
+  });
 });

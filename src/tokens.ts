@@ -11,7 +11,7 @@ import type { BridgeClientSide, BridgeServerSide } from './utils/ssr';
 import type { Tracer } from '@opentelemetry/api';
 import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { Resource } from '@opentelemetry/resources';
-import type { ElementType, ReactNode } from 'react';
+import type { ElementType, ReactNode, JSX } from 'react';
 import type { KnownHttpApiKey, PageAssets } from './preset/isomorphic/types';
 import type { ExpressHandlerContext } from './preset/node/types';
 import type { SpecificExtras } from './preset/server/utils/specific-extras';
@@ -19,7 +19,13 @@ import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
 import type { CookieStore, Handler, LogHandler, LogHandlerFactory, Middleware } from './http';
 import type { HttpApiHostPool } from './preset/isomorphic/utils/http-api-host-pool';
-import type { ServerHandlerContext, ServerHandler, ServerMiddleware } from './preset/server/types';
+import type {
+  ServerHandlerContext,
+  ServerHandler,
+  ServerMiddleware,
+  PageResponseFormatter,
+  RenderToString,
+} from './preset/server/types';
 
 /**
  * Токены компонентов.
@@ -114,12 +120,18 @@ export const KnownToken = {
 
       /** Токен компонентов входящего запроса. */
       Request: {
+        /** Токен функции которая определяет возможные типы ответа и их приоритет. */
+        acceptType: createToken<(types: string[]) => string | string[] | false>('handler/accepts'),
+
         /** Токен "специфичных" параметров запроса. В зависимости от реализации определит параметры на основе объекта запроса. */
         specificParams: createToken<Record<string, unknown>>('request/specific-params'),
       },
 
       /** Токены компонентов исходящего ответа. */
       Response: {
+        /** Токен объекта для подписки на события и вызова событий ответа. */
+        events: createToken<EventTarget>('response/events'),
+
         /** Токен "специфичных" дополнительных данных. В зависимости от реализации сформирует дополнительные данные ответа. */
         specificExtras: createToken<SpecificExtras>('response/specific-extras'),
       },
@@ -134,6 +146,12 @@ export const KnownToken = {
 
         /** Токен "шлема". Шлем - UI-компонент, внутри которого будет выведен результат render-функции. */
         helmet: createToken<ElementType<{ children: ReactNode }>>('page/helmet'),
+
+        /** Токен функции, получающей jsx и возвращающей строку. */
+        elementToString: createToken<RenderToString>('page/element-to-string'),
+
+        /** Токен функции, которая вернёт данные для ответа. */
+        formatResponse: createToken<PageResponseFormatter>('page/format-response'),
       },
     },
   },
