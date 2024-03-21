@@ -1,12 +1,9 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-import { renderToString } from 'react-dom/server';
 import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import { ResponseError, applyMiddleware } from '../../../http';
-import { PageAssets } from '../../isomorphic/types';
-import { PAGE_HANDLER_EVENT_TYPE } from '../../server/constants';
-import { getPageResponseFormat } from '../../server/utils/get-page-response-format';
 import { HelmetContext } from '../../server/utils/regular-helmet';
+import { LogLevel } from '../../../log';
 
 export function provideHandlerMain(resolve: Resolve) {
   const config = resolve(KnownToken.Config.base);
@@ -16,7 +13,7 @@ export function provideHandlerMain(resolve: Resolve) {
   const extras = resolve(KnownToken.Http.Handler.Response.specificExtras);
   const Helmet = resolve(KnownToken.Http.Handler.Page.helmet);
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
-  const context = resolve(KnownToken.Http.Handler.context);
+  const formatResponse = resolve(KnownToken.Http.Handler.Page.formatResponse);
 
   // @todo https://github.com/sima-land/isomorph/issues/69
   // const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
@@ -27,65 +24,7 @@ export function provideHandlerMain(resolve: Resolve) {
 
   const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
-  const elementToString = (element: JSX.Element) => {
-    context.events.dispatchEvent(new Event(PAGE_HANDLER_EVENT_TYPE.renderStart));
-    const result = renderToString(element);
-    context.events.dispatchEvent(new Event(PAGE_HANDLER_EVENT_TYPE.renderFinish));
-
-    return result;
-  };
-
-  const getResponseHTML = (jsx: React.JSX.Element, assets: PageAssets, meta: unknown) => {
-    const headers = new Headers();
-
-    headers.set('content-type', 'text/html');
-    headers.set('simaland-bundle-js', assets.js);
-    headers.set('simaland-bundle-css', assets.css);
-
-    if (assets.criticalJs) {
-      headers.set('simaland-critical-js', assets.criticalJs);
-    }
-
-    if (assets.criticalCss) {
-      headers.set('simaland-critical-css', assets.criticalCss);
-    }
-
-    if (meta) {
-      headers.set('simaland-meta', JSON.stringify(meta));
-    }
-
-    // ВАЖНО: DOCTYPE обязательно нужен так как влияет на то как браузер будет парсить html/css
-    // ВАЖНО: DOCTYPE нужен только когда отдаем полноценную страницу
-    if (config.env === 'development') {
-      return new Response(`<!DOCTYPE html>${elementToString(jsx)}`, {
-        headers,
-      });
-    } else {
-      return new Response(elementToString(jsx), {
-        headers,
-      });
-    }
-  };
-
-  const getResponseJSON = (jsx: React.JSX.Element, assets: PageAssets, meta: unknown) => {
-    const headers = new Headers();
-
-    headers.set('content-type', 'application/json');
-
-    return new Response(
-      JSON.stringify({
-        markup: elementToString(jsx),
-        bundle_js: assets.js,
-        bundle_css: assets.css,
-        critical_js: assets.criticalJs,
-        critical_css: assets.criticalCss,
-        meta,
-      }),
-      { headers },
-    );
-  };
-
-  const handler = async (request: Request): Promise<Response> => {
+  const handler = async (): Promise<Response> => {
     try {
       const assets = await getAssets();
       const meta = extras.getMeta();
@@ -96,33 +35,43 @@ export function provideHandlerMain(resolve: Resolve) {
         </HelmetContext.Provider>
       );
 
-      switch (getPageResponseFormat(request)) {
-        case 'html': {
-          return getResponseHTML(jsx, assets, meta);
-        }
-        case 'json': {
-          return getResponseJSON(jsx, assets, meta);
-        }
-      }
+      const { body, headers } = await formatResponse(jsx, assets, meta);
+
+      return new Response(body, { headers });
     } catch (error) {
+      let logLevel: LogLevel | null = 'error';
       let message: string;
       let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
+      let redirectLocation: string | null = null;
 
       if (error instanceof Error) {
         message = error.message;
 
         if (error instanceof ResponseError) {
           statusCode = error.statusCode;
+          redirectLocation = error.redirectLocation;
+          logLevel = error.logLevel;
         }
       } else {
         message = String(error);
       }
 
-      logger.error(error);
+      if (logLevel && logger[logLevel]) {
+        logger[logLevel](error);
+      }
 
-      return new Response(message, {
-        status: statusCode,
-      });
+      if (statusCode > 299 && statusCode < 400 && redirectLocation) {
+        return new Response(null, {
+          status: statusCode,
+          headers: {
+            Location: redirectLocation,
+          },
+        });
+      } else {
+        return new Response(message, {
+          status: statusCode,
+        });
+      }
     }
   };
 

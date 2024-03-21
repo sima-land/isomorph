@@ -1,8 +1,8 @@
 import { Fragment } from 'react';
 import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { getPageResponseFormat } from '../../node/utils/get-page-response-format';
-import { RegularHelmet } from '../../server/utils/regular-helmet';
+import { RegularHelmet } from '../utils/regular-helmet';
+import { PAGE_FORMAT_PRIORITY } from '../constants';
 
 /**
  * Провайдер helmet-компонента. Этот компонент является контейнером для результата render-функции.
@@ -11,9 +11,9 @@ import { RegularHelmet } from '../../server/utils/regular-helmet';
  */
 export function providePageHelmet(resolve: Resolve) {
   const config = resolve(KnownToken.Config.base);
-  const { req } = resolve(KnownToken.ExpressHandler.context);
+  const acceptType = resolve(KnownToken.Http.Handler.Request.acceptType);
 
-  return config.env === 'development' && getPageResponseFormat(req) === 'html'
+  return config.env === 'development' && acceptType(PAGE_FORMAT_PRIORITY) === 'html'
     ? RegularHelmet
     : Fragment;
 }

@@ -12,11 +12,11 @@ import { provideExpressLogMiddleware } from './providers/express-log-middleware'
 import { provideExpressMetricsMiddleware } from './providers/express-metrics-middleware';
 import { provideExpressRequestMiddleware } from './providers/express-request-middleware';
 import { provideExpressTracingMiddleware } from './providers/express-tracing-middleware';
-import { provideKnownHttpApiHosts } from './providers/known-http-api-hosts';
+import { provideKnownHttpApiHosts } from '../server/providers/known-http-api-hosts';
 import { provideLogger } from './providers/logger';
 import { provideMetricsHttpApp } from './providers/metrics-http-app';
 import { provideSpanExporter } from './providers/span-exporter';
-import { provideSsrBridgeServerSide } from './providers/ssr-bridge-server-side';
+import { provideSsrBridgeServerSide } from '../server/providers/ssr-bridge-server-side';
 import { provideTracer } from './providers/tracer';
 import { provideTracerProvider } from './providers/tracer-provider';
 import { provideTracerProviderResource } from './providers/tracer-provider-resource';
