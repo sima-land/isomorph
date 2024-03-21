@@ -198,7 +198,7 @@ export const KnownToken = {
   /** Токены компонентов express-обработчика. */
   ExpressHandler: {
     /** Токен главной функции (точки входа) обработчика. */
-    main: createToken<() => void>('express-handler/main'),
+    main: createToken<express.Handler>('express-handler/main'),
 
     /** Токен "контекста" обработчика. Контекст содержит все аргументы, доступные обработчику (req, res, next). */
     context: createToken<ExpressHandlerContext>('express-handler/context'),

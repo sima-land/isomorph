@@ -16,7 +16,7 @@ export function HandlerProvider(getApp: () => Application): Provider<express.Han
 
       app.attach(parent);
       app.bind(KnownToken.ExpressHandler.context).toValue({ req, res, next });
-      app.get(KnownToken.ExpressHandler.main)();
+      app.get(KnownToken.ExpressHandler.main)(req, res, next);
     };
   };
 }
