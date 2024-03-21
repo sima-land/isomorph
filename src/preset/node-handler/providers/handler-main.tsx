@@ -1,15 +1,15 @@
 import type { Resolve } from '../../../di';
+import type express from 'express';
 import { KnownToken } from '../../../tokens';
 import { HelmetContext } from '../../server/utils/regular-helmet';
-import { ResponseError } from '../../../http';
-import { LogLevel } from '../../../log';
+import { formatHandlerError } from '../../server/utils/format-handler-error';
 
 /**
  * Провайдер главной функции обработчика входящего http-запроса.
  * @param resolve Функция для получения зависимости по токену.
  * @return Главная функция.
  */
-export function provideHandlerMain(resolve: Resolve): VoidFunction {
+export function provideHandlerMain(resolve: Resolve): express.Handler {
   const config = resolve(KnownToken.Config.base);
   const logger = resolve(KnownToken.logger);
   const context = resolve(KnownToken.ExpressHandler.context);
@@ -18,7 +18,7 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
   const extras = resolve(KnownToken.Http.Handler.Response.specificExtras);
   const Helmet = resolve(KnownToken.Http.Handler.Page.helmet);
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
-  const format = resolve(KnownToken.Http.Handler.Page.formatResponse);
+  const formatResponse = resolve(KnownToken.Http.Handler.Page.formatResponse);
 
   const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
@@ -37,42 +37,27 @@ export function provideHandlerMain(resolve: Resolve): VoidFunction {
       const assets = await getAssets();
       const meta = extras.getMeta();
 
-      const { body, headers } = await format(
+      const jsx = (
         <HelmetContext.Provider value={{ title: config.appName, assets }}>
           <Helmet>{await render()}</Helmet>
-        </HelmetContext.Provider>,
-        assets,
-        meta,
+        </HelmetContext.Provider>
       );
+
+      const { body, headers } = await formatResponse(jsx, assets, meta);
 
       headers.forEach((hValue, hName) => context.res.setHeader(hName, hValue));
       context.res.send(body);
     } catch (error) {
-      let logLevel: LogLevel | null = 'error';
-      let message: string;
-      let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
-      let redirectLocation: string | null = null;
+      const { response, log } = formatHandlerError(error);
 
-      if (error instanceof Error) {
-        message = error.message;
-
-        if (error instanceof ResponseError) {
-          statusCode = error.statusCode;
-          redirectLocation = error.redirectLocation;
-          logLevel = error.logLevel;
-        }
+      if (response.status > 299 && response.status < 400 && response.redirectLocation) {
+        context.res.redirect(response.status, response.redirectLocation);
       } else {
-        message = String(error);
+        context.res.status(response.status).send(response.body);
       }
 
-      if (statusCode > 299 && statusCode < 400 && redirectLocation) {
-        context.res.redirect(statusCode, redirectLocation);
-      } else {
-        context.res.status(statusCode).send(message);
-      }
-
-      if (logLevel && logger[logLevel]) {
-        logger[logLevel](error);
+      if (log.level && logger[log.level]) {
+        logger[log.level](error);
       }
     }
 

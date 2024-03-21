@@ -1,9 +1,9 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { ResponseError, applyMiddleware } from '../../../http';
+import { applyMiddleware } from '../../../http';
 import { HelmetContext } from '../../server/utils/regular-helmet';
-import { LogLevel } from '../../../log';
+import { formatHandlerError } from '../../server/utils/format-handler-error';
 
 export function provideHandlerMain(resolve: Resolve) {
   const config = resolve(KnownToken.Config.base);
@@ -39,37 +39,22 @@ export function provideHandlerMain(resolve: Resolve) {
 
       return new Response(body, { headers });
     } catch (error) {
-      let logLevel: LogLevel | null = 'error';
-      let message: string;
-      let statusCode = 500; // по умолчанию, если на этапе подготовки страницы что-то не так, отдаем 500
-      let redirectLocation: string | null = null;
+      const { response, log } = formatHandlerError(error);
 
-      if (error instanceof Error) {
-        message = error.message;
-
-        if (error instanceof ResponseError) {
-          statusCode = error.statusCode;
-          redirectLocation = error.redirectLocation;
-          logLevel = error.logLevel;
-        }
-      } else {
-        message = String(error);
+      if (log.level && logger[log.level]) {
+        logger[log.level](error);
       }
 
-      if (logLevel && logger[logLevel]) {
-        logger[logLevel](error);
-      }
-
-      if (statusCode > 299 && statusCode < 400 && redirectLocation) {
+      if (response.status > 299 && response.status < 400 && response.redirectLocation) {
         return new Response(null, {
-          status: statusCode,
+          status: response.status,
           headers: {
-            Location: redirectLocation,
+            Location: response.redirectLocation,
           },
         });
       } else {
-        return new Response(message, {
-          status: statusCode,
+        return new Response(response.body, {
+          status: response.status,
         });
       }
     }
