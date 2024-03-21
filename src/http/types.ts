@@ -1,3 +1,5 @@
+import { LogLevel } from '../log';
+
 export type { Handler, Enhancer, Middleware, CookieStore } from '@krutoo/fetch-tools';
 export type {
   LogData,
@@ -26,3 +28,9 @@ export interface ResponseFail<T = unknown> {
 }
 
 export type EitherResponse<T> = ResponseDone<T> | ResponseFail<T>;
+
+export interface ResponseErrorInit {
+  statusCode?: number;
+  redirectLocation?: string;
+  logLevel?: LogLevel | null;
+}
