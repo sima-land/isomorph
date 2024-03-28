@@ -14,9 +14,12 @@ export function provideFormatPageResponse(resolve: Resolve): PageResponseFormatt
   const config = resolve(KnownToken.Config.base);
   const acceptType = resolve(KnownToken.Http.Handler.Request.acceptType);
   const elementToString = resolve(KnownToken.Http.Handler.Page.elementToString);
+  const extras = resolve(KnownToken.Http.Handler.Response.specificExtras);
 
-  return async (jsx, assets, meta) => {
+  return async (jsx, assets) => {
+    const meta = extras.getMeta();
     const headers = new Headers();
+
     let body: string;
 
     switch (acceptType(PAGE_FORMAT_PRIORITY)) {
@@ -55,6 +58,7 @@ export function provideFormatPageResponse(resolve: Resolve): PageResponseFormatt
 
         // ВАЖНО: DOCTYPE обязательно нужен так как влияет на то как браузер будет парсить html/css
         // ВАЖНО: DOCTYPE нужен только когда отдаем полноценную страницу
+        // @todo переделать  на проверку параметра ?html-doctype=false
         if (config.env === 'development') {
           body = `<!DOCTYPE html>${await elementToString(jsx)}`;
         } else {

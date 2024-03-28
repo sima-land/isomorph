@@ -1,5 +1,5 @@
 import { Resolve } from '../../../di';
-import { Middleware, cookie, defaultHeaders } from '../../../http';
+import { Middleware, defaultHeaders } from '../../../http';
 import { KnownToken } from '../../../tokens';
 import { getFetchErrorLogging } from '../../isomorphic/utils/get-fetch-error-logging';
 import { getFetchExtraAborting } from '../../isomorphic/utils/get-fetch-extra-aborting';
@@ -17,7 +17,6 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.ExpressHandler.context);
   const logHandler = resolve(KnownToken.Http.Fetch.Middleware.Log.handler);
-  const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
 
   return [
@@ -29,8 +28,6 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
 
     // обрывание по сигналу из обработчика входящего запроса и по сигналу из конфига исходящего запроса
     getFetchExtraAborting(abortController),
-
-    cookie(cookieStore),
 
     getFetchTracing(tracer, context.res.locals.tracing.rootContext),
 

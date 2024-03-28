@@ -3,7 +3,7 @@ import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import { HttpStatus } from '../../isomorphic/utils/http-status';
 import { axiosTracingMiddleware } from '../../node/utils/axios-tracing-middleware';
-import { cookieMiddleware, logMiddleware } from '../../../utils/axios';
+import { logMiddleware } from '../../../utils/axios';
 import { getForwardedHeaders } from '../../node/utils/get-forwarded-headers';
 
 /**
@@ -16,7 +16,6 @@ export function provideAxiosMiddleware(resolve: Resolve): Middleware<any>[] {
   const tracer = resolve(KnownToken.Tracing.tracer);
   const context = resolve(KnownToken.ExpressHandler.context);
   const logHandler = resolve(KnownToken.Axios.Middleware.Log.handler);
-  const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
 
   return [
@@ -59,6 +58,5 @@ export function provideAxiosMiddleware(resolve: Resolve): Middleware<any>[] {
     HttpStatus.axiosMiddleware(),
     axiosTracingMiddleware(tracer, context.res.locals.tracing.rootContext),
     logMiddleware(logHandler),
-    cookieMiddleware(cookieStore),
   ];
 }

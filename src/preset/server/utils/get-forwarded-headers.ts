@@ -15,9 +15,14 @@ export function getForwardedHeaders(config: BaseConfig, request: Request): Heade
 
   // client ip
   const clientIp = getClientIp(request);
-
   if (clientIp) {
     result.set('X-Client-Ip', clientIp);
+  }
+
+  // cookie
+  const cookie = request.headers.get('cookie');
+  if (cookie) {
+    result.set('cookie', cookie);
   }
 
   // service headers

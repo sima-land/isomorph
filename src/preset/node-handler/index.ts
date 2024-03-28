@@ -14,7 +14,6 @@ import { providePageHelmet } from '../server/providers/page-helmet';
 import { providePageRender } from '../server/providers/page-render';
 import { provideFetchMiddleware } from './providers/fetch-middleware';
 import { provideFetchLogHandler } from '../server/providers/fetch-log-handler';
-import { provideCookieStore } from './providers/cookie-store';
 import { SpecificExtras } from '../server/utils/specific-extras';
 import { provideAcceptType } from './providers/accepts-type';
 import { provideResponseEvents } from './providers/response-events';
@@ -32,7 +31,6 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   // fetch
   preset.set(KnownToken.Http.fetch, provideFetch);
   preset.set(KnownToken.Http.Fetch.middleware, provideFetchMiddleware);
-  preset.set(KnownToken.Http.Fetch.cookieStore, provideCookieStore);
   preset.set(KnownToken.Http.Fetch.abortController, provideAbortController);
   preset.set(KnownToken.Http.Fetch.Middleware.Log.handler, provideFetchLogHandler);
 

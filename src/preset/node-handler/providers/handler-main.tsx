@@ -15,27 +15,15 @@ export function provideHandlerMain(resolve: Resolve): express.Handler {
   const context = resolve(KnownToken.ExpressHandler.context);
   const render = resolve(KnownToken.Http.Handler.Page.render);
   const assetsInit = resolve(KnownToken.Http.Handler.Page.assets);
-  const extras = resolve(KnownToken.Http.Handler.Response.specificExtras);
   const Helmet = resolve(KnownToken.Http.Handler.Page.helmet);
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
   const formatResponse = resolve(KnownToken.Http.Handler.Page.formatResponse);
 
   const getAssets = typeof assetsInit === 'function' ? assetsInit : () => assetsInit;
 
-  // @todo https://github.com/sima-land/isomorph/issues/69
-  // const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
-  // cookieStore.subscribe(setCookieList => {
-  //   for (const setCookie of setCookieList) {
-  //     const parsed = parseSetCookieHeader(setCookie);
-
-  //     parsed && res.cookie(parsed.name, parsed.value, parsed.attrs);
-  //   }
-  // });
-
   return async () => {
     try {
       const assets = await getAssets();
-      const meta = extras.getMeta();
 
       const jsx = (
         <HelmetContext.Provider value={{ title: config.appName, assets }}>
@@ -43,7 +31,7 @@ export function provideHandlerMain(resolve: Resolve): express.Handler {
         </HelmetContext.Provider>
       );
 
-      const { body, headers } = await formatResponse(jsx, assets, meta);
+      const { body, headers } = await formatResponse(jsx, assets);
 
       headers.forEach((hValue, hName) => context.res.setHeader(hName, hValue));
       context.res.send(body);

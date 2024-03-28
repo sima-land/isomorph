@@ -11,7 +11,6 @@ import { provideFetchMiddleware } from './providers/fetch-middleware';
 import { provideHandlerMain } from './providers/handler-main';
 import { providePageHelmet } from '../server/providers/page-helmet';
 import { provideSpecificParams } from './providers/specific-params';
-import { provideCookieStore } from './providers/cookie-store';
 import { SpecificExtras } from '../server/utils/specific-extras';
 import { provideElementToString } from '../server/providers/element-to-string';
 import { provideFormatPageResponse } from '../server/providers/format-page-response';
@@ -30,7 +29,6 @@ export function PresetBunHandler(customize?: PresetTuner) {
   // http fetch
   preset.set(KnownToken.Http.fetch, provideFetch);
   preset.set(KnownToken.Http.Fetch.abortController, provideAbortController);
-  preset.set(KnownToken.Http.Fetch.cookieStore, provideCookieStore);
   preset.set(KnownToken.Http.Fetch.middleware, provideFetchMiddleware);
   preset.set(KnownToken.Http.Fetch.Middleware.Log.handler, provideFetchLogHandler);
 

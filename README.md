@@ -7,6 +7,7 @@
 - react
 - redux
 - redux-saga
+- fetch
 - axios
 - express
 - webpack

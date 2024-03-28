@@ -11,6 +11,7 @@ sidebar_position: 0
 - react
 - redux
 - redux-saga
+- fetch
 - axios
 - express
 - webpack
