@@ -1,5 +1,11 @@
-export type { ServerHandler, ServerMiddleware, ServerHandlerContext } from './types';
-export { PAGE_HANDLER_EVENT_TYPE } from './constants';
+export type {
+  ServerHandler,
+  ServerMiddleware,
+  ServerHandlerContext,
+  PageResponseFormatter,
+  PageResponseFormatResult,
+} from './types';
+export { PAGE_HANDLER_EVENT_TYPE, PAGE_FORMAT_PRIORITY } from './constants';
 
 // доступные утилиты
 export { applyServerMiddleware } from './utils/apply-server-middleware';

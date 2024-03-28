@@ -35,4 +35,17 @@ describe('getForwardedHeaders', () => {
     expect(result.get('simaland-foo')).toBe('hello');
     expect(result.get('simaland-bar')).toBe('world');
   });
+
+  it('should forward cookie when it is present', () => {
+    const config = { appName: 'app_name', appVersion: 'version', env: 'env' };
+    const request = new Request('http://test.com', {
+      headers: {
+        Cookie: 'foo=123; bar=234',
+      },
+    });
+    const result = getForwardedHeaders(config, request);
+
+    expect(result.get('user-agent')).toBe('simaland-app_name/version');
+    expect(result.get('cookie')).toBe('foo=123; bar=234');
+  });
 });

@@ -33,7 +33,6 @@ export interface PageResponseFormatter {
   (
     jsx: JSX.Element,
     assets: PageAssets,
-    meta: unknown,
   ): PageResponseFormatResult | Promise<PageResponseFormatResult>;
 }
 

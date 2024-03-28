@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { Middleware, cookie, defaultHeaders } from '../../../http';
+import { Middleware, defaultHeaders } from '../../../http';
 import { getFetchErrorLogging } from '../../isomorphic/utils/get-fetch-error-logging';
 import { getFetchExtraAborting } from '../../isomorphic/utils/get-fetch-extra-aborting';
 import { getFetchLogging } from '../../isomorphic/utils/get-fetch-logging';
@@ -11,7 +11,6 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
   const config = resolve(KnownToken.Config.base);
   const context = resolve(KnownToken.Http.Handler.context);
   const logHandler = resolve(KnownToken.Http.Fetch.Middleware.Log.handler);
-  const cookieStore = resolve(KnownToken.Http.Fetch.cookieStore);
   const abortController = resolve(KnownToken.Http.Fetch.abortController);
 
   return [
@@ -20,8 +19,6 @@ export function provideFetchMiddleware(resolve: Resolve): Middleware[] {
 
     // обрывание по сигналу из обработчика входящего запроса и по сигналу из конфига исходящего запроса
     getFetchExtraAborting(abortController),
-
-    cookie(cookieStore),
 
     defaultHeaders(getForwardedHeaders(config, context.request)),
 
