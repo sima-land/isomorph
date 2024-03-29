@@ -9,4 +9,3 @@ export {
   type LogMiddlewareHandlerInit,
   logMiddleware,
 } from './middleware/log';
-export { cookieMiddleware } from './middleware/cookie';

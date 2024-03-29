@@ -46,7 +46,7 @@
     "whatwg-fetch": "^3.6.17"
   },
   "dependencies": {
-    "@humanwhocodes/env": "^2.2.2",
+    "@humanwhocodes/env": "^3.0.2",
     "@krutoo/fetch-tools": "^0.0.12",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/exporter-prometheus": "^0.38.0",

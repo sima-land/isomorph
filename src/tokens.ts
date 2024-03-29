@@ -17,7 +17,7 @@ import type { ExpressHandlerContext } from './preset/node/types';
 import type { SpecificExtras } from './preset/server/utils/specific-extras';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
-import type { CookieStore, Handler, LogHandler, LogHandlerFactory, Middleware } from './http';
+import type { Handler, LogHandler, LogHandlerFactory, Middleware } from './http';
 import type { HttpApiHostPool } from './preset/isomorphic/utils/http-api-host-pool';
 import type {
   ServerHandlerContext,
@@ -78,9 +78,6 @@ export const KnownToken = {
     Fetch: {
       /** Токен AbortController для функции fetch. */
       abortController: createToken<AbortController>('fetch/abort-controller'),
-
-      /** Токен хранилища cookie. */
-      cookieStore: createToken<CookieStore>('fetch/cookie-store'),
 
       /** Токен списка промежуточных слоев для функции fetch. */
       middleware: createToken<Middleware[]>('fetch/middleware'),

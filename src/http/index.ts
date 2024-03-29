@@ -7,13 +7,12 @@ export type {
   FailLogData,
   LogHandler,
   LogHandlerFactory,
-  CookieStore,
   EitherResponse,
   ResponseDone,
   ResponseFail,
   ResponseErrorInit,
 } from './types';
-export { configureFetch, applyMiddleware, createCookieStore } from '@krutoo/fetch-tools';
-export { log, cookie, defaultHeaders, validateStatus } from '@krutoo/fetch-tools/middleware';
+export { configureFetch, applyMiddleware } from '@krutoo/fetch-tools';
+export { log, defaultHeaders, validateStatus } from '@krutoo/fetch-tools/middleware';
 export { StatusError, ResponseError } from './errors';
 export { FetchUtil } from './utils';

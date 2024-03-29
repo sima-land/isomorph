@@ -1,3 +1,4 @@
+// @ts-expect-error: https://github.com/humanwhocodes/env/issues/133 (@todo разобраться и убрать)
 import type { Env } from '@humanwhocodes/env';
 
 /** Источник конфигурации. */

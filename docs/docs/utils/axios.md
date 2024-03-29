@@ -27,25 +27,6 @@ const middleware = logMiddleware({
 client.use(middleware);
 ```
 
-### "Прозрачные" cookie
-
-На сервере бывает необходимо выполнить HTTP-запрос к публичным API от имени пользователя.
-
-Пакет предоставляет функцию для создания промежуточного слоя,
-накапливающего cookie из ответов на исходящие запросы в ответ express-приложения.
-
-```ts
-import { create } from 'middleware-axios';
-import { createCookieStore } from '@sima-land/isomorph/http';
-import { cookieMiddleware } from '@sima-land/isomorph/utils/axios';
-
-const client = create();
-const cookieStore = createCookieStore();
-
-// при запросе cookie из хранилища будут автоматически добавлены в заголовки
-client.use(cookieMiddleware(cookieStore));
-```
-
 ## Sauce
 
 Пакет предоставляет функцию `sauce` позволяющую сделать возвращаемые из методов экземпляра `AxiosInstance` промисы "безопасными".
