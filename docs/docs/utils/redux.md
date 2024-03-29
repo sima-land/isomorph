@@ -4,7 +4,7 @@
 
 ### Удаленные данные
 
-Для работы с удаленными данными пакет пердоставляет набор утилит `RemoteData`.
+Для работы с загружаемыми данными пакет предоставляет набор утилит `RemoteData`.
 
 Пример использования вместе с `createAction` и `createReducer` из пакета `@reduxjs/toolkit`:
 
@@ -40,10 +40,16 @@ const reducer = createReducer(initialState, builder => {
   RemoteData.applyReducers<MyData, string>(actions, builder);
 });
 
+const selectors = {
+  // определяем базовые селекторы (данных, статуса, кол-ва загрузок и тд)
+  ...RemoteData.createSelectors<MyDataState, { slice: MyDataState }>(rootState => rootState.slice),
+};
+
 export const MyData = {
   initialState,
   actions,
   reducer,
+  selectors,
 } as const;
 ```
 
@@ -76,4 +82,6 @@ export const MyData = createSlice({
     ...RemoteData.createHandlers<MyData, string>(),
   },
 });
+
+// ...использование RemoteData.createSelectors по аналогии с предыдущим примером
 ```

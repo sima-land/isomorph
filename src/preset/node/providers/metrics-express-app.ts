@@ -5,7 +5,7 @@ import express from 'express';
  * Провайдер express-приложения метрик.
  * @return Пул известных http-хостов.
  */
-export function provideMetricsHttpApp(): express.Application {
+export function provideMetricsExpressApp(): express.Application {
   PromClient.collectDefaultMetrics();
 
   const app = express();
