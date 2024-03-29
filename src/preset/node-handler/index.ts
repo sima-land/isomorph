@@ -17,6 +17,7 @@ import { provideFetchLogHandler } from '../server/providers/fetch-log-handler';
 import { SpecificExtras } from '../server/utils/specific-extras';
 import { provideAcceptType } from './providers/accepts-type';
 import { provideResponseEvents } from './providers/response-events';
+import { provideAxiosFactory } from '../isomorphic/providers/axios-factory';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для работы в рамках ответа на http-запрос.
@@ -38,6 +39,7 @@ export function PresetHandler(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Redux.Middleware.saga, provideReduxMiddlewareSaga);
 
   // axios
+  preset.set(KnownToken.Axios.factory, provideAxiosFactory);
   preset.set(KnownToken.Axios.middleware, provideAxiosMiddleware);
   preset.set(KnownToken.Axios.Middleware.Log.handler, provideAxiosLogHandler);
 
