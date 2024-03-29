@@ -1,6 +1,6 @@
 import type { LogLevel } from '../log';
 
-export type { Handler, Enhancer, Middleware, CookieStore } from '@krutoo/fetch-tools';
+export type { Handler, Enhancer, Middleware } from '@krutoo/fetch-tools';
 
 export type {
   LogData,
