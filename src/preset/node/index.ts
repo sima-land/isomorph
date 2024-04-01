@@ -14,12 +14,13 @@ import { provideExpressRequestMiddleware } from './providers/express-request-mid
 import { provideExpressTracingMiddleware } from './providers/express-tracing-middleware';
 import { provideKnownHttpApiHosts } from '../server/providers/known-http-api-hosts';
 import { provideLogger } from './providers/logger';
-import { provideMetricsHttpApp } from './providers/metrics-http-app';
+import { provideMetricsExpressApp } from './providers/metrics-express-app';
 import { provideSpanExporter } from './providers/span-exporter';
 import { provideSsrBridgeServerSide } from '../server/providers/ssr-bridge-server-side';
 import { provideTracer } from './providers/tracer';
 import { provideTracerProvider } from './providers/tracer-provider';
 import { provideTracerProviderResource } from './providers/tracer-provider-resource';
+import { provideMainExpressApp } from './providers/main-express-app';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -44,7 +45,7 @@ export function PresetNode(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Tracing.tracerProviderResource, provideTracerProviderResource);
 
   // metrics
-  preset.set(KnownToken.Metrics.httpApp, provideMetricsHttpApp);
+  preset.set(KnownToken.Metrics.expressApp, provideMetricsExpressApp);
 
   // fetch
   preset.set(KnownToken.Http.fetch, provideFetch);
@@ -55,6 +56,20 @@ export function PresetNode(customize?: PresetTuner): Preset {
   preset.set(KnownToken.Axios.middleware, () => []);
 
   // express
+  preset.set(KnownToken.Express.app, provideMainExpressApp);
+  preset.set(KnownToken.Express.pageRoutes, () => []);
+  preset.set(KnownToken.Express.serviceRoutes, resolve => [
+    ['/healthcheck', resolve(KnownToken.Express.Handlers.healthCheck)],
+  ]);
+  preset.set(KnownToken.Express.middleware, resolve => [
+    resolve(KnownToken.Express.Middleware.request),
+    resolve(KnownToken.Express.Middleware.log),
+    resolve(KnownToken.Express.Middleware.metrics),
+    resolve(KnownToken.Express.Middleware.tracing),
+  ]);
+  preset.set(KnownToken.Express.endMiddleware, resolve => [
+    resolve(KnownToken.Express.Middleware.error),
+  ]);
   preset.set(KnownToken.Express.factory, provideExpressFactory);
   preset.set(KnownToken.Express.Handlers.healthCheck, healthCheck);
   preset.set(KnownToken.Express.Middleware.request, provideExpressRequestMiddleware);

@@ -4,17 +4,21 @@ import { createApplication, Resolve } from '@sima-land/isomorph/di';
 import { PresetNode, HandlerProvider } from '@sima-land/isomorph/preset/node';
 import { AuthorsPageApp } from '../pages/authors';
 import { PostsPageApp } from '../pages/posts';
-import express from 'express';
+import { Handler } from 'express';
 
 export function MainApp() {
   const app = createApplication();
 
   // используем пресет "node" с базовыми компонентами, такими как logger и тд
-  app.preset(PresetNode());
+  app.preset(
+    PresetNode(({ override }) => {
+      // переопределяем провайдеры пресета
+      override(TOKEN.Lib.Express.pageRoutes, providePageRoutes);
+    }),
+  );
 
   // добавляем в приложение собственные компоненты
   app.bind(TOKEN.config).toProvider(provideAppConfig);
-  app.bind(TOKEN.server).toProvider(provideHttpServer);
   app.bind(TOKEN.Pages.posts).toProvider(HandlerProvider(PostsPageApp));
   app.bind(TOKEN.Pages.authors).toProvider(HandlerProvider(AuthorsPageApp));
 
@@ -36,31 +40,11 @@ function provideAppConfig(resolve: Resolve): AppConfig {
   };
 }
 
-function provideHttpServer(resolve: Resolve): express.Application {
-  const postsHandler = resolve(TOKEN.Pages.posts);
-  const authorsHandler = resolve(TOKEN.Pages.authors);
-  const healthCheckHandler = resolve(TOKEN.Lib.Express.Handlers.healthCheck);
-
-  // промежуточные слои (express) доступные из пресета PresetNode
-  const requestHandle = resolve(TOKEN.Lib.Express.Middleware.request);
-  const logging = resolve(TOKEN.Lib.Express.Middleware.log);
-  const metrics = resolve(TOKEN.Lib.Express.Middleware.metrics);
-  const tracing = resolve(TOKEN.Lib.Express.Middleware.tracing);
-  const errorHandle = resolve(TOKEN.Lib.Express.Middleware.error);
-
-  const app = express();
-
-  // регистрируем промежуточные слои
-  app.use(['/', '/users', '/posts'], [requestHandle, logging, metrics, tracing]);
-
-  // регистрируем роуты
-  app.get('/', postsHandler);
-  app.get('/posts', postsHandler);
-  app.get('/authors', authorsHandler);
-  app.get('/healthcheck', healthCheckHandler);
-
-  // регистрируем промежуточный слой обработки ошибок
-  app.use(['/', '/users', '/posts'], [errorHandle]);
-
-  return app;
+function providePageRoutes(resolve: Resolve): Array<[string, Handler]> {
+  // определяем маршруты страниц
+  return [
+    ['/', resolve(TOKEN.Pages.posts)],
+    ['/posts', resolve(TOKEN.Pages.posts)],
+    ['/authors', resolve(TOKEN.Pages.authors)],
+  ];
 }

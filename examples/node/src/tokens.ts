@@ -3,7 +3,7 @@ import { KnownToken } from '@sima-land/isomorph/tokens';
 
 // чтобы токены можно было использовать как в браузере так и на сервере импорты должны содержать только типы
 import type { AppConfig } from './app/types';
-import type { Application, Handler } from 'express';
+import type { Handler } from 'express';
 import type { AuthorApi } from './entities/author';
 import type { PostApi } from './entities/post';
 
@@ -13,7 +13,6 @@ export const TOKEN = {
 
   // далее идут токены компонентов нашего приложения
   config: createToken<AppConfig>('config'),
-  server: createToken<Application>('http/server'),
   Pages: {
     posts: createToken<Handler>('pages/posts'),
     authors: createToken<Handler>('pages/authors'),

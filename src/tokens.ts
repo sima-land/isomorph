@@ -59,7 +59,7 @@ export const KnownToken = {
 
   /** Токены компонентов сбора метрик. */
   Metrics: {
-    httpApp: createToken<express.Application>('metrics/http-app'),
+    expressApp: createToken<express.Application>('metrics/express-app'),
     httpHandler: createToken<Handler>('metrics/http-handler'),
   },
 
@@ -173,6 +173,23 @@ export const KnownToken = {
 
   /** Токены компонентов для работы с библиотекой express. */
   Express: {
+    /** Токен основного express-приложения. */
+    app: createToken<express.Application>('express/app'),
+
+    /** Токен списка маршрутов страниц. */
+    pageRoutes: createToken<Array<[string, express.Handler]>>('express/page-routes'),
+
+    /** Токен списка служебных маршрутов. */
+    serviceRoutes: createToken<Array<[string, express.Handler]>>('express/service-routes'),
+
+    /** Токен списка промежуточных слоев для публичных маршрутов. */
+    middleware:
+      createToken<Array<express.Handler | express.ErrorRequestHandler>>('express/middleware'),
+
+    /** Токен списка промежуточных слоев для публичных маршрутов, которые подключаются после обработчика. */
+    endMiddleware:
+      createToken<Array<express.Handler | express.ErrorRequestHandler>>('express/end-middleware'),
+
     /** Токен фабрики express-приложений. */
     factory: createToken<() => express.Application>('express/factory'),
 
