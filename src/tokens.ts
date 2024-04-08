@@ -13,11 +13,11 @@ import type { BasicTracerProvider, SpanExporter } from '@opentelemetry/sdk-trace
 import type { Resource } from '@opentelemetry/resources';
 import type { ElementType, ReactNode, JSX } from 'react';
 import type { KnownHttpApiKey, PageAssets } from './preset/isomorphic/types';
-import type { ExpressHandlerContext } from './preset/node/types';
+import type { ExpressHandlerContext, ExpressRouteList } from './preset/node/types';
 import type { SpecificExtras } from './preset/server/utils/specific-extras';
 import type { CreateAxiosDefaults } from 'axios';
 import type { AxiosInstanceWrapper, Middleware as AxiosMiddleware } from 'middleware-axios';
-import type { Handler, LogHandler, LogHandlerFactory, Middleware } from './http';
+import type { Handler, LogHandler, LogHandlerFactory, Middleware, ProxyOptions } from './http';
 import type { HttpApiHostPool } from './preset/isomorphic/utils/http-api-host-pool';
 import type {
   ServerHandlerContext,
@@ -25,6 +25,7 @@ import type {
   ServerMiddleware,
   PageResponseFormatter,
   RenderToString,
+  RouteList,
 } from './preset/server/types';
 
 /**
@@ -98,13 +99,17 @@ export const KnownToken = {
     /** Токены компонентов функции обработки входящего HTTP-запроса. */
     Serve: {
       /** Токен списка маршрутов. */
-      routes: createToken<Array<[string, ServerHandler]>>('serve/routes'),
+      pageRoutes: createToken<RouteList>('serve/page-routes'),
 
       /** Токен списка "служебных" маршрутов. К "служебным" маршрутам не применяются промежуточные слои. */
-      serviceRoutes: createToken<Array<[string, ServerHandler]>>('serve/service-routes'),
+      serviceRoutes: createToken<RouteList>('serve/service-routes'),
 
       /** Токен списка промежуточных слоев обработки входящего HTTP-запроса. */
       middleware: createToken<ServerMiddleware[]>('serve/middleware'),
+
+      Proxy: {
+        config: createToken<null | undefined | ProxyOptions | ProxyOptions[]>('proxy/config'),
+      },
     },
 
     /** Токены компонентов обработчиков входящих HTTP-запросов. */
@@ -177,10 +182,10 @@ export const KnownToken = {
     app: createToken<express.Application>('express/app'),
 
     /** Токен списка маршрутов страниц. */
-    pageRoutes: createToken<Array<[string, express.Handler]>>('express/page-routes'),
+    pageRoutes: createToken<ExpressRouteList>('express/page-routes'),
 
     /** Токен списка служебных маршрутов. */
-    serviceRoutes: createToken<Array<[string, express.Handler]>>('express/service-routes'),
+    serviceRoutes: createToken<ExpressRouteList>('express/service-routes'),
 
     /** Токен списка промежуточных слоев для публичных маршрутов. */
     middleware:

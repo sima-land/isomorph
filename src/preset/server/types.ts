@@ -39,3 +39,10 @@ export interface PageResponseFormatter {
 export interface RenderToString {
   (jsx: JSX.Element): string | Promise<string>;
 }
+
+export interface RouteInfo {
+  method: 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head';
+  path: string;
+}
+
+export type RouteList = Array<[string | RouteInfo, ServerHandler]>;
