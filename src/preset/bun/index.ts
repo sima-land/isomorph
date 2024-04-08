@@ -7,9 +7,9 @@ import { provideKnownHttpApiHosts } from '../server/providers/known-http-api-hos
 import { provideSsrBridgeServerSide } from '../server/providers/ssr-bridge-server-side';
 import { provideConfigSource } from './providers/config-source';
 import { provideLogger } from './providers/logger';
-import { provideServe } from './providers/serve';
+import { provideServe } from '../server/providers/serve';
 import { provideServeMetrics } from './providers/serve-metrics';
-import { provideFetchMiddleware } from './providers/fetch-middleware';
+import { provideFetchMiddleware } from '../server/providers/fetch-middleware';
 import { provideServiceRoutes } from './providers/service-routes';
 import { provideServeMiddleware } from './providers/serve-middleware';
 

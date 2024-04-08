@@ -5,6 +5,7 @@ import type express from 'express';
  * @param req Запрос.
  * @return Формат.
  * @todo Перенести в preset/node (или в preset/server но с именем getPageResponseFormatExpress?).
+ * @deprecated Стоит использовать npm:accepts.
  */
 export function getPageResponseFormat(req: express.Request): 'html' | 'json' {
   let result: 'html' | 'json' = 'html';

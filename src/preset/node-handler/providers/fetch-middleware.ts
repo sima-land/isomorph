@@ -4,7 +4,7 @@ import { KnownToken } from '../../../tokens';
 import { getFetchErrorLogging } from '../../isomorphic/utils/get-fetch-error-logging';
 import { getFetchExtraAborting } from '../../isomorphic/utils/get-fetch-extra-aborting';
 import { getFetchLogging } from '../../isomorphic/utils/get-fetch-logging';
-import { getFetchTracing } from '../../server/utils/get-fetch-tracing';
+import { getFetchTracing } from '../../node/utils/get-fetch-tracing';
 import { getForwardedHeaders } from '../../node/utils/get-forwarded-headers';
 
 /**

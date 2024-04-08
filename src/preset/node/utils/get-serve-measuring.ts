@@ -1,6 +1,6 @@
 import type { BaseConfig } from '../../../config';
-import type { ServerMiddleware } from '../types';
-import { PAGE_HANDLER_EVENT_TYPE } from '../constants';
+import type { ServerMiddleware } from '../../server/types';
+import { PAGE_HANDLER_EVENT_TYPE } from '../../server/constants';
 import { toMilliseconds } from '../../../utils';
 import { LABEL_NAMES, getHandlerMetrics } from './get-handler-metrics';
 

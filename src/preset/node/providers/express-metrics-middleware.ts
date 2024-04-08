@@ -1,6 +1,6 @@
 import type express from 'express';
 import type { Resolve } from '../../../di';
-import { LABEL_NAMES, getHandlerMetrics } from '../../server/utils/get-handler-metrics';
+import { LABEL_NAMES, getHandlerMetrics } from '../utils/get-handler-metrics';
 import { KnownToken } from '../../../tokens';
 import { PAGE_HANDLER_EVENT_TYPE } from '../../server';
 import { toMilliseconds } from '../../../utils';

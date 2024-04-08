@@ -4,6 +4,7 @@
  * Вернет "html" во всех остальных случаях.
  * @param request Запрос.
  * @return Формат.
+ * @deprecated Стоит использовать npm:accepts.
  */
 export function getPageResponseFormat(request: Request): 'html' | 'json' {
   let result: 'html' | 'json' = 'html';

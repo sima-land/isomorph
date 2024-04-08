@@ -1,5 +1,5 @@
 import { BaseConfig } from '../../../../config';
-import { PAGE_HANDLER_EVENT_TYPE } from '../../constants';
+import { PAGE_HANDLER_EVENT_TYPE } from '../../../server/constants';
 import { getServeMeasuring } from '../get-serve-measuring';
 
 describe('getServeMeasuring', () => {
