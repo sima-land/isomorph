@@ -11,7 +11,7 @@ import { hideFirstId } from '../../isomorphic/utils/hide-first-id';
  */
 export function getFetchTracing(tracer: Tracer, rootContext: Context): Middleware {
   return async (request, next) => {
-    const [url, foundId] = hideFirstId(new URL(request.url).pathname);
+    const [url, foundId] = hideFirstId(new URL(request.url).pathname); // @todo тут бы помог URLPattern
     const span = tracer.startSpan(`HTTP ${request.method} ${url}`, undefined, rootContext);
 
     span.setAttributes({
@@ -38,7 +38,7 @@ export function getFetchTracing(tracer: Tracer, rootContext: Context): Middlewar
 
       span.end();
 
-      // не прячем ошибку
+      // ВАЖНО: не прячем ошибку
       throw error;
     }
   };

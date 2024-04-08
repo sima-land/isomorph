@@ -3,7 +3,7 @@ import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import { Handler, proxy } from '../../../http';
 import { router, applyMiddleware } from '@krutoo/fetch-tools';
-import { applyServerMiddleware } from '../../server/utils/apply-server-middleware';
+import { applyServerMiddleware } from '../utils/apply-server-middleware';
 
 export function provideServe(resolve: Resolve): Handler {
   const config = resolve(KnownToken.Config.base);

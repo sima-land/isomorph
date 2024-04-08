@@ -5,7 +5,7 @@ import { runWithAsyncContext } from '@sentry/bun';
 import { ServerMiddleware } from '../../server/types';
 import { getServeLogging } from '../../server/utils/get-serve-logging';
 import { getServeErrorLogging } from '../../server/utils/get-serve-error-logging';
-import { getServeMeasuring } from '../../server/utils/get-serve-measuring';
+import { getServeMeasuring } from '../../node/utils/get-serve-measuring';
 
 export function provideServeMiddleware(resolve: Resolve): ServerMiddleware[] {
   const config = resolve(KnownToken.Config.base);

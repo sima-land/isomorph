@@ -10,5 +10,5 @@
     "module": "NodeNext"
   },
   "include": ["./src"],
-  "exclude": ["node_modules", "./src/preset/bun/**/*"]
+  "exclude": ["node_modules", "./src/preset/bun/**/*", "./src/preset/bun-handler/**/*"]
 }
