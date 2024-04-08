@@ -21,6 +21,7 @@ import { provideTracer } from './providers/tracer';
 import { provideTracerProvider } from './providers/tracer-provider';
 import { provideTracerProviderResource } from './providers/tracer-provider-resource';
 import { provideMainExpressApp } from './providers/main-express-app';
+import { ExpressRouteList } from './types';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -50,6 +51,7 @@ export function PresetNode(customize?: PresetTuner): Preset {
   // fetch
   preset.set(KnownToken.Http.fetch, provideFetch);
   preset.set(KnownToken.Http.Fetch.middleware, () => []);
+  preset.set(KnownToken.Http.Serve.Proxy.config, () => null);
 
   // axios
   preset.set(KnownToken.Axios.factory, provideAxiosFactory);
@@ -58,9 +60,12 @@ export function PresetNode(customize?: PresetTuner): Preset {
   // express
   preset.set(KnownToken.Express.app, provideMainExpressApp);
   preset.set(KnownToken.Express.pageRoutes, () => []);
-  preset.set(KnownToken.Express.serviceRoutes, resolve => [
-    ['/healthcheck', resolve(KnownToken.Express.Handlers.healthCheck)],
-  ]);
+  preset.set(
+    KnownToken.Express.serviceRoutes,
+    (resolve): ExpressRouteList => [
+      ['/healthcheck', resolve(KnownToken.Express.Handlers.healthCheck)],
+    ],
+  );
   preset.set(KnownToken.Express.middleware, resolve => [
     resolve(KnownToken.Express.Middleware.request),
     resolve(KnownToken.Express.Middleware.log),
@@ -90,6 +95,8 @@ export function PresetNode(customize?: PresetTuner): Preset {
 
   return preset;
 }
+
+export type { ExpressHandlerContext, ExpressRouteList } from './types';
 
 // доступные утилиты
 export { getClientIp } from './utils/get-client-ip';

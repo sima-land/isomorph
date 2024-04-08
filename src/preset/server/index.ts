@@ -4,6 +4,8 @@ export type {
   ServerHandlerContext,
   PageResponseFormatter,
   PageResponseFormatResult,
+  RouteInfo,
+  RouteList,
 } from './types';
 export { PAGE_HANDLER_EVENT_TYPE, PAGE_FORMAT_PRIORITY } from './constants';
 

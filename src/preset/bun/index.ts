@@ -43,6 +43,7 @@ export function PresetBun(customize?: PresetTuner) {
   preset.set(KnownToken.Http.serve, provideServe);
   preset.set(KnownToken.Http.Serve.serviceRoutes, provideServiceRoutes);
   preset.set(KnownToken.Http.Serve.middleware, provideServeMiddleware);
+  preset.set(KnownToken.Http.Serve.Proxy.config, () => null);
 
   // http api
   preset.set(KnownToken.Http.Api.knownHosts, provideKnownHttpApiHosts);
