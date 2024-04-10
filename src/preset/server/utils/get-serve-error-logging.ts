@@ -12,18 +12,16 @@ export function getServeErrorLogging(logger: Logger): Middleware {
       logger.error(
         new DetailedError(String(error), {
           level: 'error',
-          context: [
-            {
-              key: 'Incoming request details',
-              data: {
-                url: FetchUtil.withoutParams(request.url),
-                method: request.method,
-                headers: Object.fromEntries(request.headers.entries()),
-                params: Object.fromEntries(new URL(request.url).searchParams.entries()),
-                // @todo data
-              },
+          context: {
+            key: 'Incoming request details',
+            data: {
+              url: FetchUtil.withoutParams(request.url),
+              method: request.method,
+              headers: Object.fromEntries(request.headers.entries()),
+              params: Object.fromEntries(new URL(request.url).searchParams.entries()),
+              // @todo data
             },
-          ],
+          },
         }),
       );
     },

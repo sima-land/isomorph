@@ -8,6 +8,7 @@ export type {
   FailLogData,
   LogHandler,
   LogHandlerFactory,
+  ProxyOptions,
 } from '@krutoo/fetch-tools/middleware';
 
 export type URLSearchParamsInit = Record<string, string | number | boolean | undefined | null>;

@@ -1,4 +1,4 @@
-import { ErrorDetails, BreadcrumbDetails } from './types';
+import type { ErrorDetails, BreadcrumbDetails } from './types';
 
 /**
  * Ошибка с данными.

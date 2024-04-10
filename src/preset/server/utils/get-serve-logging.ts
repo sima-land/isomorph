@@ -1,6 +1,5 @@
 import type { Middleware } from '../../../http';
 import type { Logger } from '../../../log';
-import { toMilliseconds } from '../../../utils';
 import { getClientIp } from './get-client-ip';
 
 /**
@@ -10,7 +9,7 @@ import { getClientIp } from './get-client-ip';
  */
 export function getServeLogging(logger: Logger): Middleware {
   return async (request, next) => {
-    const start = process.hrtime.bigint();
+    const start = performance.now();
     const clientIp = getClientIp(request);
 
     logger.info({
@@ -22,7 +21,7 @@ export function getServeLogging(logger: Logger): Middleware {
 
     const response = await next(request);
 
-    const finish = process.hrtime.bigint();
+    const finish = performance.now();
 
     logger.info({
       type: 'http.response[outgoing]',
@@ -30,7 +29,7 @@ export function getServeLogging(logger: Logger): Middleware {
       method: request.method,
       status: response.status,
       remote_ip: clientIp,
-      latency: toMilliseconds(finish - start),
+      latency: finish - start,
     });
 
     return response;
