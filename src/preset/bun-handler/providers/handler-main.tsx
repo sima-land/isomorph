@@ -54,11 +54,11 @@ export function provideHandlerMain(resolve: Resolve) {
   const enhancer = applyMiddleware(
     // ВАЖНО: прерываем исходящие в рамках обработчика http-запросы
     async (request, next) => {
-      const response = await next(request);
-
-      abortController.abort();
-
-      return response;
+      try {
+        return await next(request);
+      } finally {
+        abortController.abort();
+      }
     },
   );
 
