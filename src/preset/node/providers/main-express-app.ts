@@ -21,7 +21,7 @@ export function provideMainExpressApp(resolve: Resolve): express.Application {
   if (config.env === 'development' && proxyConfig) {
     const proxyConfigs = Array.isArray(proxyConfig) ? proxyConfig : [proxyConfig];
 
-    for (const { target, filter } of proxyConfigs) {
+    for (const { target, filter, pathRewrite } of proxyConfigs) {
       // ВАЖНО: так как не можем предоставить web-интерфейс Request бросаем ошибку
       if (typeof filter === 'function') {
         throw new Error('Currently function is not supported for proxy "filter"');
@@ -33,6 +33,7 @@ export function provideMainExpressApp(resolve: Resolve): express.Application {
         createProxyMiddleware({
           target,
           changeOrigin: true,
+          pathRewrite,
           pathFilter: inputPath => proxyPaths.some(proxyPath => inputPath.startsWith(proxyPath)),
         }),
       );

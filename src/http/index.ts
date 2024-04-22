@@ -1,5 +1,4 @@
 export type {
-  ProxyOptions,
   Handler,
   Enhancer,
   Middleware,
@@ -8,6 +7,7 @@ export type {
   FailLogData,
   LogHandler,
   LogHandlerFactory,
+  ProxyOptions,
   EitherResponse,
   ResponseDone,
   ResponseFail,

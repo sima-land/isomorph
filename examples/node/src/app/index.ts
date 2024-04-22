@@ -12,8 +12,15 @@ export function MainApp() {
   // используем пресет "node" с базовыми компонентами, такими как logger и тд
   app.preset(
     PresetNode(({ override }) => {
-      // переопределяем провайдеры пресета
+      // переопределяем компонент маршрутов
       override(TOKEN.Lib.Express.pageRoutes, providePageRoutes);
+
+      // добавляем проксирование
+      override(TOKEN.Lib.Http.Serve.Proxy.config, () => ({
+        filter: '/api',
+        target: 'https://jsonplaceholder.typicode.com/',
+        pathRewrite: pathname => pathname.replace('/api', ''),
+      }));
     }),
   );
 
