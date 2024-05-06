@@ -16,11 +16,23 @@ export function MainApp() {
       override(TOKEN.Lib.Express.pageRoutes, providePageRoutes);
 
       // добавляем проксирование
-      override(TOKEN.Lib.Http.Serve.Proxy.config, () => ({
-        filter: '/api',
-        target: 'https://jsonplaceholder.typicode.com/',
-        pathRewrite: pathname => pathname.replace('/api', ''),
-      }));
+      override(TOKEN.Lib.Http.Serve.Proxy.config, () => [
+        {
+          filter: '/api/v3',
+          target: 'https://www.sima-land.ru/api/v3/',
+          pathRewrite: pathname => pathname.replace('/api/v3', ''),
+        },
+        {
+          filter: '/api/v6',
+          target: 'https://www.sima-land.ru/api/v6/',
+          pathRewrite: pathname => pathname.replace('/api/v6', ''),
+        },
+        {
+          filter: '/api',
+          target: 'https://jsonplaceholder.typicode.com/',
+          pathRewrite: pathname => pathname.replace('/api', ''),
+        },
+      ]);
     }),
   );
 

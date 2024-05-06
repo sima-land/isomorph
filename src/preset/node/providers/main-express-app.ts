@@ -29,14 +29,24 @@ export function provideMainExpressApp(resolve: Resolve): express.Application {
 
       const proxyPaths = Array.isArray(filter) ? filter : [filter];
 
-      app.use(
-        createProxyMiddleware({
-          target,
-          changeOrigin: true,
-          pathRewrite,
-          pathFilter: inputPath => proxyPaths.some(proxyPath => inputPath.startsWith(proxyPath)),
-        }),
-      );
+      const proxyMiddleware = createProxyMiddleware({
+        target,
+        changeOrigin: true,
+        pathRewrite,
+
+        // ВАЖНО: не используем pathFilter тк если в проекте есть webpack-dev-server,
+        // он тащит за собой http-proxy-middleware@2 который не поддерживает pathFilter
+        // pathFilter: inputPath => proxyPaths.some(proxyPath => inputPath.startsWith(proxyPath)),
+      });
+
+      app.use((req, res, next) => {
+        // ВАЖНО: поскольку не используем pathFilter - фильтруем запросы проверкой
+        if (proxyPaths.some(proxyPath => req.path.startsWith(proxyPath))) {
+          proxyMiddleware(req, res, next);
+        } else {
+          next();
+        }
+      });
     }
   }
 
