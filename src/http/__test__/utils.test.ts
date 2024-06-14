@@ -84,6 +84,11 @@ describe('FetchUtil', () => {
 
     const responseDone = new Response('{ "data": "foo" }', { status: 200, statusText: 'GOOD' });
     const responseFail = new Response('{ "data": "bar" }', { status: 400, statusText: 'BAD' });
+    const responseInvalidJson = new Response('{ aaAA }', { status: 200, statusText: 'INVALID' });
+    const responseFailInvalidJson = new Response('{ aaAA }', {
+      status: 400,
+      statusText: 'INVALID',
+    });
 
     expect(await handleDone(responseDone)).toEqual({
       ok: true,
@@ -100,6 +105,24 @@ describe('FetchUtil', () => {
       error: new Error(`Request failed with status code 400`),
       status: 400,
       statusText: 'BAD',
+      headers: new Headers({ 'content-type': 'text/plain;charset=UTF-8' }),
+    });
+
+    expect(await handleDone(responseInvalidJson)).toEqual({
+      ok: true,
+      data: null,
+      error: null,
+      status: 200,
+      statusText: 'INVALID',
+      headers: new Headers({ 'content-type': 'text/plain;charset=UTF-8' }),
+    });
+
+    expect(await handleDone(responseFailInvalidJson)).toEqual({
+      ok: false,
+      data: null,
+      error: new Error(`Request failed with status code ${400}`),
+      status: 400,
+      statusText: 'INVALID',
       headers: new Headers({ 'content-type': 'text/plain;charset=UTF-8' }),
     });
 
