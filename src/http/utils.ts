@@ -67,18 +67,7 @@ export const FetchUtil = {
     /** @inheritdoc */
     const parse = async (response: Response): Promise<T | null> => {
       try {
-        const data: T = await parseBody(response);
-
-        // https://github.com/nodejs/undici/discussions/2979
-        if (response.body && !response.bodyUsed) {
-          try {
-            response.body.cancel();
-          } catch (error) {
-            // не делаем ничего если не смогли отменить
-          }
-        }
-
-        return data;
+        return await parseBody(response);
       } catch {
         return null;
       }
