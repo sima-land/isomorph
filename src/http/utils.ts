@@ -64,12 +64,33 @@ export const FetchUtil = {
     /** Парсер body. */
     parseBody?: (response: Response) => Promise<T>;
   } = {}) {
+    /** @inheritdoc */
+    const parse = async (response: Response): Promise<T | null> => {
+      try {
+        const data: T = await parseBody(response);
+
+        // https://github.com/nodejs/undici/discussions/2979
+        if (response.body && !response.bodyUsed) {
+          try {
+            response.body.cancel();
+          } catch (error) {
+            // не делаем ничего если не смогли отменить
+          }
+        }
+
+        return data;
+      } catch {
+        return null;
+      }
+    };
+
     return [
+      // then
       async (response: Response): Promise<ResponseDone<T> | ResponseFail<T>> => {
         if (!response.ok) {
           return {
             ok: false,
-            data: (await parseBody(response).catch(() => null)) as T,
+            data: (await parse(response)) as T,
             error: new Error(`Request failed with status code ${response.status}`),
             status: response.status,
             statusText: response.statusText,
@@ -79,13 +100,15 @@ export const FetchUtil = {
 
         return {
           ok: true,
-          data: (await parseBody(response).catch(() => null)) as T,
+          data: (await parse(response)) as T,
           error: null,
           status: response.status,
           statusText: response.statusText,
           headers: response.headers,
         };
       },
+
+      // catch
       async (error: unknown): Promise<ResponseFail<T>> => ({
         ok: false,
         error,

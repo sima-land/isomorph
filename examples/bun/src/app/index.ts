@@ -12,7 +12,7 @@ export function MainApp() {
   app.preset(
     PresetBun(({ override }) => {
       // переопределяем провайдеры пресета
-      override(TOKEN.Lib.Http.Serve.routes, providePageRoutes);
+      override(TOKEN.Lib.Http.Serve.pageRoutes, providePageRoutes);
     }),
   );
 
