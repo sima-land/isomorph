@@ -19,6 +19,7 @@ export interface ResponseDone<T = unknown> {
   error: null;
   status: number;
   statusText: string;
+  headers: Headers;
 }
 
 export interface ResponseFail<T = unknown> {
@@ -27,6 +28,7 @@ export interface ResponseFail<T = unknown> {
   error: unknown;
   status?: number;
   statusText?: string;
+  headers?: Headers;
 }
 
 export type EitherResponse<T> = ResponseDone<T> | ResponseFail<T>;

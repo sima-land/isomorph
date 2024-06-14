@@ -55,33 +55,41 @@ export const FetchUtil = {
   /**
    * Возвращает кортеж обработчиков для Promise из fetch.
    * Полученный Promise никогда не уйдет в состояние rejected.
+   * @param options Опции.
    * @return Кортеж.
    */
-  eitherResponse<T = unknown>() {
+  eitherResponse<T = unknown>({
+    parseBody = response => response.json(),
+  }: {
+    /** Парсер body. */
+    parseBody?: (response: Response) => Promise<T>;
+  } = {}) {
     return [
-      (response: Response): Promise<ResponseDone<T> | ResponseFail<T>> => {
-        if (response.ok) {
-          return response.json().then(data => ({
-            ok: true,
-            data: data as T,
-            error: null,
-            status: response.status,
-            statusText: response.statusText,
-          }));
-        } else {
-          return Promise.resolve({
+      async (response: Response): Promise<ResponseDone<T> | ResponseFail<T>> => {
+        if (!response.ok) {
+          return {
             ok: false,
-            error: `Request failed with status ${response.status}`,
+            data: (await parseBody(response).catch(() => null)) as T,
+            error: new Error(`Request failed with status code ${response.status}`),
             status: response.status,
             statusText: response.statusText,
-          });
+            headers: response.headers,
+          };
         }
+
+        return {
+          ok: true,
+          data: (await parseBody(response).catch(() => null)) as T,
+          error: null,
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+        };
       },
-      (error: unknown): Promise<ResponseFail<T>> =>
-        Promise.resolve({
-          ok: false,
-          error,
-        }),
+      async (error: unknown): Promise<ResponseFail<T>> => ({
+        ok: false,
+        error,
+      }),
     ] as const;
   },
 } as const;
