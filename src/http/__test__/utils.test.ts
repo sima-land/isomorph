@@ -91,13 +91,16 @@ describe('FetchUtil', () => {
       error: null,
       status: 200,
       statusText: 'GOOD',
+      headers: new Headers({ 'content-type': 'text/plain;charset=UTF-8' }),
     });
 
     expect(await handleDone(responseFail)).toEqual({
       ok: false,
-      error: `Request failed with status 400`,
+      data: { data: 'bar' },
+      error: new Error(`Request failed with status code 400`),
       status: 400,
       statusText: 'BAD',
+      headers: new Headers({ 'content-type': 'text/plain;charset=UTF-8' }),
     });
 
     const error = new Error('Fetch failed');

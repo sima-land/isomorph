@@ -1,6 +1,4 @@
 import type { ConfigSource, Dictionary } from './types';
-
-// @ts-expect-error: https://github.com/humanwhocodes/env/issues/133 (@todo разобраться и убрать)
 import { Env } from '@humanwhocodes/env';
 
 declare const __ISOMORPH_ENV__: unknown;
