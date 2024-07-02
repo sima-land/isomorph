@@ -1,7 +1,7 @@
 import {
+  Scope,
   BrowserClient,
-  Hub,
-  defaultIntegrations,
+  getDefaultIntegrations,
   defaultStackParser,
   makeFetchTransport,
 } from '@sentry/browser';
@@ -20,21 +20,24 @@ export function provideLogger(resolve: Resolve): Logger {
   const config = resolve(KnownToken.Config.base);
 
   const client = new BrowserClient({
-    transport: makeFetchTransport,
-    stackParser: defaultStackParser,
     dsn: source.require('PUBLIC_SENTRY_DSN'),
     release: source.require('SENTRY_RELEASE'),
     environment: source.require('PUBLIC_SENTRY_ENVIRONMENT'),
-    integrations: [...defaultIntegrations],
+    tracesSampleRate: Number(source.get('SENTRY_TRACES_SAMPLE_RATE', 0)),
+    profilesSampleRate: Number(source.get('SENTRY_TRACES_SAMPLE_RATE', 0)),
+    transport: makeFetchTransport,
+    stackParser: defaultStackParser,
+    integrations: [...getDefaultIntegrations({})],
   });
 
-  const hub = new Hub(client);
+  const scope = new Scope();
 
-  hub.setTag('url', window.location.href);
+  scope.setTag('url', window.location.href);
+  scope.setClient(client);
 
   const logger = createLogger();
 
-  logger.subscribe(createSentryHandler(hub));
+  logger.subscribe(createSentryHandler(scope));
 
   if (config.env === 'development') {
     logger.subscribe(event => {
