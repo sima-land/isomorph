@@ -20,7 +20,9 @@ export function provideLogHandlerSentry(resolve: Resolve): LogHandler {
     tracesSampleRate: Number(source.get('SENTRY_TRACES_SAMPLE_RATE', 0)),
     profilesSampleRate: Number(source.get('SENTRY_TRACES_SAMPLE_RATE', 0)),
     integrations: [...getDefaultIntegrations({})],
-    skipOpenTelemetrySetup: true,
+
+    // ВАЖНО: данная опция ломает группировку ошибок, активировать при необэодимости связать компоненты OTEL с Sentry
+    // skipOpenTelemetrySetup: true,
   });
 
   // ВАЖНО: передаем функцию чтобы брать текущий scope в момент вызова метода logger'а
