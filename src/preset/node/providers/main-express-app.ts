@@ -55,9 +55,7 @@ export function provideMainExpressApp(resolve: Resolve): express.Application {
     const path = typeof routePath === 'string' ? routePath : routePath.path;
     const method = typeof routePath === 'string' ? 'get' : routePath.method;
 
-    app.use(path, middleware);
-    app[method](path, routeHandler);
-    app.use(path, endMiddleware);
+    app[method](path, middleware, routeHandler, endMiddleware);
   }
 
   // служебные маршруты (к ним не применяются промежуточные слои)
