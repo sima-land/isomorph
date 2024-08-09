@@ -38,15 +38,14 @@ if (somethingWrong) {
 
 ### Примеры использования
 
-Подготовим логгер и обработчик для него. Для работы обработчику нужен Sentry Hub.
+Подготовим логгер и обработчик для него. Для работы обработчику нужен Sentry Scope.
 
 ```ts
-import { createLogger } from '@sima-land/isomorph/log';
-import { createSentryHandler } from '@sima-land/isomorph/log/handler/sentry';
-import { BrowserClient, Hub } from '@sentry/browser';
+import { createLogger, createSentryHandler } from '@sima-land/isomorph/log';
+import { BrowserClient, Scope } from '@sentry/browser';
 
 const sentryClient = new BrowserClient({ dsn: process.env.SENTRY_DSN });
-const sentryHub = new Hub(sentryClient);
+const sentryScope = new Scope(); // пустой scope в качестве примера
 
 const logger = createLogger();
 
