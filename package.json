@@ -73,7 +73,7 @@
   },
   "peerDependencies": {
     "@reduxjs/toolkit": "^1.9.5",
-    "axios": "^1.6.7",
+    "axios": "^1.7.4",
     "react": "^17.0 || ^18.0",
     "react-dom": "^17.0 || ^18.0",
     "react-redux": "^8.0.5",
