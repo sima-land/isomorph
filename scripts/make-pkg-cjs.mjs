@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 import fs from 'fs-extra';
 
-fs.readFile('./package.json', 'utf-8')
+await fs
+  .readFile('./package.json', 'utf-8')
   .then(JSON.parse)
   .then(({ name, version, dependencies, peerDependencies }) => ({
     type: 'commonjs',
