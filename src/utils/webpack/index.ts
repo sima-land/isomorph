@@ -1,7 +1,4 @@
-import { EnvPlugin } from './env';
-import { EnvPluginOptions } from './env/types';
-import { ModuleFederationPlugin } from './module-federation';
-import { ModuleFederationPluginOptions } from './module-federation/types';
-
-export type { EnvPluginOptions, ModuleFederationPluginOptions };
-export { EnvPlugin, ModuleFederationPlugin };
+export type { EnvPluginOptions } from './env/types';
+export type { ModuleFederationPluginOptions } from './module-federation/types';
+export { EnvPlugin } from './env';
+export { ModuleFederationPlugin, DEFAULT_SHARED } from './module-federation';

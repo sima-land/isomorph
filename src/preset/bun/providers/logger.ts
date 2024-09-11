@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import { Resolve } from '../../../di';
 import { Logger, createLogger } from '../../../log';
 import { provideLogHandlerPino } from '../../node/providers/log-handler-pino';

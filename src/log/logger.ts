@@ -7,7 +7,7 @@ import type { Logger, LogEvent, LogLevel, LogHandler } from './types';
 export function createLogger(): Logger {
   const handlers: LogHandler[] = [];
 
-  // eslint-disable-next-line require-jsdoc, jsdoc/require-jsdoc
+  // eslint-disable-next-line jsdoc/require-jsdoc
   const createMethod = (type: LogLevel) => (data: any) => {
     const event: LogEvent = { type, data };
 

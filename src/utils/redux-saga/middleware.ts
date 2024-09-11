@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import { MiddlewareAPI } from '@reduxjs/toolkit';
 import {
   SagaExtendedMiddleware,
