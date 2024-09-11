@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import { ServerHandler } from '../../server/types';
 import { getStatsHandler } from '../utils/get-stats-handler';
 import { getHealthCheck } from '../../server/utils/get-health-check';

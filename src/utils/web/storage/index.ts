@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 
 /**
  * Интерфейс объекта-обертки для безопасной работы с WebStorage.

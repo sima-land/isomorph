@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import type { Application, Provider, Token, Binding, ExtractType, Preset } from './types';
 import { AlreadyBoundError, CircularDependencyError, NothingBoundError } from './errors';
 import { createToken } from './token';

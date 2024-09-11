@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import { Handler } from '../../../http';
 import { route, router } from '@krutoo/fetch-tools';
 import PromClient from 'prom-client';

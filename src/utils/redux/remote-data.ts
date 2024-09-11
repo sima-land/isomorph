@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 
 // @todo "* as" сделано для работы в Node.js ESM но есть подозрение что на tree shaking плохо скажется
 import * as redux from '@reduxjs/toolkit';

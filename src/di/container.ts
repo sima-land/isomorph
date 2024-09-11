@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import type { Container, Provider, Token } from './types';
 import { AlreadyBoundError, CircularDependencyError, NothingBoundError } from './errors';
 

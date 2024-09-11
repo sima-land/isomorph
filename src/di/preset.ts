@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import type { Application, Provider, Token, Preset } from './types';
 
 type PresetEntry<T = any> = [Token<T>, Provider<T>];

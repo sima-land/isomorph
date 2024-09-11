@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
 import { Handler, proxy } from '../../../http';
