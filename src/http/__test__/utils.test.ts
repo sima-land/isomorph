@@ -1,4 +1,4 @@
-import { FetchUtil } from '../utils';
+import { FetchUtil, isNetworkError } from '../utils';
 
 describe('FetchUtil', () => {
   it('setParams', () => {
@@ -132,5 +132,20 @@ describe('FetchUtil', () => {
       ok: false,
       error,
     });
+  });
+});
+
+describe('isNetworkError', () => {
+  it('should return true for Safari 17+ specific payload', () => {
+    const error = new TypeError('Load failed');
+    error.stack = undefined;
+
+    expect(isNetworkError(error)).toBe(true);
+  });
+
+  it('should return false for regular error', () => {
+    const error = new Error('Something wrong with your PC');
+
+    expect(isNetworkError(error)).toBe(false);
   });
 });

@@ -105,3 +105,58 @@ export const FetchUtil = {
     ] as const;
   },
 } as const;
+
+/**
+ * Проверяет, является ли переданное значение ошибкой.
+ * @param value Значение.
+ * @return Является ли значение ошибкой.
+ */
+function isError(value: unknown): value is Error {
+  return Object.prototype.toString.call(value) === '[object Error]';
+}
+
+// Основано на исходном коде пакета https://github.com/sindresorhus/is-network-error
+const networkErrorMessages = new Set([
+  'network error', // Chrome
+  'Failed to fetch', // Chrome
+  'NetworkError when attempting to fetch resource.', // Firefox
+  'The Internet connection appears to be offline.', // Safari 16
+  'Load failed', // Safari 17+
+  'Network request failed', // `cross-fetch`
+  'fetch failed', // Undici (Node.js)
+  'terminated', // Undici (Node.js)
+
+  // дальше идут наши наработки (основано на данных из Sentry)
+  'Network Error', // Safari 17.4
+]);
+
+/**
+ * Проверяет, является ли переданное значение ошибкой сети.
+ * Основано на исходном коде пакета https://github.com/sindresorhus/is-network-error.
+ * Нет возможности использовать пакет is-network-error по причине того что он - ESM only.
+ * @param value Проверяемое значение.
+ * @return Является ли значение TypeError о том что произошла ошибка сети.
+ */
+export function isNetworkError(value: unknown): value is TypeError {
+  const isValid = isError(value) && value.name === 'TypeError' && typeof value.message === 'string';
+
+  if (!isValid) {
+    return false;
+  }
+
+  // ВАЖНО: в Safari 17+ ошибки имеют определенное сообщение и не имеют свойства stack
+  if (value.message === 'Load failed') {
+    return value.stack === undefined;
+  }
+
+  return networkErrorMessages.has(value.message);
+}
+
+/**
+ * Проверяет является ли переданное значение ошибкой обрывания с помощью AbortController.
+ * @param value Проверяемое значение.
+ * @return Является ли значение ошибкой обрывания.
+ */
+export function isAbortError(value: unknown): value is { name: 'AbortError' } {
+  return typeof value === 'object' && value !== null && (value as any).name === 'AbortError';
+}
