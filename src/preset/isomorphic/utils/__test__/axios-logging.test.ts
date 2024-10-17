@@ -215,7 +215,7 @@ describe('AxiosLogging', () => {
     const error = {
       name: 'TestError',
       message: 'test',
-      response: { status: 407 },
+      response: { status: 500 },
       isAxiosError: true,
       toJSON: () => error,
     };
@@ -239,6 +239,95 @@ describe('AxiosLogging', () => {
 
     expect(logger.error).toHaveBeenCalledTimes(1);
     expect(logger.info).toHaveBeenCalledTimes(2);
+  });
+
+  it('should not log axios error with cause - network error', async () => {
+    const error = {
+      name: 'TestError',
+      message: 'test',
+      isAxiosError: true,
+      toJSON: () => error,
+      cause: new TypeError('network error'),
+    };
+
+    const config: AxiosRequestConfig<any> = {
+      url: 'https://ya.ru',
+      params: { bar: 'baz' },
+    };
+
+    const defaults: AxiosDefaults<any> = {
+      headers: {} as any,
+    };
+
+    const handler = new AxiosLogging(logger, { config, defaults });
+
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({ config, defaults, error });
+
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
+  });
+
+  it('should not log axios error with cause - abort error', async () => {
+    const cause = new Error('abort error');
+    cause.name = 'AbortError';
+    const error = {
+      name: 'TestError',
+      message: 'test',
+      isAxiosError: true,
+      toJSON: () => error,
+      cause,
+    };
+
+    const config: AxiosRequestConfig<any> = {
+      url: 'https://ya.ru',
+      params: { bar: 'baz' },
+    };
+
+    const defaults: AxiosDefaults<any> = {
+      headers: {} as any,
+    };
+
+    const handler = new AxiosLogging(logger, { config, defaults });
+
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({ config, defaults, error });
+
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
+  });
+
+  it('should not log axios error with status < 500', async () => {
+    const error = {
+      name: 'TestError',
+      message: 'test',
+      response: { status: 404 },
+      isAxiosError: true,
+      toJSON: () => error,
+    };
+
+    const config: AxiosRequestConfig<any> = {
+      url: 'https://ya.ru',
+      params: { bar: 'baz' },
+    };
+
+    const defaults: AxiosDefaults<any> = {
+      headers: {} as any,
+    };
+
+    const handler = new AxiosLogging(logger, { config, defaults });
+
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({ config, defaults, error });
+
+    expect(logger.error).toHaveBeenCalledTimes(0);
+    expect(logger.info).toHaveBeenCalledTimes(1);
   });
 
   it('should log axios error without status', async () => {

@@ -123,7 +123,7 @@ describe('FetchLogging', () => {
       response: new Response('', { status: 500 }),
     });
 
-    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(2);
     expect(spy.mock.calls[0][0]).toEqual({
       type: 'info',
       data: new Breadcrumb({
@@ -136,6 +136,23 @@ describe('FetchLogging', () => {
           status_code: 500,
         },
         level: 'error',
+      }),
+    });
+    expect(spy.mock.calls[1][0]).toEqual({
+      type: 'error',
+      data: new DetailedError(`HTTP request failed, status code: ${500}`, {
+        level: 'error',
+        context: [
+          {
+            key: 'Outgoing request details',
+            data: {
+              url: FetchUtil.withoutParams('https://test.com').href,
+              method: 'GET',
+              headers: {},
+              params: Object.fromEntries(new URL('https://test.com').searchParams.entries()),
+            },
+          },
+        ],
       }),
     });
   });
@@ -176,5 +193,52 @@ describe('FetchLogging', () => {
         ],
       }),
     });
+  });
+
+  it('onCatch should NOT log abort errors', () => {
+    const spy = jest.fn();
+    const logger = createLogger();
+    const handler = new FetchLogging(logger);
+
+    const cause = new Error('abort error');
+    cause.name = 'AbortError';
+
+    logger.subscribe(spy);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({
+      request: new Request(
+        FetchUtil.withParams('https://test.com', {
+          foo: 'bar',
+        }),
+        { method: 'GET' },
+      ),
+      error: cause,
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
+  });
+
+  it('onCatch should NOT log network errors', () => {
+    const spy = jest.fn();
+    const logger = createLogger();
+    const handler = new FetchLogging(logger);
+
+    logger.subscribe(spy);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    handler.onCatch({
+      request: new Request(
+        FetchUtil.withParams('https://test.com', {
+          foo: 'bar',
+        }),
+        { method: 'GET' },
+      ),
+      error: new TypeError('network error'),
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
   });
 });

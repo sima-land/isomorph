@@ -1,4 +1,5 @@
 import { LogHandler, LogData, DoneLogData, FetchUtil, FailLogData } from '../../../http';
+import { isAbortError, isNetworkError } from '../../../http/utils';
 import { Breadcrumb, DetailedError, Logger } from '../../../log';
 import { Disableable } from './disableable';
 
@@ -53,11 +54,44 @@ export class FetchLogging extends Disableable implements LogHandler {
         level: response.ok ? 'info' : 'error',
       }),
     );
+
+    // по общему соглашению фильтруем все статусы < 500
+    if (response.status < 500) {
+      return;
+    }
+
+    this.logger.error(
+      new DetailedError(`HTTP request failed, status code: ${response.status}`, {
+        level: 'error',
+        context: [
+          {
+            key: 'Outgoing request details',
+            data: {
+              url: FetchUtil.withoutParams(request.url).href,
+              method: request.method,
+              headers: request.headers,
+              params: Object.fromEntries(new URL(request.url).searchParams.entries()),
+              // @todo data
+            },
+          },
+        ],
+      }),
+    );
   }
 
   /** @inheritdoc */
   onCatch({ error, request }: FailLogData) {
     if (this.isDisabled()) {
+      return;
+    }
+
+    // по общему соглашению фильтруем сетевые ошибки
+    if (isNetworkError(error)) {
+      return;
+    }
+
+    // по общему соглашению фильтруем ошибки обрывания
+    if (isAbortError(error)) {
       return;
     }
 

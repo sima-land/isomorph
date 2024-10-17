@@ -1,3 +1,4 @@
+import { isAbortError, isNetworkError } from '../../../http/utils';
 import { Breadcrumb, DetailedError, type Logger } from '../../../log';
 import {
   type LogMiddlewareHandler,
@@ -98,62 +99,79 @@ export class AxiosLogging extends Disableable implements LogMiddlewareHandler {
       return;
     }
 
-    if (axios.isAxiosError(error)) {
-      const { requestInfo } = this;
-      const statusCode = error.response?.status || 'UNKNOWN';
-
-      // @todo выяснить: нужно ли нам отправлять ответы с кодом <500 в Sentry на уровне всех команд
-      // если да то можно добавить метод в духе errorStatusFilter(s => s !== 422)
-      this.logger.error(
-        new DetailedError(
-          `HTTP request failed, status code: ${statusCode}, error message: ${error.message}`,
-          {
-            level: severityFromStatus(error.response?.status),
-            context: [
-              {
-                key: 'Request details',
-                data: {
-                  url: requestInfo.url,
-                  baseURL: requestInfo.baseURL,
-                  method: requestInfo.method,
-                  headers: requestInfo.headers,
-                  data: requestInfo.data,
-                  params: requestInfo.params,
-                },
-              },
-              {
-                key: 'Response details',
-                data: {
-                  data: error.response?.data,
-
-                  // копируем так как в Sentry падает ошибка: **non-serializable** (TypeError: Object.getPrototypeOf(...) is null)
-                  headers: { ...error.response?.headers },
-
-                  error: error.toJSON(),
-                },
-              },
-            ],
-          },
-        ),
-      );
-
-      if (typeof statusCode === 'number') {
-        this.logger.info(
-          new Breadcrumb({
-            category: 'http.response',
-            type: 'http',
-            data: {
-              url: requestInfo.readyURL,
-              method: requestInfo.method,
-              status_code: statusCode,
-              params: requestInfo.params,
-            },
-            level: 'error',
-          }),
-        );
-      }
-    } else {
+    // если это не AxiosError тогда выполняем простое логирование
+    if (!axios.isAxiosError(error)) {
       this.logger.error(error);
+      return;
     }
+
+    const statusCode = error.response?.status ?? 'UNKNOWN';
+    const { requestInfo } = this;
+
+    if (typeof statusCode === 'number') {
+      this.logger.info(
+        new Breadcrumb({
+          category: 'http.response',
+          type: 'http',
+          data: {
+            url: requestInfo.readyURL,
+            method: requestInfo.method,
+            status_code: statusCode,
+            params: requestInfo.params,
+          },
+          level: 'error',
+        }),
+      );
+    }
+
+    // по общему соглашению фильтруем сетевые ошибки
+    if (isNetworkError(error.cause)) {
+      return;
+    }
+
+    // по общему соглашению фильтруем ошибки обрывания
+    if (isAbortError(error.cause)) {
+      return;
+    }
+
+    // по общему соглашению фильтруем все статусы < 500
+    if (typeof statusCode === 'number' && statusCode < 500) {
+      return;
+    }
+
+    // @todo добавить метод в духе errorStatusFilter(s => s !== 422)
+
+    this.logger.error(
+      new DetailedError(
+        `HTTP request failed, status code: ${statusCode}, error message: ${error.message}`,
+        {
+          level: severityFromStatus(error.response?.status),
+          context: [
+            {
+              key: 'Request details',
+              data: {
+                url: requestInfo.url,
+                baseURL: requestInfo.baseURL,
+                method: requestInfo.method,
+                headers: requestInfo.headers,
+                data: requestInfo.data,
+                params: requestInfo.params,
+              },
+            },
+            {
+              key: 'Response details',
+              data: {
+                data: error.response?.data,
+
+                // копируем так как в Sentry падает ошибка: **non-serializable** (TypeError: Object.getPrototypeOf(...) is null)
+                headers: { ...error.response?.headers },
+
+                error: error.toJSON(),
+              },
+            },
+          ],
+        },
+      ),
+    );
   }
 }
