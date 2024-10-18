@@ -18,6 +18,8 @@ export function provideKnownHttpApiHosts(resolve: Resolve): HttpApiHostPool<Know
       simaV4: 'PUBLIC_API_URL_SIMALAND_V4',
       simaV6: 'PUBLIC_API_URL_SIMALAND_V6',
       chponkiV2: 'PUBLIC_API_URL_CHPONKI_V2',
+      shuttle: 'PUBLIC_API_URL_SHUTTLE',
+      fileDispatcher: 'PUBLIC_API_URL_FILE_DISPATCHER',
     },
     source,
   );
