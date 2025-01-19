@@ -27,7 +27,7 @@ function saveUserPreferences(prefs: UserPreferences) {
 
     // проверяем доступность браузерного хранилища в текущей среде выполнения.
     if (!storage.isAvailable()) {
-        console.warn('Storage not available');
+        console.warn('Storage is not available');
         return;
     }
 
