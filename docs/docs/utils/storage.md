@@ -16,7 +16,7 @@ import { createSafeStorage } from '@sima-land/isomorph/utils/web/storage';
 function saveUserPreferences(prefs: UserPreferences) {
     const storage = createSafeStorage(() => window.localStorage)
 
-    // проверяем доступность браузерного хранилища в текущей среде выполнения.
+    // Проверяем доступность браузерного хранилища в текущей среде выполнения.
     if (!storage.isAvailable()) {
         console.warn('Storage is not available');
         return;
