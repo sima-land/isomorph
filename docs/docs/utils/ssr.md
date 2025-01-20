@@ -5,11 +5,62 @@ description: Утилиты для организации серверного �
 
 # Утилиты для SSR
 
-Пакет предоставляет утилиты для организации серверного рендеринга React-приложений.
+Пакет предоставляет утилиты для организации серверного рендеринга.
 
 ### GlobalDataScript
 
 Компонент для внедрения серверных данных в клиентский JavaScript. Безопасно сериализует данные при помощи [jsesc](https://github.com/mathiasbynens/jsesc).
+
+##### Пример использования:
+
+```tsx
+import { Resolve } from '@sima-land/isomorph/di';
+import { GlobalDataScript } from '@sima-land/isomorph/utils/ssr';
+import { KnownToken } from '@sima-land/isomorph/tokens';
+
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import createSagaMiddleware from 'redux-saga';
+
+import { TOKEN } from '../../di/tokens';
+import { reducer } from '../../reducer';
+import { saga } from '../../saga';
+import { Component } from '../../../component';
+
+// Провайдер рендеринга верстки
+function provideRender(resolve: Resolve) {
+  const config = resolve(TOKEN.Server.config);
+  const params = resolve(KnownToken.Http.Handler.Request.specificParams);
+  const bridge = resolve(KnownToken.SsrBridge.serverSide);
+  const logger = resolve(KnownToken.logger);
+
+  return async () => {
+    const sagaMiddleware = createSagaMiddleware({ onError: logger.error });
+    const store = configureStore({
+      reducer,
+      middleware: [sagaMiddleware],
+    });
+
+    await sagaMiddleware
+      .run(saga, {
+        params,
+        features: config.features,
+        timeout: config.ssrTimeout,
+      })
+      .toPromise();
+
+    return (
+      <Provider store={store}>
+        <div id={bridge.rootElementId}>
+          <Component />
+        </div>
+        {/** Формируем глобально доступные данные для клиента. */}
+        <GlobalDataScript property={bridge.serverDataKey} value={store.getState()} />
+      </Provider>
+    );
+  };
+};
+```
 
 ### SsrBridge
 
@@ -25,16 +76,28 @@ description: Утилиты для организации серверного �
 
 ##### Пример использования:
 
-На сервере:
+```tsx title="На сервере:"
+import { Resolve } from '@sima-land/isomorph/di';
+import { PageAssets } from '@sima-land/isomorph/preset/isomorphic';
+import { KnownToken } from '@sima-land/isomorph/tokens';
+import { GlobalDataScript } from '@sima-land/isomorph/utils/ssr';
 
-```tsx
+import { configureStore } from '@reduxjs/toolkit';
+import { Provider } from 'react-redux';
+import createSagaMiddleware from 'redux-saga';
+
+import { TOKEN } from '../di';
+import { reducer } from '../reducer';
+import { Component } from '../component';
+import { saga } from '../saga';
+
 // Провайдер рендеринга верстки
 function provideRender(resolve: Resolve) {
     const api = resolve(TOKEN.api);
     const config = resolve(TOKEN.Server.config);
-    const params = resolve(KnownToken.Http.Handler.Request.specificParams) as unknown as Params;
+    const params = resolve(KnownToken.Http.Handler.Request.specificParams);
     const logger = resolve(KnownToken.logger);
-    // Получаем серверную часть "моста" из токена
+    // Формируем серверную часть "моста"
     const bridge = SsrBridge.prepare(config.appName);
 
     return async () => {
@@ -64,35 +127,43 @@ function provideRender(resolve: Resolve) {
 }
 ```
  
-На клиенте:
- 
-```tsx
+```tsx title="На клиенте:"
+import { ErrorBoundary } from '@sima-land/isomorph/utils/react';
+import { KnownToken } from '@sima-land/isomorph/tokens';
+
+import { Provider } from 'react-redux';
+import { hydrateRoot } from 'react-dom/client';
+import { configureStore } from '@reduxjs/toolkit';
+import createSagaMiddleware from 'redux-saga';
+
+import { Component } from './component';
+import { RootState, reducer } from './reducer';
+import { rootSaga } from './saga';
+import { BrowserApp, TOKEN } from './di';
+
 // Браузерное приложение
 BrowserApp().invoke([TOKEN.Client.config, KnownToken.logger, TOKEN.api],
     (config, logger, api) => {
         const sagaMiddleware = createSagaMiddleware({ onError: logger.error });
-        // получаем клиентскую часть "моста"
+        // Получаем клиентскую часть "моста"
         const ssrBridge = SsrBridge.resolve(config.appName);
-        // извлекаем сервеные данные
-        const { state } = ssrBridge.serverSideData as { state: DesktopRootState };
+        // Извлекаем сервеные данные
+        const { state } = ssrBridge.serverSideData as { state: RootState };
+        
         const store = configureStore({
             reducer,
             preloadedState: state,
             middleware: [sagaMiddleware],
-            devTools: config.devtools ? { name: `[${config.appName}] - ${document.title}` } : false,
         });
 
-        sagaMiddleware.run(rootSaga, {
-            api,
-            external: new ExternalClient(config.appName, store.dispatch),
-        });
+        sagaMiddleware.run(rootSaga, { api });
         
         hydrateRoot(
-            ssrBridge.rootElement // корневой элемент, отрендеренный на сервере
+            ssrBridge.rootElement, // Элемент, отображенный как корневой на сервере
             <Provider store={store}>
-            <ErrorBoundary onError={logger.error} fallback={null}>
-               <Component />
-            </ErrorBoundary>
+              <ErrorBoundary onError={logger.error} fallback={null}>
+                <Component />
+              </ErrorBoundary>
             </Provider>,
         );
     },
