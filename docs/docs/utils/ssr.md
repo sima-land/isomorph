@@ -87,7 +87,7 @@ function provideRender(resolve: Resolve) {
 В примере ниже SsrBridge использован напрямую. Однако получить компоненты моста можно по токенам, используемым в DI-пресетах `PresetNode` / `PresetBun` и `PresetWeb` соответственно:
 
 * `KnownToken.SsrBridge.serverSide` - для серверной части.
-* `KnownToken.SsrBridge.clientSide` - для серверной части.
+* `KnownToken.SsrBridge.clientSide` - для клиентской части.
 
 :::
 
