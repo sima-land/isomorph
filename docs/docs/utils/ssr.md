@@ -11,6 +11,12 @@ description: Утилиты для организации серверного �
 
 Компонент для внедрения серверных данных в клиентский JavaScript. Безопасно сериализует данные с помощью [jsesc](https://github.com/mathiasbynens/jsesc).
 
+:::note
+
+Для использования  **GlobalDataScript** необходима установка `jsesc` как зависимости.
+
+:::
+
 ##### Пример использования:
 
 ```tsx
@@ -76,11 +82,20 @@ function provideRender(resolve: Resolve) {
 
 ##### Пример использования:
 
+:::info
+
+В примере ниже SsrBridge использован напрямую. Однако получить компоненты моста можно по токенам, используемым в DI-пресетах `PresetNode` / `PresetBun` и `PresetWeb` соответственно:
+
+* `KnownToken.SsrBridge.serverSide` - для серверной части.
+* `KnownToken.SsrBridge.clientSide` - для серверной части.
+
+:::
+
 ```tsx title="На сервере:"
 import { Resolve } from '@sima-land/isomorph/di';
 import { PageAssets } from '@sima-land/isomorph/preset/isomorphic';
 import { KnownToken } from '@sima-land/isomorph/tokens';
-import { GlobalDataScript } from '@sima-land/isomorph/utils/ssr';
+import { GlobalDataScript, SsrBridge } from '@sima-land/isomorph/utils/ssr';
 
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
@@ -90,6 +105,8 @@ import { TOKEN } from '../di';
 import { reducer } from '../reducer';
 import { Component } from '../component';
 import { saga } from '../saga';
+
+
 
 // Провайдер рендеринга верстки
 function provideRender(resolve: Resolve) {
@@ -130,6 +147,7 @@ function provideRender(resolve: Resolve) {
 ```tsx title="На клиенте:"
 import { ErrorBoundary } from '@sima-land/isomorph/utils/react';
 import { KnownToken } from '@sima-land/isomorph/tokens';
+import { SsrBridge } from '@sima-land/isomorph/utils/ssr';
 
 import { Provider } from 'react-redux';
 import { hydrateRoot } from 'react-dom/client';
@@ -155,8 +173,6 @@ BrowserApp().invoke([TOKEN.Client.config, KnownToken.logger, TOKEN.api],
             preloadedState: state,
             middleware: [sagaMiddleware],
         });
-
-        sagaMiddleware.run(rootSaga, { api });
         
         hydrateRoot(
             ssrBridge.rootElement, // Элемент, отображенный как корневой на сервере
@@ -166,6 +182,8 @@ BrowserApp().invoke([TOKEN.Client.config, KnownToken.logger, TOKEN.api],
               </ErrorBoundary>
             </Provider>,
         );
+
+        sagaMiddleware.run(rootSaga, { api });
     },
 );
 ```
