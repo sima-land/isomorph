@@ -9,10 +9,12 @@ describe('getSemanticHeaders', () => {
       getSemanticHeaders({
         Authorization: 'bearer samplekey',
         'x-proprietary-header': 'value',
+        'x-numeric-value': 0,
       }),
     ).toEqual({
       'http.request.header.Authorization': 'bearer samplekey',
       'http.request.header.x-proprietary-header': 'value',
+      'http.request.header.x-numeric-value': 0,
     });
   });
 });
