@@ -9,7 +9,7 @@ import { KnownToken } from '../../../tokens';
  */
 export function provideTracer(resolve: Resolve): Tracer {
   const config = resolve(KnownToken.Config.base);
-  const provider = resolve(KnownToken.Tracing.tracerProvider);
+  const provider = resolve(KnownToken.Tracing.provider);
 
   return provider.getTracer(config.appName, config.appVersion);
 }

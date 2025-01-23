@@ -1,9 +1,12 @@
 import type { AxiosInstance, AxiosRequestConfig, HeadersDefaults } from 'axios';
 import type { Middleware } from 'middleware-axios';
 import { Context, Tracer, SpanStatusCode } from '@opentelemetry/api';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_URL_FULL,
+} from '@opentelemetry/semantic-conventions/incubating';
 import { displayUrl } from '../../isomorphic/utils/display-url';
-import { hideFirstId } from '../../isomorphic/utils/hide-first-id';
+import { getSemanticHeaders } from './telemetry';
 
 /**
  * Возвращает новый middleware для трассировки исходящих запросов.
@@ -13,26 +16,23 @@ import { hideFirstId } from '../../isomorphic/utils/hide-first-id';
  */
 export function axiosTracingMiddleware(tracer: Tracer, rootContext: Context): Middleware<any> {
   return async function trace(config, next, defaults) {
-    const { method, url, foundId } = getRequestInfo(config, defaults);
-    const span = tracer.startSpan(`HTTP ${method} ${url}`, undefined, rootContext);
+    const { method, urlStr } = getRequestInfo(config, defaults);
+    const url = new URL(urlStr);
+    const span = tracer.startSpan(`axios ${method} ${url}`, undefined, rootContext);
 
     span.setAttributes({
-      [SemanticAttributes.HTTP_URL]: url,
-      [SemanticAttributes.HTTP_METHOD]: method,
-      'request.params': JSON.stringify({
+      [ATTR_URL_FULL]: url.href,
+      [ATTR_HTTP_REQUEST_METHOD]: method,
+      ...getRequestPayload({
         ...defaults.params,
         ...config.params,
       }),
-      'request.headers': JSON.stringify({
+      ...getSemanticHeaders({
         // @todo непонятно как доставать заголовки из defaults потому что там на одном уровне заголовки и таблицы заголовков
         ...defaults.headers.common,
         ...defaults.headers[method.toLowerCase() as keyof HeadersDefaults],
         ...config.headers,
-        // @todo возможно стоит убрать cookie/Cookie
       }),
-
-      // если нашли id - добавляем в теги
-      ...(foundId && { 'request.id': foundId }),
     });
 
     try {
@@ -55,7 +55,6 @@ export function axiosTracingMiddleware(tracer: Tracer, rootContext: Context): Mi
 
 /**
  * Формирует базовые данные запроса.
- * Заменяет первое найденное число в url на "{id}", возвращая его в результате.
  * @param config Axios-конфиг запроса.
  * @param defaults Базовый конфиг экземпляра Axios.
  * @return Базовые данные запроса.
@@ -65,18 +64,28 @@ export function getRequestInfo(
   defaults: AxiosInstance['defaults'],
 ): {
   method: string;
-  url: string;
-  foundId?: number;
+  urlStr: string;
 } {
   const method = (config.method || 'GET').toUpperCase();
   const baseURL = config.baseURL || defaults.baseURL || '';
 
-  // ВАЖНО: абстрагируем id только в url игнорируя baseURL
-  const [url, foundId] = hideFirstId(config.url || defaults.url || '');
-
   return {
     method,
-    url: displayUrl(baseURL, url),
-    foundId,
+    urlStr: displayUrl(baseURL, config.url || defaults.url || ''),
   };
+}
+
+/**
+ * Формирует данные полезной нагрузки запроса.
+ * @param payload Объект с полезной нагрузкой.
+ * @return Полезная нагрузка.
+ */
+function getRequestPayload(
+  payload: Record<string, unknown>,
+): Record<'request.payload', string> | null {
+  return Object.keys(payload).length
+    ? {
+        'request.payload': JSON.stringify(payload),
+      }
+    : null;
 }
