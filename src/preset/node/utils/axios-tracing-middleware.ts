@@ -23,10 +23,6 @@ export function axiosTracingMiddleware(tracer: Tracer, rootContext: Context): Mi
     span.setAttributes({
       [ATTR_URL_FULL]: url.href,
       [ATTR_HTTP_REQUEST_METHOD]: method,
-      ...getRequestPayload({
-        ...defaults.params,
-        ...config.params,
-      }),
       ...getSemanticHeaders({
         // @todo непонятно как доставать заголовки из defaults потому что там на одном уровне заголовки и таблицы заголовков
         ...defaults.headers.common,
@@ -73,19 +69,4 @@ export function getRequestInfo(
     method,
     urlStr: displayUrl(baseURL, config.url || defaults.url || ''),
   };
-}
-
-/**
- * Формирует данные полезной нагрузки запроса.
- * @param payload Объект с полезной нагрузкой.
- * @return Полезная нагрузка.
- */
-function getRequestPayload(
-  payload: Record<string, unknown>,
-): Record<'request.payload', string> | null {
-  return Object.keys(payload).length
-    ? {
-        'request.payload': JSON.stringify(payload),
-      }
-    : null;
 }

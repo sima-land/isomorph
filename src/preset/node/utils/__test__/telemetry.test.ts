@@ -10,6 +10,7 @@ describe('getSemanticHeaders', () => {
         Authorization: 'bearer samplekey',
         'x-proprietary-header': 'value',
         'x-numeric-value': 0,
+        'x-empty-value': undefined,
       }),
     ).toEqual({
       'http.request.header.Authorization': 'bearer samplekey',
