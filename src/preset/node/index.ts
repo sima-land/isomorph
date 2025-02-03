@@ -15,11 +15,11 @@ import { provideExpressTracingMiddleware } from './providers/express-tracing-mid
 import { provideKnownHttpApiHosts } from '../server/providers/known-http-api-hosts';
 import { provideLogger } from './providers/logger';
 import { provideMetricsExpressApp } from './providers/metrics-express-app';
-import { provideSpanExporter } from './providers/span-exporter';
+import { provideTracer } from './providers/telemetry-tracer';
+import { provideSpanExporter } from './providers/telemetry-tracer-span-exporter';
 import { provideSsrBridgeServerSide } from '../server/providers/ssr-bridge-server-side';
-import { provideTracer } from './providers/tracer';
-import { provideTracerProvider } from './providers/tracer-provider';
-import { provideTracerProviderResource } from './providers/tracer-provider-resource';
+import { provideTracingProvider } from './providers/telemetry-tracer-provider';
+import { provideTracingResource } from './providers/telemetry-tracer-resource';
 import { provideMainExpressApp } from './providers/main-express-app';
 import { ExpressRouteList } from './types';
 
@@ -42,8 +42,8 @@ export function PresetNode(customize?: PresetTuner): Preset {
   // tracing
   preset.set(KnownToken.Tracing.tracer, provideTracer);
   preset.set(KnownToken.Tracing.spanExporter, provideSpanExporter);
-  preset.set(KnownToken.Tracing.tracerProvider, provideTracerProvider);
-  preset.set(KnownToken.Tracing.tracerProviderResource, provideTracerProviderResource);
+  preset.set(KnownToken.Tracing.provider, provideTracingProvider);
+  preset.set(KnownToken.Tracing.resource, provideTracingResource);
 
   // metrics
   preset.set(KnownToken.Metrics.expressApp, provideMetricsExpressApp);
