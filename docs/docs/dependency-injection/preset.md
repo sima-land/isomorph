@@ -75,7 +75,7 @@ function provideConfig(resolve: Resolve): AppConfig {
 
   return {
     ...baseConfig,
-//    devtoolsEnabled: source.require('PUBLIC_DEVTOOLS_ENABLED') !== '0',
+    devtoolsEnabled: source.require('PUBLIC_DEVTOOLS_ENABLED') !== '0',
   };
 }
 ```

@@ -52,16 +52,16 @@ const result = { ...process.env };
 ### additional - массив строк
 #### Так как плагин будет зашивать в браузерную сборку только переменные среды, имеющие префикс PUBLIC_. В additional можно передать дополнительные переменные среды, которые тоже должны попасть в сборку. Передаются только наименования переменных.
 ```ts
-//      env: {
-//        additional: ['APP_NAME', 'APP_VERSION', 'SENTRY_RELEASE'],
-//      }
+      env: {
+        additional: ['APP_NAME', 'APP_VERSION', 'SENTRY_RELEASE'],
+      }
 ```
 ### define - объект, ключ - значение. Как и в additional передаются переменные среды, которые тоже должны попасть в сборку. Но переданный объект содержит не только наименования переменных, но их значение. 
 ```ts
-//      env: {
-//        define: {
-//          ASSETS_MANIFEST_MOBILE: `../client/assets-manifest.mobile.${env.BUILD_ASSET_POSTFIX}.json`,
-//          ASSETS_MANIFEST_DESKTOP: `../client/assets-manifest.desktop.${env.BUILD_ASSET_POSTFIX}.json`,
-//        }
-//      }
+      env: {
+        define: {
+          ASSETS_MANIFEST_MOBILE: `../client/assets-manifest.mobile.${env.BUILD_ASSET_POSTFIX}.json`,
+          ASSETS_MANIFEST_DESKTOP: `../client/assets-manifest.desktop.${env.BUILD_ASSET_POSTFIX}.json`,
+        }
+      }
 ```
