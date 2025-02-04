@@ -1,11 +1,15 @@
-import { Resource } from '@opentelemetry/resources';
-import * as SemanticArgs from '@opentelemetry/semantic-conventions';
-import { KnownToken } from '../../../tokens';
+import {
+  detectResourcesSync,
+  envDetector,
+  hostDetector,
+  osDetector,
+  processDetector,
+  Resource,
+} from "@opentelemetry/resources";
+import * as SemanticArgs from "@opentelemetry/semantic-conventions/incubating";
+import { KnownToken } from "../../../tokens";
 
-import type { Resolve } from '../../../di';
-
-type SemanticArgKeys = keyof typeof SemanticArgs;
-type SemanticArg = Extract<(typeof SemanticArgs)[SemanticArgKeys], string>;
+import type { Resolve } from "../../../di";
 
 /**
  * Провайдер объекта Resource.
@@ -13,15 +17,19 @@ type SemanticArg = Extract<(typeof SemanticArgs)[SemanticArgKeys], string>;
  * @return Resource.
  */
 export function provideTracingResource(resolve: Resolve): Resource {
-  const source = resolve(KnownToken.Config.source);
-  const otelEnv = Object.entries(source.source).filter(([key]) => key.startsWith('OTEL_RESOURCE_'));
-  const result = otelEnv.reduce<Record<string, string>>((acc, [rawKey, value]) => {
-    if (value) {
-      const key = rawKey.replace(/^OTEL_RESOURCE_/, '') as SemanticArgKeys;
-      acc[SemanticArgs[key] as SemanticArg] = value;
-    }
-    return acc;
-  }, {});
+  const config = resolve(KnownToken.Config.base);
 
-  return new Resource(result);
+  const resource = new Resource({
+    [SemanticArgs.ATTR_SERVICE_NAME]: config.appName,
+    [SemanticArgs.ATTR_SERVICE_VERSION]: config.appVersion,
+    [SemanticArgs.ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: config.env,
+  });
+
+  resource.merge(
+    detectResourcesSync({
+      detectors: [osDetector, envDetector, hostDetector, processDetector],
+    }),
+  );
+
+  return resource;
 }

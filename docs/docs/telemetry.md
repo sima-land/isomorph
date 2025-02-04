@@ -14,25 +14,24 @@ sidebar_position: 4
 
 ## Настройка Exporter
 
-|   Переменная окружения   | Описание                                                                              |
-| :----------------------: | ------------------------------------------------------------------------------------- |
-| `OTEL_EXPORTER_OTLP_URL` | URL куда будут высылаться данные телеметрии вида `http://<collector-hostname>:<port>` |
+Конфигурация инструмента выгрузки опциональна.
 
-> Для расширенной настройки передатчика данных см. [`@opentelemetry/exporter-trace-otlp-grpc`](https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-grpc)
+|   Переменная окружения   | Описание                   |  Значение по-умолчанию  |
+| :----------------------: | -------------------------- | :---------------------: |
+| `OTEL_EXPORTER_OTLP_URL` | URL коллектора телеметрии. | `http://localhost:4317` |
+
+> Как можно заметить в значении указывается протокол передачи — это намеренно так как выгрузка возможна в Unix domain socket (`sock://`).
+
+> Для расширенной настройки передатчика данных см. документацию пакета [`@opentelemetry/exporter-trace-otlp-grpc`](https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-grpc)
 
 ## Объявление и обогащение данных ресурса (`Resource`)
 
-|            Переменная окружения             | Описание                                    |
-| :-----------------------------------------: | ------------------------------------------- |
-|      `OTEL_RESOURCE_ATTR_SERVICE_NAME`      | Название сервиса (`service-name`)           |
-|    `OTEL_RESOURCE_ATTR_SERVICE_VERSION`     | Версия сервиса (`1.0.0`)                    |
-|       `OTEL_RESOURCE_ATTR_HOST_NAME`        | Название хоста (`localhost`)                |
-| `OTEL_RESOURCE_ATTR_DEPLOYMENT_ENVIRONMENT` | Тип окружения (`production \| development`) |
+Основные данные ресурса предзаполнены и не требуют декларирования.
 
-Также есть возможность дополнить данные через переменные окружения с префиксом `OTEL_RESOURCE_${CONVENTIONAL_NAME}`.
+|           Аттрибут            | Описание                                    |          Значение по-умолчанию          |
+| :---------------------------: | ------------------------------------------- | :-------------------------------------: |
+|        `service.name`         | Название сервиса (`service-name`)           |  `KnownTokens.Config.base -> appName`   |
+|       `service.version`       | Версия сервиса (`1.0.0`)                    | `KnownTokens.Config.base -> appVersion` |
+| `deployment.environment.name` | Тип окружения (`production \| development`) |    `KnownTokens.Config.base -> env`     |
 
-Пример: `OTEL_RESOURCE_ATTR_K8S_CONTAINER_NAME=container` будет преобразован в `{'k8s.container.name':'container'}`.
-
-> Для формирования ключей используются названия констант из [@opentelemetry/semantic-conventions](https://github.com/open-telemetry/opentelemetry-js/blob/v1.28.0/semantic-conventions/src/experimental_attributes.ts).
-
-> **Важно:** Аттрибуты могут иметь различия в зависимости от версии пакета `@opentelemetry/semantic-conventions`.
+> Также есть возможность дополнить или переписать данные через переменную окружения `OTEL_RESOURCE_ATTRIBUTES`. Подробнее — [документация OTEL](https://opentelemetry.io/docs/languages/js/resources/#process--environment-resource-detection).
