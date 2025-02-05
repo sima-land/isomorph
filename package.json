@@ -1,0 +1,299 @@
+{
+  "name": "@sima-land/isomorph",
+  "version": "0.0.0",
+  "description": "Tiny framework for fast start frontend microservices",
+  "author": "www.sima-land.ru team",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "type-check": "npx tsc -p . --noEmit && npx tsc --project tsconfig.bun.json --noEmit",
+    "build:before": "rm -rf dist cache config di http log preset utils",
+    "build:esm": "babel src --config-file ./babel.config.esm.js -d dist/esm --source-maps --extensions '.ts,.tsx' --ignore='**/__test__/**/*' --ignore='**/*.d.ts' && node scripts/make-pkg-esm.mjs",
+    "build:cjs": "babel src --config-file ./babel.config.cjs.js -d dist/cjs --source-maps --extensions '.ts,.tsx' --ignore='**/__test__/**/*' --ignore='**/*.d.ts' && node scripts/make-pkg-cjs.mjs",
+    "build:types": "tsc --project tsconfig.types.json",
+    "post-build-esm": "node scripts/post-build-esm.mjs",
+    "build": "npm run build:before && npm run build:esm && npm run build:cjs && npm run build:types && npm run post-build-esm",
+    "lint": "eslint src",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.22.5",
+    "@babel/preset-react": "^7.22.5",
+    "@babel/preset-typescript": "^7.22.5",
+    "@sima-land/linters": "^5.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@types/accepts": "^1.3.7",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^28.1.7",
+    "@types/jsesc": "^3.0.1",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@types/webpack": "^5.28.1",
+    "babel-jest": "^29.5.0",
+    "bun-types": "^1.0.12",
+    "eslint": "^9.9.0",
+    "fs-extra": "^11.1.1",
+    "husky": "^9.1.5",
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^28.1.3",
+    "prettier": "^3.3.3",
+    "typescript": "^5.3.2",
+    "whatwg-fetch": "^3.6.17"
+  },
+  "dependencies": {
+    "@humanwhocodes/env": "^3.0.5",
+    "@krutoo/fetch-tools": "^0.0.16",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-prometheus": "^0.52.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.52.1",
+    "@opentelemetry/propagator-jaeger": "^1.25.1",
+    "@opentelemetry/resources": "^1.25.1",
+    "@opentelemetry/sdk-metrics": "^1.25.1",
+    "@opentelemetry/sdk-trace-base": "^1.25.1",
+    "@opentelemetry/sdk-trace-node": "^1.25.1",
+    "@opentelemetry/semantic-conventions": "^1.25.1",
+    "@sentry/browser": "^8.33.1",
+    "@sentry/bun": "^8.33.1",
+    "@sentry/node": "^8.33.1",
+    "accepts": "^1.3.8",
+    "dotenv": "^16.3.1",
+    "express": "^4.21.0",
+    "http-proxy-middleware": "^3.0.0",
+    "jsesc": "^3.0.2",
+    "middleware-axios": "^3.0.0",
+    "pino": "^8.14.1",
+    "pino-pretty": "^9.1.1",
+    "prom-client": "^14.2.0",
+    "webpack": "^5.82.0"
+  },
+  "peerDependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
+    "axios": "^1.7.4",
+    "react": "^17.0 || ^18.0",
+    "react-dom": "^17.0 || ^18.0",
+    "react-redux": "^8.0.5",
+    "redux-saga": "^1.2.3"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    "./cache": {
+      "types": "./dist/types/cache/index.d.ts",
+      "require": "./dist/cjs/cache/index.js",
+      "import": "./dist/esm/cache/index.js",
+      "default": "./dist/esm/cache/index.js"
+    },
+    "./config": {
+      "types": "./dist/types/config/index.d.ts",
+      "require": "./dist/cjs/config/index.js",
+      "import": "./dist/esm/config/index.js",
+      "default": "./dist/esm/config/index.js"
+    },
+    "./di": {
+      "types": "./dist/types/di/index.d.ts",
+      "require": "./dist/cjs/di/index.js",
+      "import": "./dist/esm/di/index.js",
+      "default": "./dist/esm/di/index.js"
+    },
+    "./http": {
+      "types": "./dist/types/http/index.d.ts",
+      "require": "./dist/cjs/http/index.js",
+      "import": "./dist/esm/http/index.js",
+      "default": "./dist/esm/http/index.js"
+    },
+    "./log": {
+      "types": "./dist/types/log/index.d.ts",
+      "require": "./dist/cjs/log/index.js",
+      "import": "./dist/esm/log/index.js",
+      "default": "./dist/esm/log/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/types/tokens.d.ts",
+      "require": "./dist/cjs/tokens.js",
+      "import": "./dist/esm/tokens.js",
+      "default": "./dist/esm/tokens.js"
+    },
+    "./preset/isomorphic": {
+      "types": "./dist/types/preset/isomorphic/index.d.ts",
+      "require": "./dist/cjs/preset/isomorphic/index.js",
+      "import": "./dist/esm/preset/isomorphic/index.js",
+      "default": "./dist/esm/preset/isomorphic/index.js"
+    },
+    "./preset/web": {
+      "types": "./dist/types/preset/web/index.d.ts",
+      "require": "./dist/cjs/preset/web/index.js",
+      "import": "./dist/esm/preset/web/index.js",
+      "default": "./dist/esm/preset/web/index.js"
+    },
+    "./preset/server": {
+      "types": "./dist/types/preset/server/index.d.ts",
+      "require": "./dist/cjs/preset/server/index.js",
+      "import": "./dist/esm/preset/server/index.js",
+      "default": "./dist/esm/preset/server/index.js"
+    },
+    "./preset/node": {
+      "types": "./dist/types/preset/node/index.d.ts",
+      "require": "./dist/cjs/preset/node/index.js",
+      "import": "./dist/esm/preset/node/index.js",
+      "default": "./dist/esm/preset/node/index.js"
+    },
+    "./preset/node-handler": {
+      "types": "./dist/types/preset/node-handler/index.d.ts",
+      "require": "./dist/cjs/preset/node-handler/index.js",
+      "import": "./dist/esm/preset/node-handler/index.js",
+      "default": "./dist/esm/preset/node-handler/index.js"
+    },
+    "./preset/bun": {
+      "types": "./dist/types/preset/bun/index.d.ts",
+      "require": "./dist/cjs/preset/bun/index.js",
+      "import": "./dist/esm/preset/bun/index.js",
+      "default": "./dist/esm/preset/bun/index.js"
+    },
+    "./preset/bun-handler": {
+      "types": "./dist/types/preset/bun-handler/index.d.ts",
+      "require": "./dist/cjs/preset/bun-handler/index.js",
+      "import": "./dist/esm/preset/bun-handler/index.js",
+      "default": "./dist/esm/preset/bun-handler/index.js"
+    },
+    "./utils": {
+      "types": "./dist/types/utils/index.d.ts",
+      "require": "./dist/cjs/utils/index.js",
+      "import": "./dist/esm/utils/index.js",
+      "default": "./dist/esm/utils/index.js"
+    },
+    "./utils/axios": {
+      "types": "./dist/types/utils/axios/index.d.ts",
+      "require": "./dist/cjs/utils/axios/index.js",
+      "import": "./dist/esm/utils/axios/index.js",
+      "default": "./dist/esm/utils/axios/index.js"
+    },
+    "./utils/express": {
+      "types": "./dist/types/utils/express/index.d.ts",
+      "require": "./dist/cjs/utils/express/index.js",
+      "import": "./dist/esm/utils/express/index.js",
+      "default": "./dist/esm/utils/express/index.js"
+    },
+    "./utils/react": {
+      "types": "./dist/types/utils/react/index.d.ts",
+      "require": "./dist/cjs/utils/react/index.js",
+      "import": "./dist/esm/utils/react/index.js",
+      "default": "./dist/esm/utils/react/index.js"
+    },
+    "./utils/redux": {
+      "types": "./dist/types/utils/redux/index.d.ts",
+      "require": "./dist/cjs/utils/redux/index.js",
+      "import": "./dist/esm/utils/redux/index.js",
+      "default": "./dist/esm/utils/redux/index.js"
+    },
+    "./utils/redux-saga": {
+      "types": "./dist/types/utils/redux-saga/index.d.ts",
+      "require": "./dist/cjs/utils/redux-saga/index.js",
+      "import": "./dist/esm/utils/redux-saga/index.js",
+      "default": "./dist/esm/utils/redux-saga/index.js"
+    },
+    "./utils/ssr": {
+      "types": "./dist/types/utils/ssr/index.d.ts",
+      "require": "./dist/cjs/utils/ssr/index.js",
+      "import": "./dist/esm/utils/ssr/index.js",
+      "default": "./dist/esm/utils/ssr/index.js"
+    },
+    "./utils/web/analytics": {
+      "types": "./dist/types/utils/web/analytics/index.d.ts",
+      "require": "./dist/cjs/utils/web/analytics/index.js",
+      "import": "./dist/esm/utils/web/analytics/index.js",
+      "default": "./dist/esm/utils/web/analytics/index.js"
+    },
+    "./utils/web/storage": {
+      "types": "./dist/types/utils/web/storage/index.d.ts",
+      "require": "./dist/cjs/utils/web/storage/index.js",
+      "import": "./dist/esm/utils/web/storage/index.js",
+      "default": "./dist/esm/utils/web/storage/index.js"
+    },
+    "./utils/webpack": {
+      "types": "./dist/types/utils/webpack/index.d.ts",
+      "require": "./dist/cjs/utils/webpack/index.js",
+      "import": "./dist/esm/utils/webpack/index.js",
+      "default": "./dist/esm/utils/webpack/index.js"
+    }
+  },
+  "typesVersions": {
+    ">=4.2": {
+      "cache": [
+        "./dist/types/cache/index.d.ts"
+      ],
+      "config": [
+        "./dist/types/config/index.d.ts"
+      ],
+      "di": [
+        "./dist/types/di/index.d.ts"
+      ],
+      "http": [
+        "./dist/types/http/index.d.ts"
+      ],
+      "log": [
+        "./dist/types/log/index.d.ts"
+      ],
+      "tokens": [
+        "./dist/types/tokens.d.ts"
+      ],
+      "preset/isomorphic": [
+        "./dist/types/preset/isomorphic/index.d.ts"
+      ],
+      "preset/web": [
+        "./dist/types/preset/web/index.d.ts"
+      ],
+      "preset/server": [
+        "./dist/types/preset/server/index.d.ts"
+      ],
+      "preset/node": [
+        "./dist/types/preset/node/index.d.ts"
+      ],
+      "preset/node-handler": [
+        "./dist/types/preset/node-handler/index.d.ts"
+      ],
+      "preset/bun": [
+        "./dist/types/preset/bun/index.d.ts"
+      ],
+      "preset/bun-handler": [
+        "./dist/types/preset/bun-handler/index.d.ts"
+      ],
+      "utils": [
+        "./dist/types/utils/index.d.ts"
+      ],
+      "utils/axios": [
+        "./dist/types/utils/axios/index.d.ts"
+      ],
+      "utils/express": [
+        "./dist/types/utils/express/index.d.ts"
+      ],
+      "utils/react": [
+        "./dist/types/utils/react/index.d.ts"
+      ],
+      "utils/redux": [
+        "./dist/types/utils/redux/index.d.ts"
+      ],
+      "utils/redux-saga": [
+        "./dist/types/utils/redux-saga/index.d.ts"
+      ],
+      "utils/ssr": [
+        "./dist/types/utils/ssr/index.d.ts"
+      ],
+      "utils/web/analytics": [
+        "./dist/types/utils/web/analytics/index.d.ts"
+      ],
+      "utils/web/storage": [
+        "./dist/types/utils/web/storage/index.d.ts"
+      ],
+      "utils/webpack": [
+        "./dist/types/utils/webpack/index.d.ts"
+      ]
+    }
+  }
+}
