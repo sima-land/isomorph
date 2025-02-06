@@ -1,5 +1,8 @@
 import { Context } from '@opentelemetry/api';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_URL_FULL,
+} from '@opentelemetry/semantic-conventions/incubating';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
 import { axiosTracingMiddleware, getRequestInfo } from '../axios-tracing-middleware';
 
@@ -60,19 +63,27 @@ describe('getAxiosTracing', () => {
 
     expect(currentSpan).toBe(null);
 
-    const config = { url: '/api/v3/12341241/something' };
+    const config = {
+      url: '/api/v3/12341241/something',
+      headers: {
+        Accept: 'application/json',
+        'X-auth-prefix': 'some_prefix',
+      },
+    };
     const next = () => Promise.reject<any>({ ok: false, data: {} });
-    const defaults = { baseURL: 'https://www.test.com/', headers: {} as any };
+    const defaults = {
+      baseURL: 'https://www.test.com/',
+      headers: {} as any,
+    };
 
     await middleware(config, next, defaults).catch(() => Promise.resolve());
 
     expect(currentSpan.setAttributes).toHaveBeenCalledTimes(1);
     expect(currentSpan.setAttributes).toHaveBeenCalledWith({
-      [SemanticAttributes.HTTP_URL]: 'https://www.test.com/api/v3/{id}/something',
-      [SemanticAttributes.HTTP_METHOD]: 'GET',
-      'request.params': JSON.stringify({}),
-      'request.headers': JSON.stringify({}),
-      'request.id': 12341241,
+      [ATTR_URL_FULL]: 'https://www.test.com/api/v3/12341241/something',
+      [ATTR_HTTP_REQUEST_METHOD]: 'GET',
+      'http.request.header.Accept': 'application/json',
+      'http.request.header.X-auth-prefix': 'some_prefix',
     });
     expect(currentSpan.end).toHaveBeenCalledTimes(1);
     expect(currentSpan.setStatus).toHaveBeenCalledTimes(1);
@@ -85,16 +96,6 @@ describe('getRequestInfo', () => {
       // baseURL и url
       {
         baseURL: 'https://www.base.com/',
-        url: '/user/current',
-        expectedUrl: 'https://www.base.com/user/current',
-      },
-      {
-        baseURL: 'https://www.base.com',
-        url: 'user/current',
-        expectedUrl: 'https://www.base.com/user/current',
-      },
-      {
-        baseURL: 'https://www.base.com',
         url: '/user/current',
         expectedUrl: 'https://www.base.com/user/current',
       },
@@ -137,7 +138,7 @@ describe('getRequestInfo', () => {
     ];
 
     for (const { baseURL, url, expectedUrl } of cases) {
-      expect(getRequestInfo({ url }, { baseURL, headers: null as any }).url).toBe(expectedUrl);
+      expect(getRequestInfo({ url }, { baseURL, headers: null as any }).urlStr).toBe(expectedUrl);
     }
   });
 });

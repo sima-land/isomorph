@@ -1,8 +1,15 @@
 import type express from 'express';
 import type { Resolve } from '../../../di';
 import { KnownToken } from '../../../tokens';
-import { ROOT_CONTEXT, propagation, trace } from '@opentelemetry/api';
+import { Attributes, ROOT_CONTEXT, propagation, trace } from '@opentelemetry/api';
 import { PAGE_HANDLER_EVENT_TYPE } from '../../server';
+import {
+  ATTR_ERROR_TYPE,
+  ATTR_HTTP_REQUEST_HEADER,
+  ATTR_HTTP_RESPONSE_BODY_SIZE,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_URL_PATH,
+} from '@opentelemetry/semantic-conventions/incubating';
 
 /**
  * Провайдер промежуточного слоя трассировки входящих http-запросов.
@@ -17,16 +24,14 @@ export function provideExpressTracingMiddleware(resolve: Resolve): express.Handl
    * @param req Входящий http-запрос.
    * @return Атрибуты.
    */
-  const getConventionalRequestAttrs = (
-    req: express.Request,
-  ): Record<string, string | undefined> => {
-    const result: Record<string, string | undefined> = {
-      'request.path': req.originalUrl,
+  const getConventionalRequestAttrs = (req: express.Request): Attributes => {
+    const result: Attributes = {
+      [ATTR_URL_PATH]: req.originalUrl,
     };
 
     for (const headerName in req.headers) {
       if (headerName.toLowerCase().startsWith('simaland-')) {
-        result[headerName] = req.header(headerName);
+        result[`${ATTR_HTTP_REQUEST_HEADER(headerName)}`] = req.header(headerName);
       }
     }
 
@@ -35,7 +40,7 @@ export function provideExpressTracingMiddleware(resolve: Resolve): express.Handl
 
   return (req, res, next) => {
     const externalContext = propagation.extract(ROOT_CONTEXT, req.headers);
-    const rootSpan = tracer.startSpan('response', undefined, externalContext);
+    const rootSpan = tracer.startSpan(`${req.method} ${req.path}`, undefined, externalContext);
 
     rootSpan.setAttributes(getConventionalRequestAttrs(req));
 
@@ -48,7 +53,11 @@ export function provideExpressTracingMiddleware(resolve: Resolve): express.Handl
     };
 
     res.once(PAGE_HANDLER_EVENT_TYPE.renderStart, () => {
-      res.locals.tracing.renderSpan = tracer.startSpan('render', undefined, rootContext);
+      res.locals.tracing.renderSpan = tracer.startSpan(
+        'react:renderToString',
+        undefined,
+        rootContext,
+      );
 
       res.once(PAGE_HANDLER_EVENT_TYPE.renderFinish, () => {
         res.locals.tracing.renderSpan.end();
@@ -56,6 +65,12 @@ export function provideExpressTracingMiddleware(resolve: Resolve): express.Handl
     });
 
     res.once('finish', () => {
+      const contentLength = res.getHeader('content-length') as string;
+      rootSpan.setAttributes({
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: String(res.statusCode),
+        ...(res.statusCode > 400 && { [ATTR_ERROR_TYPE]: String(res.statusCode) }),
+        ...(contentLength && { [ATTR_HTTP_RESPONSE_BODY_SIZE]: contentLength }),
+      });
       rootSpan.end();
     });
 
