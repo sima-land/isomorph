@@ -55,6 +55,7 @@ function* exampleSaga(...params) {
 
 ```ts
 import { configureStore } from '@reduxjs/toolkit';
+import { createSagaMiddleware } from '@sima-land/isomorph/utils/redux-saga';
 
 
 function async initApp(logger) {
@@ -79,6 +80,7 @@ function async initApp(logger) {
 
 ```ts
 import { configureStore } from '@reduxjs/toolkit';
+import { createSagaMiddleware } from '@sima-land/isomorph/utils/redux-saga';
 
 function initApp(logger) {
     const onError = logger.error;
