@@ -1,7 +1,7 @@
 import type { Middleware } from '../../../http';
 import { SpanStatusCode, type Context, type Tracer } from '@opentelemetry/api';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { hideFirstId } from '../../isomorphic/utils/hide-first-id';
+import { ATTR_HTTP_REQUEST_METHOD, ATTR_URL_FULL } from '@opentelemetry/semantic-conventions';
+import { getSemanticHeaders } from './telemetry';
 
 /**
  * Вернет новый промежуточный слой трассировки для fetch.
@@ -11,17 +11,17 @@ import { hideFirstId } from '../../isomorphic/utils/hide-first-id';
  */
 export function getFetchTracing(tracer: Tracer, rootContext: Context): Middleware {
   return async (request, next) => {
-    const [url, foundId] = hideFirstId(new URL(request.url).pathname); // @todo тут бы помог URLPattern
-    const span = tracer.startSpan(`HTTP ${request.method} ${url}`, undefined, rootContext);
+    const url = new URL(request.url);
+    const span = tracer.startSpan(
+      `fetch ${request.method} ${url.pathname}`,
+      undefined,
+      rootContext,
+    );
 
     span.setAttributes({
-      [SemanticAttributes.HTTP_URL]: url,
-      [SemanticAttributes.HTTP_METHOD]: request.method,
-      'request.params': JSON.stringify(new URL(request.url).searchParams),
-      'request.headers': JSON.stringify(request.headers),
-
-      // если нашли id - добавляем в теги
-      ...(foundId && { 'request.id': foundId }),
+      [ATTR_URL_FULL]: url.href,
+      [ATTR_HTTP_REQUEST_METHOD]: request.method,
+      ...getSemanticHeaders(request.headers),
     });
 
     try {

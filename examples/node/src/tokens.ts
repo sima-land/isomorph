@@ -16,6 +16,7 @@ export const TOKEN = {
   Pages: {
     posts: createToken<Handler>('pages/posts'),
     authors: createToken<Handler>('pages/authors'),
+    tracing: createToken<Handler>('pages/tracing'),
   },
   Entities: {
     Post: {

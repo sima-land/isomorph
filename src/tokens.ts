@@ -52,10 +52,8 @@ export const KnownToken = {
   Tracing: {
     tracer: createToken<Tracer>('tracing/tracer'),
     spanExporter: createToken<SpanExporter>('tracing/span-exporter'),
-    tracerProvider: createToken<BasicTracerProvider>('tracing/tracer-provider'),
-
-    // @todo перенести в KnownToken.Telemetry.Resource?
-    tracerProviderResource: createToken<Resource>('tracing/resource'),
+    provider: createToken<BasicTracerProvider>('tracing/provider'),
+    resource: createToken<Resource>('tracing/resource'),
   },
 
   /** Токены компонентов сбора метрик. */
