@@ -40,6 +40,9 @@ export const KnownToken = {
 
     /** Токен базовой конфигурации. */
     base: createToken<BaseConfig>('config/base'),
+
+    /** Токен публичных переменных среды. */
+    publicEnvs: createToken<Record<string, string | undefined>>('config/public-envs'),
   },
 
   /** Токен компонента кеша. */

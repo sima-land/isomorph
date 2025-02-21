@@ -22,6 +22,7 @@ import { provideTracingProvider } from './providers/telemetry-tracer-provider';
 import { provideTracingResource } from './providers/telemetry-tracer-resource';
 import { provideMainExpressApp } from './providers/main-express-app';
 import { ExpressRouteList } from './types';
+import { providePublicEnvs } from './providers/public-envs';
 
 /**
  * Возвращает preset с зависимостями по умолчанию для frontend-микросервисов на Node.js.
@@ -35,6 +36,7 @@ export function PresetNode(customize?: PresetTuner): Preset {
   // config
   preset.set(KnownToken.Config.source, provideConfigSource);
   preset.set(KnownToken.Config.base, provideBaseConfig);
+  preset.set(KnownToken.Config.publicEnvs, providePublicEnvs);
 
   // log
   preset.set(KnownToken.logger, provideLogger);

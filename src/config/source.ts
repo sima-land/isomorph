@@ -19,5 +19,10 @@ export function createConfigSource(dictionary: Dictionary): ConfigSource {
     Object.assign(source, __ISOMORPH_ENV__);
   }
 
+  // докидываем публичные переменные сервиса из глобального окружения
+  if (source.APP_NAME && typeof (globalThis as any)[`${source.APP_NAME}__envs`] !== 'undefined') {
+    Object.assign(source, (globalThis as any)[`${source.APP_NAME}__envs`]);
+  }
+
   return new Env(source);
 }

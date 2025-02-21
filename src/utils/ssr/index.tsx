@@ -6,6 +6,7 @@ import jsesc from 'jsesc';
 export interface BridgeServerSide {
   rootElementId: string;
   serverDataKey: string;
+  publicEnvsKey: string;
 }
 
 /**
@@ -29,6 +30,7 @@ export const SsrBridge = {
     return {
       rootElementId: `${serviceKey}__root`,
       serverDataKey: `${serviceKey}__serverData`,
+      publicEnvsKey: `${serviceKey}__envs`,
     };
   },
 
