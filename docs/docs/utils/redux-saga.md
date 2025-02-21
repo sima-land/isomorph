@@ -8,11 +8,11 @@ description: Утилиты для более удобной работы с red
 
 ## takeChain
 
-Сага собирает все экшены с типом который мы передали в качестве аргумента в одну коллекцию, после отлова каждого экшена из списка она проверяет - все ли экшены из списка были собраны, если это утверждение верно - вызывается эффект с параметрами и массивом отловленных экшенов.
+Эффект собирает все экшены с типом которые мы передали в качестве аргумента в одну коллекцию, после получения каждого экшена из списка он проверяет - все ли экшены из списка были собраны, если это утверждение верно - вызывается эффект с параметрами и массивом полученных экшенов.
 
 :::tip
 
-- Сага не останавливает весь тред в котором работает в ожидании завершения, так как запускается через `fork`!
+- Эффект не останавливает весь тред в котором работает в ожидании завершения, так как запускается через `fork`!
 - Дубликаты экшенов также попадают в коллекцию
 - Если экшены не были собраны за заданное время (timeout), эффект будет также вызван, но в эффект будут переданы только экшены которые были собраны в коллекцию за это время.
   
@@ -29,13 +29,13 @@ function* exampleTakeChain() {
     const actions = [createAction('action1'), createAction('action2')]
     const options = 'example options';
 
-    yield takeChain(200,actions, exampleSaga,options);
+    yield takeChain(200, actions, exampleSaga, options);
     yield put(actions[0]);
     yield put(actions[1]);
 }
 
 function* exampleSaga(...params) {
-    yield call(console.log,params) // console.log('example options',[createAction('action1'), createAction('action2')])
+    yield call(console.log, params) // console.log('example options',[createAction('action1'), createAction('action2')])
 }
 
 ```
@@ -44,12 +44,11 @@ function* exampleSaga(...params) {
 
 :::caution
 
-В данный момент не актуально и можно сказать deprecated, так как в redux-saga была проблема с ней из-за чего советуется пока использовать оригинальный `createSagaMiddleware` из redux-saga.
-Доработки будут внесены позже.
+Не рекомендуется к использованию, так как некорректно работает с redux-saga. Следует использовать оригинальный `createSagaMiddleware` из redux-saga.
 
 :::
 
-- Обёртка над оригинальным `createSagaMiddleware` из redux-saga, расширяет и делает более удобным его использование.
+Обёртка над оригинальным `createSagaMiddleware` из redux-saga, расширяет функционал методами timeout и run, примеры отображены ниже. 
 
 #### Пример использования на SSR
 
