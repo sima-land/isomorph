@@ -148,7 +148,7 @@ app.invoke([TOKEN.config, TOKEN.Known.logger], (config, logger) => {
 - Провайдер специфичных параметров, которые frontend-микросервис будет получать в запросе. [KnownToken.Http.Handler.Request.specificParams]
 - Специфичные для наших микросервисов дополнительные данные ответа. [KnownToken.Http.Handler.Response.specificExtras]
 - Провайдер объекта событий ответа. [KnownToken.Http.Handler.Response.events]
-- Объект { js: '', css: '' } [KnownToken.Http.Handler.Page.assets]
+- Объект `{ js: '', css: '' }` [KnownToken.Http.Handler.Page.assets]
 - Провайдер helmet-компонента. Этот компонент является контейнером для результата render-функции. [KnownToken.Http.Handler.Page.helmet]
 - Провайдер render-функции. [KnownToken.Http.Handler.Page.render]
 - Провайдер функции рендера элемента в строку. [KnownToken.Http.Handler.Page.elementToString]
