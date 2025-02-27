@@ -6,6 +6,7 @@ import type { EnvPluginOptions } from './types';
  * Плагин для зашивания переменных среды в сборки.
  * В браузерную сборку зашьёт только переменные с префиксом "PUBLIC_".
  * ВАЖНО: все зашиваемые переменные будут доступны через глобальный объект __ISOMORPH_ENV__.
+ * @deprecated
  */
 export class EnvPlugin implements WebpackPluginInstance {
   options: Required<EnvPluginOptions>;
