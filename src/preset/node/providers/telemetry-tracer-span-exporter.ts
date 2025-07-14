@@ -12,8 +12,15 @@ const envPrefix = 'OTEL_EXPORTER_OTLP_';
  */
 export function provideSpanExporter(resolve: Resolve): OTLPTraceExporter {
   const source = resolve(KnownToken.Config.source);
+  const headers = source.has(`${envPrefix}HEADERS`)
+    ? JSON.parse(source.get(`${envPrefix}HEADERS`, '{}'))
+    : undefined;
+  const url = new URL(source.get(`${envPrefix}URL`, 'http://localhost:4317'));
+
+  if (source.has(`${envPrefix}PORT`)) url.port = source.get(`${envPrefix}PORT`, '');
 
   return new OTLPTraceExporter({
-    url: source.get(`${envPrefix}URL`, ''),
+    url: url.toString(),
+    headers,
   });
 }
