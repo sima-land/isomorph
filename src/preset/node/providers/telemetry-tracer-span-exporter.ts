@@ -15,12 +15,12 @@ export function provideSpanExporter(resolve: Resolve): OTLPTraceExporter {
   const headers = source.has(`${envPrefix}HEADERS`)
     ? JSON.parse(source.get(`${envPrefix}HEADERS`, '{}'))
     : undefined;
-  const url = new URL(source.get(`${envPrefix}URL`, 'http://localhost:4317'));
-
-  if (source.has(`${envPrefix}PORT`)) url.port = source.get(`${envPrefix}PORT`, '');
 
   return new OTLPTraceExporter({
-    url: url.toString(),
+    url: source.get(
+      `${envPrefix}URI`,
+      `${source.get(`${envPrefix}HOSTNAME`, 'localhost')}:${source.get(`${envPrefix}PORT`, '4317')}`,
+    ),
     headers,
   });
 }
