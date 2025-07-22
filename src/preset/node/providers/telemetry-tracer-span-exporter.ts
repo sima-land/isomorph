@@ -17,7 +17,7 @@ export function provideSpanExporter(resolve: Resolve): OTLPTraceExporter {
     : undefined;
   
   const url = new URL(source.get(`${envPrefix}ENTRYPOINT`) || `${source.get(`${envPrefix}PROTOCOL`, 'https')}://${source.get(`${envPrefix}HOSTNAME`, 'localhost')}`);
-  url.port = source.get(`${envPrefix}PORT`, url.port);
+  url.port = source.get(`${envPrefix}PORT`, '4317');
 
   return new OTLPTraceExporter({
     url: url.toString(),
