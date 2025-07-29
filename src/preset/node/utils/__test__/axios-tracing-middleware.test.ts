@@ -3,14 +3,14 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions/incubating';
-import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
+import { Span } from '@opentelemetry/sdk-trace-base';
 import { axiosTracingMiddleware, getRequestInfo } from '../axios-tracing-middleware';
 
 describe('getAxiosTracing', () => {
   it('should handle success response', async () => {
     let currentSpan: Span = null as any;
 
-    const tracer: Tracer = {
+    const tracer = {
       startSpan: jest.fn(() => {
         const span: Span = {
           setAttributes: jest.fn(),
@@ -43,7 +43,7 @@ describe('getAxiosTracing', () => {
   it('should handle failure response', async () => {
     let currentSpan: Span = null as any;
 
-    const tracer: Tracer = {
+    const tracer = {
       startSpan: jest.fn(() => {
         const span: Span = {
           setAttributes: jest.fn(),
