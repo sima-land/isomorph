@@ -7,11 +7,11 @@ import {
   osDetector,
   processDetector,
   Resource,
-} from "@opentelemetry/resources";
-import * as SemanticArgs from "@opentelemetry/semantic-conventions/incubating";
-import { KnownToken } from "../../../tokens";
+} from '@opentelemetry/resources';
+import * as SemanticArgs from '@opentelemetry/semantic-conventions/incubating';
+import { KnownToken } from '../../../tokens';
 
-import type { Resolve } from "../../../di";
+import type { Resolve } from '../../../di';
 
 /**
  * Провайдер объекта Resource.
